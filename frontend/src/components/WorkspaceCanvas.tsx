@@ -4,6 +4,7 @@ import { useWorkspaceStore } from '../store/workspaceStore';
 import { SeedInputCanvas } from './SeedInputCanvas';
 import { SeedDnaViewer } from './SeedDnaViewer';
 import { WorldCandidatesCanvas } from './WorldCandidatesCanvas';
+import { WorldSelectionCanvas } from './WorldSelectionCanvas';
 
 export const WorkspaceCanvas: React.FC = () => {
   const {
@@ -27,7 +28,7 @@ export const WorkspaceCanvas: React.FC = () => {
         inspectorOpen ? 'mr-0 md:mr-80 lg:mr-96' : ''
       }`}
     >
-      <div className={`w-full ${activeStage === 'worlds' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
+      <div className={`w-full ${activeStage === 'worlds' || activeStage === 'choose' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
         {/* Dynamic Stage Canvas View */}
         {activeStage === 'seed' && <SeedInputCanvas />}
 
@@ -35,7 +36,9 @@ export const WorkspaceCanvas: React.FC = () => {
 
         {activeStage === 'worlds' && <WorldCandidatesCanvas />}
 
-        {activeStage !== 'seed' && activeStage !== 'understand' && activeStage !== 'worlds' && (
+        {activeStage === 'choose' && <WorldSelectionCanvas />}
+
+        {activeStage !== 'seed' && activeStage !== 'understand' && activeStage !== 'worlds' && activeStage !== 'choose' && (
           <div className="py-12 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 flex items-center justify-center mx-auto">
               <Compass className="w-6 h-6 animate-pulse" />
@@ -44,16 +47,16 @@ export const WorkspaceCanvas: React.FC = () => {
               Stage: {activeStage}
             </h2>
             <p className="text-sm text-slate-400 max-w-md mx-auto">
-              Human world selection will activate in Phase 4 (Human World Selection).
+              Universe unfolding will activate in Phase 5 (Stage-by-Stage Unfolding Pipeline).
             </p>
             <div className="pt-2">
               <button
                 type="button"
-                onClick={() => setActiveStage('worlds')}
+                onClick={() => setActiveStage('choose')}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Return to Three Worlds</span>
+                <span>Return to World Selection</span>
               </button>
             </div>
           </div>

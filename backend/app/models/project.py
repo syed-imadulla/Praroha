@@ -12,6 +12,7 @@ class ProjectBase(SQLModel):
     title: str = Field(index=True)
     seed_text: str = Field(default="")
     status: str = Field(default="draft")
+    selected_world_id: Optional[str] = Field(default=None, nullable=True)
 
 
 class Project(ProjectBase, table=True):

@@ -12,6 +12,9 @@ export const InspectorDrawer: React.FC = () => {
     setInspectorTab,
     seedDNA,
     worlds,
+    seedText,
+    selectedWorldId,
+    selectedWorldRationale,
   } = useWorkspaceStore();
 
   return (
@@ -170,23 +173,118 @@ export const InspectorDrawer: React.FC = () => {
                 <div className="p-3 rounded-lg bg-canvas-card/60 border border-canvas-border text-xs">
                   <div className="flex items-center gap-1.5 text-emerald-400 font-medium mb-1">
                     <GitCommit className="w-3.5 h-3.5" />
-                    <span>Causal Provenance Lineage</span>
+                    <span>Active Causal Provenance Trail</span>
                   </div>
                   <p className="text-slate-400 leading-relaxed text-[11px]">
-                    Every character, location, rule, and scene maintains an explicit parent-child edge back to its generating world candidate and seed.
+                    Phase 4 establishes the immutable human selection edge in the project's causal DAG.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-2">
-                  <div className="text-slate-500 font-mono text-[10px] uppercase">
-                    Graph Engine
+                {/* Step 1: Raw Seed Node */}
+                <div className="p-3.5 rounded-xl bg-slate-900/70 border border-cyan-800/40 space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                      Step 1 • Root Seed
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      Immutable
+                    </span>
                   </div>
-                  <div className="text-slate-300 font-mono text-[11px]">
-                    DAG Relationships: derived_from, constrained_by, selected_by
+                  <p className="text-slate-300 text-[11.5px] italic line-clamp-3">
+                    "{seedText || 'No seed text recorded'}"
+                  </p>
+                </div>
+
+                {/* Vertical Connector */}
+                <div className="flex justify-center -my-2">
+                  <div className="w-0.5 h-5 bg-gradient-to-b from-cyan-500/40 to-emerald-500/40" />
+                </div>
+
+                {/* Step 2: Seed DNA Node */}
+                <div className="p-3.5 rounded-xl bg-slate-900/70 border border-emerald-800/40 space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                      Step 2 • Seed DNA
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {seedDNA ? seedDNA.model_used : 'Pending'}
+                    </span>
                   </div>
-                  <div className="text-slate-400 text-[11px]">
-                    Traceability visualization activates in Phase 6.
+                  {seedDNA ? (
+                    <div className="space-y-1">
+                      <p className="text-slate-200 text-[11.5px] font-medium line-clamp-2">
+                        {seedDNA.dna.premise}
+                      </p>
+                      <div className="flex items-center gap-2 text-[10px] text-slate-400 pt-1">
+                        <span>Tone: {seedDNA.dna.tone}</span>
+                        <span>•</span>
+                        <span>{seedDNA.dna.themes?.length || 0} themes</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 italic text-[11px]">DNA extraction pending in Stage 2</p>
+                  )}
+                </div>
+
+                {/* Vertical Connector */}
+                <div className="flex justify-center -my-2">
+                  <div className="w-0.5 h-5 bg-gradient-to-b from-emerald-500/40 to-amber-500/40" />
+                </div>
+
+                {/* Step 3: Human World Selection Node */}
+                <div className={`p-3.5 rounded-xl border space-y-2 text-xs transition-all ${
+                  selectedWorldId
+                    ? 'bg-slate-900/90 border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.1)]'
+                    : 'bg-slate-900/40 border-slate-800'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                      selectedWorldId
+                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      Step 3 • Human World Selection
+                    </span>
+                    {selectedWorldId && (
+                      <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        Human Verified
+                      </span>
+                    )}
                   </div>
+
+                  {selectedWorldId ? (
+                    (() => {
+                      const selWorld = worlds.find((w) => w.id === selectedWorldId);
+                      return (
+                        <div className="space-y-2">
+                          <div>
+                            <div className="text-slate-100 font-bold text-sm">
+                              {selWorld?.title || 'Selected World'}
+                            </div>
+                            <div className="text-[10px] text-amber-300 font-mono">
+                              {selWorld?.archetype}
+                            </div>
+                          </div>
+                          {selectedWorldRationale && (
+                            <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800/80 space-y-1">
+                              <span className="text-[10px] uppercase font-bold text-slate-400">
+                                Creator Rationale:
+                              </span>
+                              <p className="text-[11px] text-slate-300 italic leading-relaxed">
+                                "{selectedWorldRationale}"
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-slate-500 italic text-[11px]">
+                      Awaiting human world choice in Stage 4
+                    </p>
+                  )}
                 </div>
               </div>
             )}

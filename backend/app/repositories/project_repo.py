@@ -1,10 +1,11 @@
 import json
-from typing import AsyncGenerator, List, Optional
+from typing import AsyncGenerator, List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, select
 from backend.app.config import settings
 from backend.app.models.dna import SeedDNA, SeedDNARecord
 from backend.app.models.project import Asset, AssetCreate, Project, ProjectCreate
+from backend.app.models.selection import WorldSelectionRecord
 from backend.app.models.world import WorldCandidate, WorldCandidateRecord
 
 engine = create_async_engine(
@@ -24,6 +25,16 @@ async def init_db() -> None:
     """Initialize database tables asynchronously."""
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+
+        def _migrate_columns(connection):
+            from sqlalchemy import inspect, text
+            inspector = inspect(connection)
+            if "projects" in inspector.get_table_names():
+                cols = [c["name"] for c in inspector.get_columns("projects")]
+                if "selected_world_id" not in cols:
+                    connection.execute(text("ALTER TABLE projects ADD COLUMN selected_world_id VARCHAR"))
+
+        await conn.run_sync(_migrate_columns)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -176,5 +187,89 @@ class ProjectRepository:
         )
         candidates_res = await self.session.execute(stmt)
         return list(candidates_res.scalars().all())
+
+    async def save_world_selection(
+        self,
+        project_id: str,
+        candidate_id: str,
+        user_rationale: Optional[str] = None,
+    ) -> WorldSelectionRecord:
+        """
+        Enforce selection validation:
+        1. Candidate exists.
+        2. Candidate belongs to project.
+        3. Candidate.batch_id matches the project's latest world generation batch.
+        4. Otherwise reject by raising ValueError / KeyError.
+        """
+        # 0. Check if project exists and whether Stage 5 has already begun
+        project = await self.get_project(project_id)
+        if not project:
+            raise KeyError(f"Project with ID '{project_id}' not found.")
+        if project.status in ["unfolding", "unfolded", "bible_generated", "characters_generated", "scenes_generated"]:
+            raise ValueError("World selection is locked because Stage 5 universe unfolding has already begun. Branch the project to explore a different direction.")
+
+        # 1. Candidate exists
+        cand_stmt = select(WorldCandidateRecord).where(WorldCandidateRecord.id == candidate_id)
+        res = await self.session.execute(cand_stmt)
+        candidate = res.scalar_one_or_none()
+        if not candidate:
+            raise KeyError(f"World candidate '{candidate_id}' not found.")
+
+        # 2. Candidate belongs to project
+        if candidate.project_id != project_id:
+            raise ValueError(f"World candidate '{candidate_id}' does not belong to project '{project_id}'.")
+
+        # 3. Candidate.batch_id matches project's latest world generation batch
+        latest_batch_stmt = (
+            select(WorldCandidateRecord.batch_id)
+            .where(WorldCandidateRecord.project_id == project_id)
+            .order_by(WorldCandidateRecord.created_at.desc())
+            .limit(1)
+        )
+        batch_res = await self.session.execute(latest_batch_stmt)
+        latest_batch_id = batch_res.scalar_one_or_none()
+        if candidate.batch_id != latest_batch_id:
+            raise ValueError("Candidate belongs to an older generation batch. Only candidates from the latest batch can be selected.")
+
+        # 4. Create and persist selection record (preserving history)
+        selection = WorldSelectionRecord(
+            project_id=project_id,
+            world_candidate_id=candidate.id,
+            batch_id=candidate.batch_id,
+            user_rationale=user_rationale,
+        )
+        self.session.add(selection)
+
+        # Update project status and selected world pointer
+        project = await self.get_project(project_id)
+        if project:
+            project.selected_world_id = candidate.id
+            project.status = "world_selected"
+            self.session.add(project)
+
+        await self.session.commit()
+        await self.session.refresh(selection)
+        if project:
+            await self.session.refresh(project)
+
+        return selection
+
+    async def get_active_world_selection(
+        self,
+        project_id: str,
+    ) -> Optional[Tuple[WorldSelectionRecord, WorldCandidateRecord]]:
+        """Fetch the latest WorldSelectionRecord for project with its WorldCandidateRecord."""
+        stmt = (
+            select(WorldSelectionRecord, WorldCandidateRecord)
+            .join(WorldCandidateRecord, WorldSelectionRecord.world_candidate_id == WorldCandidateRecord.id)
+            .where(WorldSelectionRecord.project_id == project_id)
+            .order_by(WorldSelectionRecord.created_at.desc())
+            .limit(1)
+        )
+        res = await self.session.execute(stmt)
+        row = res.first()
+        if not row:
+            return None
+        return (row[0], row[1])
 
 

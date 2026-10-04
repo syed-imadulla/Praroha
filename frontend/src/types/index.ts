@@ -32,6 +32,7 @@ export interface Project {
   title: string;
   seed_text: string;
   status: string;
+  selected_world_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -118,5 +119,15 @@ export interface WorldCandidateRead {
   key_visual: string;
   model_used: string;
   fallback_used: boolean;
+  created_at: string;
+}
+
+export interface WorldSelectionRead {
+  id: string;
+  project_id: string;
+  world_candidate_id: string;
+  batch_id: string;
+  user_rationale: string | null;
+  selected_world: WorldCandidateRead;
   created_at: string;
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiClient } from '../api/client';
-import { Project, SeedDNARead, StageType, SystemHealthData, WorldCandidateRead } from '../types';
+import { Project, SeedDNARead, StageType, SystemHealthData, WorldCandidateRead, WorldSelectionRead } from '../types';
 
 interface WorkspaceState {
   activeStage: StageType;
@@ -10,6 +10,10 @@ interface WorkspaceState {
   activeProject: Project | null;
   seedDNA: SeedDNARead | null;
   worlds: WorldCandidateRead[];
+  selectedWorldId: string | null;
+  selectedWorldRationale: string;
+  activeSelection: WorldSelectionRead | null;
+  isSelectingWorld: boolean;
   isExtracting: boolean;
   extractionStep: string;
   isGeneratingWorlds: boolean;
@@ -26,6 +30,10 @@ interface WorkspaceState {
   setActiveProject: (project: Project | null) => void;
   setSeedDNA: (seedDNA: SeedDNARead | null) => void;
   setWorlds: (worlds: WorldCandidateRead[]) => void;
+  setSelectedWorldId: (id: string | null) => void;
+  setSelectedWorldRationale: (rationale: string) => void;
+  confirmWorldSelection: (candidateId: string, rationale?: string) => Promise<boolean>;
+  fetchActiveSelection: () => Promise<void>;
   setExtracting: (isExtracting: boolean, step?: string) => void;
   extractSeedDNA: (customSeed?: string) => Promise<boolean>;
   generateWorlds: () => Promise<boolean>;
@@ -47,6 +55,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeProject: null,
       seedDNA: null,
       worlds: [],
+      selectedWorldId: null,
+      selectedWorldRationale: '',
+      activeSelection: null,
+      isSelectingWorld: false,
       isExtracting: false,
       extractionStep: '',
       isGeneratingWorlds: false,
@@ -67,6 +79,66 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setActiveProject: (activeProject) => set({ activeProject }),
       setSeedDNA: (seedDNA) => set({ seedDNA }),
       setWorlds: (worlds) => set({ worlds }),
+      setSelectedWorldId: (selectedWorldId) => set({ selectedWorldId }),
+      setSelectedWorldRationale: (selectedWorldRationale) => set({ selectedWorldRationale }),
+
+      confirmWorldSelection: async (candidateId: string, rationale?: string) => {
+        const state = get();
+        const project = state.activeProject;
+        if (!project) return false;
+
+        set({ isSelectingWorld: true });
+        try {
+          const res = await apiClient.selectWorld(project.id, candidateId, rationale);
+          if (!res.success || !res.data) {
+            throw new Error(res.error?.message || 'Failed to select world candidate');
+          }
+
+          const selectionData = res.data;
+          set((s) => ({
+            selectedWorldId: selectionData.world_candidate_id,
+            selectedWorldRationale: selectionData.user_rationale || '',
+            activeSelection: selectionData,
+            isSelectingWorld: false,
+            activeProject: s.activeProject
+              ? {
+                  ...s.activeProject,
+                  status: 'world_selected',
+                  selected_world_id: selectionData.world_candidate_id,
+                }
+              : null,
+            unlockedStages: s.unlockedStages.includes('unfold')
+              ? s.unlockedStages
+              : [...s.unlockedStages, 'unfold'],
+            activeStage: 'unfold',
+            inspectorOpen: true,
+            inspectorTab: 'provenance',
+          }));
+          return true;
+        } catch (err) {
+          console.error('Failed to select world candidate:', err);
+          set({ isSelectingWorld: false });
+          return false;
+        }
+      },
+
+      fetchActiveSelection: async () => {
+        const project = get().activeProject;
+        if (!project) return;
+        try {
+          const res = await apiClient.getActiveSelection(project.id);
+          if (res.success && res.data) {
+            set({
+              activeSelection: res.data,
+              selectedWorldId: res.data.world_candidate_id,
+              selectedWorldRationale: res.data.user_rationale || '',
+            });
+          }
+        } catch (err) {
+          console.error('Error fetching active selection:', err);
+        }
+      },
+
       setExtracting: (isExtracting, step = '') =>
         set({ isExtracting, extractionStep: step }),
 
@@ -202,6 +274,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           activeProject: null,
           seedDNA: null,
           worlds: [],
+          selectedWorldId: null,
+          selectedWorldRationale: '',
+          activeSelection: null,
+          isSelectingWorld: false,
           isExtracting: false,
           extractionStep: '',
           isGeneratingWorlds: false,
@@ -219,6 +295,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         activeProject: state.activeProject,
         seedDNA: state.seedDNA,
         worlds: state.worlds,
+        selectedWorldId: state.selectedWorldId,
+        selectedWorldRationale: state.selectedWorldRationale,
+        activeSelection: state.activeSelection,
         inspectorTab: state.inspectorTab,
       }),
     }

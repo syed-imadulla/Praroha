@@ -1,4 +1,4 @@
-import { APIResponse, Project, SeedDNARead, SystemHealthData, WorldCandidateRead } from '../types';
+import { APIResponse, Project, SeedDNARead, SystemHealthData, WorldCandidateRead, WorldSelectionRead } from '../types';
 
 class ApiClient {
   private baseUrl = '/api';
@@ -73,6 +73,27 @@ class ApiClient {
   async getLatestWorlds(projectId: string): Promise<APIResponse<WorldCandidateRead[]>> {
     return this.request<WorldCandidateRead[]>(`/projects/${projectId}/worlds`);
   }
+
+  async selectWorld(
+    projectId: string,
+    candidateId: string,
+    rationale?: string
+  ): Promise<APIResponse<WorldSelectionRead>> {
+    return this.request<WorldSelectionRead>(
+      `/projects/${projectId}/worlds/${candidateId}/select`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          user_rationale: rationale || null,
+        }),
+      }
+    );
+  }
+
+  async getActiveSelection(projectId: string): Promise<APIResponse<WorldSelectionRead>> {
+    return this.request<WorldSelectionRead>(`/projects/${projectId}/selection`);
+  }
 }
 
 export const apiClient = new ApiClient();
+

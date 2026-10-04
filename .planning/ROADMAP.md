@@ -70,7 +70,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. User sees 3 world cards side-by-side with loglines, aesthetic palettes, and trade-offs.
   2. The workflow pauses and strictly prevents autonomous progression until human selection occurs.
   3. Selecting a world triggers confirmation and advances to unfolding mode.  
-**Plans**: TBD
+**Plans**: 2 plans (all completed)
+- [x] **04-01-PLAN.md** (Wave 1): Backend World Selection Models, Repository Methods with strict latest-batch validation, Endpoints, and Pytest Suite.
+- [x] **04-02-PLAN.md** (Wave 2): Frontend Selection Store, Stage 4 Choose Canvas, Glow & Dim Visual Hierarchy, Inspector Lineage Tab, and Playwright E2E Suite.
 
 ---
 

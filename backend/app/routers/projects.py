@@ -20,6 +20,7 @@ async def list_projects(
             title=p.title,
             seed_text=p.seed_text,
             status=p.status,
+            selected_world_id=p.selected_world_id,
             created_at=p.created_at,
             updated_at=p.updated_at,
         )
@@ -40,6 +41,7 @@ async def create_project(
         title=project.title,
         seed_text=project.seed_text,
         status=project.status,
+        selected_world_id=project.selected_world_id,
         created_at=project.created_at,
         updated_at=project.updated_at,
     )
@@ -63,6 +65,7 @@ async def get_project(
         title=project.title,
         seed_text=project.seed_text,
         status=project.status,
+        selected_world_id=project.selected_world_id,
         created_at=project.created_at,
         updated_at=project.updated_at,
     )

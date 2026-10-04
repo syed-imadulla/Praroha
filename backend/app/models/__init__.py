@@ -12,6 +12,12 @@ from backend.app.models.world import (
     WorldCandidateRecord,
     WorldCandidateRead,
 )
+from backend.app.models.selection import (
+    WorldSelectionBase,
+    WorldSelectionRecord,
+    WorldSelectionCreate,
+    WorldSelectionRead,
+)
 
 __all__ = [
     "Project",
@@ -29,5 +35,9 @@ __all__ = [
     "WorldCandidateBase",
     "WorldCandidateRecord",
     "WorldCandidateRead",
+    "WorldSelectionBase",
+    "WorldSelectionRecord",
+    "WorldSelectionCreate",
+    "WorldSelectionRead",
 ]
 
