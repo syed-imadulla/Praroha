@@ -90,9 +90,9 @@ export const UniverseCodexCanvas: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                Tattva 4: Generative Unfolding (Srishti)
+                Tattva 2: Forms Hidden in Formless • Stage 5 Unfolding
               </span>
-              <span className="text-xs text-slate-400 font-mono">• Stage 5 Codex</span>
+              <span className="text-xs text-slate-400 font-mono">• Universe Codex</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight">
               {selectedWorld ? selectedWorld.title : 'Progressive World Unfolding'}
@@ -231,7 +231,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 className="inline-flex items-center gap-3 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Unfold Universe (Tattva 4: Srishti)</span>
+                <span>Unfold Universe (Stage 5)</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

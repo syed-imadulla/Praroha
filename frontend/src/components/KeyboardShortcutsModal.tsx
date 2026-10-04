@@ -10,13 +10,13 @@ interface ShortcutRow {
 }
 
 const SHORTCUTS: ShortcutRow[] = [
-  { keys: ['1'], action: 'Jump to Stage 1: Seed (Avyakta)', category: 'Navigation' },
-  { keys: ['2'], action: 'Jump to Stage 2: Understand (Bija)', category: 'Navigation' },
-  { keys: ['3'], action: 'Jump to Stage 3: 3 Worlds (Srishti)', category: 'Navigation' },
-  { keys: ['4'], action: 'Jump to Stage 4: Choose (Sankalpa)', category: 'Navigation' },
-  { keys: ['5'], action: 'Jump to Stage 5: Unfold (Vistara)', category: 'Navigation' },
-  { keys: ['6'], action: 'Jump to Stage 6: Trace (Sambandha)', category: 'Navigation' },
-  { keys: ['7'], action: 'Jump to Stage 7: Refine (Parinamana & Dharana)', category: 'Navigation' },
+  { keys: ['1'], action: 'Jump to Stage 1: Seed (Raw Idea / Formless Potential)', category: 'Navigation' },
+  { keys: ['2'], action: 'Jump to Stage 2: Understand (Seed DNA)', category: 'Navigation' },
+  { keys: ['3'], action: 'Jump to Stage 3: 3 Worlds (Latent Manifestations)', category: 'Navigation' },
+  { keys: ['4'], action: 'Jump to Stage 4: Choose (Human Direction Gate)', category: 'Navigation' },
+  { keys: ['5'], action: 'Jump to Stage 5: Unfold (Universe Codex)', category: 'Navigation' },
+  { keys: ['6'], action: 'Jump to Stage 6: Trace (Causal Lineage DAG)', category: 'Navigation' },
+  { keys: ['7'], action: 'Jump to Stage 7: Refine (Continuity, Branch & Save)', category: 'Navigation' },
   { keys: ['i'], action: 'Toggle Inspector Drawer', category: 'Tools' },
   { keys: ['t'], action: 'Launch 7-Stage Guided Demo Tour', category: 'Tools' },
   { keys: ['?'], action: 'Toggle Keyboard Shortcuts Modal', category: 'General' },

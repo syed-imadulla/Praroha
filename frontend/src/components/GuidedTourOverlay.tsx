@@ -21,6 +21,7 @@ interface TourStepData {
   tattvaTitle: string;
   subtitle: string;
   description: string;
+  tattvaConnection: string;
   technicalFeat: string;
   icon: React.ReactNode;
   accentColor: string;
@@ -30,10 +31,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 1,
     stageName: 'Seed',
-    tattvaTitle: 'Avyakta (Starting Formless Potential)',
+    tattvaTitle: 'Stage 1: Seed — Formless Creative Potential',
     subtitle: 'The Raw Creative Spark',
     description:
-      'The creative journey begins in the formless realm. A raw, unconditioned user premise enters the system without premature structure or hallucinated boundaries.',
+      'The challenge asks us to explore how a small seed contains the potential for richer forms. Praroha begins with a compact, unconditioned creative premise—the formless starting condition from which all macro-scale forms will emerge.',
+    tattvaConnection:
+      'Forms hidden in formless: The entire macro-scale universe is latent within this small starting seed.',
     technicalFeat: 'Deterministic canonical presets, freeform seed capture, and instant demo bootstrap.',
     icon: <Sparkles className="w-5 h-5 text-amber-400" />,
     accentColor: 'from-amber-500/20 to-amber-900/10 border-amber-500/30 text-amber-400',
@@ -41,10 +44,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 2,
     stageName: 'Understand',
-    tattvaTitle: 'Tattva 1: Bija (First Manifestation)',
-    subtitle: 'Semantic Seed DNA Distillation',
+    tattvaTitle: 'Stage 2: Understand — Seed DNA Distillation',
+    subtitle: 'Uncovering the Hidden Structure',
     description:
-      'The raw seed crystallizes into its foundational semantic DNA—distilling core premise, implicit themes, key entities, negative constraints, aesthetic tone, and domain keywords.',
+      'Before generating worlds, the system analyzes the seed to distill its foundational semantic DNA—core premise, implicit themes, key entities, negative constraints, and tone.',
+    tattvaConnection:
+      'Forms hidden in formless: Revealing the inherent rules and latent structure buried within the formless seed.',
     technicalFeat: 'Pydantic v2 strict schema enforcement and negative boundary preservation.',
     icon: <Cpu className="w-5 h-5 text-cyan-400" />,
     accentColor: 'from-cyan-500/20 to-cyan-900/10 border-cyan-500/30 text-cyan-400',
@@ -52,10 +57,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 3,
     stageName: '3 Worlds',
-    tattvaTitle: 'Tattva 2: Srishti (Latent Forms)',
+    tattvaTitle: 'Stage 3: 3 Worlds — Latent Manifestations',
     subtitle: 'Exactly Three Creative Archetypes',
     description:
-      'From the distilled Seed DNA, the engine branches into exactly three contrasting creative archetypes (Mythic, Ecological Bio-City, Time Capsule) eliminating cognitive overload.',
+      'From the distilled Seed DNA, the generative engine reveals three distinct, high-contrast manifestations (Mythic, Ecological Bio-City, Relic Capsule) eliminating cognitive overload.',
+    tattvaConnection:
+      'Forms hidden in formless: Demonstrating how one seed can unfold into multiple divergent, coherent forms.',
     technicalFeat: 'High-contrast prompt design preventing archetype convergence or generic overlap.',
     icon: <Layers className="w-5 h-5 text-indigo-400" />,
     accentColor: 'from-indigo-500/20 to-indigo-900/10 border-indigo-500/30 text-indigo-400',
@@ -63,10 +70,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 4,
     stageName: 'Choose',
-    tattvaTitle: 'Tattva 3: Sankalpa (Creative Commitment)',
+    tattvaTitle: 'Stage 4: Choose — Human Creative Direction',
     subtitle: 'Human-in-the-Loop Choice Gate',
     description:
       'Creation is not autonomous autopilot. The creator commits to a single trajectory, recording their creative rationale before any downstream expansion is unlocked.',
+    tattvaConnection:
+      'Forms hidden in formless: Initial human agency selecting which latent form will be brought into full manifestation.',
     technicalFeat: 'Architectural choice gate rejecting unauthorized downstream expansion attempts.',
     icon: <Compass className="w-5 h-5 text-purple-400" />,
     accentColor: 'from-purple-500/20 to-purple-900/10 border-purple-500/30 text-purple-400',
@@ -74,10 +83,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 5,
     stageName: 'Unfold',
-    tattvaTitle: 'Tattva 4: Vistara (Universe Expansion)',
+    tattvaTitle: 'Stage 5: Unfold — Selected World Becomes a Universe',
     subtitle: '4-Layer Mini-Universe Codex',
     description:
-      'The chosen world expands into a rich mini-universe: World Bible (geography, timeline, canon facts), Cast Members, Socio-Emotional Relationships, and Pivotal Narrative Scenes.',
+      'The selected form expands into a complete mini-universe: World Bible (canon facts, physics rules, locations), grounded characters, socio-emotional dynamics, and narrative scenes.',
+    tattvaConnection:
+      'Forms hidden in formless: The compact seed has now unfolded into a rich, visible multi-dimensional universe.',
     technicalFeat: 'Atomic multi-table transaction persistence with strict foreign key integrity.',
     icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
     accentColor: 'from-emerald-500/20 to-emerald-900/10 border-emerald-500/30 text-emerald-400',
@@ -85,10 +96,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 6,
     stageName: 'Trace',
-    tattvaTitle: 'Tattva 5: Sambandha (Causal Lineage)',
+    tattvaTitle: 'Stage 6: Trace — Causal Lineage Back to Seed',
     subtitle: 'Multi-Lane Provenance DAG',
     description:
-      'Every downstream entity remains provably connected back to its origin. The interactive DAG reveals exact ancestor paths and causal lineage without leaking raw model CoT.',
+      'Every downstream entity remains provably connected back to its origin. The interactive DAG reveals exact ancestor paths and causal lineage without leaking raw model reasoning tokens.',
+    tattvaConnection:
+      'Forms hidden in formless: Proving that every single manifest atom originated directly from the unmanifest seed.',
     technicalFeat: 'Dynamic topological DAG layout with ancestor path glow and zoom/pan controls.',
     icon: <Activity className="w-5 h-5 text-sky-400" />,
     accentColor: 'from-sky-500/20 to-sky-900/10 border-sky-500/30 text-sky-400',
@@ -96,10 +109,12 @@ const TOUR_STEPS: TourStepData[] = [
   {
     stageNumber: 7,
     stageName: 'Refine',
-    tattvaTitle: 'Tattva 6: Parinamana & Dharana (Transformation & Persistence)',
+    tattvaTitle: 'Stage 7: Refine — Evolve while Preserving Continuity',
     subtitle: 'Versioned Refinement, Forking & Storage',
     description:
-      'The unfolded universe lives. Creators refine character motivations, fork isolated timeline branches with complete ID remapping, and export portable project bundles.',
+      'The unfolded universe lives. Creators refine characters and scenes with immutable version logs, fork isolated timeline branches with complete ID remapping, and export portable project bundles.',
+    tattvaConnection:
+      'Forms hidden in formless: Continuous evolutionary unfolding while preserving the identity of the original seed.',
     technicalFeat: 'Immutable entity revisions with visual diffs, branch isolation, and object storage snapshots.',
     icon: <GitBranch className="w-5 h-5 text-rose-400" />,
     accentColor: 'from-rose-500/20 to-rose-900/10 border-rose-500/30 text-rose-400',
@@ -134,6 +149,9 @@ export const GuidedTourOverlay: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                    Tattva 2: Forms Hidden in Formless
+                  </span>
                   <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
                     Stage {currentStepData.stageNumber} of 7 • {currentStepData.stageName}
                   </span>
@@ -153,7 +171,7 @@ export const GuidedTourOverlay: React.FC = () => {
           </div>
 
           {/* Body Content */}
-          <div className="p-4 sm:p-5 space-y-3.5">
+          <div className="p-4 sm:p-5 space-y-3">
             <div>
               <p className="text-xs font-medium text-white/50 uppercase tracking-wider mb-1">
                 {currentStepData.subtitle}
@@ -163,8 +181,17 @@ export const GuidedTourOverlay: React.FC = () => {
               </p>
             </div>
 
+            {/* Tattva 2 Connection Pill */}
+            <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/25 flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+              <div className="text-xs">
+                <span className="text-cyan-400 font-semibold">Tattva 2 Connection: </span>
+                <span className="text-cyan-100/90">{currentStepData.tattvaConnection}</span>
+              </div>
+            </div>
+
             {/* Technical Feat Pill */}
-            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-start gap-2.5">
+            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-start gap-2.5">
               <Shield className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div className="text-xs">
                 <span className="text-emerald-400 font-semibold">Technical Feat: </span>

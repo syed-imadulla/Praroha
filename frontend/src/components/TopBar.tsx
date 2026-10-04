@@ -51,15 +51,18 @@ export const TopBar: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-100 tracking-tight text-sm md:text-base font-sans">
-                Seed Unfold
-              </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/50">
+              <span className="font-bold text-slate-100 tracking-tight text-sm md:text-base font-sans">
                 Praroha
               </span>
+              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/50">
+                Tattva 2
+              </span>
+              <span className="hidden sm:inline text-[11px] text-slate-400 font-mono">
+                Forms hidden in formless
+              </span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-none truncate max-w-[200px] md:max-w-xs">
-              {activeProject ? activeProject.title : 'Human-Guided Creative Engine'}
+            <p className="text-[11px] text-slate-400 leading-none truncate max-w-[200px] md:max-w-xs mt-0.5">
+              {activeProject ? activeProject.title : 'Seed → Universe · Generative AI (Idea 1)'}
             </p>
           </div>
         </div>

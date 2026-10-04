@@ -173,7 +173,7 @@ export const RefineCanvas: React.FC = () => {
       <div className="space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono uppercase tracking-wider">
           <History className="w-3.5 h-3.5" />
-          <span>Tattva 6: Transformation & Persistence (Parinamana & Dharana)</span>
+          <span>Tattva 2: Forms Hidden in Formless • Stage 7 Refinement & Continuity</span>
         </div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

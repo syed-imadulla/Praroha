@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
-    "mtime": 1791097625.8956962,
-    "seen": 1791097877.3634965,
-    "ast_hash": "edfdb4f02b2ac2f16d2a43c00ea4909e",
+    "mtime": 1791107515.2533078,
+    "seen": 1791107850.3000767,
+    "ast_hash": "5d084101856bd6e8dc90c325874b7e24",
     "semantic_hash": ""
   },
   "frontend/src/components/StageProgressHeader.tsx": {
@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/TopBar.tsx": {
-    "mtime": 1791105820.5531027,
-    "seen": 1791106275.8671467,
-    "ast_hash": "817769303341abb1464865c62a9bb25d",
+    "mtime": 1791107428.4865255,
+    "seen": 1791107850.3000932,
+    "ast_hash": "47b2ef0d0bd572fb13606688df221095",
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
@@ -414,9 +414,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/SeedInputCanvas.tsx": {
-    "mtime": 1791105791.5984623,
-    "seen": 1791106275.8671422,
-    "ast_hash": "44423e09daf81808f79f5421b4f5c706",
+    "mtime": 1791107440.064363,
+    "seen": 1791107850.3000886,
+    "ast_hash": "fcb65c5254b8dbf2622b7a7056922f54",
     "semantic_hash": ""
   },
   ".planning/phases/02-seed-understanding-seed-dna/02-01-PLAN.md": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/UniverseCodexCanvas.tsx": {
-    "mtime": 1791102300.8392932,
-    "seen": 1791103973.265085,
-    "ast_hash": "c6dd2d7c69914ac32dcf155bbe16ec80",
+    "mtime": 1791107477.0178444,
+    "seen": 1791107850.300098,
+    "ast_hash": "f335f16db43cac235fdbd5e277fd052e",
     "semantic_hash": ""
   },
   ".planning/phases/05-progressive-world-unfolding/05-SUMMARY.md": {
@@ -762,9 +762,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/TraceabilityCanvas.tsx": {
-    "mtime": 1791105766.903769,
-    "seen": 1791106275.8671486,
-    "ast_hash": "512b41dea5c4831219e25b3a77bab90a",
+    "mtime": 1791107491.745638,
+    "seen": 1791107850.3000956,
+    "ast_hash": "e08a2d96e6857c7aba5e0869e76cc140",
     "semantic_hash": ""
   },
   ".planning/phases/06-traceability-provenance/06-01-PLAN.md": {
@@ -876,9 +876,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/RefineCanvas.tsx": {
-    "mtime": 1791102393.256162,
-    "seen": 1791103973.2650776,
-    "ast_hash": "783cd7da67dd8407a6336643cb0171b6",
+    "mtime": 1791107504.1034644,
+    "seen": 1791107850.3000815,
+    "ast_hash": "ab8dd1f3e690768abdcee5c29cd6011b",
     "semantic_hash": ""
   },
   "frontend/src/components/RefinementModal.tsx": {
@@ -906,15 +906,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/GuidedTourOverlay.tsx": {
-    "mtime": 1791105670.6929593,
-    "seen": 1791106275.8671303,
-    "ast_hash": "0ad01609ce5e6f25855b76e1bbee7920",
+    "mtime": 1791107572.684502,
+    "seen": 1791107850.3000734,
+    "ast_hash": "061bd09c98b2a842405c3e81e0623783",
     "semantic_hash": ""
   },
   "frontend/src/components/KeyboardShortcutsModal.tsx": {
-    "mtime": 1791105680.6598368,
-    "seen": 1791106275.8671339,
-    "ast_hash": "7611217b48c4481fe4d87b3b169191c4",
+    "mtime": 1791107527.5501354,
+    "seen": 1791107850.3000789,
+    "ast_hash": "cf4dcbc9145710c61f2b0d75b5e14ea8",
     "semantic_hash": ""
   },
   ".planning/phases/07-refine-branch-save/07-UAT.md": {
@@ -969,6 +969,48 @@
     "mtime": 1791105018.82797,
     "seen": 1791106275.867314,
     "ast_hash": "325a6c572a2ea43ecbd7b22cb8e312ff",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1791107785.5525146,
+    "seen": 1791107850.3003044,
+    "ast_hash": "408e4af1c2a3fadce7ef682c3ef005c1",
+    "semantic_hash": ""
+  },
+  "docs/architecture/AI_PIPELINE.md": {
+    "mtime": 1791107667.59217,
+    "seen": 1791107850.3003092,
+    "ast_hash": "dc62e2937670012cabc84e10e305f5fd",
+    "semantic_hash": ""
+  },
+  "docs/architecture/DATA_AND_STORAGE.md": {
+    "mtime": 1791107684.3009355,
+    "seen": 1791107850.3003106,
+    "ast_hash": "1668e994a068b63ca2b44ba360f304f6",
+    "semantic_hash": ""
+  },
+  "docs/architecture/PRAROHA_ARCHITECTURE.md": {
+    "mtime": 1791107701.658692,
+    "seen": 1791107850.3003147,
+    "ast_hash": "c772f8edfc805176e3950b1b4c1daeac",
+    "semantic_hash": ""
+  },
+  "docs/presentation/DEMO_SCRIPT.md": {
+    "mtime": 1791107733.6282432,
+    "seen": 1791107850.3003285,
+    "ast_hash": "12ff7f1ed57a942329026a00dc9d497d",
+    "semantic_hash": ""
+  },
+  "docs/presentation/JUDGE_EXPLANATION.md": {
+    "mtime": 1791107718.2724588,
+    "seen": 1791107850.30033,
+    "ast_hash": "6c57a54a72974e6eda19be61d2a66446",
+    "semantic_hash": ""
+  },
+  "docs/presentation/JUDGE_QA.md": {
+    "mtime": 1791107748.9190288,
+    "seen": 1791107850.3003316,
+    "ast_hash": "1704441806f2e64f929b1b1e1f996e76",
     "semantic_hash": ""
   }
 }

@@ -64,16 +64,16 @@ export const SeedInputCanvas: React.FC = () => {
     <div className="w-full max-w-4xl space-y-8 py-4">
       {/* Hero Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 text-xs font-medium tracking-wide">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 text-xs font-medium tracking-wide font-mono">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Stage 1: Raw Creative Ingestion</span>
+          <span>Tattva 2: Forms Hidden in Formless • Stage 1: Seed</span>
         </div>
 
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-100 font-sans">
           Plant the Creative Seed
         </h1>
         <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-          Provide an incomplete, evocative premise. Seed Unfold will perform an understanding pass to distill its structural DNA before branching into worlds.
+          Provide an incomplete, evocative premise. Praroha will progressively reveal the latent forms hidden within this seed through structured Generative AI unfolding.
         </p>
 
         {/* Instant Canonical Demo Launcher */}

@@ -302,7 +302,7 @@ export const InspectorDrawer: React.FC = () => {
                           Step 4 • Unfolded Codex
                         </span>
                         <span className="text-[10px] text-cyan-300 font-mono font-bold">
-                          Tattva 4 Complete
+                          Universe Unfolded
                         </span>
                       </div>
 
