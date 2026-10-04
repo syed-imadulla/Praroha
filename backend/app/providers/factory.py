@@ -13,11 +13,8 @@ def get_ai_provider() -> AIProvider:
     provider_name = (settings.AI_PROVIDER or "mock").lower()
 
     if provider_name == "gemini":
-        if not settings.GEMINI_API_KEY:
-            # Fallback to mock if API key is not configured
-            return MockProvider()
-        # In Phase 2, Google Gemini SDK provider will be instantiated here
-        return MockProvider()
+        from backend.app.providers.gemini_provider import GeminiProvider
+        return GeminiProvider()
     return MockProvider()
 
 
