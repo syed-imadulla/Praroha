@@ -1,12 +1,12 @@
 # Graph Report - Praroha  (2026-10-04)
 
 ## Corpus Check
-- 162 files · ~194,028 words
+- 162 files · ~194,181 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 4 file(s) not represented in the graph (top: .example 1, (none) 1, .css 1)
 
 ## Summary
-- 1368 nodes · 2794 edges · 110 communities (91 shown, 19 thin omitted)
+- 1369 nodes · 2795 edges · 102 communities (92 shown, 10 thin omitted)
 - Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 535 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
@@ -16,21 +16,21 @@
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- LineageService
+- SupabaseStorageProvider
 - Seed Unfold (Praroha)
 - frontend/package.json
 - apiClient
 - Acceptance Test Scenarios & Results
 - Phase 1: Foundation / Project Shell - Research
-- Implementation Decisions
+- Phase 1: Foundation / Project Shell - Context
 - Seed Unfold — Product Concepts Glossary
 - compilerOptions
 - v1 Requirements (MVP)
 - package.json
 - Phase Details
 - Phase 6 Research: Traceability & Provenance (TRAC-01 to TRAC-03)
-- models/__init__.py
-- AIProvider
+- Asset
+- routers/persistence.py
 - 2. The Three Demo Worlds
 - Automated Playwright Test Results
 - Phase 1 — Validation Strategy
@@ -59,40 +59,39 @@
 - Phase 2 — Validation Strategy
 - Phase 1: Foundation / Project Shell - Discussion Log
 - ADR-001: Core Architecture & Stack Selection
-- 06-01-PLAN.md
+- LineageService
 - GeminiProvider
 - Seed Unfold — Traceability & Provenance Model
-- test_unfold.py
-- APIResponse
+- test_providers.py
+- routers/dna.py
 - ADR-003: Cloud Object Storage and Asset Management
 - Phase 4 User Acceptance Testing (UAT) Report
 - main.py
-- project_repo.py
-- WorldSelectionRecord
+- project.py
+- models/__init__.py
 - Locked Decisions
-- .generate_worlds
+- Phase 3 Context: Three World Generation
 - api_success
 - useWorkspaceStore
-- worlds.py
+- extract_seed_dna
 - Phase 5 Research: Progressive World Unfolding
 - Phase 4 Research: Human World Selection
 - Phase 5 Execution Summary: Progressive World Unfolding (Tattva 4: Srishti)
 - Validation Checklist
-- models/selection.py
-- 2. Technical Investigation & Corrected Patterns
+- world.py
+- Implementation Decisions
 - MockProvider
 - 1. Questions & Locked Decisions
-- routers/selection.py
-- Technical Specifications
-- Key Topics & Alignment
-- EntityRevisionRecord
+- models/selection.py
+- Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback
+- Phase 3 Research: Three World Generation
+- Delivered Features
 - test_dna.py
 - test_persistence.py
-- conftest.py
-- Phase 6: Traceability & Provenance (Tattva 5: Sambandha) - Summary
-- PersistenceService
+- AIProvider
+- project_repo.py
 - Phase 7: Refine / Branch / Save (Tattva 6: Parinamana & Dharana) — Summary
-- Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback
+- httpx
 - Phase 8: Polish / Reliability / Demo — Research & Technical Spikes
 - 2. Technical Tasks
 - 2. Key Accomplishments & Deliverables
@@ -104,23 +103,17 @@
 - SeedPreset
 - Praroha AI Pipeline & Provider Architecture
 - Praroha 3-Minute Live Judging Demo Script
-- .upload
+- Praroha Data & Storage Architecture
 - Phase 8 User Acceptance Testing (UAT) Report
 - 2. Locked Implementation Decisions
-- Settings
 - StorageProvider
 - 2. Locked Decisions (Incorporating Plan Corrections)
-- SeedDNARead
-- routers/lineage.py
+- models/dna.py
 - Praroha Master Architecture: Tattva 2 & Idea 1
 - TraceabilityCanvas.tsx
-- pytest
-- Phase 3 Plan 01 Summary: Backend World Candidate Models, Provider & API
-- 2. Acceptance Criteria Checklist
 - Plan 01-02 Summary: Frontend Workspace Shell & End-to-End Integration
-- SeedDNA
+- Key Changes
 - Phase 3 Plan 02 Summary: Frontend Candidate Cards, Comparison Canvas & Inspector Integration
-- get_persistence_service
 
 ## God Nodes (most connected - your core abstractions)
 1. `ProjectRepository` - 89 edges
@@ -143,17 +136,17 @@
   .planning/phases/07-refine-branch-save/07-RESEARCH.md → backend/app/models/persistence.py
 - `1. Test Automation Matrix` --references--> `EntityRevisionRecord`  [INFERRED]
   .planning/phases/07-refine-branch-save/07-VALIDATION.md → backend/app/models/persistence.py
-- `Edge Relationships` --references--> `Asset`  [INFERRED]
-  docs/architecture/TRACEABILITY_MODEL.md → backend/app/models/project.py
+- `Common Pitfalls & Landmines` --references--> `Asset`  [INFERRED]
+  .planning/phases/01-foundation-project-shell/01-RESEARCH.md → backend/app/models/project.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (110 total, 19 thin omitted)
+## Communities (102 total, 10 thin omitted)
 
-### Community 0 - "LineageService"
-Cohesion: 0.22
-Nodes (5): AncestorPathRead, TraceEdge, TraceGraphRead, TraceNode, LineageService
+### Community 0 - "SupabaseStorageProvider"
+Cohesion: 0.17
+Nodes (4): SupabaseStorageProvider, test_supabase_storage_provider_fallback_on_network_error(), test_supabase_storage_provider_fallback_when_unset(), 13. Is Supabase actually being used right now?
 
 ### Community 1 - "Seed Unfold (Praroha)"
 Cohesion: 0.17
@@ -173,11 +166,11 @@ Nodes (10): Acceptance Test Scenarios & Results, Phase 3 UAT: Three World Genera
 
 ### Community 5 - "Phase 1: Foundation / Project Shell - Research"
 Cohesion: 0.10
-Nodes (20): 1. Monorepo Organization, 2. Standardized Response Envelope, 3. AI Provider ABC Contract, 4. Storage Provider ABC Contract, Architectural Responsibility Map, Architecture Patterns & Implementation Blueprint, Automated Test Commands, Backend Core (+12 more)
+Nodes (19): 1. Monorepo Organization, 2. Standardized Response Envelope, 3. AI Provider ABC Contract, 4. Storage Provider ABC Contract, Architectural Responsibility Map, Architecture Patterns & Implementation Blueprint, Automated Test Commands, Backend Core (+11 more)
 
-### Community 6 - "Implementation Decisions"
-Cohesion: 0.10
-Nodes (19): AI Provider Abstraction & Stub Provider, Architecture & Provenance Specifications, Canonical References, Deferred Ideas, Established Patterns, Existing Code Insights, Frontend-Backend Communication & Monorepo Structure, Implementation Decisions (+11 more)
+### Community 6 - "Phase 1: Foundation / Project Shell - Context"
+Cohesion: 0.15
+Nodes (12): Architecture & Provenance Specifications, Canonical References, Deferred Ideas, Established Patterns, Existing Code Insights, Integration Points, Phase 1: Foundation / Project Shell - Context, Phase Boundary (+4 more)
 
 ### Community 7 - "Seed Unfold — Product Concepts Glossary"
 Cohesion: 0.11
@@ -203,13 +196,13 @@ Nodes (12): Overview, Phase 1: Foundation / Project Shell, Phase 2: Seed Underst
 Cohesion: 0.17
 Nodes (11): 1.2 Node Schema (`TraceNode`), 1.3 Edge Schema (`TraceEdge`), 1.4 Lineage DAG Response (`TraceGraphRead`), 1. Domain Modeling: Nodes, Edges & Lineage, 2. Causal Explanation Engine (TRAC-03), 3.1 Stage 6 ("Trace") Canvas (`TraceabilityCanvas.tsx`), 3. Frontend Canvas & UX Architecture, 4. Test Strategy (+3 more)
 
-### Community 13 - "models/__init__.py"
-Cohesion: 0.17
-Nodes (13): CharacterBase, CharacterRead, CharacterRelationshipBase, CharacterRelationshipRead, FactionItem, get_utc_now(), LocationItem, SceneBase (+5 more)
+### Community 13 - "Asset"
+Cohesion: 0.27
+Nodes (7): Asset, AssetBase, AssetCreate, AssetRead, 1. Lineage Graph Model, Edge Relationships, Node Types
 
-### Community 14 - "AIProvider"
-Cohesion: 0.20
-Nodes (5): AIProvider, get_storage_provider(), test_storage_factory_supabase_resolution(), 1. Actual AI Provider Architecture, Components
+### Community 14 - "routers/persistence.py"
+Cohesion: 0.18
+Nodes (3): get_storage_provider(), health_check(), get_persistence_service()
 
 ### Community 15 - "2. The Three Demo Worlds"
 Cohesion: 0.22
@@ -235,10 +228,6 @@ Nodes (26): { chromium }, path, assert, { chromium }, runUAT(), assert, { chromi
 Cohesion: 0.33
 Nodes (5): ADR-002: Three-World Branching and Traceability DAG, Consequences, Context, Decision, Status
 
-### Community 21 - "ProjectRepository"
-Cohesion: 0.13
-Nodes (5): Asset, ProjectRepository, Delivered Features, Plan 01-01 Summary: Backend Shell, Provider Abstractions, and Persistence, Verification Evidence
-
 ### Community 22 - "Seed Unfold — Product Documentation"
 Cohesion: 0.33
 Nodes (5): Key Concept Definitions, Overview, Primary References, Seed Unfold — Product Documentation, The Core Product Loop
@@ -252,12 +241,12 @@ Cohesion: 0.40
 Nodes (4): 1. Product Rules, 2. UX Rules, 3. Architecture Rules, Seed Unfold — Project Rules
 
 ### Community 32 - "test_selection.py"
-Cohesion: 0.11
-Nodes (22): test_cannot_select_world_after_stage5_unfolding_begun(), test_get_active_selection_endpoint(), test_select_candidate_from_older_batch_rejected(), test_select_invalid_candidate(), test_select_world_success(), test_select_world_with_rationale(), test_switch_world_selection(), 2. Database & Repository (`backend/app/repositories/project_repo.py`) (+14 more)
+Cohesion: 0.10
+Nodes (23): test_cannot_select_world_after_stage5_unfolding_begun(), test_get_active_selection_endpoint(), test_select_candidate_from_older_batch_rejected(), test_select_invalid_candidate(), test_select_world_success(), test_select_world_with_rationale(), test_selection_schema(), test_switch_world_selection() (+15 more)
 
 ### Community 33 - "LocalStorageProvider"
-Cohesion: 0.07
-Nodes (17): LocalStorageProvider, SupabaseStorageProvider, test_supabase_storage_provider_fallback_on_network_error(), test_supabase_storage_provider_fallback_when_unset(), 1. Structured Relational Data Layer, 2. Object Storage Layer (`StorageProvider`), 3. Current Runtime Configuration Audit, Key Takeaway for Judges (+9 more)
+Cohesion: 0.15
+Nodes (8): LocalStorageProvider, 3. Current Runtime Configuration Audit, Key Takeaway for Judges, Final Verdict, Phase 7 User Acceptance Testing (UAT) Report, Test Environment, Test Scenarios & Results, Visual Artifacts
 
 ### Community 34 - "index.ts"
 Cohesion: 0.15
@@ -272,16 +261,16 @@ Cohesion: 0.22
 Nodes (8): 1. Questions & User Decisions, 2. Locked Decisions Summary, Phase 4 Discussion Log: Human World Selection, Q1: Selection Interaction & Confirmation Flow, Q2: Backend Selection Persistence, Q3: Re-Selection / Switching Policy, Q4: Visual Canvas Treatment, Q5: Traceability DAG in Inspector Drawer
 
 ### Community 37 - "Topics Discussed & Decisions Made"
-Cohesion: 0.22
-Nodes (8): 1. Progressive Unfolding UX & Lifecycle State Machine, 2. Canonical Demo Fixture Support, 3. Database & Relational Persistence Architecture, 4. Non-blocking Visual Prompt Descriptors (UNFL-05) & Key Locations, 5. Lineage & Inspector Integration, Date: 2026-10-04, Phase 5 Discussion Log: Progressive World Unfolding, Topics Discussed & Decisions Made
+Cohesion: 0.25
+Nodes (7): 1. Progressive Unfolding UX & Lifecycle State Machine, 3. Database & Relational Persistence Architecture, 4. Non-blocking Visual Prompt Descriptors (UNFL-05) & Key Locations, 5. Lineage & Inspector Integration, Date: 2026-10-04, Phase 5 Discussion Log: Progressive World Unfolding, Topics Discussed & Decisions Made
 
 ### Community 38 - "WorldCandidate"
-Cohesion: 0.21
-Nodes (7): WorldCandidate, test_canonical_demo_fixtures_determinism(), test_generate_worlds_mock_fallback(), test_world_candidate_schema_validation(), test_worlds_generate_and_get_endpoint(), test_worlds_regenerate_batch_history(), What Was Built
+Cohesion: 0.17
+Nodes (9): WorldCandidate, test_canonical_demo_fixtures_determinism(), test_generate_worlds_mock_fallback(), test_world_candidate_schema_validation(), test_worlds_generate_and_get_endpoint(), test_worlds_regenerate_batch_history(), Phase 3 Plan 01 Summary: Backend World Candidate Models, Provider & API, Verification (+1 more)
 
 ### Community 39 - "Discussion Topics & Agreed Decisions"
-Cohesion: 0.20
-Nodes (9): 1. AI Provider & Understanding Pass Integration, 2. Human Interaction & Editing Boundaries, 3. Seed Presets on Input Canvas, 4. Inspector Drawer Presentation, Discussion Topics & Agreed Decisions, Next Steps, Participants, Phase 2 Discussion Log: Seed Understanding + Seed DNA (+1 more)
+Cohesion: 0.22
+Nodes (8): 2. Human Interaction & Editing Boundaries, 3. Seed Presets on Input Canvas, 4. Inspector Drawer Presentation, Discussion Topics & Agreed Decisions, Next Steps, Participants, Phase 2 Discussion Log: Seed Understanding + Seed DNA, Session Date
 
 ### Community 40 - "Phase 3 — Validation Strategy"
 Cohesion: 0.29
@@ -311,25 +300,25 @@ Nodes (7): AI Provider Abstraction & Stub Provider, Deferred Ideas, Frontend-Bac
 Cohesion: 0.33
 Nodes (5): ADR-001: Core Architecture & Stack Selection, Consequences, Context, Decision, Status
 
-### Community 47 - "06-01-PLAN.md"
-Cohesion: 0.16
-Nodes (10): test_ancestor_path_traversal(), test_lineage_initial_project(), test_lineage_with_dna(), test_lineage_with_selection(), test_lineage_with_unfolded_universe(), test_lineage_with_worlds(), test_no_cot_leakage(), test_relation_types_coverage() (+2 more)
+### Community 47 - "LineageService"
+Cohesion: 0.05
+Nodes (36): AncestorPathRead, TraceEdge, TraceGraphRead, TraceNode, LineageService, test_ancestor_path_traversal(), test_lineage_initial_project(), test_lineage_with_dna() (+28 more)
 
 ### Community 48 - "GeminiProvider"
-Cohesion: 0.15
-Nodes (5): GeminiProvider, 3. Is Gemini actually being used?, 5. What happens if Gemini goes down during a live demo?, 2. Acceptance Criteria Checklist, Phase 8: Polish / Reliability / Demo - Validation Matrix
+Cohesion: 0.13
+Nodes (6): GeminiProvider, 5. What happens if Gemini goes down during a live demo?, 1. AI Provider & Understanding Pass Integration, 2. Canonical Demo Fixture Support, 2. Acceptance Criteria Checklist, Phase 8: Polish / Reliability / Demo - Validation Matrix
 
 ### Community 49 - "Seed Unfold — Traceability & Provenance Model"
-Cohesion: 0.29
-Nodes (6): 1. Lineage Graph Model, 2. Core Provenance Queries, 3. Privacy & Explainability Constraints, Edge Relationships, Node Types, Seed Unfold — Traceability & Provenance Model
+Cohesion: 0.50
+Nodes (3): 2. Core Provenance Queries, 3. Privacy & Explainability Constraints, Seed Unfold — Traceability & Provenance Model
 
-### Community 50 - "test_unfold.py"
-Cohesion: 0.15
-Nodes (10): test_canonical_fixtures_by_raw_seed_and_title(), test_character_relationships_scoped_to_candidate(), test_get_unfolded_endpoint(), test_unfold_concurrency_rejection(), test_unfold_failure_lifecycle_and_rollback(), test_unfold_idempotency_when_already_unfolded(), test_unfold_requires_world_selection(), test_unfold_universe_success() (+2 more)
+### Community 50 - "test_providers.py"
+Cohesion: 0.48
+Nodes (5): test_local_storage_provider(), test_mock_provider_extract_dna(), test_mock_provider_generate_worlds(), test_mock_provider_health_check(), test_mock_provider_unfold_stages()
 
-### Community 51 - "APIResponse"
-Cohesion: 0.24
-Nodes (5): api_error(), APIResponse, ErrorDetail, get_unfolded_universe(), unfold_universe()
+### Community 51 - "routers/dna.py"
+Cohesion: 0.19
+Nodes (4): get_ai_provider(), get_session(), get_unfolded_universe(), unfold_universe()
 
 ### Community 52 - "ADR-003: Cloud Object Storage and Asset Management"
 Cohesion: 0.33
@@ -339,33 +328,37 @@ Nodes (5): ADR-003: Cloud Object Storage and Asset Management, Consequences, Con
 Cohesion: 0.33
 Nodes (5): Final Verdict, Phase 4 User Acceptance Testing (UAT) Report, Test Environment, Test Scenarios & Results, Visual Artifacts
 
-### Community 55 - "project_repo.py"
-Cohesion: 0.17
-Nodes (11): get_utc_now(), SeedDNABase, AssetBase, AssetCreate, AssetRead, get_utc_now(), Project, ProjectBase (+3 more)
+### Community 54 - "main.py"
+Cohesion: 0.12
+Nodes (6): api_error(), ErrorDetail, http_exception_handler(), lifespan(), get_node_ancestor_path(), get_project_lineage()
 
-### Community 56 - "WorldSelectionRecord"
-Cohesion: 0.23
-Nodes (21): SeedDNARecord, WorldSelectionRecord, CharacterRecord, CharacterRelationshipRecord, SceneRecord, WorldBibleRecord, WorldCandidateRecord, 2. Source-Accurate Pipeline Table (+13 more)
+### Community 55 - "project.py"
+Cohesion: 0.36
+Nodes (4): get_utc_now(), ProjectBase, ProjectCreate, 1. Data Models & Relational Entity (`backend/app/models/selection.py`)
+
+### Community 56 - "models/__init__.py"
+Cohesion: 0.05
+Nodes (63): SeedDNARecord, BranchCreate, BranchRead, CharacterRefineRequest, EntityRevisionBase, EntityRevisionRead, EntityRevisionRecord, get_utc_now() (+55 more)
 
 ### Community 57 - "Locked Decisions"
 Cohesion: 0.25
 Nodes (7): D-02: Deterministic Causal Explanation Engine (TRAC-03), D-03: Stage 6 Hybrid Canvas UX, D-04: Cross-Stage Deep Linking, Locked Decisions, Phase 6 Context: Traceability & Provenance (TRAC-01 to TRAC-03), Phase Purpose, Technical Constraints & Boundaries
 
-### Community 58 - ".generate_worlds"
-Cohesion: 0.11
-Nodes (13): 1. Data Models (`backend/app/models/world.py`), 2. API Endpoints (`backend/app/routers/worlds.py`), 3. Frontend Experience (Stage 3 `worlds`), Executive Summary, Out of Scope for Phase 3, Phase 3 Context: Three World Generation, Technical Specifications, 1. Domain & Architecture Analysis (+5 more)
+### Community 58 - "Phase 3 Context: Three World Generation"
+Cohesion: 0.29
+Nodes (6): 1. Data Models (`backend/app/models/world.py`), 2. API Endpoints (`backend/app/routers/worlds.py`), 3. Frontend Experience (Stage 3 `worlds`), Out of Scope for Phase 3, Phase 3 Context: Three World Generation, Technical Specifications
 
 ### Community 59 - "api_success"
-Cohesion: 0.18
-Nodes (9): api_success(), export_project_bundle(), get_project_revisions(), list_project_branches(), list_storage_snapshots(), create_canonical_demo(), create_project(), get_project() (+1 more)
+Cohesion: 0.13
+Nodes (16): api_success(), APIResponse, ProjectRead, branch_project(), create_storage_snapshot(), export_project_bundle(), get_project_revisions(), import_project_bundle() (+8 more)
 
 ### Community 60 - "useWorkspaceStore"
 Cohesion: 0.14
 Nodes (27): App(), GuidedTourOverlay(), TOUR_STEPS, TourStepData, InspectorDrawer(), KeyboardShortcutsModal(), ShortcutRow, SHORTCUTS (+19 more)
 
-### Community 61 - "worlds.py"
-Cohesion: 0.11
-Nodes (7): get_ai_provider(), get_session(), extract_seed_dna(), get_latest_seed_dna(), generate_world_candidates(), get_latest_world_candidates(), B. Foolproof AI Provider Fallback Resilience (DEMO-02)
+### Community 61 - "extract_seed_dna"
+Cohesion: 0.20
+Nodes (5): extract_seed_dna(), get_latest_seed_dna(), 2. Bulletproof Error Fallback & Notification (`DEMO-02`), The Problem, The Solution: Provider Fallback Decorator / Wrapper
 
 ### Community 62 - "Phase 5 Research: Progressive World Unfolding"
 Cohesion: 0.33
@@ -383,29 +376,37 @@ Nodes (4): Captured Artifacts, Execution Overview, Phase 5 Execution Summary: Pr
 Cohesion: 0.33
 Nodes (5): 1. Backend Verification, 2. Frontend Verification, 3. End-to-End Playwright Verification, Phase 6 Validation: Traceability & Provenance (TRAC-01 to TRAC-03), Validation Checklist
 
-### Community 66 - "models/selection.py"
-Cohesion: 0.16
-Nodes (9): get_utc_now(), WorldSelectionBase, WorldSelectionCreate, WorldSelectionRead, get_utc_now(), WorldCandidateBase, WorldCandidateRead, test_selection_schema() (+1 more)
+### Community 66 - "world.py"
+Cohesion: 0.15
+Nodes (5): get_utc_now(), WorldCandidateBase, WorldCandidateRead, generate_world_candidates(), get_latest_world_candidates()
 
-### Community 67 - "2. Technical Investigation & Corrected Patterns"
-Cohesion: 0.20
-Nodes (9): 1. Domain Overview & Requirements Mapping, 2. Technical Investigation & Corrected Patterns, A. Immutable Revision History (`entity_revisions`) & Audit Diffs, B. Phase 6 Lineage Version Semantics (`refined_from`), C. Strict Branch Cloning ID Remapping (PERS-02), D. Complete ProjectBundle with Lineage DAG, E. StorageProvider Interface Verification, F. Refinement Scope Boundary (+1 more)
+### Community 67 - "Implementation Decisions"
+Cohesion: 0.29
+Nodes (7): AI Provider Abstraction & Stub Provider, Frontend-Backend Communication & Monorepo Structure, Implementation Decisions, Initial State & Persistence Bootstrap, Object Storage & Asset Foundation, The Agent's Discretion, Workspace Layout & Shell Aesthetics
 
 ### Community 68 - "MockProvider"
-Cohesion: 0.20
-Nodes (7): MockProvider, test_local_storage_provider(), test_mock_provider_extract_dna(), test_mock_provider_generate_worlds(), test_mock_provider_health_check(), test_mock_provider_unfold_stages(), 3. Fallback & Failure Modes (Actual Source Behavior)
+Cohesion: 0.16
+Nodes (7): MockProvider, 3. Fallback & Failure Modes (Actual Source Behavior), Summary, Discussion Summary, Key Topics & Alignment, Phase 3 Discussion Log: Three World Generation, Status
 
 ### Community 69 - "1. Questions & Locked Decisions"
 Cohesion: 0.25
 Nodes (7): 1. Questions & Locked Decisions, 2. Next Steps, Phase 7: Refine, Branch & Save - Discussion Log, Question 1: Timeline Branching Architecture (PERS-02), Question 2: Component Refinement & Auditable Versioning (PERS-01), Question 3: Full Project State Save/Reload (PERS-03), Question 4: UI Architecture & Stage 7 Canvas Placement
 
-### Community 71 - "Technical Specifications"
-Cohesion: 0.40
-Nodes (5): 2. Provider Unfolding Extension (`backend/app/providers/`), 3. Database & Repository (`backend/app/repositories/project_repo.py`), 4. API Endpoints (`backend/app/routers/unfold.py`), 5. Frontend Canvas & State (`frontend/src/`), Technical Specifications
+### Community 70 - "models/selection.py"
+Cohesion: 0.19
+Nodes (7): get_utc_now(), WorldSelectionBase, WorldSelectionCreate, WorldSelectionRead, get_active_selection(), select_world_candidate(), 1. Backend Data Models (`backend/app/models/selection.py`)
 
-### Community 72 - "Key Topics & Alignment"
-Cohesion: 0.40
-Nodes (4): Discussion Summary, Key Topics & Alignment, Phase 3 Discussion Log: Three World Generation, Status
+### Community 71 - "Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback"
+Cohesion: 0.29
+Nodes (6): 1. Context & Objectives, 2. Technical Tasks, 3. Verification Criteria, Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback, Task 2: Mount `POST /api/projects/canonical-demo`, Task 3: Resilient Fallback Wrapper in `gemini_provider.py`
+
+### Community 72 - "Phase 3 Research: Three World Generation"
+Cohesion: 0.33
+Nodes (5): 1. Domain & Architecture Analysis, 2. Reusable Assets in Workspace, 3. Potential Hazards & Mitigations, Goal, Phase 3 Research: Three World Generation
+
+### Community 73 - "Delivered Features"
+Cohesion: 0.50
+Nodes (3): Delivered Features, Plan 01-01 Summary: Backend Shell, Provider Abstractions, and Persistence, Verification Evidence
 
 ### Community 74 - "test_dna.py"
 Cohesion: 0.43
@@ -415,37 +416,33 @@ Nodes (4): test_dna_extract_and_get_endpoint(), test_gemini_provider_mock_fallba
 Cohesion: 0.27
 Nodes (6): _setup_unfolded_project(), test_bundle_export_and_import_with_lineage(), test_character_and_scene_refinement_audit(), test_lineage_version_chaining(), test_storage_snapshots_persistence(), test_timeline_branching_strict_id_remapping()
 
-### Community 77 - "conftest.py"
-Cohesion: 0.15
-Nodes (7): build_engine(), init_db(), _migrate_columns(), client(), event_loop(), initialize_test_db(), test_supabase_engine_configuration()
+### Community 76 - "AIProvider"
+Cohesion: 0.16
+Nodes (3): AIProvider, 1. Actual AI Provider Architecture, Components
 
-### Community 78 - "Phase 6: Traceability & Provenance (Tattva 5: Sambandha) - Summary"
-Cohesion: 0.20
-Nodes (9): 1. Executive Summary, 2. Key Architecture Decisions & Implementations, 3. Verification & Testing, 4. Artifact Links, B. User Clarifications & Plan Corrections, Backend Test Suite, C. Frontend Visual Excellence & Interactive DAG, Frontend Build & End-to-End Suite (+1 more)
-
-### Community 79 - "PersistenceService"
-Cohesion: 0.10
-Nodes (15): BranchCreate, BranchRead, CharacterRefineRequest, EntityRevisionBase, EntityRevisionRead, get_utc_now(), ProjectBundle, SceneRefineRequest (+7 more)
+### Community 77 - "project_repo.py"
+Cohesion: 0.11
+Nodes (10): Settings, build_engine(), init_db(), _migrate_columns(), client(), event_loop(), initialize_test_db(), test_database_url_formatting_for_supabase() (+2 more)
 
 ### Community 80 - "Phase 7: Refine / Branch / Save (Tattva 6: Parinamana & Dharana) — Summary"
 Cohesion: 0.25
 Nodes (7): 1. Overview & Architecture, 2. Implementation Artifacts, 3. Verification Results, 4. Visual Artifacts, Core Architectural Guarantees, Frontend (`frontend/src/`), Phase 7: Refine / Branch / Save (Tattva 6: Parinamana & Dharana) — Summary
 
-### Community 81 - "Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback"
-Cohesion: 0.12
-Nodes (10): test_canonical_demo_api_endpoint(), test_create_canonical_demo_project_repository(), test_gemini_provider_graceful_fallback(), 1. Context & Objectives, 2. Technical Tasks, 3. Verification Criteria, Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback, Task 2: Mount `POST /api/projects/canonical-demo` (+2 more)
+### Community 81 - "httpx"
+Cohesion: 0.15
+Nodes (6): test_canonical_demo_api_endpoint(), test_create_canonical_demo_project_repository(), test_gemini_provider_graceful_fallback(), test_health_endpoint(), test_projects_crud(), Task 4: Pytest Suite `backend/tests/test_demo.py`
 
 ### Community 82 - "Phase 8: Polish / Reliability / Demo — Research & Technical Spikes"
-Cohesion: 0.14
-Nodes (13): 1. Fast Canonical Demo Seeding Architecture (`DEMO-01`), 2. Bulletproof Error Fallback & Notification (`DEMO-02`), 3. Keyboard Shortcuts & Evaluator Flow, 4. 7-Stage Stepped Floating Guided Tour (Avyakta + 6 Tattva Transformations), 5. Lineage DAG Zoom & Polish, 6. Verification Plan, Design & Mechanics, Event Handling Best Practices (+5 more)
+Cohesion: 0.18
+Nodes (10): 1. Fast Canonical Demo Seeding Architecture (`DEMO-01`), 3. Keyboard Shortcuts & Evaluator Flow, 4. 7-Stage Stepped Floating Guided Tour (Avyakta + 6 Tattva Transformations), 5. Lineage DAG Zoom & Polish, 6. Verification Plan, Design & Mechanics, Event Handling Best Practices, Phase 8: Polish / Reliability / Demo — Research & Technical Spikes (+2 more)
 
 ### Community 83 - "2. Technical Tasks"
 Cohesion: 0.17
 Nodes (11): 1. Context & Objectives, 2. Technical Tasks, 3. Verification Criteria, Plan: Phase 8 Wave 2 — Frontend Guided Demo Tour, Keyboard Shortcuts, Polish & E2E, Task 1: API & Store Integration for Instant Demo, Task 2: Create `GuidedTourOverlay.tsx`, Task 3: Create `KeyboardShortcutsModal.tsx`, Task 4: Global Keyboard Listener in `WorkspaceCanvas.tsx` (+3 more)
 
 ### Community 84 - "2. Key Accomplishments & Deliverables"
-Cohesion: 0.20
-Nodes (9): 1. Overview & Conceptual Architecture, 2. Key Accomplishments & Deliverables, 3. Verification & Testing, 4. Phase Completion Sign-Off, C. 7-Stage Guided Demo Tour Overlay, D. Global Keyboard Shortcuts & Cheatsheet Modal, E. Traceability DAG Zoom & View Controls, Phase 8: Polish / Reliability / Demo (DEMO-01, DEMO-02) — Summary (+1 more)
+Cohesion: 0.18
+Nodes (10): 1. Overview & Conceptual Architecture, 2. Key Accomplishments & Deliverables, 3. Verification & Testing, 4. Phase Completion Sign-Off, B. Foolproof AI Provider Fallback Resilience (DEMO-02), C. 7-Stage Guided Demo Tour Overlay, D. Global Keyboard Shortcuts & Cheatsheet Modal, E. Traceability DAG Zoom & View Controls (+2 more)
 
 ### Community 85 - "Areas Discussed & Decisions Made"
 Cohesion: 0.29
@@ -464,8 +461,8 @@ Cohesion: 0.36
 Nodes (5): WorldCandidateCard(), WorldCandidateCardProps, WorldCandidatesCanvas(), WorldSelectionCanvas(), WorldCandidateRead
 
 ### Community 90 - "Praroha Judge Q&A Cheatsheet"
-Cohesion: 0.13
-Nodes (14): 10. How is provenance represented?, 11. Why a relational database instead of a dedicated graph database like Neo4j?, 12. What is stored in object storage?, 14. Can this generate actual images, audio, or video right now?, 15. Can this architecture scale?, 16. What is the key technical innovation?, 1. Why is this project Tattva 2?, 2. Why not simply use ChatGPT or Claude in a chat window? (+6 more)
+Cohesion: 0.12
+Nodes (15): 10. How is provenance represented?, 11. Why a relational database instead of a dedicated graph database like Neo4j?, 12. What is stored in object storage?, 14. Can this generate actual images, audio, or video right now?, 15. Can this architecture scale?, 16. What is the key technical innovation?, 1. Why is this project Tattva 2?, 2. Why not simply use ChatGPT or Claude in a chat window? (+7 more)
 
 ### Community 91 - "SeedPreset"
 Cohesion: 0.33
@@ -479,9 +476,9 @@ Nodes (8): 4. Canonical Demo vs Live Custom Seed Operation, 5. Multimodal Capabi
 Cohesion: 0.18
 Nodes (10): [0:00 – 0:20] 1. Introduction: The Philosophical & Technical Challenge, [0:20 – 0:40] 2. The Formless Seed (Stage 1), [0:40 – 1:00] 3. Uncovering Hidden Structure: Seed DNA (Stage 2), [1:00 – 1:20] 4. Three Latent Manifestations (Stage 3), [1:20 – 1:35] 5. Human Choice Gate (Stage 4), [1:35 – 2:05] 6. Progressive Universe Unfolding (Stage 5), [2:05 – 2:25] 7. Refinement, Branching & Continuity (Stage 7), [2:25 – 2:45] 8. Traceability DAG: Proving Origin (Stage 6) (+2 more)
 
-### Community 94 - ".upload"
-Cohesion: 0.33
-Nodes (4): 4. State Portability & Snapshots, Lossless Round-Trip Import (`POST /api/projects/import`), ProjectBundle (`GET /api/projects/{id}/bundle`), Storage Snapshots (`POST /api/projects/{id}/snapshots`)
+### Community 94 - "Praroha Data & Storage Architecture"
+Cohesion: 0.17
+Nodes (9): 1. Structured Relational Data Layer, 2. Object Storage Layer (`StorageProvider`), 4. State Portability & Snapshots, Lossless Round-Trip Import (`POST /api/projects/import`), Overview, Praroha Data & Storage Architecture, ProjectBundle (`GET /api/projects/{id}/bundle`), Providers Implemented in Source Code (+1 more)
 
 ### Community 95 - "Phase 8 User Acceptance Testing (UAT) Report"
 Cohesion: 0.29
@@ -492,12 +489,16 @@ Cohesion: 0.22
 Nodes (8): 1. Executive Summary & Goals, 2. Locked Implementation Decisions, 3. Plan Decomposition (2 Waves), B. Graceful Degradation & Network Resilience (`DEMO-02`), C. Guided Demo Tour for Evaluators, D. Keyboard Shortcuts (`KeyboardShortcutsModal.tsx`), E. UI Polish, Aesthetics & Micro-Animations, Phase 8: Polish / Reliability / Demo — Context & Implementation Decisions
 
 ### Community 98 - "StorageProvider"
-Cohesion: 0.12
-Nodes (7): StorageProvider, health_check(), 1. Technical Stack Overview, 2. Architectural Principles & Boundaries, 3. Data Flow Diagram, Seed Unfold — System Architecture, 16. What is cloud storage?
+Cohesion: 0.15
+Nodes (6): StorageProvider, 1. Technical Stack Overview, 2. Architectural Principles & Boundaries, 3. Data Flow Diagram, Seed Unfold — System Architecture, 16. What is cloud storage?
 
 ### Community 99 - "2. Locked Decisions (Incorporating Plan Corrections)"
 Cohesion: 0.29
 Nodes (6): 1. Phase Objective & Tattva Alignment, 2. Locked Decisions (Incorporating Plan Corrections), D-01: Timeline Branching & Strict Child ID Remapping (PERS-02), D-03: Full Project State Export, Import & Snapshots (PERS-03), D-04: UI Architecture & Stage 7 Canvas, Phase 7: Refine, Branch & Save (Tattva 6: Parinamana & Dharana) - Context
+
+### Community 100 - "models/dna.py"
+Cohesion: 0.24
+Nodes (5): ExtractDNARequest, get_utc_now(), SeedDNA, SeedDNABase, SeedDNARead
 
 ### Community 102 - "Praroha Master Architecture: Tattva 2 & Idea 1"
 Cohesion: 0.33
@@ -507,28 +508,24 @@ Nodes (5): 1. Conceptual Unfolding Pipeline, 2. Technical System Architecture, 3
 Cohesion: 0.40
 Nodes (4): NodeCard(), NodeCardProps, TraceNode, TraceNodeType
 
-### Community 106 - "2. Acceptance Criteria Checklist"
-Cohesion: 0.50
-Nodes (3): 1. Test Automation Matrix, 2. Acceptance Criteria Checklist, Phase 7: Refine, Branch & Save - Validation Matrix
-
-### Community 108 - "SeedDNA"
-Cohesion: 0.25
-Nodes (5): ExtractDNARequest, SeedDNA, Key Changes, Plan 02-01 Summary: Backend Seed Understanding & Seed DNA Service, Verification Results
+### Community 108 - "Key Changes"
+Cohesion: 0.40
+Nodes (3): Key Changes, Plan 02-01 Summary: Backend Seed Understanding & Seed DNA Service, Verification Results
 
 ## Knowledge Gaps
 - **421 isolated node(s):** `{ chromium }`, `path`, `{ chromium }`, `{ chromium }`, `{ chromium }` (+416 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 642 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `MockProvider` connect `MockProvider` to `Phase 1: Foundation / Project Shell - Research`, `AIProvider`, `ProjectRepository`, `LocalStorageProvider`, `Topics Discussed & Decisions Made`, `WorldCandidate`, `Discussion Topics & Agreed Decisions`, `Implementation Decisions`, `GeminiProvider`, `test_unfold.py`, `project_repo.py`, `WorldSelectionRecord`, `.generate_worlds`, `useWorkspaceStore`, `worlds.py`, `Key Topics & Alignment`, `test_dna.py`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `Phase 8: Polish / Reliability / Demo — Research & Technical Spikes`, `Praroha: Comprehensive Judge Explanation`, `2. Locked Implementation Decisions`?**
-  _High betweenness centrality (0.154) - this node is a cross-community bridge._
-- **Why does `ProjectRepository` connect `ProjectRepository` to `LineageService`, `Phase 1: Foundation / Project Shell - Research`, `Implementation Decisions`, `models/__init__.py`, `test_selection.py`, `WorldCandidate`, `Phase 1: Foundation / Project Shell - Discussion Log`, `test_unfold.py`, `APIResponse`, `project_repo.py`, `WorldSelectionRecord`, `api_success`, `worlds.py`, `MockProvider`, `routers/selection.py`, `EntityRevisionRecord`, `PersistenceService`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `StorageProvider`, `routers/lineage.py`, `pytest`, `SeedDNA`, `get_persistence_service`?**
-  _High betweenness centrality (0.144) - this node is a cross-community bridge._
-- **Why does `1. Test Automation Matrix` connect `useWorkspaceStore` to `GeminiProvider`, `WorldSelectionRecord`, `MockProvider`, `project_repo.py`?**
-  _High betweenness centrality (0.122) - this node is a cross-community bridge._
+- **Why does `MockProvider` connect `MockProvider` to `Asset`, `routers/persistence.py`, `ProjectRepository`, `LocalStorageProvider`, `WorldCandidate`, `Implementation Decisions`, `GeminiProvider`, `test_providers.py`, `routers/dna.py`, `models/__init__.py`, `useWorkspaceStore`, `extract_seed_dna`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `Delivered Features`, `test_dna.py`, `AIProvider`, `project_repo.py`, `Praroha: Comprehensive Judge Explanation`, `2. Locked Implementation Decisions`?**
+  _High betweenness centrality (0.140) - this node is a cross-community bridge._
+- **Why does `ProjectRepository` connect `ProjectRepository` to `Phase 1: Foundation / Project Shell - Research`, `Phase 1: Foundation / Project Shell - Context`, `Asset`, `routers/persistence.py`, `test_selection.py`, `WorldCandidate`, `Phase 1: Foundation / Project Shell - Discussion Log`, `LineageService`, `routers/dna.py`, `main.py`, `project.py`, `models/__init__.py`, `api_success`, `extract_seed_dna`, `world.py`, `Implementation Decisions`, `MockProvider`, `models/selection.py`, `Delivered Features`, `project_repo.py`, `httpx`, `StorageProvider`, `models/dna.py`, `Key Changes`?**
+  _High betweenness centrality (0.137) - this node is a cross-community bridge._
+- **Why does `1. Test Automation Matrix` connect `useWorkspaceStore` to `GeminiProvider`, `models/__init__.py`, `api_success`, `MockProvider`?**
+  _High betweenness centrality (0.115) - this node is a cross-community bridge._
 - **Are the 47 inferred relationships involving `ProjectRepository` (e.g. with `SeedDNA` and `SeedDNARecord`) actually correct?**
   _`ProjectRepository` has 47 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 30 inferred relationships involving `PersistenceService` (e.g. with `branch_project()` and `create_storage_snapshot()`) actually correct?**

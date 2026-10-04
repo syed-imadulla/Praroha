@@ -26,10 +26,12 @@ export const WorldCandidatesCanvas: React.FC = () => {
   } = useWorkspaceStore();
 
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+  const hasTriggeredRef = React.useRef(false);
 
   // Auto-generate on first arrival if worlds are empty and DNA exists
   useEffect(() => {
-    if (worlds.length === 0 && !isGeneratingWorlds && seedDNA) {
+    if (worlds.length === 0 && !isGeneratingWorlds && seedDNA && !hasTriggeredRef.current) {
+      hasTriggeredRef.current = true;
       generateWorlds();
     }
   }, [worlds.length, isGeneratingWorlds, seedDNA, generateWorlds]);

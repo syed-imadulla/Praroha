@@ -610,6 +610,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
       generateWorlds: async () => {
         const state = get();
+        if (state.isGeneratingWorlds) return false;
         const project = state.activeProject;
         if (!project) return false;
 

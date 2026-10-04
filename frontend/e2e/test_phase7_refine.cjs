@@ -23,6 +23,8 @@ async function runPhase7E2E() {
     // -------------------------------------------------------------
     console.log('--- Setup: Progressing through Stages 1-5 with Canonical Ocean Seed ---');
     await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: 'networkidle' });
 
     // Step 1: Click Canonical Sunken Ocean City preset
     const oceanPreset = page.locator('button:has-text("Sunken Ocean City")');
