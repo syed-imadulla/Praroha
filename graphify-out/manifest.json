@@ -102,9 +102,9 @@
     "semantic_hash": ""
   },
   "frontend/package.json": {
-    "mtime": 1791082707.2240992,
-    "seen": 1791082976.2541122,
-    "ast_hash": "98d7087a6a99b0ef557936f6f95695b8",
+    "mtime": 1791085836.9805927,
+    "seen": 1791086010.7382886,
+    "ast_hash": "93516a0236c56f831ab27596e97d1026",
     "semantic_hash": ""
   },
   "frontend/postcss.config.js": {
@@ -465,6 +465,18 @@
     "mtime": 1791085580.1025863,
     "seen": 1791085614.1853487,
     "ast_hash": "f1f8172f75deaabb21ccce815c2027dd",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/run_uat.cjs": {
+    "mtime": 1791085988.7758236,
+    "seen": 1791086010.738286,
+    "ast_hash": "d5959105ccfd411a12bbd68b25017c13",
+    "semantic_hash": ""
+  },
+  ".planning/phases/02-seed-understanding-seed-dna/02-UAT.md": {
+    "mtime": 1791086003.6576502,
+    "seen": 1791086010.738331,
+    "ast_hash": "a77f478f7a4329bf5ceb38cc2549a347",
     "semantic_hash": ""
   }
 }
