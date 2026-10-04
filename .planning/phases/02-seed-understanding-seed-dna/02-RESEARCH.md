@@ -16,35 +16,58 @@ The Seed DNA represents the invariant boundary parameters of the unfolding unive
 
 ## Technical Architecture & Implementation Patterns
 
-### 1. Gemini Structured Extraction Pattern
-Google Gemini 1.5/2.0 natively supports structured JSON outputs through its `generationConfig`:
+### 1. Gemini Current Stable API & Structured Extraction Pattern
+Using the currently supported stable Gemini model identifier (`gemini-2.5-flash`, configurable via `settings.GEMINI_MODEL`), Google's current `generateContent` REST API supports strict schema enforcement and separate system instructions:
+
+**Endpoint**:
+`POST https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent`
+
+**Headers**:
+- `x-goog-api-key`: `{settings.GEMINI_API_KEY}`
+- `Content-Type`: `application/json`
+
+**Request Payload**:
 ```json
 {
-  "response_mime_type": "application/json",
-  "response_schema": {
-    "type": "OBJECT",
-    "properties": {
-      "premise": { "type": "STRING" },
-      "themes": { "type": "ARRAY", "items": { "type": "STRING" } },
-      "entities": { "type": "ARRAY", "items": { "type": "STRING" } },
-      "constraints": { "type": "ARRAY", "items": { "type": "STRING" } },
-      "tone": { "type": "STRING" },
-      "domain_keywords": { "type": "ARRAY", "items": { "type": "STRING" } }
-    },
-    "required": ["premise", "themes", "entities", "constraints", "tone", "domain_keywords"]
+  "systemInstruction": {
+    "parts": [
+      {
+        "text": "You are Seed Unfold's semantic understanding engine. Analyze the creative seed and distill its invariant Seed DNA parameters without generating final narrative or story content prematurely."
+      }
+    ]
+  },
+  "contents": [
+    {
+      "role": "user",
+      "parts": [{ "text": "Creative Seed: \"A child discovers a forgotten city beneath the ocean.\"" }]
+    }
+  ],
+  "generationConfig": {
+    "responseMimeType": "application/json",
+    "responseSchema": {
+      "type": "OBJECT",
+      "properties": {
+        "premise": { "type": "STRING", "description": "Core conceit and foundation of the seed" },
+        "themes": { "type": "ARRAY", "items": { "type": "STRING" }, "description": "Implicit dramatic and thematic tensions" },
+        "entities": { "type": "ARRAY", "items": { "type": "STRING" }, "description": "Core figures, relics, places, or structures" },
+        "constraints": { "type": "ARRAY", "items": { "type": "STRING" }, "description": "Strict negative boundaries and exclusions" },
+        "tone": { "type": "STRING", "description": "Atmospheric mood and aesthetic tone" },
+        "domain_keywords": { "type": "ARRAY", "items": { "type": "STRING" }, "description": "Semantic keywords for world grounding" }
+      },
+      "required": ["premise", "themes", "entities", "constraints", "tone", "domain_keywords"]
+    }
   }
 }
 ```
-Using an asynchronous `httpx.AsyncClient` with a 15-second timeout ensures fast, non-blocking requests without adding bulky external dependencies.
 
-### 2. Resilience & Fallback Hierarchy
-When `extract_dna(seed)` is called:
-1. If `settings.AI_PROVIDER == "mock"`: immediately return deterministic canonical fixtures.
-2. If `settings.AI_PROVIDER == "gemini"`:
-   - Check if `settings.GEMINI_API_KEY` is present. If missing, log a warning and delegate to `MockProvider` with `fallback_used: true`.
-   - Call Gemini endpoint via async `httpx`.
-   - If response status is non-200, or payload fails Pydantic `SeedDNA` validation, or a timeout occurs, catch exception and delegate to `MockProvider` with `fallback_used: true` and diagnostic warning message.
-   - Return verified `APIResponse[SeedDNAResponse]`.
+**Response Parsing & Schema Validation**:
+1. Extract content string from `data["candidates"][0]["content"]["parts"][0]["text"]`.
+2. Parse JSON payload: `parsed_json = json.loads(text_content)`.
+3. Validate through Pydantic: `seed_dna = SeedDNA.model_validate(parsed_json)`.
+4. Wrap in `SeedDNARead` and return via `api_success(data=...)`.
+5. On HTTP error, rate-limit, timeout, or Pydantic validation failure: catch exception, log warning, and fall back cleanly to `MockProvider().extract_dna(seed)` with `fallback_used: True`.
+
+Using async `httpx.AsyncClient` with a 15-second timeout ensures non-blocking I/O while keeping external dependencies lean and isolated from domain logic.
 
 ### 3. Immutability & Persistence
 In `backend/app/models/dna.py`:

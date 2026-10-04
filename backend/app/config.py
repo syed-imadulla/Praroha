@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     # Optional provider keys
     GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     SUPABASE_URL: Optional[str] = None
     SUPABASE_KEY: Optional[str] = None
     SUPABASE_BUCKET: str = "seed-unfold-assets"
