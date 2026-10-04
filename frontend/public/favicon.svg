@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#090D16" />
+  <circle cx="16" cy="16" r="14" stroke="#06B6D4" stroke-width="1.5" stroke-dasharray="2 3" opacity="0.4" />
+  <!-- Sprouting Seed / Unfolding Geometry for Seed Unfold (Praroha) -->
+  <path d="M16 23V13M16 13C16 9.5 13 7 9.5 7C9.5 10.5 12 13.5 16 13ZM16 13C16 9.5 19 7 22.5 7C22.5 10.5 20 13.5 16 13Z" stroke="url(#seedGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="16" cy="24" r="2" fill="#10B981" />
+  <defs>
+    <linearGradient id="seedGrad" x1="9.5" y1="7" x2="22.5" y2="23" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06B6D4" />
+      <stop offset="1" stop-color="#10B981" />
+    </linearGradient>
+  </defs>
+</svg>
