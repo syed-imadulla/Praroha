@@ -5,38 +5,23 @@ Enable users to enter or choose a creative seed, execute an AI understanding pas
 
 ---
 
-## Decisions & Boundaries
+<decisions>
+## Implementation Decisions
 
 ### AI Provider & Extraction Engine
-- **D-01**: **Gemini Provider with Mock Fallback**: Implement `GeminiProvider(AIProvider)` utilizing Google Gemini API with structured JSON/schema extraction. If `GEMINI_API_KEY` is missing or invalid, or if the API request times out/fails, fallback automatically to `MockProvider` returning deterministic canonical fixtures with a `{ fallback_used: true, warning: '...' }` envelope. — **Reversibility:** costly — defines live AI extraction client.
-- **D-02**: **Strict Pydantic SeedDNA Schema**: Seed DNA data model enforced across backend and frontend:
-  ```python
-  class SeedDNA(BaseModel):
-      premise: str
-      themes: List[str]
-      entities: List[str]
-      constraints: List[str]
-      tone: str
-      domain_keywords: List[str]
-  ```
-  Any LLM output must be parsed and validated through this schema before returning to the frontend. — **Reversibility:** one-way — standardizes Seed DNA data contract across all downstream phases.
-- **D-03**: **Raw Seed Immutability Contract**: The raw user input seed text is stored permanently and immutably alongside the extracted `SeedDNA`. Subsequent understanding passes or re-runs create a new version without mutating past runs. — **Reversibility:** one-way — permanent project rule (Rule #1).
+- **D-01:** Implement `GeminiProvider(AIProvider)` utilizing Google Gemini API with structured JSON/schema extraction and automatic `MockProvider` fallback if key is missing or calls fail. — **Reversibility:** costly — defines live AI extraction client.
+- **D-02:** Strict Pydantic SeedDNA schema validating premise, themes, entities, constraints, tone, and domain_keywords before returning. — **Reversibility:** one-way — standardizes Seed DNA data contract across all downstream phases.
+- **D-03:** Raw user input seed text is stored permanently and immutably in SQLModel SeedDNARecord table alongside extracted SeedDNA. — **Reversibility:** one-way — permanent project rule.
 
 ### User Experience & Seed Ingestion
-- **D-04**: **Presets & Seed Ingestion UX**: Canvas provides the canonical ocean city prompt (*"A child discovers a forgotten city beneath the ocean"*) plus two diverse presets (Sci-Fi orbital generation ship, Ancient whispering forest) for instant exploration, alongside a freeform multi-line text input with character/word counting. — **Reversibility:** reversible — front-end input presets.
-- **D-05**: **Stage Transition (Seed -> Understand)**: Submitting a seed triggers the understanding pass, displays an animated analysis state (showing the model analyzing intent without generating final story content prematurely), and automatically unlocks and transitions the workspace to Stage 2 (`understand`). — **Reversibility:** reversible — stage transition logic.
-- **D-06**: **Inspection-Only with Seed Refinement**: Seed DNA parameters are presented as a structured inspection pass. Users unsatisfied with the DNA can adjust their raw seed and re-run extraction, preserving the AI understanding boundary without ad-hoc parameter tampering. — **Reversibility:** reversible.
+- **D-04:** Input canvas provides canonical demo seed and 2 genre presets (Sci-Fi orbital ark, Fantasy whispering forest) alongside freeform textarea. — **Reversibility:** reversible — front-end input presets.
+- **D-05:** Submitting seed displays animated understanding pass state and automatically transitions workspace to Stage 2 (understand). — **Reversibility:** reversible — stage transition logic.
+- **D-06:** Seed DNA parameters are presented as a structured inspection pass; users can adjust raw seed and re-extract if desired. — **Reversibility:** reversible.
 
 ### Inspector Drawer & Visual Presentation
-- **D-07**: **Structured Parameter Cards & Badge Chips**: The "Seed DNA" tab of `InspectorDrawer` renders dedicated cards:
-  - Core Premise (highlighted callout)
-  - Themes (cyan badge chips)
-  - Entities (emerald badge chips)
-  - Boundary Constraints (amber warning-styled badge chips)
-  - Emotional Tone (styled italic badge)
-  - Domain Keywords (slate badge chips)
-  — **Reversibility:** reversible — UI presentation component.
-- **D-08**: **Copy / Export DNA Action**: A quick-action button in the Inspector Drawer allows creators to copy the raw structured Seed DNA as formatted JSON to the clipboard or export it. — **Reversibility:** reversible.
+- **D-07:** Inspector Drawer renders structured cards with cyan theme pills, emerald entity pills, and amber warning constraint badges. — **Reversibility:** reversible — UI presentation component.
+- **D-08:** Quick-action button in Inspector Drawer allows copying formatted Seed DNA JSON to clipboard or exporting it. — **Reversibility:** reversible.
+</decisions>
 
 ---
 

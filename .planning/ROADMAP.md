@@ -42,7 +42,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   2. System extracts valid Pydantic `SeedDNA` (premise, themes, entities, constraints, tone, domain keywords).
   3. Seed DNA inspection drawer displays extracted parameters clearly.
   4. Raw user seed remains immutable.  
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] **02-01-PLAN.md** (Wave 1): Backend Seed Understanding & DNA Service (GeminiProvider + Mock Fallback, SQLModel SeedDNARecord, Extraction Endpoints, and Pytest Suite).
+- [ ] **02-02-PLAN.md** (Wave 2): Frontend Seed Ingestion, Understanding Pass Loader, Seed DNA Visualizer, and Inspector Drawer Integration.
 
 ---
 
