@@ -74,3 +74,44 @@
 | External graph database (Neo4j / Memgraph) | Excessive infrastructure complexity; DAG in SQLite/JSON is fast and portable |
 | User authentication / billing / subscriptions | Distraction from core hackathon creative engine and judging evaluation |
 | Real-time multi-cursor collaboration | Unnecessary complexity for single-creator ideation and initial product validation |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|---|---|---|
+| SHEL-01 | Phase 1 | Pending |
+| SHEL-02 | Phase 1 | Pending |
+| SHEL-03 | Phase 1 | Pending |
+| DNA-01 | Phase 2 | Pending |
+| DNA-02 | Phase 2 | Pending |
+| DNA-03 | Phase 2 | Pending |
+| DNA-04 | Phase 2 | Pending |
+| DNA-05 | Phase 2 | Pending |
+| WGEN-01 | Phase 3 | Pending |
+| WGEN-02 | Phase 3 | Pending |
+| WGEN-03 | Phase 3 | Pending |
+| HCHO-01 | Phase 4 | Pending |
+| HCHO-02 | Phase 4 | Pending |
+| HCHO-03 | Phase 4 | Pending |
+| UNFL-01 | Phase 5 | Pending |
+| UNFL-02 | Phase 5 | Pending |
+| UNFL-03 | Phase 5 | Pending |
+| UNFL-04 | Phase 5 | Pending |
+| UNFL-05 | Phase 5 | Pending |
+| TRAC-01 | Phase 6 | Pending |
+| TRAC-02 | Phase 6 | Pending |
+| TRAC-03 | Phase 6 | Pending |
+| PERS-01 | Phase 7 | Pending |
+| PERS-02 | Phase 7 | Pending |
+| PERS-03 | Phase 7 | Pending |
+| DEMO-01 | Phase 8 | Pending |
+| DEMO-02 | Phase 8 | Pending |
+
+**Coverage:**
+- v1 requirements: 26 total
+- Mapped to phases: 26
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-10-04*  
+*Last updated: 2026-10-04 after phase 1 planning*

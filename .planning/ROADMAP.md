@@ -27,7 +27,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. Frontend boots with Vite and renders the dark, creative workspace theme with stage navigation.
   2. Backend boots with FastAPI, health check passes, and API endpoints are reachable from frontend.
   3. `AIProvider` base class and stub/mock provider return structured responses.  
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] **01-01-PLAN.md** (Wave 1): Backend Application Shell, Provider Abstractions (AIProvider & StorageProvider), Persistence Bootstrap, and Test Suite.
+- [ ] **01-02-PLAN.md** (Wave 2): Frontend Workspace Shell, Design System, Stage Progression Header, Inspection Drawer, and End-to-End API Integration.
 
 ---
 
