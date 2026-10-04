@@ -53,9 +53,10 @@ Progress: [░░░░░░░░░░] 0%
 - **React + Vite + TypeScript**: Chosen for rapid frontend build velocity, strong typing, and rich animation support.
 - **FastAPI + Pydantic v2**: Chosen for asynchronous backend performance and strict schema validation of all AI outputs.
 - **Provider Abstraction**: Model access is decoupled behind `AIProvider` to allow hot-swapping between Gemini, OpenAI, Claude, and offline mocks.
+- **PostgreSQL / Supabase Persistence**: Intended relational persistence direction for core domain entities; SQLite recognized strictly as an optional local development / offline demo fallback.
 - **Exactly Three Worlds**: Strict architectural constraint reflecting Tattva 2 (latent forms from formlessness) without cognitive overload.
 - **Human Choice Gate**: AI generation strictly halts at three worlds until human selection is registered.
-- **Relational / JSON DAG Traceability**: No external graph database needed for MVP; parent-child DAG relations are modeled directly in SQLite/JSON.
+- **Traceability / Provenance DAG**: Provenance and causal relationships are modeled via explicit parent-child nodes and edge relations connecting entities, without requiring an external graph database.
 - **Canonical Demo Fixture**: "A child discovers a forgotten city beneath the ocean" configured with three pre-baked worlds for 100% demo resilience.
 
 ### Important Constraints & Guardrails

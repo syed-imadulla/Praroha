@@ -13,7 +13,7 @@ This document records the intended architectural direction, technical stack, and
 | **Backend** | Python 3.11+ / FastAPI | High-performance asynchronous API, native Pydantic integration |
 | **Data Validation** | Pydantic v2 | Strict schema validation for all incoming and AI-generated outputs |
 | **AI Integration** | Gemini (or OpenAI / Claude) via Provider Abstraction | Structured generation with temperature control and deterministic fallbacks |
-| **Storage / Persistence** | SQLite / JSON (local MVP) → PostgreSQL / Supabase | Relational tables for entities and JSON columns for lineage DAGs |
+| **Storage / Persistence** | PostgreSQL / Supabase (primary) & SQLite (local/demo fallback) | Relational data model for core entities; explicit node/edge DAG relationships for traceability |
 | **Optional Multimodal** | Imagen / Stable Diffusion / ElevenLabs (future) | Plug-in asset generation without blocking core text-first workflows |
 
 ---
@@ -31,7 +31,7 @@ This document records the intended architectural direction, technical stack, and
    No frontend or core backend business logic binds directly to SDK-specific clients.
 3. **Strict Schema Enactment**: Every LLM response is requested with structured output constraints and validated through Pydantic models before being stored or served to the client.
 4. **Deterministic Fallbacks & Demo Fixtures**: When external AI APIs are unreachable, rate-limited, or offline, the backend seamlessly falls back to pre-compiled fixture data (e.g. for the canonical underwater city demo seed).
-5. **Traceability DAG (Directed Acyclic Graph)**: Every entity maintains explicit parent-child reference arrays in the database. No heavyweight external graph database (like Neo4j) is needed for the MVP.
+5. **Traceability as Provenance Model**: Lineage is modeled through explicit parent-child nodes and edge relations (DAG structure) across core relational entities in PostgreSQL/Supabase. No external graph database (like Neo4j) is needed for the MVP.
 
 ---
 

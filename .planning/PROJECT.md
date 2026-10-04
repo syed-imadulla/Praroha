@@ -53,7 +53,8 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - Frontend: React + Vite + TypeScript, styled with Tailwind CSS (calm dark theme) and Framer Motion for progressive disclosure.
 - Backend: Python 3.11+ with FastAPI, Pydantic v2 schemas for strict structured LLM outputs.
 - AI Provider: Provider abstraction (`AIProvider`) decoupling Gemini or other LLMs with deterministic fallbacks.
-- Lineage: In-memory and relational DAG nodes (`derived_from`, `selected_by`, `constrained_by`, `appears_in`, `generated_for`, `revised_from`, `branched_from`).
+- Persistence: PostgreSQL / Supabase as the intended persistence direction with a relational data model; SQLite strictly as local development / offline demo fallback.
+- Traceability: Modeled as explicit nodes and edges / DAG relationships across core entities, not as a specialized graph database engine.
 
 ## Constraints
 
@@ -68,9 +69,10 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | React + Vite + FastAPI | Fast development velocity, async execution, clean typing across full stack | ✓ Accepted (ADR-001) |
+| PostgreSQL / Supabase Relational Model | Primary persistence target for core entities; SQLite strictly as local/demo fallback | ✓ Accepted (ADR-001) |
 | Exactly 3 Worlds | Balances creative diversity with decision focus; embodies Tattva 2 | ✓ Accepted (ADR-002) |
 | Normalized Seed DNA Schema | Provides strict, immutable anchor for all downstream unfolding | ✓ Accepted |
-| DAG-based Traceability (No Graph DB) | Relational/JSON structures are simple, robust, and zero-dependency for MVP | ✓ Accepted (ADR-002) |
+| DAG Lineage Model (No Graph DB) | Relational node/edge structures model provenance cleanly without graph DB complexity | ✓ Accepted (ADR-002) |
 | Provider Adapter + Demo Fallbacks | Decouples LLM vendor and guarantees 100% demo uptime | ✓ Accepted (ADR-001) |
 
 ---
