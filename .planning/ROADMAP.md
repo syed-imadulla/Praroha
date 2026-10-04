@@ -99,7 +99,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. Every character, scene, and world rule stores explicit parent node IDs (`derived_from`, `constrained_by`, `selected_by`).
   2. Clicking any entity highlights its provenance path back to Seed DNA and user choices.
   3. Explanations are plain-language and free of raw model reasoning tokens.  
-**Plans**: TBD
+**Plans**: 2 plans (all completed)
+- [x] **06-01-PLAN.md** (Wave 1): Backend Lineage DAG Models, Dynamic Relational Synthesis Engine, Causal Explanation Service, API Endpoints, and Pytest Suite.
+- [x] **06-02-PLAN.md** (Wave 2): Frontend Lineage Types, Workspace Store, Stage 6 Traceability Canvas with Multi-Lane DAG, Path Glow & Dimming, Causal Inspector Card, and Playwright E2E Suite.
 
 ---
 

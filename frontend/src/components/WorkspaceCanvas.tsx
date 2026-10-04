@@ -6,6 +6,7 @@ import { SeedDnaViewer } from './SeedDnaViewer';
 import { WorldCandidatesCanvas } from './WorldCandidatesCanvas';
 import { WorldSelectionCanvas } from './WorldSelectionCanvas';
 import { UniverseCodexCanvas } from './UniverseCodexCanvas';
+import { TraceabilityCanvas } from './TraceabilityCanvas';
 
 export const WorkspaceCanvas: React.FC = () => {
   const {
@@ -29,7 +30,7 @@ export const WorkspaceCanvas: React.FC = () => {
         inspectorOpen ? 'mr-0 md:mr-80 lg:mr-96' : ''
       }`}
     >
-      <div className={`w-full ${activeStage === 'worlds' || activeStage === 'choose' || activeStage === 'unfold' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
+      <div className={`w-full ${activeStage === 'worlds' || activeStage === 'choose' || activeStage === 'unfold' || activeStage === 'trace' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
         {/* Dynamic Stage Canvas View */}
         {activeStage === 'seed' && <SeedInputCanvas />}
 
@@ -41,7 +42,9 @@ export const WorkspaceCanvas: React.FC = () => {
 
         {activeStage === 'unfold' && <UniverseCodexCanvas />}
 
-        {activeStage !== 'seed' && activeStage !== 'understand' && activeStage !== 'worlds' && activeStage !== 'choose' && activeStage !== 'unfold' && (
+        {activeStage === 'trace' && <TraceabilityCanvas />}
+
+        {activeStage !== 'seed' && activeStage !== 'understand' && activeStage !== 'worlds' && activeStage !== 'choose' && activeStage !== 'unfold' && activeStage !== 'trace' && (
           <div className="py-12 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 flex items-center justify-center mx-auto">
               <Compass className="w-6 h-6 animate-pulse" />

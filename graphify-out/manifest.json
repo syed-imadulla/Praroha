@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1791097257.113281,
-    "seen": 1791097877.363439,
-    "ast_hash": "71a4ed38d714bef280f232e71d1521c3",
+    "mtime": 1791099106.549369,
+    "seen": 1791099701.7282338,
+    "ast_hash": "4c67e52ca4c9cf15b7d927c09f8b7093",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791097386.830666,
-    "seen": 1791097877.363495,
-    "ast_hash": "ad595faaa3ef13c04155d65cab54fffb",
+    "mtime": 1791099329.1926246,
+    "seen": 1791099701.7283425,
+    "ast_hash": "41de1843d11914a6e124a348d2fbff6c",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -144,9 +144,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
-    "mtime": 1791097574.8883297,
-    "seen": 1791097877.3635054,
-    "ast_hash": "95893ca0d1375b006c6e596e5a0b2946",
+    "mtime": 1791099474.522833,
+    "seen": 1791099701.7283623,
+    "ast_hash": "cfaa24fcd194775294c39d0a61376ec9",
     "semantic_hash": ""
   },
   "frontend/src/main.tsx": {
@@ -156,15 +156,15 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791097446.2879267,
-    "seen": 1791097877.3635287,
-    "ast_hash": "e9d334d2739f50a762c589b02715ee01",
+    "mtime": 1791099376.8830369,
+    "seen": 1791099701.728375,
+    "ast_hash": "6df3a0f7511feb1d74c8d46a8cc37245",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1791097364.5639431,
-    "seen": 1791097877.3635314,
-    "ast_hash": "218d08d8067a8b959d3291afa3f18856",
+    "mtime": 1791099307.730889,
+    "seen": 1791099701.728377,
+    "ast_hash": "64f766b6db9a38f4ffaf636b4b2a7543",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791097844.0509872,
-    "seen": 1791097877.3635519,
-    "ast_hash": "18d4821e7762f8c25e5bd244a39eb98e",
+    "mtime": 1791099668.0324674,
+    "seen": 1791099701.728402,
+    "ast_hash": "0512f1656c927e260d754aa42798434d",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791097857.4828203,
-    "seen": 1791097877.3635533,
-    "ast_hash": "dc155aeeba342691594185c157954f95",
+    "mtime": 1791099686.5222414,
+    "seen": 1791099701.728404,
+    "ast_hash": "0a7fcdf1d857d913ba441b4e7a725220",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1791097066.2366576,
-    "seen": 1791097877.3634424,
-    "ast_hash": "622eb37b24e444919ff1530757eaa776",
+    "mtime": 1791099045.7251189,
+    "seen": 1791099701.7282374,
+    "ast_hash": "165899db76262160353409fdad913aec",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -720,15 +720,93 @@
     "semantic_hash": ""
   },
   "frontend/src/components/UniverseCodexCanvas.tsx": {
-    "mtime": 1791097769.574912,
-    "seen": 1791097877.3635035,
-    "ast_hash": "d2d6d0f67bc55a65dac36b96442ade1d",
+    "mtime": 1791099508.1374214,
+    "seen": 1791099701.72836,
+    "ast_hash": "48317c8559161883cf96ae95fdbf5cfc",
     "semantic_hash": ""
   },
   ".planning/phases/05-progressive-world-unfolding/05-SUMMARY.md": {
     "mtime": 1791097867.5606952,
     "seen": 1791097877.3636117,
     "ast_hash": "c8776833bad493fb581c7575abab0547",
+    "semantic_hash": ""
+  },
+  "backend/app/models/lineage.py": {
+    "mtime": 1791099033.0802748,
+    "seen": 1791099701.7282438,
+    "ast_hash": "8223b204b3a6a228b5ad3354d4e0f09c",
+    "semantic_hash": ""
+  },
+  "backend/app/routers/lineage.py": {
+    "mtime": 1791099094.4285185,
+    "seen": 1791099701.7282803,
+    "ast_hash": "95a1fff6458a3dbc4b075d12467e5566",
+    "semantic_hash": ""
+  },
+  "backend/app/services/lineage_service.py": {
+    "mtime": 1791099252.8909025,
+    "seen": 1791099701.7282934,
+    "ast_hash": "64bd30a439a93e4aaaec842805a54242",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_lineage.py": {
+    "mtime": 1791099164.4566553,
+    "seen": 1791099701.7283046,
+    "ast_hash": "4ba22bdeb85b7198cc1e0209927135ff",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase6_traceability.cjs": {
+    "mtime": 1791099601.3872817,
+    "seen": 1791099701.7283323,
+    "ast_hash": "89bdff220c1453795aaaba2fb46809ea",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/TraceabilityCanvas.tsx": {
+    "mtime": 1791099546.9019477,
+    "seen": 1791099701.728357,
+    "ast_hash": "bd107132d7a2566379037f3e9fd0d0b3",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-01-PLAN.md": {
+    "mtime": 1791098830.3197742,
+    "seen": 1791099701.7285101,
+    "ast_hash": "3d059ada6346b52c018c482a8f1aa28b",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-02-PLAN.md": {
+    "mtime": 1791098891.0150259,
+    "seen": 1791099701.728529,
+    "ast_hash": "9fcc5c6522876c1f8485e96365cbfb89",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-CONTEXT.md": {
+    "mtime": 1791098790.4672654,
+    "seen": 1791099701.7285306,
+    "ast_hash": "e6507e129f2bfdd22727d18c03a8959f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-DISCUSSION-LOG.md": {
+    "mtime": 1791098263.0367842,
+    "seen": 1791099701.7285328,
+    "ast_hash": "2eeff64464ee9b69e0910f8b1af629b2",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-RESEARCH.md": {
+    "mtime": 1791098809.9090257,
+    "seen": 1791099701.7285347,
+    "ast_hash": "b2e8cddb05d9ca23a6d75c66a40caf5f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-SUMMARY.md": {
+    "mtime": 1791099650.707679,
+    "seen": 1791099701.7285366,
+    "ast_hash": "d9e2c89426b01bf49a5a1aaf50446422",
+    "semantic_hash": ""
+  },
+  ".planning/phases/06-traceability-provenance/06-VALIDATION.md": {
+    "mtime": 1791098460.1193376,
+    "seen": 1791099701.7285383,
+    "ast_hash": "57dfa3d453202af50069db096faaf5fd",
     "semantic_hash": ""
   }
 }

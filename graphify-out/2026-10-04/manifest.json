@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1791092180.454625,
-    "seen": 1791092668.9944968,
-    "ast_hash": "2649d9392460c3830455b80b9fff61fe",
+    "mtime": 1791097257.113281,
+    "seen": 1791097877.363439,
+    "ast_hash": "71a4ed38d714bef280f232e71d1521c3",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/base.py": {
-    "mtime": 1791082531.7811723,
-    "seen": 1791082976.2540941,
-    "ast_hash": "cc577cbe81af05c768826e02969e3f08",
+    "mtime": 1791097109.825115,
+    "seen": 1791097877.363454,
+    "ast_hash": "13b429252a7a2189e0aec4d486f355da",
     "semantic_hash": ""
   },
   "backend/app/providers/factory.py": {
@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/mock_provider.py": {
-    "mtime": 1791087518.3700056,
-    "seen": 1791088121.3629925,
-    "ast_hash": "4b1ed1bd5bdc7199bbdeefc9e3af9cde",
+    "mtime": 1791097132.6558306,
+    "seen": 1791097877.3634584,
+    "ast_hash": "004376950eba190053bee65f4b2bb8fb",
     "semantic_hash": ""
   },
   "backend/app/providers/storage.py": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791093103.4054813,
-    "seen": 1791093703.6646035,
-    "ast_hash": "b31d865faa4fb2e2fe91379c74cb69dc",
+    "mtime": 1791097308.2526443,
+    "seen": 1791097877.363461,
+    "ast_hash": "3a95b60a9f838d198ccfd1ca36830c58",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -114,27 +114,27 @@
     "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
-    "mtime": 1791082831.5166306,
-    "seen": 1791082976.2541156,
-    "ast_hash": "266c1155ddd2ac6f73cb99cf5f924bf0",
+    "mtime": 1791097635.3925784,
+    "seen": 1791097877.3634937,
+    "ast_hash": "fed54875065b2be4c9bc1c48552e1f39",
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791092308.9240842,
-    "seen": 1791092668.994609,
-    "ast_hash": "5bc32d4ead62e8416cc36ce33ac90aae",
+    "mtime": 1791097386.830666,
+    "seen": 1791097877.363495,
+    "ast_hash": "ad595faaa3ef13c04155d65cab54fffb",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
-    "mtime": 1791092467.3191698,
-    "seen": 1791092668.9946117,
-    "ast_hash": "0f7c212e0fd320c176d87f5bb8919ec3",
+    "mtime": 1791097625.8956962,
+    "seen": 1791097877.3634965,
+    "ast_hash": "edfdb4f02b2ac2f16d2a43c00ea4909e",
     "semantic_hash": ""
   },
   "frontend/src/components/StageProgressHeader.tsx": {
-    "mtime": 1791082799.8530047,
-    "seen": 1791082976.2541215,
-    "ast_hash": "e74ebc84f108f515dfc9bd080926a301",
+    "mtime": 1791097587.097178,
+    "seen": 1791097877.363501,
+    "ast_hash": "7363cd2a7e2ef1cb2d92c5d45899759b",
     "semantic_hash": ""
   },
   "frontend/src/components/TopBar.tsx": {
@@ -144,9 +144,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
-    "mtime": 1791092436.756539,
-    "seen": 1791092668.9946246,
-    "ast_hash": "ddc0096971984e5cf1b9950431dcaec6",
+    "mtime": 1791097574.8883297,
+    "seen": 1791097877.3635054,
+    "ast_hash": "95893ca0d1375b006c6e596e5a0b2946",
     "semantic_hash": ""
   },
   "frontend/src/main.tsx": {
@@ -156,15 +156,15 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791092341.4356914,
-    "seen": 1791092668.9946368,
-    "ast_hash": "05c7a24485427b4bd01082ff793ebaef",
+    "mtime": 1791097446.2879267,
+    "seen": 1791097877.3635287,
+    "ast_hash": "e9d334d2739f50a762c589b02715ee01",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1791092295.306249,
-    "seen": 1791092668.9946392,
-    "ast_hash": "b1da05e41b2a27cab62771c1d619072e",
+    "mtime": 1791097364.5639431,
+    "seen": 1791097877.3635314,
+    "ast_hash": "218d08d8067a8b959d3291afa3f18856",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791095497.6693912,
-    "seen": 1791095516.5384448,
-    "ast_hash": "df8eeef9b23422e4b54da15d32d2d16a",
+    "mtime": 1791097844.0509872,
+    "seen": 1791097877.3635519,
+    "ast_hash": "18d4821e7762f8c25e5bd244a39eb98e",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791095505.2752948,
-    "seen": 1791095516.5384476,
-    "ast_hash": "778d87ea8f79b032c80ae883511393df",
+    "mtime": 1791097857.4828203,
+    "seen": 1791097877.3635533,
+    "ast_hash": "dc155aeeba342691594185c157954f95",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1791092119.0953565,
-    "seen": 1791092668.994502,
-    "ast_hash": "b3819aefd85f4c3196aa9238357688ac",
+    "mtime": 1791097066.2366576,
+    "seen": 1791097877.3634424,
+    "ast_hash": "622eb37b24e444919ff1530757eaa776",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/gemini_provider.py": {
-    "mtime": 1791087355.8858967,
-    "seen": 1791088121.3629904,
-    "ast_hash": "b6b909e4343ed22441d7810b4ef0aeca",
+    "mtime": 1791097155.7245433,
+    "seen": 1791097877.3634567,
+    "ast_hash": "0e6a83dab5819d2e1c7b8a1ee8e36b45",
     "semantic_hash": ""
   },
   "backend/app/routers/dna.py": {
@@ -693,6 +693,42 @@
     "mtime": 1791096371.6823084,
     "seen": 1791096384.6508214,
     "ast_hash": "d006eb27b10ba64c62ffbb825a434845",
+    "semantic_hash": ""
+  },
+  "backend/app/models/unfold.py": {
+    "mtime": 1791097054.4208047,
+    "seen": 1791097877.3634508,
+    "ast_hash": "1bab34eae9b4dc35db63556b92f3fa24",
+    "semantic_hash": ""
+  },
+  "backend/app/routers/unfold.py": {
+    "mtime": 1791097240.3004904,
+    "seen": 1791097877.3634691,
+    "ast_hash": "78c07498bf7570c83c87cc6b99d31e18",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_unfold.py": {
+    "mtime": 1791097279.8059986,
+    "seen": 1791097877.3634799,
+    "ast_hash": "301ff2b62be023abd8bb03d8c5c594ba",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase5_unfold.cjs": {
+    "mtime": 1791097776.5318255,
+    "seen": 1791097877.3634884,
+    "ast_hash": "6f4bd39de4ea9bb442118de1c6642a85",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/UniverseCodexCanvas.tsx": {
+    "mtime": 1791097769.574912,
+    "seen": 1791097877.3635035,
+    "ast_hash": "d2d6d0f67bc55a65dac36b96442ade1d",
+    "semantic_hash": ""
+  },
+  ".planning/phases/05-progressive-world-unfolding/05-SUMMARY.md": {
+    "mtime": 1791097867.5606952,
+    "seen": 1791097877.3636117,
+    "ast_hash": "c8776833bad493fb581c7575abab0547",
     "semantic_hash": ""
   }
 }

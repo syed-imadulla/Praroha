@@ -13,6 +13,7 @@ import {
   Flame,
   ArrowRight,
   GitBranch,
+  GitFork,
   Shield,
   Layers,
   AlertTriangle,
@@ -31,6 +32,7 @@ export const UniverseCodexCanvas: React.FC = () => {
     activeCodexTab,
     setActiveCodexTab,
     unfoldUniverse,
+    jumpToTraceNode,
     toggleInspector,
     setInspectorTab,
   } = useWorkspaceStore();
@@ -399,9 +401,19 @@ export const UniverseCodexCanvas: React.FC = () => {
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <h3 className="font-bold text-slate-100 text-sm">{loc.name}</h3>
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                                Location {idx + 1}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => jumpToTraceNode(`node-loc-${idx}`)}
+                                  className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition"
+                                  title="Trace causal lineage in DAG"
+                                >
+                                  <GitFork className="w-3 h-3" />
+                                  <span>Trace Lineage</span>
+                                </button>
+                                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                                  Location {idx + 1}
+                                </span>
+                              </div>
                             </div>
                             <p className="text-xs text-slate-300 leading-relaxed">{loc.description}</p>
                           </div>
@@ -530,9 +542,19 @@ export const UniverseCodexCanvas: React.FC = () => {
                               <h3 className="font-extrabold text-slate-100 text-sm md:text-base">
                                 {char.name}
                               </h3>
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                                {char.archetype}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
+                                  className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition"
+                                  title="Trace causal lineage in DAG"
+                                >
+                                  <GitFork className="w-3 h-3" />
+                                  <span>Trace Lineage</span>
+                                </button>
+                                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                                  {char.archetype}
+                                </span>
+                              </div>
                             </div>
                             <div className="text-xs text-slate-400 font-medium mt-0.5">
                               {char.role}
@@ -616,8 +638,18 @@ export const UniverseCodexCanvas: React.FC = () => {
                             {rel.target_character_name || 'Character B'}
                           </span>
                         </div>
-                        <div className="inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-orange-500/10 text-orange-300 border border-orange-500/20">
-                          {rel.relation_type}
+                        <div className="flex items-center justify-between">
+                          <div className="inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-orange-500/10 text-orange-300 border border-orange-500/20">
+                            {rel.relation_type}
+                          </div>
+                          <button
+                            onClick={() => jumpToTraceNode(`node-rel-${rel.id}`)}
+                            className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border border-orange-500/30 transition"
+                            title="Trace causal lineage in DAG"
+                          >
+                            <GitFork className="w-3 h-3" />
+                            <span>Trace Lineage</span>
+                          </button>
                         </div>
                         <p className="text-slate-300 leading-relaxed text-[11.5px]">
                           {rel.dynamic_description}
@@ -654,6 +686,14 @@ export const UniverseCodexCanvas: React.FC = () => {
                           </h3>
                         </div>
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => jumpToTraceNode(`node-scene-${scene.id}`)}
+                            className="trace-lineage-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 transition"
+                            title="Trace causal lineage in DAG"
+                          >
+                            <GitFork className="w-3.5 h-3.5" />
+                            <span>Trace Lineage</span>
+                          </button>
                           <span className="text-[11px] text-slate-400 font-medium">Setting:</span>
                           <span className="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700">
                             {scene.location_setting}

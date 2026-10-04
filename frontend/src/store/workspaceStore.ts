@@ -1,7 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiClient } from '../api/client';
-import { Project, SeedDNARead, StageType, SystemHealthData, WorldCandidateRead, WorldSelectionRead, UnfoldedUniverseRead } from '../types';
+import {
+  Project,
+  SeedDNARead,
+  StageType,
+  SystemHealthData,
+  WorldCandidateRead,
+  WorldSelectionRead,
+  UnfoldedUniverseRead,
+  TraceGraphRead,
+} from '../types';
 
 interface WorkspaceState {
   activeStage: StageType;
@@ -19,6 +28,10 @@ interface WorkspaceState {
   unfoldingStep: number;
   unfoldError: string | null;
   activeCodexTab: 'bible' | 'characters' | 'scenes';
+  lineageGraph: TraceGraphRead | null;
+  selectedNodeId: string | null;
+  isLoadingLineage: boolean;
+  lineageFilter: 'all' | 'characters' | 'scenes' | 'locations' | 'lore';
   isExtracting: boolean;
   extractionStep: string;
   isGeneratingWorlds: boolean;
@@ -42,6 +55,10 @@ interface WorkspaceState {
   setActiveCodexTab: (tab: 'bible' | 'characters' | 'scenes') => void;
   unfoldUniverse: () => Promise<boolean>;
   fetchUnfoldedUniverse: () => Promise<void>;
+  fetchLineage: () => Promise<void>;
+  setSelectedNodeId: (nodeId: string | null) => void;
+  setLineageFilter: (filter: 'all' | 'characters' | 'scenes' | 'locations' | 'lore') => void;
+  jumpToTraceNode: (nodeId: string) => void;
   setExtracting: (isExtracting: boolean, step?: string) => void;
   extractSeedDNA: (customSeed?: string) => Promise<boolean>;
   generateWorlds: () => Promise<boolean>;
@@ -73,6 +90,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       unfoldingStep: 0,
       unfoldError: null,
       activeCodexTab: 'bible',
+      lineageGraph: null,
+      selectedNodeId: null,
+      isLoadingLineage: false,
+      lineageFilter: 'all',
       isExtracting: false,
       extractionStep: '',
       isGeneratingWorlds: false,
@@ -235,6 +256,40 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }
       },
 
+      fetchLineage: async () => {
+        const state = get();
+        const project = state.activeProject;
+        if (!project) return;
+
+        set({ isLoadingLineage: true });
+        try {
+          const res = await apiClient.getProjectLineage(project.id);
+          if (res.success && res.data) {
+            set({ lineageGraph: res.data, isLoadingLineage: false });
+          } else {
+            set({ isLoadingLineage: false });
+          }
+        } catch (err) {
+          console.error('Failed to fetch project lineage:', err);
+          set({ isLoadingLineage: false });
+        }
+      },
+
+      setSelectedNodeId: (selectedNodeId) => set({ selectedNodeId }),
+      setLineageFilter: (lineageFilter) => set({ lineageFilter }),
+
+      jumpToTraceNode: (nodeId: string) => {
+        set((state) => ({
+          activeStage: 'trace',
+          selectedNodeId: nodeId,
+          unlockedStages: state.unlockedStages.includes('trace')
+            ? state.unlockedStages
+            : [...state.unlockedStages, 'trace'],
+        }));
+        const state = get();
+        state.fetchLineage();
+      },
+
       setExtracting: (isExtracting, step = '') =>
         set({ isExtracting, extractionStep: step }),
 
@@ -380,6 +435,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           unfoldingStep: 0,
           unfoldError: null,
           activeCodexTab: 'bible',
+          lineageGraph: null,
+          selectedNodeId: null,
+          isLoadingLineage: false,
+          lineageFilter: 'all',
           isExtracting: false,
           extractionStep: '',
           isGeneratingWorlds: false,

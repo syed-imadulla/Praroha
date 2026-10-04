@@ -36,6 +36,14 @@ from backend.app.models.unfold import (
     SceneRead,
     UnfoldedUniverseRead,
 )
+from backend.app.models.lineage import (
+    TraceNodeType,
+    TraceRelationType,
+    TraceNode,
+    TraceEdge,
+    TraceGraphRead,
+    AncestorPathRead,
+)
 
 __all__ = [
     "Project",
@@ -73,5 +81,11 @@ __all__ = [
     "SceneRecord",
     "SceneRead",
     "UnfoldedUniverseRead",
+    "TraceNodeType",
+    "TraceRelationType",
+    "TraceNode",
+    "TraceEdge",
+    "TraceGraphRead",
+    "AncestorPathRead",
 ]
 

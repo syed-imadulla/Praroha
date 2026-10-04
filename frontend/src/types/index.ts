@@ -211,3 +211,57 @@ export interface UnfoldedUniverseRead {
   scenes: SceneRead[];
 }
 
+export type TraceNodeType =
+  | "root_seed"
+  | "seed_dna"
+  | "world_candidate"
+  | "human_selection"
+  | "world_bible"
+  | "key_location"
+  | "character"
+  | "relationship"
+  | "scene";
+
+export type TraceRelationType =
+  | "derived_from"
+  | "selected_by"
+  | "constrained_by"
+  | "appears_in"
+  | "generated_for";
+
+export interface TraceNode {
+  id: string;
+  entity_id: string;
+  entity_type: TraceNodeType;
+  label: string;
+  title: string;
+  stage: number;
+  summary: string;
+  causal_explanation: string;
+  parent_ids: string[];
+  metadata?: Record<string, unknown>;
+}
+
+export interface TraceEdge {
+  id: string;
+  source: string;
+  target: string;
+  relation_type: TraceRelationType;
+  label: string;
+}
+
+export interface TraceGraphRead {
+  project_id: string;
+  root_node_id: string;
+  nodes: TraceNode[];
+  edges: TraceEdge[];
+  selected_node_id?: string | null;
+}
+
+export interface AncestorPathRead {
+  node_id: string;
+  ancestor_nodes: TraceNode[];
+  ancestor_edges: TraceEdge[];
+  summary_explanation: string;
+}
+

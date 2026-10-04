@@ -1,4 +1,14 @@
-import { APIResponse, Project, SeedDNARead, SystemHealthData, WorldCandidateRead, WorldSelectionRead, UnfoldedUniverseRead } from '../types';
+import {
+  APIResponse,
+  Project,
+  SeedDNARead,
+  SystemHealthData,
+  WorldCandidateRead,
+  WorldSelectionRead,
+  UnfoldedUniverseRead,
+  TraceGraphRead,
+  AncestorPathRead,
+} from '../types';
 
 class ApiClient {
   private baseUrl = '/api';
@@ -102,6 +112,14 @@ class ApiClient {
 
   async getUnfoldedUniverse(projectId: string): Promise<APIResponse<UnfoldedUniverseRead>> {
     return this.request<UnfoldedUniverseRead>(`/projects/${projectId}/unfolded`);
+  }
+
+  async getProjectLineage(projectId: string): Promise<APIResponse<TraceGraphRead>> {
+    return this.request<TraceGraphRead>(`/projects/${projectId}/lineage`);
+  }
+
+  async getNodeAncestors(projectId: string, nodeId: string): Promise<APIResponse<AncestorPathRead>> {
+    return this.request<AncestorPathRead>(`/projects/${projectId}/lineage/node/${nodeId}/ancestors`);
   }
 }
 
