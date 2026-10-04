@@ -567,7 +567,7 @@
       "file_type": "code",
       "norm_label": "test_local_storage_provider()",
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L65"
+      "source_location": "L67"
     },
     {
       "id": "backend_tests_test_providers_test_mock_provider_extract_dna",
@@ -615,7 +615,7 @@
       "file_type": "code",
       "norm_label": "test_mock_provider_unfold_stages()",
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L45"
+      "source_location": "L47"
     },
     {
       "id": "backend_app_core_response_api_error",
@@ -5160,6 +5160,7 @@
     {
       "id": "os",
       "label": "os",
+      "_origin": "semantic",
       "community": 0,
       "community_name": "AIProvider",
       "external": true,
@@ -5171,6 +5172,7 @@
     {
       "id": "pathlib",
       "label": "pathlib",
+      "_origin": "semantic",
       "community": 0,
       "community_name": "AIProvider",
       "external": true,
@@ -5182,6 +5184,7 @@
     {
       "id": "pydantic_settings",
       "label": "pydantic_settings",
+      "_origin": "semantic",
       "community": 0,
       "community_name": "AIProvider",
       "external": true,
@@ -5193,6 +5196,7 @@
     {
       "id": "typing",
       "label": "typing",
+      "_origin": "semantic",
       "community": 0,
       "community_name": "AIProvider",
       "external": true,
@@ -5204,6 +5208,7 @@
     {
       "id": "pydantic",
       "label": "pydantic",
+      "_origin": "semantic",
       "community": 1,
       "community_name": "ProjectRepository",
       "external": true,
@@ -5215,6 +5220,7 @@
     {
       "id": "sqlalchemy_ext_asyncio",
       "label": "sqlalchemy_ext_asyncio",
+      "_origin": "semantic",
       "community": 1,
       "community_name": "ProjectRepository",
       "external": true,
@@ -5226,6 +5232,7 @@
     {
       "id": "uuid",
       "label": "uuid",
+      "_origin": "semantic",
       "community": 1,
       "community_name": "ProjectRepository",
       "external": true,
@@ -5237,6 +5244,7 @@
     {
       "id": "frontend_src_index",
       "label": "frontend_src_index",
+      "_origin": "semantic",
       "community": 3,
       "community_name": "App.tsx",
       "external": true,
@@ -5248,6 +5256,7 @@
     {
       "id": "asyncio",
       "label": "asyncio",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5259,6 +5268,7 @@
     {
       "id": "contextlib",
       "label": "contextlib",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5270,6 +5280,7 @@
     {
       "id": "fastapi_middleware_cors",
       "label": "fastapi_middleware_cors",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5281,6 +5292,7 @@
     {
       "id": "fastapi_responses",
       "label": "fastapi_responses",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5292,6 +5304,7 @@
     {
       "id": "httpx",
       "label": "httpx",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5303,6 +5316,7 @@
     {
       "id": "pytest",
       "label": "pytest",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5314,6 +5328,7 @@
     {
       "id": "pytest_asyncio",
       "label": "pytest_asyncio",
+      "_origin": "semantic",
       "community": 4,
       "community_name": "main.py",
       "external": true,
@@ -5801,7 +5816,7 @@
       "confidence_score": 1.0,
       "context": "decorator",
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L64",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -5849,7 +5864,7 @@
       "confidence_score": 1.0,
       "context": "decorator",
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L44",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -8675,7 +8690,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L45",
+      "source_location": "L47",
       "weight": 1.0
     },
     {
@@ -8686,7 +8701,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L65",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -13008,7 +13023,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.95,
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L66",
+      "source_location": "L68",
       "weight": 0.8
     },
     {
@@ -13052,10 +13067,10 @@
       "confidence": "INFERRED",
       "confidence_score": 0.95,
       "source_file": "backend/tests/test_providers.py",
-      "source_location": "L46",
+      "source_location": "L48",
       "weight": 0.8
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1eb089c0ad0e16c0daa0f9f57d43d4b63d24022d"
+  "built_at_commit": "bbd85053d62f8cd76c605eec1fa4a616fd8f2dc1"
 }

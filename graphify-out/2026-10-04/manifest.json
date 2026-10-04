@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/mock_provider.py": {
-    "mtime": 1791082552.0209332,
-    "seen": 1791082976.2540977,
-    "ast_hash": "f9d868f02859ee196936b549ab3bc8eb",
+    "mtime": 1791083992.659086,
+    "seen": 1791084026.380501,
+    "ast_hash": "73197ffa9167498c4d9e3b0d8d8999e5",
     "semantic_hash": ""
   },
   "backend/app/providers/storage.py": {
@@ -96,9 +96,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_providers.py": {
-    "mtime": 1791082617.1901631,
-    "seen": 1791082976.2541106,
-    "ast_hash": "9234e6ff9d86b29f1df1ae03a7c179f1",
+    "mtime": 1791084004.2669506,
+    "seen": 1791084026.380557,
+    "ast_hash": "9e0ae0e80d7b79201cb496c35c4e7c88",
     "semantic_hash": ""
   },
   "frontend/package.json": {

@@ -1,9 +1,9 @@
 ---
 phase: "2"
 slug: "seed-understanding-seed-dna"
-status: draft
+status: complete
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: "2026-10-04"
 ---
 
@@ -38,12 +38,12 @@ created: "2026-10-04"
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| 02-01-01 | 01 | 1 | DNA-03 | — | Validates Pydantic SeedDNA model & SQLModel record | unit | `pytest backend/tests/test_dna.py -k test_schema` | ❌ W0 | ⬜ pending |
-| 02-01-02 | 01 | 1 | DNA-02 | — | Verifies GeminiProvider with Mock fallback logic | unit | `pytest backend/tests/test_dna.py -k test_provider` | ❌ W0 | ⬜ pending |
-| 02-01-03 | 01 | 1 | DNA-05 | — | Verifies raw seed immutability & extraction API endpoint | integration | `pytest backend/tests/test_dna.py -k test_endpoint` | ❌ W0 | ⬜ pending |
-| 02-02-01 | 02 | 2 | DNA-01 | — | Verifies frontend presets & seed textarea input | build | `npm run build --prefix frontend` | ❌ W0 | ⬜ pending |
-| 02-02-02 | 02 | 2 | DNA-02 | — | Verifies understanding pass loader and stage transition | component | `npm run build --prefix frontend` | ❌ W0 | ⬜ pending |
-| 02-02-03 | 02 | 2 | DNA-04 | — | Verifies Inspector Drawer Seed DNA cards and JSON export | component | `npm run build --prefix frontend` | ❌ W0 | ⬜ pending |
+| 02-01-01 | 01 | 1 | DNA-03 | — | Validates Pydantic SeedDNA model & SQLModel record | unit | `pytest backend/tests/test_dna.py -k test_schema` | ✅ | ✅ green |
+| 02-01-02 | 01 | 1 | DNA-02 | — | Verifies GeminiProvider with Mock fallback logic | unit | `pytest backend/tests/test_dna.py -k test_provider` | ✅ | ✅ green |
+| 02-01-03 | 01 | 1 | DNA-05 | — | Verifies raw seed immutability & extraction API endpoint | integration | `pytest backend/tests/test_dna.py -k test_endpoint` | ✅ | ✅ green |
+| 02-02-01 | 02 | 2 | DNA-01 | — | Verifies frontend presets & seed textarea input | build | `npm run build --prefix frontend` | ✅ | ✅ green |
+| 02-02-02 | 02 | 2 | DNA-02 | — | Verifies understanding pass loader and stage transition | component | `npm run build --prefix frontend` | ✅ | ✅ green |
+| 02-02-03 | 02 | 2 | DNA-04 | — | Verifies Inspector Drawer Seed DNA cards and JSON export | component | `npm run build --prefix frontend` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -51,9 +51,9 @@ created: "2026-10-04"
 
 ## Wave 0 Requirements
 
-- [ ] `backend/tests/test_dna.py` — unit and integration test fixtures for Seed DNA
-- [ ] `backend/app/models/dna.py` — SeedDNA Pydantic and SQLModel schemas
-- [ ] `frontend/src/components/SeedDnaViewer.tsx` — component for rendering DNA parameter cards
+- [x] `backend/tests/test_dna.py` — unit and integration test fixtures for Seed DNA
+- [x] `backend/app/models/dna.py` — SeedDNA Pydantic and SQLModel schemas
+- [x] `frontend/src/components/SeedDnaViewer.tsx` — component for rendering DNA parameter cards
 
 ---
 
