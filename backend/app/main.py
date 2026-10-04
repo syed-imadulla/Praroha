@@ -9,6 +9,7 @@ from backend.app.repositories.project_repo import init_db
 from backend.app.routers.dna import router as dna_router
 from backend.app.routers.health import router as health_router
 from backend.app.routers.projects import router as projects_router
+from backend.app.routers.worlds import router as worlds_router
 
 
 @asynccontextmanager
@@ -53,3 +54,4 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 app.include_router(health_router, prefix=settings.API_V1_PREFIX)
 app.include_router(projects_router, prefix=settings.API_V1_PREFIX)
 app.include_router(dna_router, prefix=settings.API_V1_PREFIX)
+app.include_router(worlds_router, prefix=settings.API_V1_PREFIX)

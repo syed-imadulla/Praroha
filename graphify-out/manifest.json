@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1791085324.4455655,
-    "seen": 1791085614.185191,
-    "ast_hash": "861807d0703fd7fafc2559e311658cf9",
+    "mtime": 1791087453.816757,
+    "seen": 1791088121.3629725,
+    "ast_hash": "ed6ba25c358e6f8915a7402138ed4d53",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/mock_provider.py": {
-    "mtime": 1791083992.659086,
-    "seen": 1791084026.380501,
-    "ast_hash": "73197ffa9167498c4d9e3b0d8d8999e5",
+    "mtime": 1791087518.3700056,
+    "seen": 1791088121.3629925,
+    "ast_hash": "4b1ed1bd5bdc7199bbdeefc9e3af9cde",
     "semantic_hash": ""
   },
   "backend/app/providers/storage.py": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791085288.5079844,
-    "seen": 1791085614.185219,
-    "ast_hash": "453efeba085718a22b877a81acd52e8f",
+    "mtime": 1791087393.6784568,
+    "seen": 1791088121.3629973,
+    "ast_hash": "f23468e0bfcdba56db49b99dfbe873c2",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -120,15 +120,15 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791085426.961371,
-    "seen": 1791085614.1852508,
-    "ast_hash": "f85982a5b26955faed4fc72fc9cb2e1f",
+    "mtime": 1791087618.632839,
+    "seen": 1791088121.3630395,
+    "ast_hash": "537cb3e5b69131dba9c4b1f21ed6ad39",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
-    "mtime": 1791085503.3594806,
-    "seen": 1791085614.185254,
-    "ast_hash": "6eb57890bf8ea4be422955a4d510be16",
+    "mtime": 1791087771.6800578,
+    "seen": 1791088121.3630407,
+    "ast_hash": "da0c4bddaf8bb2c49df97be206f07aa5",
     "semantic_hash": ""
   },
   "frontend/src/components/StageProgressHeader.tsx": {
@@ -144,9 +144,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
-    "mtime": 1791085517.053321,
-    "seen": 1791085614.185268,
-    "ast_hash": "008f8498deb28b9c0dc5cfbe86520c7a",
+    "mtime": 1791088017.6371956,
+    "seen": 1791088121.3630512,
+    "ast_hash": "4ae19e262674880610419753b8f4021f",
     "semantic_hash": ""
   },
   "frontend/src/main.tsx": {
@@ -156,15 +156,15 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791085441.6461997,
-    "seen": 1791085614.1852736,
-    "ast_hash": "5eb860b1e7cf1649a02527d17972803f",
+    "mtime": 1791087663.992311,
+    "seen": 1791088121.363057,
+    "ast_hash": "38b12199339c6f942b866cdbc9ddc036",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1791085411.8695467,
-    "seen": 1791085614.1852763,
-    "ast_hash": "8dad4225fc31c4787fe1e8635ae15ba6",
+    "mtime": 1791087589.5341775,
+    "seen": 1791088121.363059,
+    "ast_hash": "ca13ebb6a04f59b5fdf3e89ff1e44f58",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791085595.3694084,
-    "seen": 1791085614.1853049,
-    "ast_hash": "519318b87d63f04563d63e574dce694e",
+    "mtime": 1791088095.8062859,
+    "seen": 1791088121.363079,
+    "ast_hash": "e719d16395f896beb249a78914b52478",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791085604.9102972,
-    "seen": 1791085614.1853077,
-    "ast_hash": "84848974a31fa45011b95fc312520e1f",
+    "mtime": 1791088111.2441032,
+    "seen": 1791088121.3630812,
+    "ast_hash": "f97ba3be58fb3780add9aec0b510e954",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "frontend/index.html": {
-    "mtime": 1791082751.1355803,
-    "seen": 1791082976.2541864,
-    "ast_hash": "7286471695cce1ba4ff049fbab39342a",
+    "mtime": 1791086623.811423,
+    "seen": 1791086669.575298,
+    "ast_hash": "4fb2b925baf6f55cf32cf191457bf731",
     "semantic_hash": ""
   },
   "startDocs/SEED UNFOLD product documentation.pdf": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1791085233.11263,
-    "seen": 1791085614.1851943,
-    "ast_hash": "5eb1626cb365fc58245ffb3c73488b5e",
+    "mtime": 1791087305.8214793,
+    "seen": 1791088121.3629758,
+    "ast_hash": "5d03b913a2289c4812fbf0cee69d0abb",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/gemini_provider.py": {
-    "mtime": 1791085250.448428,
-    "seen": 1791085614.1852107,
-    "ast_hash": "483daa3f125360a8d8bdf47033100ede",
+    "mtime": 1791087355.8858967,
+    "seen": 1791088121.3629904,
+    "ast_hash": "b6b909e4343ed22441d7810b4ef0aeca",
     "semantic_hash": ""
   },
   "backend/app/routers/dna.py": {
@@ -477,6 +477,108 @@
     "mtime": 1791086003.6576502,
     "seen": 1791086010.738331,
     "ast_hash": "a77f478f7a4329bf5ceb38cc2549a347",
+    "semantic_hash": ""
+  },
+  "frontend/public/favicon.svg": {
+    "mtime": 1791086607.598612,
+    "seen": 1791086669.5753112,
+    "ast_hash": "aa491a437ea6434b28699bd280108ffe",
+    "semantic_hash": ""
+  },
+  "frontend/public/vite.svg": {
+    "mtime": 1791086614.4915318,
+    "seen": 1791086669.5753138,
+    "ast_hash": "aa491a437ea6434b28699bd280108ffe",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-CONTEXT.md": {
+    "mtime": 1791087186.2088711,
+    "seen": 1791087244.62382,
+    "ast_hash": "ae81fe43cc31daa7c4edc8eaa42ac869",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-DISCUSSION-LOG.md": {
+    "mtime": 1791086893.4112813,
+    "seen": 1791086905.583784,
+    "ast_hash": "89e98fabb9f779b832f5eaf23ae05fab",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-01-PLAN.md": {
+    "mtime": 1791087228.7243764,
+    "seen": 1791087244.6238167,
+    "ast_hash": "4c56964a098445f8bcfdc151ecec798e",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-02-PLAN.md": {
+    "mtime": 1791087056.215384,
+    "seen": 1791087096.6655772,
+    "ast_hash": "e8f5caf2bc6ba2300bc52190d044468a",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-RESEARCH.md": {
+    "mtime": 1791087199.4827168,
+    "seen": 1791087244.6238234,
+    "ast_hash": "26c786f2213fddbd9be58107936b80c9",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-VALIDATION.md": {
+    "mtime": 1791088081.793449,
+    "seen": 1791088121.363127,
+    "ast_hash": "2a39be8850bb7d2ec8157edacce75989",
+    "semantic_hash": ""
+  },
+  "backend/app/models/world.py": {
+    "mtime": 1791087292.3246362,
+    "seen": 1791088121.3629837,
+    "ast_hash": "ec03fe90b57559f956517a627422dd50",
+    "semantic_hash": ""
+  },
+  "backend/app/routers/worlds.py": {
+    "mtime": 1791087529.3828776,
+    "seen": 1791088121.3630052,
+    "ast_hash": "6acd050c471ab774ccad50b3057c62c0",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_worlds.py": {
+    "mtime": 1791087549.346645,
+    "seen": 1791088121.3630264,
+    "ast_hash": "f0dc76e6acd9cde775ff07278defce1b",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/capture_phase3_screenshots.cjs": {
+    "mtime": 1791087972.7647178,
+    "seen": 1791088121.363028,
+    "ast_hash": "2b85c997e5934c93183917d640a67dcd",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase3_worlds.cjs": {
+    "mtime": 1791087912.4424198,
+    "seen": 1791088121.3630328,
+    "ast_hash": "48fe8f63635c10f9973e02035368737b",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WorldCandidateCard.tsx": {
+    "mtime": 1791087716.7136974,
+    "seen": 1791088121.363053,
+    "ast_hash": "69465f079b2679de9cb493f27853f4f6",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WorldCandidatesCanvas.tsx": {
+    "mtime": 1791087783.3819215,
+    "seen": 1791088121.363054,
+    "ast_hash": "0cacb1bbb1a22a325b003ccadd9a6c91",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-01-SUMMARY.md": {
+    "mtime": 1791087576.4933293,
+    "seen": 1791088121.3631167,
+    "ast_hash": "6162fc16f80294552c5e3177fb6bc16f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-02-SUMMARY.md": {
+    "mtime": 1791088063.578661,
+    "seen": 1791088121.3631198,
+    "ast_hash": "d129b2e5e159a6f56dc280d2672b2534",
     "semantic_hash": ""
   }
 }

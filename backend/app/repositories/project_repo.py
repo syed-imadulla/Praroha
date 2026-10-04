@@ -5,6 +5,7 @@ from sqlmodel import SQLModel, select
 from backend.app.config import settings
 from backend.app.models.dna import SeedDNA, SeedDNARecord
 from backend.app.models.project import Asset, AssetCreate, Project, ProjectCreate
+from backend.app.models.world import WorldCandidate, WorldCandidateRecord
 
 engine = create_async_engine(
     settings.DATABASE_URL,
@@ -121,4 +122,59 @@ class ProjectRepository:
         )
         result = await self.session.execute(statement)
         return result.scalars().first()
+
+    async def save_world_candidates(
+        self,
+        project_id: str,
+        seed_dna_id: str,
+        batch_id: str,
+        candidates: List[WorldCandidate],
+        model_used: str = "mock",
+        fallback_used: bool = False,
+    ) -> List[WorldCandidateRecord]:
+        records = []
+        for cand in candidates:
+            rec = WorldCandidateRecord(
+                project_id=project_id,
+                seed_dna_id=seed_dna_id,
+                batch_id=batch_id,
+                candidate_index=cand.index,
+                title=cand.title,
+                archetype=cand.archetype,
+                concept=cand.concept,
+                aesthetic=cand.aesthetic,
+                core_tension=cand.core_tension,
+                trade_offs=cand.trade_offs,
+                key_visual=cand.key_visual,
+                model_used=model_used,
+                fallback_used=fallback_used,
+            )
+            self.session.add(rec)
+            records.append(rec)
+        await self.session.commit()
+        for rec in records:
+            await self.session.refresh(rec)
+        return records
+
+    async def get_latest_world_candidates(self, project_id: str) -> List[WorldCandidateRecord]:
+        latest_stmt = (
+            select(WorldCandidateRecord.batch_id)
+            .where(WorldCandidateRecord.project_id == project_id)
+            .order_by(WorldCandidateRecord.created_at.desc())
+            .limit(1)
+        )
+        res = await self.session.execute(latest_stmt)
+        latest_batch = res.scalar_one_or_none()
+        if not latest_batch:
+            return []
+
+        stmt = (
+            select(WorldCandidateRecord)
+            .where(WorldCandidateRecord.project_id == project_id)
+            .where(WorldCandidateRecord.batch_id == latest_batch)
+            .order_by(WorldCandidateRecord.candidate_index.asc())
+        )
+        candidates_res = await self.session.execute(stmt)
+        return list(candidates_res.scalars().all())
+
 

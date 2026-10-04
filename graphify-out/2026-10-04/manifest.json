@@ -102,9 +102,9 @@
     "semantic_hash": ""
   },
   "frontend/package.json": {
-    "mtime": 1791082707.2240992,
-    "seen": 1791082976.2541122,
-    "ast_hash": "98d7087a6a99b0ef557936f6f95695b8",
+    "mtime": 1791085836.9805927,
+    "seen": 1791086010.7382886,
+    "ast_hash": "93516a0236c56f831ab27596e97d1026",
     "semantic_hash": ""
   },
   "frontend/postcss.config.js": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791085595.3694084,
-    "seen": 1791085614.1853049,
-    "ast_hash": "519318b87d63f04563d63e574dce694e",
+    "mtime": 1791087071.406207,
+    "seen": 1791087096.6654904,
+    "ast_hash": "c695b5ac7f87fb7f0f040f47397e47fd",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791085604.9102972,
-    "seen": 1791085614.1853077,
-    "ast_hash": "84848974a31fa45011b95fc312520e1f",
+    "mtime": 1791087083.4390671,
+    "seen": 1791087096.6654956,
+    "ast_hash": "06e7064a361377aa01ddb4c6d6525216",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "frontend/index.html": {
-    "mtime": 1791082751.1355803,
-    "seen": 1791082976.2541864,
-    "ast_hash": "7286471695cce1ba4ff049fbab39342a",
+    "mtime": 1791086623.811423,
+    "seen": 1791086669.575298,
+    "ast_hash": "4fb2b925baf6f55cf32cf191457bf731",
     "semantic_hash": ""
   },
   "startDocs/SEED UNFOLD product documentation.pdf": {
@@ -465,6 +465,66 @@
     "mtime": 1791085580.1025863,
     "seen": 1791085614.1853487,
     "ast_hash": "f1f8172f75deaabb21ccce815c2027dd",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/run_uat.cjs": {
+    "mtime": 1791085988.7758236,
+    "seen": 1791086010.738286,
+    "ast_hash": "d5959105ccfd411a12bbd68b25017c13",
+    "semantic_hash": ""
+  },
+  ".planning/phases/02-seed-understanding-seed-dna/02-UAT.md": {
+    "mtime": 1791086003.6576502,
+    "seen": 1791086010.738331,
+    "ast_hash": "a77f478f7a4329bf5ceb38cc2549a347",
+    "semantic_hash": ""
+  },
+  "frontend/public/favicon.svg": {
+    "mtime": 1791086607.598612,
+    "seen": 1791086669.5753112,
+    "ast_hash": "aa491a437ea6434b28699bd280108ffe",
+    "semantic_hash": ""
+  },
+  "frontend/public/vite.svg": {
+    "mtime": 1791086614.4915318,
+    "seen": 1791086669.5753138,
+    "ast_hash": "aa491a437ea6434b28699bd280108ffe",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-CONTEXT.md": {
+    "mtime": 1791087186.2088711,
+    "seen": 1791087244.62382,
+    "ast_hash": "ae81fe43cc31daa7c4edc8eaa42ac869",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-DISCUSSION-LOG.md": {
+    "mtime": 1791086893.4112813,
+    "seen": 1791086905.583784,
+    "ast_hash": "89e98fabb9f779b832f5eaf23ae05fab",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-01-PLAN.md": {
+    "mtime": 1791087228.7243764,
+    "seen": 1791087244.6238167,
+    "ast_hash": "4c56964a098445f8bcfdc151ecec798e",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-02-PLAN.md": {
+    "mtime": 1791087056.215384,
+    "seen": 1791087096.6655772,
+    "ast_hash": "e8f5caf2bc6ba2300bc52190d044468a",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-RESEARCH.md": {
+    "mtime": 1791087199.4827168,
+    "seen": 1791087244.6238234,
+    "ast_hash": "26c786f2213fddbd9be58107936b80c9",
+    "semantic_hash": ""
+  },
+  ".planning/phases/03-three-world-generation/03-VALIDATION.md": {
+    "mtime": 1791087028.7777038,
+    "seen": 1791087096.6655908,
+    "ast_hash": "9b0cea4615b140870132b1cdf6299246",
     "semantic_hash": ""
   }
 }

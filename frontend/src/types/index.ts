@@ -90,3 +90,33 @@ export interface SeedPreset {
   seed: string;
   tagline: string;
 }
+
+export interface WorldCandidate {
+  id: string;
+  index: number;
+  title: string;
+  archetype: string;
+  concept: string;
+  aesthetic: string;
+  core_tension: string;
+  trade_offs: string;
+  key_visual: string;
+}
+
+export interface WorldCandidateRead {
+  id: string;
+  project_id: string;
+  seed_dna_id: string;
+  batch_id: string;
+  candidate_index: number;
+  title: string;
+  archetype: string;
+  concept: string;
+  aesthetic: string;
+  core_tension: string;
+  trade_offs: string;
+  key_visual: string;
+  model_used: string;
+  fallback_used: boolean;
+  created_at: string;
+}

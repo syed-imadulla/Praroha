@@ -6,6 +6,12 @@ from backend.app.models.dna import (
     ExtractDNARequest,
     SeedDNARead,
 )
+from backend.app.models.world import (
+    WorldCandidate,
+    WorldCandidateBase,
+    WorldCandidateRecord,
+    WorldCandidateRead,
+)
 
 __all__ = [
     "Project",
@@ -19,4 +25,9 @@ __all__ = [
     "SeedDNARecord",
     "ExtractDNARequest",
     "SeedDNARead",
+    "WorldCandidate",
+    "WorldCandidateBase",
+    "WorldCandidateRecord",
+    "WorldCandidateRead",
 ]
+

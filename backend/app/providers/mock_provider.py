@@ -34,6 +34,7 @@ CANONICAL_SEED_DNA: Dict[str, Any] = {
 CANONICAL_WORLDS: List[Dict[str, Any]] = [
     {
         "id": "world-1",
+        "index": 1,
         "title": "Lost Civilization",
         "archetype": "Lost Civilization (Archaeological / Mythic)",
         "concept": "Classical high-technology or mystical civilization submerged millennia ago due to cataclysm.",
@@ -44,6 +45,7 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
     },
     {
         "id": "world-2",
+        "index": 2,
         "title": "Bio-City",
         "archetype": "Bio-City (Symbiotic / Ecological)",
         "concept": "A living city grown from modified coral, bioluminescent siphonophores, and abyssal organisms.",
@@ -54,6 +56,7 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
     },
     {
         "id": "world-3",
+        "index": 3,
         "title": "Time Capsule",
         "archetype": "Time Capsule (Retro-Futuristic / Cold War)",
         "concept": "A sealed 1960s experimental geodesic research sanctuary submerged during nuclear paranoia and forgotten for generations.",

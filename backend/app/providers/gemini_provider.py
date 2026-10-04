@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from backend.app.config import settings
 from backend.app.models.dna import SeedDNA
+from backend.app.models.world import WorldCandidate
 from backend.app.providers.base import AIProvider
 from backend.app.providers.mock_provider import MockProvider
 
@@ -164,8 +165,129 @@ class GeminiProvider(AIProvider):
             }
 
     async def generate_worlds(self, dna: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Candidate worlds generation (delegates to MockProvider until Phase 3)."""
-        return await self._mock_provider.generate_worlds(dna)
+        """Generate exactly three high-contrast candidate worlds based on Seed DNA."""
+        # 1. Canonical Demo Fixture Determinism (strictly evaluate against immutable raw_seed)
+        raw_seed = (dna.get("raw_seed") or "").strip().lower().rstrip(".")
+        if raw_seed == "a child discovers a forgotten city beneath the ocean":
+            logger.info("Canonical ocean seed detected; deterministically returning canonical demo fixtures.")
+            return await self._mock_provider.generate_worlds(dna)
+
+        # 2. Check API key
+        if not self.api_key:
+            logger.info("No Gemini API key configured. Using MockProvider fallback for world generation.")
+            return await self._mock_provider.generate_worlds(dna)
+
+        endpoint_url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{self.model}:generateContent"
+        )
+        headers = {
+            "x-goog-api-key": self.api_key,
+            "Content-Type": "application/json",
+        }
+
+        payload = {
+            "systemInstruction": {
+                "parts": [
+                    {
+                        "text": (
+                            "You are the World Branching Engine for Seed Unfold. Given a Seed DNA specification "
+                            "(premise, themes, entities, constraints, tone, and domain keywords), generate exactly "
+                            "THREE distinct, high-contrast world candidate concepts (Candidate 1, 2, and 3). "
+                            "The three candidates must explore contrasting creative archetypes while strictly honoring "
+                            "all Seed DNA constraints and implicit themes:\n"
+                            "- Candidate 1: Mythic, Archaeological, or Ancient Mystery\n"
+                            "- Candidate 2: Ecological, Organic, Symbiotic, or Bio-centric\n"
+                            "- Candidate 3: Technological, Industrial, Retro-Futuristic, or Grounded Human\n\n"
+                            "Do NOT generate narrative prose, scenes, or characters yet. Produce exactly three structured objects with:\n"
+                            "- id: unique slug (e.g. 'world-1', 'world-2', 'world-3')\n"
+                            "- index: integer sequence number (1, 2, or 3)\n"
+                            "- title: evocative world title\n"
+                            "- archetype: creative archetype genre tag\n"
+                            "- concept: 1-2 sentence high-concept premise logline\n"
+                            "- aesthetic: visual mood, color palette, lighting, environment\n"
+                            "- core_tension: central conflict, systemic crisis, or dramatic stakes\n"
+                            "- trade_offs: narrative balance, what this world emphasizes vs sacrifices\n"
+                            "- key_visual: signature scene vignette or focal cinematic image description"
+                        )
+                    }
+                ]
+            },
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": f"Seed DNA Specification:\n{json.dumps(dna, indent=2)}"
+                        }
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "responseSchema": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "id": {"type": "STRING"},
+                            "index": {"type": "INTEGER"},
+                            "title": {"type": "STRING"},
+                            "archetype": {"type": "STRING"},
+                            "concept": {"type": "STRING"},
+                            "aesthetic": {"type": "STRING"},
+                            "core_tension": {"type": "STRING"},
+                            "trade_offs": {"type": "STRING"},
+                            "key_visual": {"type": "STRING"},
+                        },
+                        "required": [
+                            "id",
+                            "index",
+                            "title",
+                            "archetype",
+                            "concept",
+                            "aesthetic",
+                            "core_tension",
+                            "trade_offs",
+                            "key_visual",
+                        ],
+                    },
+                },
+            },
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=35.0) as client:
+                response = await client.post(endpoint_url, headers=headers, json=payload)
+                response.raise_for_status()
+                data = response.json()
+
+            candidates = data.get("candidates", [])
+            if not candidates:
+                raise ValueError("No candidates returned from Gemini API")
+
+            part_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            if not part_text:
+                raise ValueError("Empty content text in Gemini candidate part")
+
+            parsed_list = json.loads(part_text)
+            if not isinstance(parsed_list, list) or len(parsed_list) != 3:
+                raise ValueError(f"Expected array of exactly 3 world candidates, got {len(parsed_list) if isinstance(parsed_list, list) else type(parsed_list)}")
+
+            validated_candidates: List[Dict[str, Any]] = []
+            for idx, item in enumerate(parsed_list, start=1):
+                item["index"] = idx
+                cand = WorldCandidate.model_validate(item)
+                validated_candidates.append(cand.model_dump())
+
+            return validated_candidates
+
+        except (httpx.HTTPError, json.JSONDecodeError, ValidationError, ValueError, Exception) as exc:
+            logger.warning(
+                "Gemini generate_worlds call failed (%s: %s). Falling back gracefully to MockProvider.",
+                type(exc).__name__,
+                exc,
+            )
+            return await self._mock_provider.generate_worlds(dna)
 
     async def unfold_stage(
         self, stage: str, context: Dict[str, Any]

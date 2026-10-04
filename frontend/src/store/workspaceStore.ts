@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiClient } from '../api/client';
-import { Project, SeedDNARead, StageType, SystemHealthData } from '../types';
+import { Project, SeedDNARead, StageType, SystemHealthData, WorldCandidateRead } from '../types';
 
 interface WorkspaceState {
   activeStage: StageType;
@@ -9,10 +9,13 @@ interface WorkspaceState {
   seedText: string;
   activeProject: Project | null;
   seedDNA: SeedDNARead | null;
+  worlds: WorldCandidateRead[];
   isExtracting: boolean;
   extractionStep: string;
+  isGeneratingWorlds: boolean;
+  worldBranchingStep: string;
   inspectorOpen: boolean;
-  inspectorTab: 'dna' | 'provenance';
+  inspectorTab: 'dna' | 'provenance' | 'worlds';
   health: SystemHealthData | null;
   isSyncing: boolean;
 
@@ -22,10 +25,12 @@ interface WorkspaceState {
   setSeedText: (seed: string) => void;
   setActiveProject: (project: Project | null) => void;
   setSeedDNA: (seedDNA: SeedDNARead | null) => void;
+  setWorlds: (worlds: WorldCandidateRead[]) => void;
   setExtracting: (isExtracting: boolean, step?: string) => void;
   extractSeedDNA: (customSeed?: string) => Promise<boolean>;
+  generateWorlds: () => Promise<boolean>;
   toggleInspector: (open?: boolean) => void;
-  setInspectorTab: (tab: 'dna' | 'provenance') => void;
+  setInspectorTab: (tab: 'dna' | 'provenance' | 'worlds') => void;
   setHealth: (health: SystemHealthData | null) => void;
   setSyncing: (syncing: boolean) => void;
   resetWorkspace: () => void;
@@ -41,8 +46,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       seedText: '',
       activeProject: null,
       seedDNA: null,
+      worlds: [],
       isExtracting: false,
       extractionStep: '',
+      isGeneratingWorlds: false,
+      worldBranchingStep: '',
       inspectorOpen: false,
       inspectorTab: 'dna',
       health: null,
@@ -58,6 +66,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setSeedText: (seedText) => set({ seedText }),
       setActiveProject: (activeProject) => set({ activeProject }),
       setSeedDNA: (seedDNA) => set({ seedDNA }),
+      setWorlds: (worlds) => set({ worlds }),
       setExtracting: (isExtracting, step = '') =>
         set({ isExtracting, extractionStep: step }),
 
@@ -130,6 +139,54 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }
       },
 
+      generateWorlds: async () => {
+        const state = get();
+        const project = state.activeProject;
+        if (!project) return false;
+
+        set({
+          isGeneratingWorlds: true,
+          worldBranchingStep: 'Analyzing Seed DNA constraints & core themes...',
+        });
+
+        try {
+          const stepTimer1 = setTimeout(() => {
+            if (get().isGeneratingWorlds) {
+              set({ worldBranchingStep: 'Formulating contrasting archetypes (Mythic, Ecological, Technological)...' });
+            }
+          }, 700);
+
+          const stepTimer2 = setTimeout(() => {
+            if (get().isGeneratingWorlds) {
+              set({ worldBranchingStep: 'Synthesizing core tensions, aesthetics & cinematic visuals...' });
+            }
+          }, 1400);
+
+          const res = await apiClient.generateWorlds(project.id);
+          clearTimeout(stepTimer1);
+          clearTimeout(stepTimer2);
+
+          if (!res.success || !res.data) {
+            throw new Error(res.error?.message || 'Failed to generate worlds');
+          }
+
+          set((s) => ({
+            worlds: res.data || [],
+            unlockedStages: s.unlockedStages.includes('worlds')
+              ? s.unlockedStages
+              : [...s.unlockedStages, 'worlds'],
+            activeStage: 'worlds',
+            isGeneratingWorlds: false,
+            worldBranchingStep: '',
+          }));
+          return true;
+        } catch (err) {
+          console.error('Failed to generate worlds:', err);
+          set({ isGeneratingWorlds: false, worldBranchingStep: '' });
+          return false;
+        }
+      },
+
       toggleInspector: (open) =>
         set((state) => ({
           inspectorOpen: typeof open === 'boolean' ? open : !state.inspectorOpen,
@@ -144,8 +201,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           seedText: '',
           activeProject: null,
           seedDNA: null,
+          worlds: [],
           isExtracting: false,
           extractionStep: '',
+          isGeneratingWorlds: false,
+          worldBranchingStep: '',
           inspectorOpen: false,
           inspectorTab: 'dna',
         }),
@@ -158,6 +218,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         seedText: state.seedText,
         activeProject: state.activeProject,
         seedDNA: state.seedDNA,
+        worlds: state.worlds,
         inspectorTab: state.inspectorTab,
       }),
     }

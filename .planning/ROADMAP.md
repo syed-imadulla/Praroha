@@ -56,9 +56,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. Branching engine outputs precisely three candidate objects (World A, World B, World C).
   2. Candidates have distinct tones, aesthetics, and trade-offs while honoring Seed DNA constraints.
   3. Structured response passes validation without formatting errors.  
-**Plans**: 2 plans
-- [ ] **03-01-PLAN.md** (Wave 1): Backend World Candidate Models, Provider Generation with Gemini + Mock Fallback, Repository Persistence, API Endpoints, and Pytest Suite.
-- [ ] **03-02-PLAN.md** (Wave 2): Frontend Candidate Cards, Stage 3 Canvas, Comparison Visualizer, Re-generation, and Inspector Integration.
+**Plans**: 2 plans (all completed)
+- [x] **03-01-PLAN.md** (Wave 1): Backend World Candidate Models, Provider Generation with Gemini + Mock Fallback, Repository Persistence, API Endpoints, and Pytest Suite.
+- [x] **03-02-PLAN.md** (Wave 2): Frontend Candidate Cards, Stage 3 Canvas, Comparison Visualizer, Re-generation, and Inspector Integration.
 
 ---
 

@@ -3,6 +3,7 @@ import { Layers, Database, HardDrive, Compass, ArrowLeft } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { SeedInputCanvas } from './SeedInputCanvas';
 import { SeedDnaViewer } from './SeedDnaViewer';
+import { WorldCandidatesCanvas } from './WorldCandidatesCanvas';
 
 export const WorkspaceCanvas: React.FC = () => {
   const {
@@ -13,19 +14,28 @@ export const WorkspaceCanvas: React.FC = () => {
     seedDNA,
   } = useWorkspaceStore();
 
+  const mainRef = React.useRef<HTMLElement>(null);
+
+  React.useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeStage]);
+
   return (
     <main
+      ref={mainRef}
       className={`flex-1 overflow-y-auto transition-all duration-300 p-6 md:p-10 flex flex-col items-center justify-start ${
         inspectorOpen ? 'mr-0 md:mr-80 lg:mr-96' : ''
       }`}
     >
-      <div className="w-full max-w-4xl space-y-8">
+      <div className={`w-full ${activeStage === 'worlds' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
         {/* Dynamic Stage Canvas View */}
         {activeStage === 'seed' && <SeedInputCanvas />}
 
         {activeStage === 'understand' && <SeedDnaViewer dnaRecord={seedDNA} />}
 
-        {activeStage !== 'seed' && activeStage !== 'understand' && (
+        {activeStage === 'worlds' && <WorldCandidatesCanvas />}
+
+        {activeStage !== 'seed' && activeStage !== 'understand' && activeStage !== 'worlds' && (
           <div className="py-12 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 flex items-center justify-center mx-auto">
               <Compass className="w-6 h-6 animate-pulse" />
@@ -34,16 +44,16 @@ export const WorkspaceCanvas: React.FC = () => {
               Stage: {activeStage}
             </h2>
             <p className="text-sm text-slate-400 max-w-md mx-auto">
-              Candidate worlds generation and human choice will activate in Phase 3 (Three Worlds Generation).
+              Human world selection will activate in Phase 4 (Human World Selection).
             </p>
             <div className="pt-2">
               <button
                 type="button"
-                onClick={() => setActiveStage('understand')}
+                onClick={() => setActiveStage('worlds')}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Return to Seed DNA</span>
+                <span>Return to Three Worlds</span>
               </button>
             </div>
           </div>
