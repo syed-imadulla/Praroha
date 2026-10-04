@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Dna, GitCommit, Info, Sparkles } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
+import { SeedDnaViewer } from './SeedDnaViewer';
 
 export const InspectorDrawer: React.FC = () => {
   const {
@@ -10,6 +11,7 @@ export const InspectorDrawer: React.FC = () => {
     toggleInspector,
     setInspectorTab,
     activeStage,
+    seedDNA,
   } = useWorkspaceStore();
 
   return (
@@ -67,29 +69,33 @@ export const InspectorDrawer: React.FC = () => {
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {inspectorTab === 'dna' ? (
-              <div className="space-y-4">
-                <div className="p-3 rounded-lg bg-canvas-card/60 border border-canvas-border text-xs">
-                  <div className="flex items-center gap-1.5 text-cyan-400 font-medium mb-1">
-                    <Info className="w-3.5 h-3.5" />
-                    <span>Seed DNA Parameters</span>
+              seedDNA ? (
+                <SeedDnaViewer dnaRecord={seedDNA} compact={true} />
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-3 rounded-lg bg-canvas-card/60 border border-canvas-border text-xs">
+                    <div className="flex items-center gap-1.5 text-cyan-400 font-medium mb-1">
+                      <Info className="w-3.5 h-3.5" />
+                      <span>Seed DNA Parameters</span>
+                    </div>
+                    <p className="text-slate-400 leading-relaxed text-[11px]">
+                      Extracted intent, tone, entities, and constraints will appear here as structured chips and exportable JSON once the understanding pass runs in Stage 1.
+                    </p>
                   </div>
-                  <p className="text-slate-400 leading-relaxed text-[11px]">
-                    Extracted intent, tone, entities, and constraints will be inspected here once the AI understanding pass runs in Stage 2.
-                  </p>
-                </div>
 
-                <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-2">
-                  <div className="text-slate-500 font-mono text-[10px] uppercase">
-                    Current Stage Context
-                  </div>
-                  <div className="text-slate-200 font-semibold uppercase font-mono tracking-wider">
-                    {activeStage}
-                  </div>
-                  <div className="text-slate-400 text-[11px]">
-                    Seed DNA parameters remain immutable across all subsequent stages to guarantee thematic coherence.
+                  <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-2">
+                    <div className="text-slate-500 font-mono text-[10px] uppercase">
+                      Current Stage Context
+                    </div>
+                    <div className="text-slate-200 font-semibold uppercase font-mono tracking-wider">
+                      {activeStage}
+                    </div>
+                    <div className="text-slate-400 text-[11px]">
+                      Seed DNA parameters remain immutable across all subsequent stages to guarantee thematic coherence.
+                    </div>
                   </div>
                 </div>
-              </div>
+              )
             ) : (
               <div className="space-y-4">
                 <div className="p-3 rounded-lg bg-canvas-card/60 border border-canvas-border text-xs">
@@ -119,7 +125,7 @@ export const InspectorDrawer: React.FC = () => {
 
           {/* Drawer Footer */}
           <div className="p-3 border-t border-canvas-border bg-canvas-panel text-[11px] text-slate-500 text-center font-mono">
-            Seed Unfold Inspector • Phase 1 Shell
+            Seed Unfold Inspector • Phase 2 DNA
           </div>
         </motion.aside>
       )}

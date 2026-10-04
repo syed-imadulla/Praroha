@@ -1,4 +1,4 @@
-import { APIResponse, Project, SystemHealthData } from '../types';
+import { APIResponse, Project, SeedDNARead, SystemHealthData } from '../types';
 
 class ApiClient {
   private baseUrl = '/api';
@@ -49,6 +49,19 @@ class ApiClient {
 
   async getProject(projectId: string): Promise<APIResponse<Project>> {
     return this.request<Project>(`/projects/${projectId}`);
+  }
+
+  async extractDNA(projectId: string, rawSeed?: string): Promise<APIResponse<SeedDNARead>> {
+    return this.request<SeedDNARead>(`/projects/${projectId}/dna/extract`, {
+      method: 'POST',
+      body: JSON.stringify({
+        raw_seed: rawSeed,
+      }),
+    });
+  }
+
+  async getLatestDNA(projectId: string): Promise<APIResponse<SeedDNARead>> {
+    return this.request<SeedDNARead>(`/projects/${projectId}/dna`);
   }
 }
 

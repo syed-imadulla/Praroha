@@ -1,21 +1,17 @@
 import React from 'react';
-import { Sparkles, Compass, Shield, ArrowRight, Layers, Database, HardDrive } from 'lucide-react';
+import { Layers, Database, HardDrive, Compass, ArrowLeft } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
-
-const CANONICAL_SEED = 'A child discovers a forgotten city beneath the ocean.';
+import { SeedInputCanvas } from './SeedInputCanvas';
+import { SeedDnaViewer } from './SeedDnaViewer';
 
 export const WorkspaceCanvas: React.FC = () => {
   const {
-    seedText,
-    setSeedText,
+    activeStage,
+    setActiveStage,
     health,
     inspectorOpen,
-    toggleInspector,
+    seedDNA,
   } = useWorkspaceStore();
-
-  const handleUseDemo = () => {
-    setSeedText(CANONICAL_SEED);
-  };
 
   return (
     <main
@@ -24,76 +20,47 @@ export const WorkspaceCanvas: React.FC = () => {
       }`}
     >
       <div className="w-full max-w-4xl space-y-8">
-        {/* Hero Title & Philosophy */}
-        <div className="text-center space-y-3 pt-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 text-xs font-medium tracking-wide">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Tattva: Forms Hidden in the Formless</span>
-          </div>
+        {/* Dynamic Stage Canvas View */}
+        {activeStage === 'seed' && <SeedInputCanvas />}
 
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-100 font-sans">
-            Unfold One Seed into a Universe
-          </h1>
-          <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-            Enter an incomplete, raw premise. Seed Unfold extracts its latent DNA, branches into exactly three distinct creative worlds, and lets you steer its progressive unfolding.
-          </p>
-        </div>
+        {activeStage === 'understand' && <SeedDnaViewer dnaRecord={seedDNA} />}
 
-        {/* Primary Seed Input Canvas Card */}
-        <div className="glass-panel rounded-2xl p-6 md:p-8 space-y-5 border border-canvas-border shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-500 opacity-60" />
-
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-              <Compass className="w-4 h-4 text-cyan-400" />
-              <span>The Creative Seed</span>
-            </label>
-            <button
-              onClick={handleUseDemo}
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium underline underline-offset-4 transition"
-            >
-              Use Canonical Demo Seed
-            </button>
-          </div>
-
-          <div className="relative">
-            <textarea
-              rows={4}
-              value={seedText}
-              onChange={(e) => setSeedText(e.target.value)}
-              placeholder="e.g. A solitary cartographer maps islands that vanish when not being observed..."
-              className="w-full bg-canvas-deep/90 border border-slate-700/80 rounded-xl p-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition font-sans text-sm md:text-base resize-none shadow-inner"
-            />
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-slate-800">
-            <div className="text-xs text-slate-400 flex items-center gap-2">
-              <Shield className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Immutable input guarantee — raw seed is never discarded or mutated</span>
+        {activeStage !== 'seed' && activeStage !== 'understand' && (
+          <div className="py-12 text-center space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 flex items-center justify-center mx-auto">
+              <Compass className="w-6 h-6 animate-pulse" />
             </div>
-
-            <button
-              onClick={() => toggleInspector(true)}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-glow-cyan transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <span>Inspect Workspace Shell</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <h2 className="text-2xl font-bold text-slate-100 font-sans capitalize">
+              Stage: {activeStage}
+            </h2>
+            <p className="text-sm text-slate-400 max-w-md mx-auto">
+              Candidate worlds generation and human choice will activate in Phase 3 (Three Worlds Generation).
+            </p>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setActiveStage('understand')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Return to Seed DNA</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Architecture & Engine Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-canvas-border/60">
           <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
             <div className="flex items-center gap-2 text-cyan-400 text-xs font-semibold">
               <Layers className="w-4 h-4" />
               <span>AI Provider Engine</span>
             </div>
             <p className="text-xs text-slate-300 font-mono">
-              Provider: <span className="text-cyan-300 font-bold">{health?.ai_provider.resolved || 'mock'}</span>
+              Configured: <span className="text-cyan-300 font-bold">{health?.ai_provider.configured || 'gemini'}</span>
             </p>
             <p className="text-[11px] text-slate-400">
-              Zero-latency mock provider active with canonical underwater city fixtures.
+              Resolved: <span className="text-slate-200 font-mono">{health?.ai_provider.resolved || 'mock'}</span> with automatic fallback.
             </p>
           </div>
 

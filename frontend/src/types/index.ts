@@ -63,3 +63,30 @@ export interface StageDefinition {
   label: string;
   description: string;
 }
+
+export interface SeedDNA {
+  premise: string;
+  themes: string[];
+  entities: string[];
+  constraints: string[];
+  tone: string;
+  domain_keywords: string[];
+}
+
+export interface SeedDNARead {
+  id: string;
+  project_id: string;
+  raw_seed: string;
+  dna: SeedDNA;
+  fallback_used: boolean;
+  model_used: string;
+  created_at: string;
+}
+
+export interface SeedPreset {
+  id: string;
+  title: string;
+  genre: string;
+  seed: string;
+  tagline: string;
+}
