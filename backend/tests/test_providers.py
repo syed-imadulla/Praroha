@@ -33,6 +33,8 @@ async def test_mock_provider_generate_worlds():
     worlds = await provider.generate_worlds({})
     # Strictly exactly three worlds per product requirement
     assert len(worlds) == 3
+    titles = [w["title"] for w in worlds]
+    assert titles == ["Lost Civilization", "Bio-City", "Time Capsule"]
     for world in worlds:
         assert "id" in world
         assert "title" in world

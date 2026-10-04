@@ -34,7 +34,7 @@ CANONICAL_SEED_DNA: Dict[str, Any] = {
 CANONICAL_WORLDS: List[Dict[str, Any]] = [
     {
         "id": "world-1",
-        "title": "The Drowned Archive",
+        "title": "Lost Civilization",
         "archetype": "Lost Civilization (Archaeological / Mythic)",
         "concept": "Classical high-technology or mystical civilization submerged millennia ago due to cataclysm.",
         "aesthetic": "Ancient monumental architecture, drowned marble columns, golden gears, silent grand halls submerged in deep blue waters.",
@@ -44,7 +44,7 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
     },
     {
         "id": "world-2",
-        "title": "Bioluminescent Spire",
+        "title": "Bio-City",
         "archetype": "Bio-City (Symbiotic / Ecological)",
         "concept": "A living city grown from modified coral, bioluminescent siphonophores, and abyssal organisms.",
         "aesthetic": "Organic curves, pulsing cyan and amber glow, underwater breathable air bubbles, living architecture.",
@@ -54,7 +54,7 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
     },
     {
         "id": "world-3",
-        "title": "The Iron Cradle",
+        "title": "Time Capsule",
         "archetype": "Time Capsule (Retro-Futuristic / Cold War)",
         "concept": "A sealed 1960s experimental geodesic research sanctuary submerged during nuclear paranoia and forgotten for generations.",
         "aesthetic": "Analog dials, rusting titanium domes, vacuum tubes, amber monitors, mid-century warning signs.",
