@@ -17,6 +17,7 @@ Progress from Stage 2 (Seed Understanding & Seed DNA) to Stage 3 (Three World Ge
      1. *Lost Civilization*
      2. *Bio-City*
      3. *Time Capsule*
+   - **Detection Rule:** Detection must strictly check the persisted, immutable `raw_seed` from `SeedDNARecord` using normalized string matching (e.g., `(dna.get("raw_seed") or "").strip().lower().rstrip(".") == "a child discovers a forgotten city beneath the ocean"`). Do NOT rely on the AI-generated `premise`, as Gemini may rephrase it.
 3. **Structured Gemini Generation**:
    - Model: `gemini-2.5-flash` using REST API `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`.
    - `systemInstruction`: World branching rules enforcing strict Seed DNA adherence, 3 distinct archetypes, and zero narrative generation beyond candidate summaries.
