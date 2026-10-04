@@ -292,5 +292,81 @@ class GeminiProvider(AIProvider):
     async def unfold_stage(
         self, stage: str, context: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Progressive unfolding stages (delegates to MockProvider until Phase 4)."""
+        """Progressive unfolding stages (delegates to MockProvider)."""
         return await self._mock_provider.unfold_stage(stage, context)
+
+    async def unfold_universe(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Unfold the entire universe (World Bible, Characters, Relationships, Scenes) for the selected world."""
+        # 1. Canonical Demo Fixture Determinism (strictly evaluate against immutable raw_seed)
+        raw_seed = (context.get("raw_seed") or context.get("seed") or "").strip().lower().rstrip(".")
+        if raw_seed == "a child discovers a forgotten city beneath the ocean":
+            logger.info("Canonical ocean seed detected; deterministically returning canonical demo fixtures for selected world.")
+            return await self._mock_provider.unfold_universe(context)
+
+        # 2. Check API key
+        if not self.api_key:
+            logger.info("No Gemini API key configured. Using MockProvider fallback for universe unfolding.")
+            return await self._mock_provider.unfold_universe(context)
+
+        # 3. Call Gemini if configured, with graceful fallback to MockProvider
+        try:
+            endpoint_url = (
+                f"https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{self.model}:generateContent"
+            )
+            headers = {
+                "x-goog-api-key": self.api_key,
+                "Content-Type": "application/json",
+            }
+
+            system_instruction = (
+                "You are an expert world-builder and narrative architect in the Seed Unfold creative engine.\n"
+                "Given a Seed DNA, a chosen World Candidate, and creator rationale, expand the world into a 4-layer mini-universe:\n"
+                "1. World Bible (geography, physics rules, history timeline, factions, canon facts, key locations with visual prompts, visual style prompt).\n"
+                "2. Characters (2 to 4 core cast members grounded in World Bible rules, with archetypes, motivations, conflicts, visual prompts).\n"
+                "3. Relationships (socio-emotional dynamics, tension/alliance types between characters).\n"
+                "4. Scenes (2 to 3 pivotal narrative scenes with dramatic questions, conflicts, outcomes, and visual prompts).\n"
+                "Output strictly a valid JSON object matching the required schema."
+            )
+
+            user_prompt = (
+                f"SEED: {context.get('seed')}\n"
+                f"SEED DNA: {json.dumps(context.get('seed_dna', {}))}\n"
+                f"SELECTED WORLD: {json.dumps(context.get('selected_world', {}))}\n"
+                f"CREATOR RATIONALE: {context.get('creator_rationale') or 'Focus on world depth and dynamic tension'}\n"
+            )
+
+            payload = {
+                "systemInstruction": {"parts": [{"text": system_instruction}]},
+                "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
+                "generationConfig": {
+                    "temperature": 0.7,
+                    "responseMimeType": "application/json",
+                },
+            }
+
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(endpoint_url, headers=headers, json=payload)
+                response.raise_for_status()
+                data = response.json()
+
+            part_text = (
+                data.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "")
+            )
+            parsed = json.loads(part_text)
+            if not isinstance(parsed, dict) or "world_bible" not in parsed:
+                raise ValueError("Incomplete or malformed universe JSON from Gemini")
+
+            return parsed
+
+        except Exception as exc:
+            logger.warning(
+                "Gemini unfold_universe call failed (%s: %s). Falling back gracefully to MockProvider.",
+                type(exc).__name__,
+                exc,
+            )
+            return await self._mock_provider.unfold_universe(context)
+

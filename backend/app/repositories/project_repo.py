@@ -1,11 +1,18 @@
 import json
 from typing import AsyncGenerator, List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlmodel import SQLModel, select
+from sqlmodel import SQLModel, delete, select
 from backend.app.config import settings
 from backend.app.models.dna import SeedDNA, SeedDNARecord
 from backend.app.models.project import Asset, AssetCreate, Project, ProjectCreate
 from backend.app.models.selection import WorldSelectionRecord
+from backend.app.models.unfold import (
+    CharacterRecord,
+    CharacterRelationshipRecord,
+    SceneRecord,
+    WorldBibleRecord,
+    UnfoldedUniverseRead,
+)
 from backend.app.models.world import WorldCandidate, WorldCandidateRecord
 
 engine = create_async_engine(
@@ -188,6 +195,12 @@ class ProjectRepository:
         candidates_res = await self.session.execute(stmt)
         return list(candidates_res.scalars().all())
 
+    async def get_world_candidate(self, candidate_id: str) -> Optional[WorldCandidateRecord]:
+        """Fetch a specific WorldCandidateRecord by ID."""
+        stmt = select(WorldCandidateRecord).where(WorldCandidateRecord.id == candidate_id)
+        res = await self.session.execute(stmt)
+        return res.scalar_one_or_none()
+
     async def save_world_selection(
         self,
         project_id: str,
@@ -271,5 +284,208 @@ class ProjectRepository:
         if not row:
             return None
         return (row[0], row[1])
+
+    async def save_unfolded_universe(
+        self,
+        project_id: str,
+        world_candidate_id: str,
+        data: dict,
+    ) -> UnfoldedUniverseRead:
+        """Persist the 4 unfolded layers atomically within a database transaction."""
+        try:
+            # 1. Cleanse previous unfolded entities for this project/candidate to allow safe retries
+            await self.session.execute(
+                delete(SceneRecord).where(
+                    SceneRecord.project_id == project_id,
+                    SceneRecord.world_candidate_id == world_candidate_id,
+                )
+            )
+            await self.session.execute(
+                delete(CharacterRelationshipRecord).where(
+                    CharacterRelationshipRecord.project_id == project_id,
+                    CharacterRelationshipRecord.world_candidate_id == world_candidate_id,
+                )
+            )
+            await self.session.execute(
+                delete(CharacterRecord).where(
+                    CharacterRecord.project_id == project_id,
+                    CharacterRecord.world_candidate_id == world_candidate_id,
+                )
+            )
+            await self.session.execute(
+                delete(WorldBibleRecord).where(
+                    WorldBibleRecord.project_id == project_id,
+                    WorldBibleRecord.world_candidate_id == world_candidate_id,
+                )
+            )
+
+            # 2. Persist World Bible
+            bible_data = data.get("world_bible", {})
+            timeline_items = bible_data.get("history_timeline", [])
+            factions_items = bible_data.get("factions", [])
+            canon_facts = bible_data.get("canon_facts", [])
+            locations_items = bible_data.get("key_locations", [])
+
+            bible_record = WorldBibleRecord(
+                project_id=project_id,
+                world_candidate_id=world_candidate_id,
+                geography=bible_data.get("geography", ""),
+                physics_rules=bible_data.get("physics_rules", ""),
+                history_timeline_json=json.dumps([t if isinstance(t, dict) else t.model_dump() for t in timeline_items]),
+                factions_json=json.dumps([f if isinstance(f, dict) else f.model_dump() for f in factions_items]),
+                canon_facts_json=json.dumps(canon_facts if isinstance(canon_facts, list) else []),
+                key_locations_json=json.dumps([loc if isinstance(loc, dict) else loc.model_dump() for loc in locations_items]),
+                visual_style_prompt=bible_data.get("visual_style_prompt", ""),
+            )
+            self.session.add(bible_record)
+
+            # 3. Persist Characters
+            created_characters: List[CharacterRecord] = []
+            char_items = data.get("characters", [])
+            for c in char_items:
+                char_record = CharacterRecord(
+                    project_id=project_id,
+                    world_candidate_id=world_candidate_id,
+                    name=c.get("name", "Unnamed"),
+                    role=c.get("role", "Cast Member"),
+                    archetype=c.get("archetype", "Archetype"),
+                    motivation=c.get("motivation", ""),
+                    core_conflict=c.get("core_conflict") or c.get("conflict", ""),
+                    visual_prompt=c.get("visual_prompt", ""),
+                )
+                self.session.add(char_record)
+                created_characters.append(char_record)
+
+            # Flush to generate character IDs for relationships
+            await self.session.flush()
+
+            name_to_id = {c.name.strip().lower(): c.id for c in created_characters}
+
+            # 4. Persist Character Relationships
+            rel_items = data.get("relationships", [])
+            for r in rel_items:
+                source_id = r.get("source_character_id")
+                if not source_id and r.get("source_character_name"):
+                    source_id = name_to_id.get(r["source_character_name"].strip().lower())
+
+                target_id = r.get("target_character_id")
+                if not target_id and r.get("target_character_name"):
+                    target_id = name_to_id.get(r["target_character_name"].strip().lower())
+
+                # If we have both character IDs, persist relationship
+                if source_id and target_id:
+                    rel_record = CharacterRelationshipRecord(
+                        project_id=project_id,
+                        world_candidate_id=world_candidate_id,
+                        source_character_id=source_id,
+                        target_character_id=target_id,
+                        relation_type=r.get("relation_type", "Dynamic Tension"),
+                        dynamic_description=r.get("dynamic_description", ""),
+                    )
+                    self.session.add(rel_record)
+
+            # 5. Persist Scenes
+            scene_items = data.get("scenes", [])
+            for s in scene_items:
+                characters_involved = s.get("characters_involved", [])
+                scene_record = SceneRecord(
+                    project_id=project_id,
+                    world_candidate_id=world_candidate_id,
+                    scene_number=s.get("scene_number", 1),
+                    title=s.get("title", "Untitled Scene"),
+                    location_setting=s.get("location_setting") or s.get("setting", ""),
+                    characters_involved_json=json.dumps(characters_involved if isinstance(characters_involved, list) else []),
+                    dramatic_question=s.get("dramatic_question", ""),
+                    conflict_narrative=s.get("conflict_narrative") or s.get("conflict", ""),
+                    pivotal_outcome=s.get("pivotal_outcome") or s.get("outcome", ""),
+                    visual_prompt=s.get("visual_prompt", ""),
+                )
+                self.session.add(scene_record)
+
+            # 6. Update project status to universe_unfolded
+            project = await self.get_project(project_id)
+            if project:
+                project.status = "universe_unfolded"
+                self.session.add(project)
+
+            # Commit the atomic transaction
+            await self.session.commit()
+
+            unfolded = await self.get_unfolded_universe(project_id)
+            if not unfolded:
+                raise RuntimeError("Failed to retrieve unfolded universe after commit")
+            return unfolded
+
+        except Exception:
+            await self.session.rollback()
+            raise
+
+    async def get_unfolded_universe(self, project_id: str) -> Optional[UnfoldedUniverseRead]:
+        """Fetch the complete unfolded universe codex for a project."""
+        # 1. Fetch latest WorldBibleRecord
+        bible_stmt = (
+            select(WorldBibleRecord)
+            .where(WorldBibleRecord.project_id == project_id)
+            .order_by(WorldBibleRecord.created_at.desc())
+            .limit(1)
+        )
+        bible_res = await self.session.execute(bible_stmt)
+        bible = bible_res.scalar_one_or_none()
+        if not bible:
+            return None
+
+        world_candidate_id = bible.world_candidate_id
+
+        # 2. Fetch Characters
+        char_stmt = (
+            select(CharacterRecord)
+            .where(
+                CharacterRecord.project_id == project_id,
+                CharacterRecord.world_candidate_id == world_candidate_id,
+            )
+            .order_by(CharacterRecord.created_at.asc())
+        )
+        char_res = await self.session.execute(char_stmt)
+        characters = list(char_res.scalars().all())
+
+        id_to_name = {c.id: c.name for c in characters}
+
+        # 3. Fetch Relationships
+        rel_stmt = (
+            select(CharacterRelationshipRecord)
+            .where(
+                CharacterRelationshipRecord.project_id == project_id,
+                CharacterRelationshipRecord.world_candidate_id == world_candidate_id,
+            )
+            .order_by(CharacterRelationshipRecord.created_at.asc())
+        )
+        rel_res = await self.session.execute(rel_stmt)
+        relationships = list(rel_res.scalars().all())
+
+        # 4. Fetch Scenes
+        scene_stmt = (
+            select(SceneRecord)
+            .where(
+                SceneRecord.project_id == project_id,
+                SceneRecord.world_candidate_id == world_candidate_id,
+            )
+            .order_by(SceneRecord.scene_number.asc())
+        )
+        scene_res = await self.session.execute(scene_stmt)
+        scenes = list(scene_res.scalars().all())
+
+        return UnfoldedUniverseRead(
+            world_bible=bible.to_read_schema(),
+            characters=[c.to_read_schema() for c in characters],
+            relationships=[
+                r.to_read_schema(
+                    source_name=id_to_name.get(r.source_character_id),
+                    target_name=id_to_name.get(r.target_character_id),
+                )
+                for r in relationships
+            ],
+            scenes=[s.to_read_schema() for s in scenes],
+        )
+
 
 

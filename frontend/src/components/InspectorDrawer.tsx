@@ -15,6 +15,7 @@ export const InspectorDrawer: React.FC = () => {
     seedText,
     selectedWorldId,
     selectedWorldRationale,
+    unfoldedUniverse,
   } = useWorkspaceStore();
 
   return (
@@ -176,7 +177,7 @@ export const InspectorDrawer: React.FC = () => {
                     <span>Active Causal Provenance Trail</span>
                   </div>
                   <p className="text-slate-400 leading-relaxed text-[11px]">
-                    Phase 4 establishes the immutable human selection edge in the project's causal DAG.
+                    Traceable DAG linking root seed, distilled Seed DNA, human world choice, and unfolded universe layers.
                   </p>
                 </div>
 
@@ -286,13 +287,65 @@ export const InspectorDrawer: React.FC = () => {
                     </p>
                   )}
                 </div>
+
+                {/* Vertical Connector to Step 4 */}
+                {unfoldedUniverse && (
+                  <>
+                    <div className="flex justify-center -my-2">
+                      <div className="w-0.5 h-5 bg-gradient-to-b from-amber-500/40 to-cyan-500/40" />
+                    </div>
+
+                    {/* Step 4: Unfolded Universe Codex Node */}
+                    <div id="lineage-unfolded-codex" className="p-3.5 rounded-xl bg-slate-900/90 border border-cyan-500/60 shadow-[0_0_20px_rgba(6,182,212,0.1)] space-y-3 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                          Step 4 • Unfolded Codex
+                        </span>
+                        <span className="text-[10px] text-cyan-300 font-mono font-bold">
+                          Tattva 4 Complete
+                        </span>
+                      </div>
+
+                      {/* 4 Child Branches */}
+                      <div className="space-y-2 pt-1 border-t border-slate-800">
+                        <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800/80 flex items-center justify-between">
+                          <span className="text-slate-300 text-[11px] font-medium">World Bible</span>
+                          <span className="text-[10px] text-cyan-400 font-mono">
+                            {unfoldedUniverse.world_bible.key_locations.length} Locations • {unfoldedUniverse.world_bible.factions.length} Factions
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800/80 flex items-center justify-between">
+                          <span className="text-slate-300 text-[11px] font-medium">Characters</span>
+                          <span className="text-[10px] text-amber-400 font-mono">
+                            {unfoldedUniverse.characters.length} Inhabitants
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800/80 flex items-center justify-between">
+                          <span className="text-slate-300 text-[11px] font-medium">Dynamics Web</span>
+                          <span className="text-[10px] text-orange-400 font-mono">
+                            {unfoldedUniverse.relationships.length} Tensions
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800/80 flex items-center justify-between">
+                          <span className="text-slate-300 text-[11px] font-medium">Story Scenes</span>
+                          <span className="text-[10px] text-purple-400 font-mono">
+                            {unfoldedUniverse.scenes.length} Beats
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
 
           {/* Drawer Footer */}
           <div className="p-3 border-t border-canvas-border bg-canvas-panel text-[11px] text-slate-500 text-center font-mono">
-            Seed Unfold Inspector • Phase 3 Candidates
+            Seed Unfold Inspector • Phase 5 Universe Codex
           </div>
         </motion.aside>
       )}

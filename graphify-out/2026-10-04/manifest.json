@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791092240.9539037,
-    "seen": 1791092668.99456,
-    "ast_hash": "f0c6250b2179c1e80ad95bd9c9f304d9",
+    "mtime": 1791093103.4054813,
+    "seen": 1791093703.6646035,
+    "ast_hash": "b31d865faa4fb2e2fe91379c74cb69dc",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791089831.4687018,
-    "seen": 1791089857.7242212,
-    "ast_hash": "a1760cd19f4ba3e2fa2e191652c98064",
+    "mtime": 1791095497.6693912,
+    "seen": 1791095516.5384448,
+    "ast_hash": "df8eeef9b23422e4b54da15d32d2d16a",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791089848.1005034,
-    "seen": 1791089857.7242262,
-    "ast_hash": "88ed8d2b58193f495d133fc8ef704171",
+    "mtime": 1791095505.2752948,
+    "seen": 1791095516.5384476,
+    "ast_hash": "778d87ea8f79b032c80ae883511393df",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_selection.py": {
-    "mtime": 1791092200.3663876,
-    "seen": 1791092668.9945858,
-    "ast_hash": "2129d58589449fe7a192ef5b03cc0b79",
+    "mtime": 1791093128.7701747,
+    "seen": 1791093703.6646855,
+    "ast_hash": "db05ec9d467a55da7a873c7e81898676",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase4_selection.cjs": {
@@ -648,9 +648,51 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorldSelectionCanvas.tsx": {
-    "mtime": 1791092419.6827455,
-    "seen": 1791092668.994631,
-    "ast_hash": "be69fe33d443258484a5942fc62c1757",
+    "mtime": 1791093164.3637445,
+    "seen": 1791093703.6648643,
+    "ast_hash": "7526371406eef07180ec8e97e6a52991",
+    "semantic_hash": ""
+  },
+  ".planning/phases/04-human-world-selection/04-SUMMARY.md": {
+    "mtime": 1791092677.5766284,
+    "seen": 1791093703.665156,
+    "ast_hash": "5331f8aba345c6175dc7419d8a301ffb",
+    "semantic_hash": ""
+  },
+  ".planning/phases/04-human-world-selection/04-UAT.md": {
+    "mtime": 1791093679.2385104,
+    "seen": 1791093703.6651592,
+    "ast_hash": "0f525a319d28567529fdfceb2c9ba0df",
+    "semantic_hash": ""
+  },
+  ".planning/phases/05-progressive-world-unfolding/05-01-PLAN.md": {
+    "mtime": 1791096298.2352397,
+    "seen": 1791096384.6508121,
+    "ast_hash": "0ca42cf44a11ce6cac46ade0b187d4e8",
+    "semantic_hash": ""
+  },
+  ".planning/phases/05-progressive-world-unfolding/05-02-PLAN.md": {
+    "mtime": 1791096324.5719059,
+    "seen": 1791096384.6508162,
+    "ast_hash": "f3eb67ec1f9aef6287f5705073f308c6",
+    "semantic_hash": ""
+  },
+  ".planning/phases/05-progressive-world-unfolding/05-CONTEXT.md": {
+    "mtime": 1791096351.6152651,
+    "seen": 1791096384.6508183,
+    "ast_hash": "ef41d2b099942b79a5c558505a38f9db",
+    "semantic_hash": ""
+  },
+  ".planning/phases/05-progressive-world-unfolding/05-DISCUSSION-LOG.md": {
+    "mtime": 1791095309.8267448,
+    "seen": 1791095516.5385075,
+    "ast_hash": "3bee747bf7e733094cb270124f9371a1",
+    "semantic_hash": ""
+  },
+  ".planning/phases/05-progressive-world-unfolding/05-RESEARCH.md": {
+    "mtime": 1791096371.6823084,
+    "seen": 1791096384.6508214,
+    "ast_hash": "d006eb27b10ba64c62ffbb825a434845",
     "semantic_hash": ""
   }
 }

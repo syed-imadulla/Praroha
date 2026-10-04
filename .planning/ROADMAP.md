@@ -8,9 +8,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 
 - [x] **Phase 1: Foundation / Project Shell** — Setup full-stack shell (React+Vite frontend, FastAPI backend), calm dark workspace layout, and AI provider abstraction.
 - [x] **Phase 2: Seed Understanding + Seed DNA** — Implement seed ingestion, input validation, AI understanding pass, and canonical Seed DNA extraction & inspection.
-- [ ] **Phase 3: Three World Generation** — Build the branching engine to generate exactly three distinct, high-contrast world candidates respecting Seed DNA.
-- [ ] **Phase 4: Human World Selection** — Implement the 3-world comparison UI, trade-off review, and explicit human choice gating mechanism.
-- [ ] **Phase 5: Progressive World Unfolding** — Progressively unfold the selected world into a World Bible, core characters, relationship web, and key dramatic scenes.
+- [x] **Phase 3: Three World Generation** — Build the branching engine to generate exactly three distinct, high-contrast world candidates respecting Seed DNA.
+- [x] **Phase 4: Human World Selection** — Implement the 3-world comparison UI, trade-off review, and explicit human choice gating mechanism.
+- [x] **Phase 5: Progressive World Unfolding** — Progressively unfold the selected world into a World Bible, core characters, relationship web, and key dramatic scenes.
 - [ ] **Phase 6: Traceability / Provenance** — Construct the DAG lineage graph connecting all entities, enabling interactive drill-down to root seed decisions without CoT leakage.
 - [ ] **Phase 7: Refine / Branch / Save** — Implement localized refinement, macro timeline branching, and complete project state persistence (save/load).
 - [ ] **Phase 8: Polish / Reliability / Demo** — Integrate canonical underwater city demo fixtures, offline fallback handling, end-to-end testing, and presentation polish.
@@ -85,7 +85,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   2. 2-4 characters are generated with motivations grounded in canon.
   3. Relationship graph maps tensions and alliances between characters.
   4. 2-3 narrative scenes are produced displaying characters in conflict.  
-**Plans**: TBD
+**Plans**: 2 plans (all completed)
+- [x] **05-01-PLAN.md** (Wave 1): Backend Unfolded Universe Models, AI Provider Unfold Service with Canonical Archetype Fixtures, Atomic Repository Persistence, Router Lifecycle Endpoints, and Pytest Suite.
+- [x] **05-02-PLAN.md** (Wave 2): Frontend Unfold Types, Workspace Store, Stage 5 Interactive Codex Canvas, Key Locations & Visual Prompt Copying, Inspector Lineage Expansion, and Playwright E2E Suite.
 
 ---
 

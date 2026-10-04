@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiClient } from '../api/client';
-import { Project, SeedDNARead, StageType, SystemHealthData, WorldCandidateRead, WorldSelectionRead } from '../types';
+import { Project, SeedDNARead, StageType, SystemHealthData, WorldCandidateRead, WorldSelectionRead, UnfoldedUniverseRead } from '../types';
 
 interface WorkspaceState {
   activeStage: StageType;
@@ -14,6 +14,11 @@ interface WorkspaceState {
   selectedWorldRationale: string;
   activeSelection: WorldSelectionRead | null;
   isSelectingWorld: boolean;
+  unfoldedUniverse: UnfoldedUniverseRead | null;
+  isUnfolding: boolean;
+  unfoldingStep: number;
+  unfoldError: string | null;
+  activeCodexTab: 'bible' | 'characters' | 'scenes';
   isExtracting: boolean;
   extractionStep: string;
   isGeneratingWorlds: boolean;
@@ -34,6 +39,9 @@ interface WorkspaceState {
   setSelectedWorldRationale: (rationale: string) => void;
   confirmWorldSelection: (candidateId: string, rationale?: string) => Promise<boolean>;
   fetchActiveSelection: () => Promise<void>;
+  setActiveCodexTab: (tab: 'bible' | 'characters' | 'scenes') => void;
+  unfoldUniverse: () => Promise<boolean>;
+  fetchUnfoldedUniverse: () => Promise<void>;
   setExtracting: (isExtracting: boolean, step?: string) => void;
   extractSeedDNA: (customSeed?: string) => Promise<boolean>;
   generateWorlds: () => Promise<boolean>;
@@ -43,6 +51,7 @@ interface WorkspaceState {
   setSyncing: (syncing: boolean) => void;
   resetWorkspace: () => void;
 }
+
 
 const DEFAULT_STAGES: StageType[] = ['seed'];
 
@@ -59,6 +68,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       selectedWorldRationale: '',
       activeSelection: null,
       isSelectingWorld: false,
+      unfoldedUniverse: null,
+      isUnfolding: false,
+      unfoldingStep: 0,
+      unfoldError: null,
+      activeCodexTab: 'bible',
       isExtracting: false,
       extractionStep: '',
       isGeneratingWorlds: false,
@@ -139,8 +153,91 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }
       },
 
+      setActiveCodexTab: (activeCodexTab) => set({ activeCodexTab }),
+
+      unfoldUniverse: async () => {
+        const state = get();
+        const project = state.activeProject;
+        if (!project || state.isUnfolding) return false;
+
+        set({
+          isUnfolding: true,
+          unfoldError: null,
+          unfoldingStep: 1,
+        });
+
+        // Step progression timers for responsive feedback
+        const timer1 = setTimeout(() => {
+          if (get().isUnfolding) set({ unfoldingStep: 2 });
+        }, 500);
+        const timer2 = setTimeout(() => {
+          if (get().isUnfolding) set({ unfoldingStep: 3 });
+        }, 1000);
+        const timer3 = setTimeout(() => {
+          if (get().isUnfolding) set({ unfoldingStep: 4 });
+        }, 1500);
+
+        try {
+          const res = await apiClient.unfoldUniverse(project.id);
+          clearTimeout(timer1);
+          clearTimeout(timer2);
+          clearTimeout(timer3);
+
+          if (!res.success || !res.data) {
+            throw new Error(res.error?.message || 'Failed to unfold universe');
+          }
+
+          const unfoldedData = res.data;
+          set((s) => ({
+            unfoldedUniverse: unfoldedData,
+            isUnfolding: false,
+            unfoldingStep: 4,
+            unfoldError: null,
+            activeProject: s.activeProject
+              ? { ...s.activeProject, status: 'universe_unfolded' }
+              : null,
+            unlockedStages: s.unlockedStages.includes('trace')
+              ? s.unlockedStages
+              : [...s.unlockedStages, 'trace'],
+          }));
+          return true;
+        } catch (err: unknown) {
+          clearTimeout(timer1);
+          clearTimeout(timer2);
+          clearTimeout(timer3);
+          const errorMsg =
+            err instanceof Error ? err.message : 'Universe unfolding failed. Please try again.';
+          console.error('Failed to unfold universe:', err);
+          set((s) => ({
+            isUnfolding: false,
+            unfoldingStep: 0,
+            unfoldError: errorMsg,
+            activeProject: s.activeProject
+              ? { ...s.activeProject, status: 'world_selected' }
+              : null,
+          }));
+          return false;
+        }
+      },
+
+      fetchUnfoldedUniverse: async () => {
+        const state = get();
+        const project = state.activeProject;
+        if (!project) return;
+
+        try {
+          const res = await apiClient.getUnfoldedUniverse(project.id);
+          if (res.success && res.data) {
+            set({ unfoldedUniverse: res.data });
+          }
+        } catch (err) {
+          console.debug('No existing unfolded universe to fetch:', err);
+        }
+      },
+
       setExtracting: (isExtracting, step = '') =>
         set({ isExtracting, extractionStep: step }),
+
 
       extractSeedDNA: async (customSeed?: string) => {
         const state = get();
@@ -278,6 +375,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           selectedWorldRationale: '',
           activeSelection: null,
           isSelectingWorld: false,
+          unfoldedUniverse: null,
+          isUnfolding: false,
+          unfoldingStep: 0,
+          unfoldError: null,
+          activeCodexTab: 'bible',
           isExtracting: false,
           extractionStep: '',
           isGeneratingWorlds: false,
@@ -298,8 +400,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         selectedWorldId: state.selectedWorldId,
         selectedWorldRationale: state.selectedWorldRationale,
         activeSelection: state.activeSelection,
+        unfoldedUniverse: state.unfoldedUniverse,
+        activeCodexTab: state.activeCodexTab,
         inspectorTab: state.inspectorTab,
       }),
     }
   )
 );
+

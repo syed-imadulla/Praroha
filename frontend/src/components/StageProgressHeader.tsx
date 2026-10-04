@@ -14,9 +14,23 @@ const STAGES: StageDefinition[] = [
 ];
 
 export const StageProgressHeader: React.FC = () => {
-  const { activeStage, unlockedStages, setActiveStage } = useWorkspaceStore();
+  const { activeStage, unlockedStages, activeProject, setActiveStage } = useWorkspaceStore();
 
-  const isUnlocked = (stageId: StageType) => unlockedStages.includes(stageId);
+  const isUnlocked = (stageId: StageType) => {
+    if (unlockedStages.includes(stageId)) return true;
+    if (stageId === 'unfold') {
+      return (
+        activeProject?.status === 'world_selected' ||
+        activeProject?.status === 'unfolding' ||
+        activeProject?.status === 'universe_unfolded'
+      );
+    }
+    if (stageId === 'trace') {
+      return activeProject?.status === 'universe_unfolded';
+    }
+    return false;
+  };
+
   const isCurrent = (stageId: StageType) => activeStage === stageId;
   const isCompleted = (stageId: StageType) => {
     const currentIndex = STAGES.findIndex((s) => s.id === activeStage);

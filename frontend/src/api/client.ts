@@ -1,4 +1,4 @@
-import { APIResponse, Project, SeedDNARead, SystemHealthData, WorldCandidateRead, WorldSelectionRead } from '../types';
+import { APIResponse, Project, SeedDNARead, SystemHealthData, WorldCandidateRead, WorldSelectionRead, UnfoldedUniverseRead } from '../types';
 
 class ApiClient {
   private baseUrl = '/api';
@@ -93,7 +93,18 @@ class ApiClient {
   async getActiveSelection(projectId: string): Promise<APIResponse<WorldSelectionRead>> {
     return this.request<WorldSelectionRead>(`/projects/${projectId}/selection`);
   }
+
+  async unfoldUniverse(projectId: string): Promise<APIResponse<UnfoldedUniverseRead>> {
+    return this.request<UnfoldedUniverseRead>(`/projects/${projectId}/unfold`, {
+      method: 'POST',
+    });
+  }
+
+  async getUnfoldedUniverse(projectId: string): Promise<APIResponse<UnfoldedUniverseRead>> {
+    return this.request<UnfoldedUniverseRead>(`/projects/${projectId}/unfolded`);
+  }
 }
 
 export const apiClient = new ApiClient();
+
 

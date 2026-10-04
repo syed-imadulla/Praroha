@@ -131,3 +131,83 @@ export interface WorldSelectionRead {
   selected_world: WorldCandidateRead;
   created_at: string;
 }
+
+export interface LocationItem {
+  name: string;
+  description: string;
+  visual_prompt: string;
+}
+
+export interface FactionItem {
+  name: string;
+  role: string;
+  agenda: string;
+}
+
+export interface TimelineEvent {
+  era: string;
+  event: string;
+}
+
+export interface WorldBibleRead {
+  id: string;
+  project_id: string;
+  world_candidate_id: string;
+  geography: string;
+  physics_rules: string;
+  history_timeline: TimelineEvent[];
+  factions: FactionItem[];
+  canon_facts: string[];
+  key_locations: LocationItem[];
+  visual_style_prompt: string;
+  created_at: string;
+}
+
+export interface CharacterRead {
+  id: string;
+  project_id: string;
+  world_candidate_id: string;
+  name: string;
+  role: string;
+  archetype: string;
+  motivation: string;
+  core_conflict: string;
+  visual_prompt: string;
+  created_at: string;
+}
+
+export interface CharacterRelationshipRead {
+  id: string;
+  project_id: string;
+  world_candidate_id: string;
+  source_character_id: string;
+  target_character_id: string;
+  source_character_name?: string | null;
+  target_character_name?: string | null;
+  relation_type: string;
+  dynamic_description: string;
+  created_at: string;
+}
+
+export interface SceneRead {
+  id: string;
+  project_id: string;
+  world_candidate_id: string;
+  scene_number: number;
+  title: string;
+  location_setting: string;
+  characters_involved: string[];
+  dramatic_question: string;
+  conflict_narrative: string;
+  pivotal_outcome: string;
+  visual_prompt: string;
+  created_at: string;
+}
+
+export interface UnfoldedUniverseRead {
+  world_bible: WorldBibleRead;
+  characters: CharacterRead[];
+  relationships: CharacterRelationshipRead[];
+  scenes: SceneRead[];
+}
+

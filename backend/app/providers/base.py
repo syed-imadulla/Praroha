@@ -26,3 +26,9 @@ class AIProvider(ABC):
     ) -> Dict[str, Any]:
         """Progressively unfold a stage (bible, characters, scenes, etc.) for the chosen world."""
         pass
+
+    @abstractmethod
+    async def unfold_universe(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Unfold the entire universe (World Bible, Characters, Relationships, Scenes) for the selected world."""
+        pass
+

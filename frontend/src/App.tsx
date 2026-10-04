@@ -7,7 +7,14 @@ import { apiClient } from './api/client';
 import { useWorkspaceStore } from './store/workspaceStore';
 
 export const App: React.FC = () => {
-  const { setHealth } = useWorkspaceStore();
+  const {
+    setHealth,
+    activeProject,
+    unfoldedUniverse,
+    fetchUnfoldedUniverse,
+    fetchActiveSelection,
+    selectedWorldId,
+  } = useWorkspaceStore();
 
   useEffect(() => {
     // Initial health check against backend API
@@ -23,6 +30,21 @@ export const App: React.FC = () => {
     const interval = setInterval(checkBackend, 10000);
     return () => clearInterval(interval);
   }, [setHealth]);
+
+  // Sync active selection & unfolded codex if project exists
+  useEffect(() => {
+    if (activeProject) {
+      if (activeProject.status === 'universe_unfolded' && !unfoldedUniverse) {
+        fetchUnfoldedUniverse();
+      }
+      if (
+        (activeProject.status === 'world_selected' || activeProject.status === 'universe_unfolded') &&
+        !selectedWorldId
+      ) {
+        fetchActiveSelection();
+      }
+    }
+  }, [activeProject, unfoldedUniverse, selectedWorldId, fetchUnfoldedUniverse, fetchActiveSelection]);
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[#090D16] text-slate-100 overflow-hidden font-sans select-none">

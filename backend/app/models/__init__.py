@@ -18,6 +18,24 @@ from backend.app.models.selection import (
     WorldSelectionCreate,
     WorldSelectionRead,
 )
+from backend.app.models.unfold import (
+    LocationItem,
+    FactionItem,
+    TimelineEvent,
+    WorldBibleBase,
+    WorldBibleRecord,
+    WorldBibleRead,
+    CharacterBase,
+    CharacterRecord,
+    CharacterRead,
+    CharacterRelationshipBase,
+    CharacterRelationshipRecord,
+    CharacterRelationshipRead,
+    SceneBase,
+    SceneRecord,
+    SceneRead,
+    UnfoldedUniverseRead,
+)
 
 __all__ = [
     "Project",
@@ -39,5 +57,21 @@ __all__ = [
     "WorldSelectionRecord",
     "WorldSelectionCreate",
     "WorldSelectionRead",
+    "LocationItem",
+    "FactionItem",
+    "TimelineEvent",
+    "WorldBibleBase",
+    "WorldBibleRecord",
+    "WorldBibleRead",
+    "CharacterBase",
+    "CharacterRecord",
+    "CharacterRead",
+    "CharacterRelationshipBase",
+    "CharacterRelationshipRecord",
+    "CharacterRelationshipRead",
+    "SceneBase",
+    "SceneRecord",
+    "SceneRead",
+    "UnfoldedUniverseRead",
 ]
 

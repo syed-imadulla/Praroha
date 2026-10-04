@@ -1,0 +1,159 @@
+import logging
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.app.core.response import APIResponse, api_success
+from backend.app.models.unfold import UnfoldedUniverseRead
+from backend.app.providers.factory import get_ai_provider
+from backend.app.repositories.project_repo import ProjectRepository, get_session
+
+logger = logging.getLogger("seed_unfold.router.unfold")
+
+router = APIRouter(prefix="/projects/{project_id}", tags=["unfold"])
+
+
+@router.post("/unfold", response_model=APIResponse[UnfoldedUniverseRead])
+async def unfold_universe(
+    project_id: str,
+    session: AsyncSession = Depends(get_session),
+) -> APIResponse[UnfoldedUniverseRead]:
+    """
+    Unfold the selected world candidate into a multi-layered universe
+    (World Bible with key locations, Characters, Relationship Web, and Scenes).
+
+    Enforces:
+    1. Project exists (HTTP 404 if missing)
+    2. Concurrency guard: Rejects requests while 'unfolding' with HTTP 409 Conflict.
+    3. Idempotency guard: If already 'universe_unfolded', returns existing codex without re-generating.
+    4. Lifecycle state machine: Project must be in 'world_selected' status to begin unfolding.
+    5. Atomic transaction: Rolls back completely on failure and resets project to 'world_selected'
+       so creator can safely retry without corrupt partial records.
+    """
+    repo = ProjectRepository(session)
+    project = await repo.get_project(project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project with ID '{project_id}' not found.",
+        )
+
+    # Concurrency guard: already in progress
+    if project.status == "unfolding":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Universe unfolding is already in progress for this project.",
+        )
+
+    # Idempotency guard: already unfolded
+    if project.status == "universe_unfolded":
+        existing = await repo.get_unfolded_universe(project_id)
+        if existing:
+            return api_success(data=existing)
+
+    # Must be in world_selected status
+    if project.status != "world_selected":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Project must be in 'world_selected' status to begin unfolding. Current status: '{project.status}'.",
+        )
+
+    if not project.selected_world_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Project has no selected world candidate to unfold.",
+        )
+
+    # Fetch selected candidate
+    candidate_record = await repo.get_world_candidate(project.selected_world_id)
+    if not candidate_record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Selected world candidate '{project.selected_world_id}' not found.",
+        )
+
+    # Fetch Seed DNA record
+    dna_record = await repo.get_latest_seed_dna(project_id)
+    if not dna_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Project '{project_id}' has no Seed DNA. Complete Stage 2 before unfolding.",
+        )
+
+    # Fetch creator selection rationale if present
+    active_selection = await repo.get_active_world_selection(project_id)
+    creator_rationale = (
+        active_selection[0].user_rationale if active_selection else None
+    )
+
+    # Transition project status to "unfolding"
+    project.status = "unfolding"
+    session.add(project)
+    await session.commit()
+    await session.refresh(project)
+
+    # Assemble context with immutable normalized raw_seed for canonical detection
+    dna_schema = dna_record.to_seed_dna()
+    context = {
+        "raw_seed": dna_record.raw_seed or project.seed_text,
+        "seed": project.seed_text,
+        "seed_dna": dna_schema.model_dump(),
+        "selected_world": candidate_record.to_read_schema().model_dump(),
+        "creator_rationale": creator_rationale,
+    }
+
+    try:
+        provider = get_ai_provider()
+        unfolded_data = await provider.unfold_universe(context)
+        unfolded_universe = await repo.save_unfolded_universe(
+            project_id=project_id,
+            world_candidate_id=candidate_record.id,
+            data=unfolded_data,
+        )
+        return api_success(data=unfolded_universe)
+
+    except Exception as exc:
+        logger.error(
+            "Universe unfolding failed for project '%s': %s",
+            project_id,
+            exc,
+            exc_info=True,
+        )
+        # Roll back state transition to world_selected so creator can safely retry
+        try:
+            p = await repo.get_project(project_id)
+            if p:
+                p.status = "world_selected"
+                session.add(p)
+                await session.commit()
+        except Exception as reset_exc:
+            logger.error("Failed to reset project status after error: %s", reset_exc)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Universe unfolding failed: {str(exc)}",
+        )
+
+
+@router.get("/unfolded", response_model=APIResponse[UnfoldedUniverseRead])
+async def get_unfolded_universe(
+    project_id: str,
+    session: AsyncSession = Depends(get_session),
+) -> APIResponse[UnfoldedUniverseRead]:
+    """Retrieve the unfolded universe codex for a project."""
+    repo = ProjectRepository(session)
+    project = await repo.get_project(project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project with ID '{project_id}' not found.",
+        )
+
+    codex = await repo.get_unfolded_universe(project_id)
+    if not codex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Universe has not been unfolded yet for this project.",
+        )
+
+    return api_success(data=codex)
