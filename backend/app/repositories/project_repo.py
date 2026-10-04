@@ -26,11 +26,33 @@ from backend.app.providers.mock_provider import (
     MockProvider,
 )
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=False,
-    future=True,
-)
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def build_engine(database_url: str):
+    """Build async SQLAlchemy engine optimized for SQLite or PostgreSQL/Supabase."""
+    url_str = str(database_url).strip()
+    if url_str.startswith("sqlite"):
+        return create_async_engine(
+            url_str,
+            echo=False,
+            future=True,
+            connect_args={"check_same_thread": False},
+        )
+    else:
+        # Optimized for Supabase poolers (pgbouncer transaction & session modes)
+        return create_async_engine(
+            url_str,
+            echo=False,
+            future=True,
+            pool_pre_ping=True,
+            connect_args={"statement_cache_size": 0},
+        )
+
+
+engine = build_engine(settings.DATABASE_URL)
 
 async_session = async_sessionmaker(
     engine,
@@ -39,40 +61,84 @@ async_session = async_sessionmaker(
 )
 
 
+def _migrate_columns(connection):
+    from sqlalchemy import inspect, text
+    inspector = inspect(connection)
+    table_names = inspector.get_table_names()
+
+    if "projects" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("projects")]
+        if "selected_world_id" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN selected_world_id VARCHAR"))
+            except Exception:
+                pass
+        if "parent_project_id" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN parent_project_id VARCHAR"))
+            except Exception:
+                pass
+        if "branch_name" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN branch_name VARCHAR DEFAULT 'main'"))
+            except Exception:
+                pass
+
+    if "characters" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("characters")]
+        if "version" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN version INTEGER DEFAULT 1"))
+            except Exception:
+                pass
+        if "revision_notes" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN revision_notes VARCHAR"))
+            except Exception:
+                pass
+
+    if "scenes" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("scenes")]
+        if "version" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN version INTEGER DEFAULT 1"))
+            except Exception:
+                pass
+        if "revision_notes" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
+            except Exception:
+                pass
+
+
 async def init_db() -> None:
-    """Initialize database tables asynchronously."""
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
-
-        def _migrate_columns(connection):
-            from sqlalchemy import inspect, text
-            inspector = inspect(connection)
-            table_names = inspector.get_table_names()
-
-            if "projects" in table_names:
-                cols = [c["name"] for c in inspector.get_columns("projects")]
-                if "selected_world_id" not in cols:
-                    connection.execute(text("ALTER TABLE projects ADD COLUMN selected_world_id VARCHAR"))
-                if "parent_project_id" not in cols:
-                    connection.execute(text("ALTER TABLE projects ADD COLUMN parent_project_id VARCHAR"))
-                if "branch_name" not in cols:
-                    connection.execute(text("ALTER TABLE projects ADD COLUMN branch_name VARCHAR DEFAULT 'main'"))
-
-            if "characters" in table_names:
-                cols = [c["name"] for c in inspector.get_columns("characters")]
-                if "version" not in cols:
-                    connection.execute(text("ALTER TABLE characters ADD COLUMN version INTEGER DEFAULT 1"))
-                if "revision_notes" not in cols:
-                    connection.execute(text("ALTER TABLE characters ADD COLUMN revision_notes VARCHAR"))
-
-            if "scenes" in table_names:
-                cols = [c["name"] for c in inspector.get_columns("scenes")]
-                if "version" not in cols:
-                    connection.execute(text("ALTER TABLE scenes ADD COLUMN version INTEGER DEFAULT 1"))
-                if "revision_notes" not in cols:
-                    connection.execute(text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
-
-        await conn.run_sync(_migrate_columns)
+    """Initialize database tables asynchronously with automatic fallback to local SQLite."""
+    global engine, async_session
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(SQLModel.metadata.create_all)
+            await conn.run_sync(_migrate_columns)
+        logger.info("Database initialized successfully using %s", engine.url.drivername)
+    except Exception as exc:
+        if not str(engine.url).startswith("sqlite"):
+            logger.warning(
+                "Failed to connect to primary database (%s: %s). Falling back gracefully to local SQLite.",
+                type(exc).__name__,
+                exc,
+            )
+            sqlite_url = "sqlite+aiosqlite:///./seed_unfold.db"
+            engine = build_engine(sqlite_url)
+            async_session = async_sessionmaker(
+                engine,
+                class_=AsyncSession,
+                expire_on_commit=False,
+            )
+            async with engine.begin() as conn:
+                await conn.run_sync(SQLModel.metadata.create_all)
+                await conn.run_sync(_migrate_columns)
+            logger.info("Local SQLite fallback database initialized successfully.")
+        else:
+            raise exc
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -357,16 +423,25 @@ class ProjectRepository:
             canon_facts = bible_data.get("canon_facts", [])
             locations_items = bible_data.get("key_locations", [])
 
+            clean_canon_facts = [
+                (f.get("fact") or f.get("text") or f.get("description") or str(f)) if isinstance(f, dict) else str(f)
+                for f in (canon_facts if isinstance(canon_facts, list) else [])
+            ]
+            raw_physics = bible_data.get("physics_rules", "")
+            physics_rules = json.dumps(raw_physics) if isinstance(raw_physics, (list, dict)) else str(raw_physics or "")
+            raw_geo = bible_data.get("geography", "")
+            geography = json.dumps(raw_geo) if isinstance(raw_geo, (list, dict)) else str(raw_geo or "")
+
             bible_record = WorldBibleRecord(
                 project_id=project_id,
                 world_candidate_id=world_candidate_id,
-                geography=bible_data.get("geography", ""),
-                physics_rules=bible_data.get("physics_rules", ""),
+                geography=geography,
+                physics_rules=physics_rules,
                 history_timeline_json=json.dumps([t if isinstance(t, dict) else t.model_dump() for t in timeline_items]),
                 factions_json=json.dumps([f if isinstance(f, dict) else f.model_dump() for f in factions_items]),
-                canon_facts_json=json.dumps(canon_facts if isinstance(canon_facts, list) else []),
+                canon_facts_json=json.dumps(clean_canon_facts),
                 key_locations_json=json.dumps([loc if isinstance(loc, dict) else loc.model_dump() for loc in locations_items]),
-                visual_style_prompt=bible_data.get("visual_style_prompt", ""),
+                visual_style_prompt=str(bible_data.get("visual_style_prompt", "") or ""),
             )
             self.session.add(bible_record)
 

@@ -35,8 +35,8 @@ async function runPhase8E2E() {
     const startTime = Date.now();
     await instantDemoBtn.click();
 
-    // Verify rapid transition directly to Stage 5 Universe Codex
-    await page.locator('h1:has-text("Bio-City")').first().waitFor({ timeout: 10000 });
+    // Verify rapid transition directly to Stage 5 Universe Codex (allowing for cloud roundtrips)
+    await page.locator('h1:has-text("Bio-City")').first().waitFor({ timeout: 25000 });
     const seedDuration = Date.now() - startTime;
     console.log(`✅ Instant Demo Universe seeded and rendered in ${seedDuration}ms`);
 

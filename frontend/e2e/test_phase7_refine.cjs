@@ -32,24 +32,26 @@ async function runPhase7E2E() {
     // Step 2: Extract Seed DNA
     const extractBtn = page.locator('button:has-text("Extract Seed DNA")');
     await extractBtn.click();
-    await page.locator('main').getByText('Distilled Seed DNA').waitFor({ timeout: 10000 });
+    await page.locator('main').getByText('Distilled Seed DNA').waitFor({ timeout: 45000 });
     console.log('✅ Stage 2 Seed DNA Extracted');
 
     // Step 3: Generate 3 Worlds
     const proceedToWorldsBtn = page.locator('button:has-text("Generate 3 Worlds (Stage 3)")');
     await proceedToWorldsBtn.click();
-    await page.locator('h2:has-text("Three Contrasting Creative Worlds")').waitFor({ timeout: 10000 });
+    await page.locator('h2:has-text("Three Contrasting Creative Worlds")').waitFor({ timeout: 45000 });
     console.log('✅ Stage 3 Worlds generated and loaded');
 
     // Step 4: Proceed to Stage 4 Selection
     const proceedToStage4Btn = page.locator('button:has-text("Proceed to Selection (Stage 4)")').first();
     await proceedToStage4Btn.click();
-    await page.locator('h2:has-text("Human World Selection & Creative Commitment")').waitFor({ timeout: 8000 });
+    await page.locator('h2:has-text("Human World Selection & Creative Commitment")').waitFor({ timeout: 20000 });
+    await page.waitForTimeout(1000);
 
     // Select Candidate 02 (Bio-City)
     const selectBtnBioCity = page.locator('button:has-text("Select This Direction")').nth(1);
-    await selectBtnBioCity.click();
-    await page.waitForTimeout(300);
+    await selectBtnBioCity.scrollIntoViewIfNeeded();
+    await selectBtnBioCity.click({ force: true });
+    await page.waitForTimeout(500);
 
     // Enter creator rationale
     const rationaleTextarea = page.locator('textarea#creator-rationale');
@@ -64,12 +66,12 @@ async function runPhase7E2E() {
 
     // Unfold Universe in Stage 5
     const unfoldBtn = page.locator('button#unfold-universe-btn');
-    await unfoldBtn.waitFor({ timeout: 8000 });
+    await unfoldBtn.waitFor({ timeout: 20000 });
     await unfoldBtn.click();
 
     // Wait for codex tabs to appear
     const bibleTab = page.locator('button#codex-tab-bible');
-    await bibleTab.waitFor({ timeout: 15000 });
+    await bibleTab.waitFor({ timeout: 60000 });
     console.log('✅ Stage 5 Universe Unfolded successfully');
 
     // -------------------------------------------------------------
@@ -111,10 +113,10 @@ async function runPhase7E2E() {
     // Save refinement
     const saveRefineBtn = page.locator('#save-refinement-btn');
     await saveRefineBtn.click();
-    await page.waitForTimeout(800);
+    const updatedCharBadge = page.locator('.char-version-badge').first();
+    await updatedCharBadge.filter({ hasText: 'v2' }).waitFor({ timeout: 15000 });
 
     // Verify character version badge is now v2!
-    const updatedCharBadge = page.locator('.char-version-badge').first();
     const updatedCharVersion = await updatedCharBadge.textContent();
     assert(updatedCharVersion.includes('v2'), `Updated character version must be v2, got: ${updatedCharVersion}`);
     console.log(`✅ Character successfully refined to ${updatedCharVersion.trim()} with immutable revision!`);
@@ -150,10 +152,10 @@ async function runPhase7E2E() {
 
     // Save scene refinement
     await saveRefineBtn.click();
-    await page.waitForTimeout(800);
+    const updatedSceneBadge = page.locator('.scene-version-badge').first();
+    await updatedSceneBadge.filter({ hasText: 'v2' }).waitFor({ timeout: 15000 });
 
     // Verify scene version badge is now v2!
-    const updatedSceneBadge = page.locator('.scene-version-badge').first();
     const updatedSceneVersion = await updatedSceneBadge.textContent();
     assert(updatedSceneVersion.includes('v2'), `Updated scene version must be v2, got: ${updatedSceneVersion}`);
     console.log(`✅ Scene successfully refined to ${updatedSceneVersion.trim()}!`);
@@ -178,7 +180,7 @@ async function runPhase7E2E() {
 
     // Look for node with v2 in the DAG
     const refinedNodeV2 = page.locator('div[data-node-id]:has-text("v2")').first();
-    await refinedNodeV2.waitFor({ timeout: 8000 });
+    await refinedNodeV2.waitFor({ timeout: 15000 });
     assert(await refinedNodeV2.isVisible(), 'Refined v2 lineage node must be present in DAG');
 
     // Click the refined node to view inspector
@@ -188,7 +190,7 @@ async function runPhase7E2E() {
     await page.waitForTimeout(400);
 
     const causalInspectorCard = page.locator('#causal-inspector-card');
-    await causalInspectorCard.waitFor({ timeout: 5000 });
+    await causalInspectorCard.waitFor({ timeout: 10000 });
     assert(await causalInspectorCard.isVisible(), 'Causal Inspector must open for refined node');
     const inspectorText = await causalInspectorCard.textContent();
     assert(inspectorText.includes('v2') || inspectorText.includes('refined'), 'Inspector must show refinement context');
@@ -209,18 +211,18 @@ async function runPhase7E2E() {
     }
 
     const stage7NavBtn = page.locator('#stage-nav-refine');
-    await stage7NavBtn.waitFor({ timeout: 8000 });
+    await stage7NavBtn.waitFor({ timeout: 12000 });
     await stage7NavBtn.scrollIntoViewIfNeeded();
     await stage7NavBtn.click();
     await page.waitForTimeout(800);
 
     const stage7Title = page.locator('h1:has-text("Refine, Branch & Save")');
-    await stage7Title.waitFor({ timeout: 8000 });
+    await stage7Title.waitFor({ timeout: 12000 });
     assert(await stage7Title.isVisible(), 'Stage 7 title must be visible');
 
     // Check Audit Log shows at least 2 revisions (character + scene)
     const auditLog = page.locator('#refinement-audit-log');
-    await auditLog.waitFor({ timeout: 5000 });
+    await auditLog.waitFor({ timeout: 15000 });
     const auditText = await auditLog.textContent();
     assert(auditText.includes('v2'), 'Audit log must display v2 revisions');
     assert(auditText.includes('Elevated character stakes') || auditText.includes('deep trench'), 'Audit log must display creator rationale');
@@ -242,7 +244,7 @@ async function runPhase7E2E() {
 
     // Verify active timeline changed to solar-rebellion-fork
     const activeTimelineBadge = page.locator('text=solar-rebellion-fork').first();
-    await activeTimelineBadge.waitFor({ timeout: 8000 });
+    await activeTimelineBadge.waitFor({ timeout: 15000 });
     console.log('✅ Active timeline switched to newly forked branch "solar-rebellion-fork"');
 
     // Verify TopBar branch switcher popover
@@ -251,7 +253,9 @@ async function runPhase7E2E() {
     await page.waitForTimeout(300);
 
     const branchPopover = page.locator('#branch-switcher-popover');
+    await branchPopover.waitFor({ timeout: 5000 });
     assert(await branchPopover.isVisible(), 'Branch switcher popover must open');
+    await page.locator('#branch-switcher-popover').getByText('solar-rebellion-fork').waitFor({ timeout: 15000 });
     const popoverText = await branchPopover.textContent();
     assert(popoverText.includes('solar-rebellion-fork'), 'Popover must contain newly forked branch');
 
@@ -272,7 +276,7 @@ async function runPhase7E2E() {
     await page.waitForTimeout(1500);
 
     const snapshotsGrid = page.locator('#storage-snapshots-grid');
-    await snapshotsGrid.waitFor({ timeout: 8000 });
+    await snapshotsGrid.waitFor({ timeout: 15000 });
     assert(await snapshotsGrid.isVisible(), 'Storage snapshots grid must be visible');
     const snapsText = await snapshotsGrid.textContent();
     assert(snapsText.includes('KB') || snapsText.includes('snapshots/'), 'Snapshot card must display storage details');

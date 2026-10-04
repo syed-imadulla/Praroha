@@ -226,7 +226,7 @@ class GeminiProvider(AIProvider):
                 {
                     "parts": [
                         {
-                            "text": f"Seed DNA Specification:\n{json.dumps(dna, indent=2)}"
+                            "text": f"Seed DNA Specification:\n{json.dumps(dna, indent=2, default=str)}"
                         }
                     ]
                 }
@@ -341,8 +341,8 @@ class GeminiProvider(AIProvider):
 
             user_prompt = (
                 f"SEED: {context.get('seed')}\n"
-                f"SEED DNA: {json.dumps(context.get('seed_dna', {}))}\n"
-                f"SELECTED WORLD: {json.dumps(context.get('selected_world', {}))}\n"
+                f"SEED DNA: {json.dumps(context.get('seed_dna', {}), default=str)}\n"
+                f"SELECTED WORLD: {json.dumps(context.get('selected_world', {}), default=str)}\n"
                 f"CREATOR RATIONALE: {context.get('creator_rationale') or 'Focus on world depth and dynamic tension'}\n"
             )
 

@@ -67,9 +67,16 @@ class WorldBibleRecord(WorldBibleBase, table=True):
             factions = []
 
         try:
-            canon_facts = json.loads(self.canon_facts_json or "[]")
-            if not isinstance(canon_facts, list):
+            canon_facts_raw = json.loads(self.canon_facts_json or "[]")
+            if not isinstance(canon_facts_raw, list):
                 canon_facts = []
+            else:
+                canon_facts = [
+                    (item.get("fact") or item.get("text") or item.get("description") or str(item))
+                    if isinstance(item, dict)
+                    else str(item)
+                    for item in canon_facts_raw
+                ]
         except Exception:
             canon_facts = []
 

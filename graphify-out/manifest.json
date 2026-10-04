@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "backend/app/config.py": {
-    "mtime": 1791084800.4116726,
-    "seen": 1791085614.1851835,
-    "ast_hash": "a39513a1e3b9d62bbf3418096ae0e28f",
+    "mtime": 1791111339.2631068,
+    "seen": 1791113214.819021,
+    "ast_hash": "e9533d127a05f13d6cdc01e93424518e",
     "semantic_hash": ""
   },
   "backend/app/core/response.py": {
@@ -60,15 +60,15 @@
     "semantic_hash": ""
   },
   "backend/app/providers/storage.py": {
-    "mtime": 1791082538.8670886,
-    "seen": 1791082976.2540994,
-    "ast_hash": "bf59343f91d5a1c9e97689e1a6109841",
+    "mtime": 1791112981.6490803,
+    "seen": 1791113214.8190794,
+    "ast_hash": "79d98adeb13b4018772a479e6c30d642",
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791105439.4138014,
-    "seen": 1791106275.8670356,
-    "ast_hash": "b24e8a362f3b962972baa3f04e9dda27",
+    "mtime": 1791111809.3309236,
+    "seen": 1791113214.8190825,
+    "ast_hash": "f6c5a921f6964bb3fcbe6214bb463579",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "backend/tests/conftest.py": {
-    "mtime": 1791082644.4928405,
-    "seen": 1791082976.254107,
-    "ast_hash": "c344133111b4718f735484fcbb16905c",
+    "mtime": 1791110587.9064481,
+    "seen": 1791110667.0691473,
+    "ast_hash": "adda2f43e1db4133c9415b5046279760",
     "semantic_hash": ""
   },
   "backend/tests/test_health.py": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/gemini_provider.py": {
-    "mtime": 1791105320.3702643,
-    "seen": 1791106275.867025,
-    "ast_hash": "a29763d9ee2e93412611e31b83b59b47",
+    "mtime": 1791111682.726589,
+    "seen": 1791113214.8190725,
+    "ast_hash": "1879b38c9b5881f9c6dc86cc811cf8e5",
     "semantic_hash": ""
   },
   "backend/app/routers/dna.py": {
@@ -696,9 +696,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/unfold.py": {
-    "mtime": 1791101275.3778367,
-    "seen": 1791103973.2650323,
-    "ast_hash": "c019d8e9a6c5fbb6651c7d7a6d49c0bb",
+    "mtime": 1791111796.2760952,
+    "seen": 1791113214.8190582,
+    "ast_hash": "193e1a8f8ca528c029baa4d42bfac006",
     "semantic_hash": ""
   },
   "backend/app/routers/unfold.py": {
@@ -756,9 +756,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase6_traceability.cjs": {
-    "mtime": 1791099601.3872817,
-    "seen": 1791099701.7283323,
-    "ast_hash": "89bdff220c1453795aaaba2fb46809ea",
+    "mtime": 1791112844.8537695,
+    "seen": 1791113214.8191788,
+    "ast_hash": "b8785846393756a42c4727c286be8f60",
     "semantic_hash": ""
   },
   "frontend/src/components/TraceabilityCanvas.tsx": {
@@ -870,9 +870,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase7_refine.cjs": {
-    "mtime": 1791103872.271048,
-    "seen": 1791103973.265071,
-    "ast_hash": "c3b90b61e1e23ec6a40cfcb1d5c0fbbe",
+    "mtime": 1791112555.9283376,
+    "seen": 1791113214.8191822,
+    "ast_hash": "5650cb36fbab9bfbb3ea465c9d8a6a71",
     "semantic_hash": ""
   },
   "frontend/src/components/RefineCanvas.tsx": {
@@ -900,9 +900,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase8_demo.cjs": {
-    "mtime": 1791106092.0897312,
-    "seen": 1791106275.8671193,
-    "ast_hash": "6de782ec5b16c562ee705ad26fb66efb",
+    "mtime": 1791112096.0051527,
+    "seen": 1791113214.8191848,
+    "ast_hash": "3efbc013dd6bd243fe1e5ceae047687c",
     "semantic_hash": ""
   },
   "frontend/src/components/GuidedTourOverlay.tsx": {
@@ -1011,6 +1011,12 @@
     "mtime": 1791107748.9190288,
     "seen": 1791107850.3003316,
     "ast_hash": "1704441806f2e64f929b1b1e1f996e76",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_supabase_compat.py": {
+    "mtime": 1791110533.1382077,
+    "seen": 1791110667.0691695,
+    "ast_hash": "e4f28ce5ac7691f40da20865c02651b5",
     "semantic_hash": ""
   }
 }

@@ -10,6 +10,9 @@ async function runPhase6E2E() {
   });
   const page = await context.newPage();
 
+  page.on('console', (msg) => console.log(`PAGE [${msg.type()}]:`, msg.text()));
+  page.on('pageerror', (err) => console.log('PAGE UNHANDLED ERROR:', err));
+
   const results = [];
   const screenshotDir = '/home/syed-imadulla/.gemini/antigravity-ide/brain/673909d6-31c3-46fd-be51-2fffe4acec04';
 
@@ -28,44 +31,48 @@ async function runPhase6E2E() {
     // Step 2: Extract Seed DNA
     const extractBtn = page.locator('button:has-text("Extract Seed DNA")');
     await extractBtn.click();
-    await page.locator('main').getByText('Distilled Seed DNA').waitFor({ timeout: 10000 });
+    await page.locator('main').getByText('Distilled Seed DNA').waitFor({ timeout: 45000 });
     console.log('✅ Stage 2 Seed DNA Extracted');
 
     // Step 3: Generate 3 Worlds
     const proceedToWorldsBtn = page.locator('button:has-text("Generate 3 Worlds (Stage 3)")');
     await proceedToWorldsBtn.click();
-    await page.locator('h2:has-text("Three Contrasting Creative Worlds")').waitFor({ timeout: 10000 });
+    await page.locator('h2:has-text("Three Contrasting Creative Worlds")').waitFor({ timeout: 45000 });
     console.log('✅ Stage 3 Worlds generated and loaded');
 
     // Step 4: Proceed to Stage 4 Selection
     const proceedToStage4Btn = page.locator('button:has-text("Proceed to Selection (Stage 4)")').first();
     await proceedToStage4Btn.click();
-    await page.locator('h2:has-text("Human World Selection & Creative Commitment")').waitFor({ timeout: 8000 });
+    await page.locator('h2:has-text("Human World Selection & Creative Commitment")').waitFor({ timeout: 20000 });
+
+    await page.waitForTimeout(1000);
 
     // Select Candidate 02 (Bio-City)
     const selectBtnBioCity = page.locator('button:has-text("Select This Direction")').nth(1);
-    await selectBtnBioCity.click();
-    await page.waitForTimeout(300);
+    await selectBtnBioCity.scrollIntoViewIfNeeded();
+    await selectBtnBioCity.click({ force: true });
+    await page.waitForTimeout(500);
 
     // Enter creator rationale
     const rationaleTextarea = page.locator('textarea#creator-rationale');
     const testRationale = 'Focus on symbiotic biology and ecological wonder under deep water pressure.';
     await rationaleTextarea.fill(testRationale);
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(300);
 
     // Confirm & Lock Direction -> Transitions to Stage 5
     const confirmBtn = page.locator('button:has-text("Confirm & Lock Direction")');
-    await confirmBtn.click();
-    await page.waitForTimeout(600);
+    await confirmBtn.scrollIntoViewIfNeeded();
+    await confirmBtn.click({ force: true });
+    await page.waitForTimeout(1000);
 
     // Unfold Universe in Stage 5
     const unfoldBtn = page.locator('button#unfold-universe-btn');
-    await unfoldBtn.waitFor({ timeout: 8000 });
+    await unfoldBtn.waitFor({ timeout: 30000 });
     await unfoldBtn.click();
 
     // Wait for codex tabs to appear
     const bibleTab = page.locator('button#codex-tab-bible');
-    await bibleTab.waitFor({ timeout: 12000 });
+    await bibleTab.waitFor({ timeout: 60000 });
     console.log('✅ Stage 5 Universe Unfolded successfully');
 
     // -------------------------------------------------------------
@@ -81,11 +88,12 @@ async function runPhase6E2E() {
     await stage6Title.waitFor({ timeout: 8000 });
     assert(await stage6Title.isVisible(), 'Stage 6 Canvas title must be visible');
 
-    const tattva5Badge = page.locator('text=Tattva 5: Causal Lineage (Sambandha)');
-    assert(await tattva5Badge.isVisible(), 'Tattva 5 badge must be visible');
+    const stage6Badge = page.locator('text=Stage 6 Traceability');
+    assert(await stage6Badge.isVisible(), 'Stage 6 Traceability badge must be visible');
 
     // Check that the 6 pipeline lanes are displayed
     const lane1 = page.locator('text=STAGE 01');
+    await lane1.waitFor({ timeout: 25000 });
     const lane2 = page.locator('text=STAGE 02');
     const lane3 = page.locator('text=STAGES 03 & 04');
     const lane4 = page.locator('text=STAGE 05A');

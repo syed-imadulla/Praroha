@@ -53,38 +53,90 @@ class LocalStorageProvider(StorageProvider):
         return False
 
 
+import logging
+import httpx
+
+logger = logging.getLogger(__name__)
+
+
+_UNSET = object()
+
+
 class SupabaseStorageProvider(StorageProvider):
     """Supabase cloud object storage provider."""
 
     def __init__(
         self,
-        supabase_url: Optional[str] = None,
-        supabase_key: Optional[str] = None,
-        bucket: Optional[str] = None,
+        supabase_url: Any = _UNSET,
+        supabase_key: Any = _UNSET,
+        bucket: Any = _UNSET,
     ):
-        self.supabase_url = supabase_url or settings.SUPABASE_URL
-        self.supabase_key = supabase_key or settings.SUPABASE_KEY
-        self.bucket = bucket or settings.SUPABASE_BUCKET
+        raw_url = settings.SUPABASE_URL if supabase_url is _UNSET else supabase_url
+        self.supabase_url = raw_url.strip().rstrip("/") if raw_url else None
+        self.supabase_key = settings.SUPABASE_KEY if supabase_key is _UNSET else supabase_key
+        self.bucket = settings.SUPABASE_BUCKET if bucket is _UNSET else (bucket or settings.SUPABASE_BUCKET)
 
     async def upload(self, file_data: bytes, key: str, mime_type: str) -> str:
-        # In cloud environment, uses Supabase REST storage API
-        # Fallback to local if credentials unset
+        # Fallback to local storage if credentials unset
         if not self.supabase_url or not self.supabase_key:
             fallback = LocalStorageProvider()
             return await fallback.upload(file_data, key, mime_type)
 
         clean_key = key.lstrip("/\\")
-        # In future phases, httpx calls to Supabase Storage endpoint
-        return f"{self.supabase_url}/storage/v1/object/public/{self.bucket}/{clean_key}"
+        upload_endpoint = f"{self.supabase_url}/storage/v1/object/{self.bucket}/{clean_key}"
+        headers = {
+            "Authorization": f"Bearer {self.supabase_key}",
+            "apikey": self.supabase_key,
+            "Content-Type": mime_type,
+            "x-upsert": "true",
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(upload_endpoint, headers=headers, content=file_data)
+                if response.status_code in (200, 201):
+                    logger.info("Successfully uploaded %s to Supabase bucket '%s'", clean_key, self.bucket)
+                    return f"{self.supabase_url}/storage/v1/object/public/{self.bucket}/{clean_key}"
+                else:
+                    logger.warning(
+                        "Supabase storage upload returned HTTP %s (%s). Falling back gracefully to LocalStorageProvider.",
+                        response.status_code,
+                        response.text,
+                    )
+                    fallback = LocalStorageProvider()
+                    return await fallback.upload(file_data, key, mime_type)
+        except Exception as exc:
+            logger.warning(
+                "Supabase storage upload failed (%s: %s). Falling back gracefully to LocalStorageProvider.",
+                type(exc).__name__,
+                exc,
+            )
+            fallback = LocalStorageProvider()
+            return await fallback.upload(file_data, key, mime_type)
 
     async def get_url(self, key: str) -> str:
-        if not self.supabase_url:
-            return f"/uploads/{key.lstrip('/\\')}"
         clean_key = key.lstrip("/\\")
+        if not self.supabase_url:
+            return f"/uploads/{clean_key}"
         return f"{self.supabase_url}/storage/v1/object/public/{self.bucket}/{clean_key}"
 
     async def delete(self, key: str) -> bool:
         if not self.supabase_url or not self.supabase_key:
             fallback = LocalStorageProvider()
             return await fallback.delete(key)
-        return True
+
+        clean_key = key.lstrip("/\\")
+        delete_endpoint = f"{self.supabase_url}/storage/v1/object/{self.bucket}/{clean_key}"
+        headers = {
+            "Authorization": f"Bearer {self.supabase_key}",
+            "apikey": self.supabase_key,
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                response = await client.delete(delete_endpoint, headers=headers)
+                return response.status_code in (200, 204)
+        except Exception as exc:
+            logger.warning("Supabase storage delete failed (%s).", exc)
+            fallback = LocalStorageProvider()
+            return await fallback.delete(key)
