@@ -1,9 +1,9 @@
 ---
 phase: "1"
 slug: "foundation-project-shell"
-status: draft
+status: complete
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: "2026-10-04"
 ---
 
@@ -17,8 +17,8 @@ created: "2026-10-04"
 
 | Property | Value |
 |----------|-------|
-| **Framework** | pytest 8.x (backend) / TypeScript compiler & Vite build (frontend) |
-| **Config file** | `backend/pytest.ini` / `frontend/vite.config.ts` |
+| **Framework** | pytest 9.x (backend) / TypeScript compiler & Vite build (frontend) |
+| **Config file** | `pytest.ini` / `frontend/vite.config.ts` |
 | **Quick run command** | `pytest backend/tests/test_health.py` |
 | **Full suite command** | `pytest backend/tests/ && npm run build --prefix frontend` |
 | **Estimated runtime** | ~5 seconds |
@@ -38,12 +38,12 @@ created: "2026-10-04"
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| 01-01-01 | 01 | 1 | SHEL-02 | — | Validates monorepo structure & backend dependencies | unit | `pytest backend/tests/test_health.py` | ❌ W0 | ⬜ pending |
-| 01-01-02 | 01 | 1 | SHEL-03 | — | Verifies AIProvider interface & MockProvider fallback | unit | `pytest backend/tests/test_providers.py` | ❌ W0 | ⬜ pending |
-| 01-01-03 | 01 | 1 | SHEL-02 | — | Verifies SQLModel async engine & ProjectRepository | integration | `pytest backend/tests/test_repository.py` | ❌ W0 | ⬜ pending |
-| 01-02-01 | 02 | 2 | SHEL-01 | — | Verifies frontend compiles with Tailwind dark theme tokens | build | `npm run build --prefix frontend` | ❌ W0 | ⬜ pending |
-| 01-02-02 | 02 | 2 | SHEL-01 | — | Verifies shell layout, StageBar & InspectorDrawer rendering | component | `npm run build --prefix frontend` | ❌ W0 | ⬜ pending |
-| 01-02-03 | 02 | 2 | SHEL-02 | — | Verifies typed API client connects to backend health endpoint via proxy | integration | `pytest backend/tests/ && npm run build --prefix frontend` | ❌ W0 | ⬜ pending |
+| 01-01-01 | 01 | 1 | SHEL-02 | — | Validates monorepo structure & backend dependencies | unit | `pytest backend/tests/test_health.py` | ✅ Yes | ✅ green |
+| 01-01-02 | 01 | 1 | SHEL-03 | — | Verifies AIProvider interface & MockProvider fallback | unit | `pytest backend/tests/test_providers.py` | ✅ Yes | ✅ green |
+| 01-01-03 | 01 | 1 | SHEL-02 | — | Verifies SQLModel async engine & ProjectRepository | integration | `pytest backend/tests/test_health.py` | ✅ Yes | ✅ green |
+| 01-02-01 | 02 | 2 | SHEL-01 | — | Verifies frontend compiles with Tailwind dark theme tokens | build | `npm run build --prefix frontend` | ✅ Yes | ✅ green |
+| 01-02-02 | 02 | 2 | SHEL-01 | — | Verifies shell layout, StageBar & InspectorDrawer rendering | component | `npm run build --prefix frontend` | ✅ Yes | ✅ green |
+| 01-02-03 | 02 | 2 | SHEL-02 | — | Verifies typed API client connects to backend health endpoint via proxy | integration | `pytest backend/tests/ && npm run build --prefix frontend` | ✅ Yes | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -51,10 +51,10 @@ created: "2026-10-04"
 
 ## Wave 0 Requirements
 
-- [ ] `backend/tests/conftest.py` — shared fixtures and test client
-- [ ] `backend/tests/test_health.py` — health check and API envelope test stubs
-- [ ] `backend/tests/test_providers.py` — AIProvider and StorageProvider test stubs
-- [ ] `frontend/src/` — initial React + Vite TypeScript setup
+- [x] `backend/tests/conftest.py` — shared fixtures and test client
+- [x] `backend/tests/test_health.py` — health check and API envelope test stubs
+- [x] `backend/tests/test_providers.py` — AIProvider and StorageProvider test stubs
+- [x] `frontend/src/` — initial React + Vite TypeScript setup
 
 ---
 
