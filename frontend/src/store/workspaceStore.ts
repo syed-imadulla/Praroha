@@ -53,6 +53,10 @@ interface WorkspaceState {
   refiningEntity: { type: 'character' | 'scene'; data: CharacterRead | SceneRead } | null;
   isBranching: boolean;
   isSavingSnapshot: boolean;
+  tourOpen: boolean;
+  tourStep: number;
+  shortcutsModalOpen: boolean;
+  providerFallbackWarning: string | null;
 
   // Actions
   setActiveStage: (stage: StageType) => void;
@@ -88,6 +92,13 @@ interface WorkspaceState {
   setInspectorTab: (tab: 'dna' | 'provenance' | 'worlds') => void;
   setHealth: (health: SystemHealthData | null) => void;
   setSyncing: (syncing: boolean) => void;
+  startTour: () => void;
+  nextTourStep: () => void;
+  prevTourStep: () => void;
+  closeTour: () => void;
+  toggleShortcutsModal: () => void;
+  setProviderFallbackWarning: (warning: string | null) => void;
+  loadCanonicalDemoUniverse: () => Promise<boolean>;
   resetWorkspace: () => void;
 }
 
@@ -130,6 +141,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       refiningEntity: null,
       isBranching: false,
       isSavingSnapshot: false,
+      tourOpen: false,
+      tourStep: 0,
+      shortcutsModalOpen: false,
+      providerFallbackWarning: null,
 
       setActiveStage: (stage) => set({ activeStage: stage }),
       unlockStage: (stage) =>
@@ -648,6 +663,65 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setInspectorTab: (inspectorTab) => set({ inspectorTab }),
       setHealth: (health) => set({ health }),
       setSyncing: (isSyncing) => set({ isSyncing }),
+      startTour: () => {
+        const currentUnlocked = get().unlockedStages;
+        set({
+          tourOpen: true,
+          tourStep: 0,
+          unlockedStages: currentUnlocked.includes('seed') ? currentUnlocked : ['seed', ...currentUnlocked],
+          activeStage: 'seed',
+        });
+      },
+
+      nextTourStep: () => {
+        const next = Math.min(get().tourStep + 1, 6);
+        const stages: StageType[] = ['seed', 'understand', 'worlds', 'choose', 'unfold', 'trace', 'refine'];
+        const targetStage = stages[next];
+        const currentUnlocked = get().unlockedStages;
+        set({
+          tourStep: next,
+          unlockedStages: currentUnlocked.includes(targetStage) ? currentUnlocked : [...currentUnlocked, targetStage],
+          activeStage: targetStage,
+        });
+      },
+
+      prevTourStep: () => {
+        const prev = Math.max(get().tourStep - 1, 0);
+        const stages: StageType[] = ['seed', 'understand', 'worlds', 'choose', 'unfold', 'trace', 'refine'];
+        set({ tourStep: prev, activeStage: stages[prev] });
+      },
+
+      closeTour: () => set({ tourOpen: false }),
+
+      toggleShortcutsModal: () => set((s) => ({ shortcutsModalOpen: !s.shortcutsModalOpen })),
+
+      setProviderFallbackWarning: (warning) => set({ providerFallbackWarning: warning }),
+
+      loadCanonicalDemoUniverse: async () => {
+        try {
+          set({ isSyncing: true });
+          const res = await apiClient.createCanonicalDemoProject();
+          if (res.success && res.data) {
+            const success = await get().switchBranch(res.data.id);
+            if (success) {
+              set({
+                activeStage: 'unfold',
+                seedText: res.data.seed_text || 'A child discovers a forgotten city beneath the ocean.',
+                unlockedStages: ['seed', 'understand', 'worlds', 'choose', 'unfold', 'trace', 'refine'],
+                isSyncing: false,
+              });
+              return true;
+            }
+          }
+          set({ isSyncing: false });
+          return false;
+        } catch (err) {
+          console.error('Failed to load canonical demo universe:', err);
+          set({ isSyncing: false });
+          return false;
+        }
+      },
+
       resetWorkspace: () =>
         set({
           activeStage: 'seed',
@@ -681,6 +755,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           worldBranchingStep: '',
           inspectorOpen: false,
           inspectorTab: 'dna',
+          tourOpen: false,
+          tourStep: 0,
+          shortcutsModalOpen: false,
+          providerFallbackWarning: null,
         }),
     }),
     {

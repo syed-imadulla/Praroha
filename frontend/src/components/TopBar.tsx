@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { GitBranch, RefreshCw, PanelRight, Sparkles, AlertCircle, ChevronDown, Check, Plus } from 'lucide-react';
+import {
+  GitBranch,
+  RefreshCw,
+  PanelRight,
+  Sparkles,
+  AlertCircle,
+  ChevronDown,
+  Check,
+  Plus,
+  Compass,
+  HelpCircle,
+} from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 
 export const TopBar: React.FC = () => {
@@ -13,6 +24,9 @@ export const TopBar: React.FC = () => {
     fetchBranches,
     switchBranch,
     forkBranch,
+    startTour,
+    toggleShortcutsModal,
+    loadCanonicalDemoUniverse,
   } = useWorkspaceStore();
 
   const [branchMenuOpen, setBranchMenuOpen] = useState(false);
@@ -187,6 +201,39 @@ export const TopBar: React.FC = () => {
             </span>
           )}
         </div>
+
+        {/* Instant Canonical Demo Launcher */}
+        <button
+          onClick={() => loadCanonicalDemoUniverse()}
+          id="instant-demo-topbar-btn"
+          title="Instantly generate and unfold complete Bio-City universe (DEMO-01)"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/30 transition font-medium"
+        >
+          <Sparkles className="w-3.5 h-3.5 fill-current" />
+          <span className="hidden lg:inline">Demo Universe</span>
+        </button>
+
+        {/* 7-Stage Guided Tour Launcher */}
+        <button
+          onClick={() => startTour()}
+          id="guided-tour-btn"
+          title="Launch 7-Stage Guided Demo Tour (t)"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 transition font-medium"
+        >
+          <Compass className="w-3.5 h-3.5" />
+          <span className="hidden lg:inline">Guided Tour</span>
+        </button>
+
+        {/* Shortcuts Modal Launcher */}
+        <button
+          onClick={() => toggleShortcutsModal()}
+          id="keyboard-shortcuts-btn"
+          title="Keyboard Shortcuts (?)"
+          aria-label="Keyboard Shortcuts"
+          className="p-1.5 text-xs rounded-md bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 transition"
+        >
+          <HelpCircle className="w-3.5 h-3.5" />
+        </button>
 
         {/* Restart Button */}
         <button

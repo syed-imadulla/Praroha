@@ -65,6 +65,12 @@ class ApiClient {
     });
   }
 
+  async createCanonicalDemoProject(): Promise<APIResponse<Project>> {
+    return this.request<Project>('/projects/canonical-demo', {
+      method: 'POST',
+    });
+  }
+
   async getProject(projectId: string): Promise<APIResponse<Project>> {
     return this.request<Project>(`/projects/${projectId}`);
   }

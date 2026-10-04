@@ -1,4 +1,5 @@
 import json
+import uuid
 from typing import AsyncGenerator, List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, delete, select
@@ -18,6 +19,11 @@ from backend.app.models.persistence import (
     EntityRevisionRecord,
     CharacterRefineRequest,
     SceneRefineRequest,
+)
+from backend.app.providers.mock_provider import (
+    CANONICAL_SEED_DNA,
+    CANONICAL_WORLDS,
+    MockProvider,
 )
 
 engine = create_async_engine(
@@ -702,6 +708,219 @@ class ProjectRepository:
         )
         res = await self.session.execute(stmt)
         return list(res.scalars().all())
+
+    async def create_canonical_demo_project(self) -> Project:
+        """Atomically seed the complete canonical Bio-City universe for zero-latency hackathon demos.
+
+        Populates:
+        - Project ("The Sunken City: Bio-City")
+        - SeedDNA (canonical ocean seed)
+        - 3 World Candidates (Lost Civilization, Bio-City, Time Capsule)
+        - World Selection (Bio-City selected)
+        - World Bible (Bio-City canon, locations, factions, timeline)
+        - Characters (Dr. Althea Thorne, Sentry Unit Nereus, Kaelen)
+        - Character Relationships (3 relationships)
+        - Scenes (Scenes 1, 2, and 3)
+        - Baseline Entity Revisions (Dr. Althea Thorne v1, Scene 1 v1)
+        """
+        # 1. Create Project
+        project = Project(
+            title="The Sunken City: Bio-City",
+            seed_text="A child discovers a forgotten city beneath the ocean.",
+            status="universe_unfolded",
+            branch_name="main",
+        )
+        self.session.add(project)
+        await self.session.flush()
+
+        # 2. Add Seed DNA
+        dna_record = SeedDNARecord(
+            project_id=project.id,
+            raw_seed=project.seed_text,
+            premise=CANONICAL_SEED_DNA["premise"],
+            themes_json=json.dumps(CANONICAL_SEED_DNA["themes"]),
+            entities_json=json.dumps(CANONICAL_SEED_DNA["entities"]),
+            constraints_json=json.dumps(CANONICAL_SEED_DNA["constraints"]),
+            tone=CANONICAL_SEED_DNA["tone"],
+            domain_keywords_json=json.dumps(CANONICAL_SEED_DNA["domain_keywords"]),
+        )
+        self.session.add(dna_record)
+        await self.session.flush()
+
+        # 3. Add 3 World Candidates
+        batch_id = str(uuid.uuid4())
+        created_worlds: List[WorldCandidateRecord] = []
+        for w in CANONICAL_WORLDS:
+            world_rec = WorldCandidateRecord(
+                project_id=project.id,
+                seed_dna_id=dna_record.id,
+                batch_id=batch_id,
+                candidate_index=w["index"],
+                title=w["title"],
+                archetype=w["archetype"],
+                concept=w["concept"],
+                aesthetic=w["aesthetic"],
+                core_tension=w["core_tension"],
+                trade_offs=w["trade_offs"],
+                key_visual=w["key_visual"],
+            )
+            self.session.add(world_rec)
+            created_worlds.append(world_rec)
+
+        await self.session.flush()
+
+        # Candidate 2 is Bio-City (candidate_index == 2)
+        bio_city_candidate = next((cw for cw in created_worlds if cw.candidate_index == 2), created_worlds[1])
+        project.selected_world_id = bio_city_candidate.id
+        self.session.add(project)
+
+        # 4. Add World Selection Record
+        selection = WorldSelectionRecord(
+            project_id=project.id,
+            world_candidate_id=bio_city_candidate.id,
+            batch_id=batch_id,
+            user_rationale="Selected Bio-City (Symbiotic / Ecological) for deep biopunk exploration and rich ecological tension.",
+        )
+        self.session.add(selection)
+
+        # 5. Retrieve canonical unfolding data for Bio-City
+        mock_provider = MockProvider()
+        unfold_data = await mock_provider.unfold_universe({
+            "raw_seed": "a child discovers a forgotten city beneath the ocean",
+            "selected_world": {"title": "Bio-City"},
+        })
+
+        # 6. Save World Bible
+        bible_data = unfold_data.get("world_bible", {})
+        timeline_items = bible_data.get("history_timeline", [])
+        factions_items = bible_data.get("factions", [])
+        canon_facts = bible_data.get("canon_facts", [])
+        locations_items = bible_data.get("key_locations", [])
+
+        bible_record = WorldBibleRecord(
+            project_id=project.id,
+            world_candidate_id=bio_city_candidate.id,
+            geography=bible_data.get("geography", ""),
+            physics_rules=bible_data.get("physics_rules", ""),
+            history_timeline_json=json.dumps(timeline_items),
+            factions_json=json.dumps(factions_items),
+            canon_facts_json=json.dumps(canon_facts),
+            key_locations_json=json.dumps(locations_items),
+            visual_style_prompt=bible_data.get("visual_style_prompt", ""),
+        )
+        self.session.add(bible_record)
+
+        # 7. Save Characters
+        created_characters: List[CharacterRecord] = []
+        for c in unfold_data.get("characters", []):
+            char_record = CharacterRecord(
+                project_id=project.id,
+                world_candidate_id=bio_city_candidate.id,
+                name=c.get("name", "Unnamed"),
+                role=c.get("role", "Cast Member"),
+                archetype=c.get("archetype", "Archetype"),
+                motivation=c.get("motivation", ""),
+                core_conflict=c.get("core_conflict") or c.get("conflict", ""),
+                visual_prompt=c.get("visual_prompt", ""),
+                version=1,
+            )
+            self.session.add(char_record)
+            created_characters.append(char_record)
+
+        await self.session.flush()
+
+        name_to_id = {c.name.strip().lower(): c.id for c in created_characters}
+
+        # 8. Save Character Relationships
+        for r in unfold_data.get("relationships", []):
+            source_id = name_to_id.get(r.get("source_character_name", "").strip().lower())
+            target_id = name_to_id.get(r.get("target_character_name", "").strip().lower())
+            if source_id and target_id:
+                rel_record = CharacterRelationshipRecord(
+                    project_id=project.id,
+                    world_candidate_id=bio_city_candidate.id,
+                    source_character_id=source_id,
+                    target_character_id=target_id,
+                    relation_type=r.get("relation_type", "Dynamic Tension"),
+                    dynamic_description=r.get("dynamic_description", ""),
+                )
+                self.session.add(rel_record)
+
+        # 9. Save Scenes (Scenes 1 & 2 + Scene 3 for complete 3-scene arc)
+        scene_items = list(unfold_data.get("scenes", []))
+        if len(scene_items) < 3:
+            scene_items.append({
+                "scene_number": 3,
+                "title": "Heart of the Siphonophore",
+                "location_setting": "The Abyssal Coral Neural Core",
+                "characters_involved": ["Dr. Althea Thorne", "Kaelen"],
+                "dramatic_question": "Can Althea and Kaelen prevent the neural core from severing its link with the surface world?",
+                "conflict_narrative": "Toxic runoff from an illegal deep-sea drilling rig penetrates the outer caldera, threatening the core with irreparable necrotic collapse.",
+                "pivotal_outcome": "Althea integrates her biometric slate into the neural core, reversing the necrosis and broadcasting a distress beacon across the ocean shelf.",
+                "visual_prompt": "Climactic sci-fi underwater chamber, massive translucent siphonophore floating in a crystal sphere, glowing neural sparks, human figures backlit by cyan and gold bioluminescence, photorealistic 8k",
+            })
+
+        created_scenes: List[SceneRecord] = []
+        for s in scene_items:
+            scene_rec = SceneRecord(
+                project_id=project.id,
+                world_candidate_id=bio_city_candidate.id,
+                scene_number=s.get("scene_number", 1),
+                title=s.get("title", "Untitled Scene"),
+                location_setting=s.get("location_setting") or s.get("setting", ""),
+                characters_involved_json=json.dumps(s.get("characters_involved", [])),
+                dramatic_question=s.get("dramatic_question", ""),
+                conflict_narrative=s.get("conflict_narrative") or s.get("conflict", ""),
+                pivotal_outcome=s.get("pivotal_outcome") or s.get("outcome", ""),
+                visual_prompt=s.get("visual_prompt", ""),
+                version=1,
+            )
+            self.session.add(scene_rec)
+            created_scenes.append(scene_rec)
+
+        await self.session.flush()
+
+        # 10. Baseline Entity Revisions for Character and Scene
+        if created_characters:
+            lead_char = created_characters[0]
+            rev_char = EntityRevisionRecord(
+                project_id=project.id,
+                entity_type="character",
+                entity_id=lead_char.id,
+                version=1,
+                snapshot_json=json.dumps({
+                    "name": lead_char.name,
+                    "role": lead_char.role,
+                    "archetype": lead_char.archetype,
+                    "motivation": lead_char.motivation,
+                    "core_conflict": lead_char.core_conflict,
+                }),
+                revision_notes="Initial baseline creation from Bio-City unfolding",
+            )
+            self.session.add(rev_char)
+
+        if created_scenes:
+            lead_scene = created_scenes[0]
+            rev_scene = EntityRevisionRecord(
+                project_id=project.id,
+                entity_type="scene",
+                entity_id=lead_scene.id,
+                version=1,
+                snapshot_json=json.dumps({
+                    "title": lead_scene.title,
+                    "location_setting": lead_scene.location_setting,
+                    "dramatic_question": lead_scene.dramatic_question,
+                    "conflict_narrative": lead_scene.conflict_narrative,
+                    "pivotal_outcome": lead_scene.pivotal_outcome,
+                }),
+                revision_notes="Initial baseline creation from Bio-City unfolding",
+            )
+            self.session.add(rev_scene)
+
+        # Commit everything in this atomic transaction
+        await self.session.commit()
+        await self.session.refresh(project)
+        return project
 
 
 

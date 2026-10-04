@@ -13,6 +13,8 @@ import {
   Film,
   MapPin,
   Compass,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { TraceNode, TraceNodeType } from '../types';
@@ -28,6 +30,8 @@ export const TraceabilityCanvas: React.FC = () => {
     setSelectedNodeId,
     setLineageFilter,
   } = useWorkspaceStore();
+
+  const [zoomLevel, setZoomLevel] = React.useState<number>(1.0);
 
   useEffect(() => {
     if (activeProject) {
@@ -212,6 +216,34 @@ export const TraceabilityCanvas: React.FC = () => {
             <RotateCw className={`w-3.5 h-3.5 ${isLoadingLineage ? 'animate-spin' : ''}`} />
             <span>Sync Graph</span>
           </button>
+
+          {/* DAG Zoom Controls */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+            <button
+              onClick={() => setZoomLevel((z) => Math.max(0.7, Number((z - 0.15).toFixed(2))))}
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              title="Zoom Out (-)"
+              aria-label="Zoom Out"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setZoomLevel(1.0)}
+              className="px-2 py-0.5 rounded text-[11px] font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition"
+              title="Reset Zoom to 100%"
+              aria-label="Reset Zoom"
+            >
+              {Math.round(zoomLevel * 100)}%
+            </button>
+            <button
+              onClick={() => setZoomLevel((z) => Math.min(1.3, Number((z + 0.15).toFixed(2))))}
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              title="Zoom In (+)"
+              aria-label="Zoom In"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -256,7 +288,14 @@ export const TraceabilityCanvas: React.FC = () => {
       {/* Main 2-Column Responsive Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: 6-Lane DAG Pipeline (8 cols) */}
-        <div id="lineage-dag-canvas" className="lg:col-span-8 space-y-6">
+        <div
+          id="lineage-dag-canvas"
+          className="lg:col-span-8 space-y-6 origin-top-left transition-transform duration-200"
+          style={{
+            transform: `scale(${zoomLevel})`,
+            width: zoomLevel !== 1 ? `${(100 / zoomLevel).toFixed(1)}%` : '100%',
+          }}
+        >
           {isLoadingLineage && !lineageGraph ? (
             <div className="p-12 text-center rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
               <RotateCw className="w-6 h-6 text-cyan-400 animate-spin mx-auto" />

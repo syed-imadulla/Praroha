@@ -45,6 +45,7 @@ export const SeedInputCanvas: React.FC = () => {
     isExtracting,
     extractionStep,
     extractSeedDNA,
+    loadCanonicalDemoUniverse,
   } = useWorkspaceStore();
 
   const wordCount = seedText.trim() ? seedText.trim().split(/\s+/).length : 0;
@@ -74,6 +75,19 @@ export const SeedInputCanvas: React.FC = () => {
         <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
           Provide an incomplete, evocative premise. Seed Unfold will perform an understanding pass to distill its structural DNA before branching into worlds.
         </p>
+
+        {/* Instant Canonical Demo Launcher */}
+        <div className="pt-2 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => loadCanonicalDemoUniverse()}
+            className="px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-300 text-slate-950 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2 font-mono"
+            title="Instantly generate and unfold complete Bio-City universe for hackathon judging"
+          >
+            <Sparkles className="w-4 h-4 text-slate-950 fill-current" />
+            <span>🌟 Instant Full Universe (Demo)</span>
+          </button>
+        </div>
       </div>
 
       {/* Preset Curations */}
@@ -105,17 +119,26 @@ export const SeedInputCanvas: React.FC = () => {
                 className={`text-left p-3.5 rounded-xl border transition-all relative overflow-hidden group ${
                   isSelected
                     ? 'bg-cyan-950/40 border-cyan-500 shadow-glow-cyan/30'
+                    : preset.id === 'ocean-city'
+                    ? 'bg-cyan-950/20 hover:bg-cyan-950/40 border-cyan-500/50 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
                     : 'bg-canvas-card/60 hover:bg-canvas-card border-canvas-border hover:border-slate-700'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1.5 gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition">
                     <Icon className="w-3.5 h-3.5 text-cyan-400" />
                     {preset.title}
                   </span>
-                  {isSelected && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {preset.id === 'ocean-city' && (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        🌟 Canonical Demo
+                      </span>
+                    )}
+                    {isSelected && (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+                    )}
+                  </div>
                 </div>
                 <div className="text-[10px] text-cyan-400/80 font-mono mb-1">
                   {preset.genre}

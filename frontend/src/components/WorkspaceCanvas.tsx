@@ -1,6 +1,7 @@
 import React from 'react';
-import { Layers, Database, HardDrive, Compass, ArrowLeft } from 'lucide-react';
+import { Layers, Database, HardDrive, Compass, ArrowLeft, AlertTriangle, X } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
+import { StageType } from '../types';
 import { SeedInputCanvas } from './SeedInputCanvas';
 import { SeedDnaViewer } from './SeedDnaViewer';
 import { WorldCandidatesCanvas } from './WorldCandidatesCanvas';
@@ -8,14 +9,25 @@ import { WorldSelectionCanvas } from './WorldSelectionCanvas';
 import { UniverseCodexCanvas } from './UniverseCodexCanvas';
 import { TraceabilityCanvas } from './TraceabilityCanvas';
 import { RefineCanvas } from './RefineCanvas';
+import { GuidedTourOverlay } from './GuidedTourOverlay';
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 
 export const WorkspaceCanvas: React.FC = () => {
   const {
     activeStage,
     setActiveStage,
+    unlockedStages,
     health,
     inspectorOpen,
+    toggleInspector,
     seedDNA,
+    tourOpen,
+    startTour,
+    closeTour,
+    shortcutsModalOpen,
+    toggleShortcutsModal,
+    providerFallbackWarning,
+    setProviderFallbackWarning,
   } = useWorkspaceStore();
 
   const mainRef = React.useRef<HTMLElement>(null);
@@ -23,6 +35,78 @@ export const WorkspaceCanvas: React.FC = () => {
   React.useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeStage]);
+
+  // Global Keyboard Shortcuts Listener
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't fire shortcuts when typing in inputs/textareas
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (shortcutsModalOpen) toggleShortcutsModal();
+        if (tourOpen) closeTour();
+        return;
+      }
+
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        toggleShortcutsModal();
+        return;
+      }
+
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        startTour();
+        return;
+      }
+
+      if (e.key === 'i' || e.key === 'I') {
+        e.preventDefault();
+        toggleInspector();
+        return;
+      }
+
+      // Keys 1 through 7 for stages
+      const stageMap: Record<string, StageType> = {
+        '1': 'seed',
+        '2': 'understand',
+        '3': 'worlds',
+        '4': 'choose',
+        '5': 'unfold',
+        '6': 'trace',
+        '7': 'refine',
+      };
+
+      if (e.key in stageMap) {
+        const targetStage = stageMap[e.key];
+        if (unlockedStages.includes(targetStage)) {
+          e.preventDefault();
+          setActiveStage(targetStage);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    unlockedStages,
+    setActiveStage,
+    toggleInspector,
+    startTour,
+    toggleShortcutsModal,
+    shortcutsModalOpen,
+    tourOpen,
+    closeTour,
+  ]);
 
   return (
     <main
@@ -32,6 +116,21 @@ export const WorkspaceCanvas: React.FC = () => {
       }`}
     >
       <div className={`w-full ${activeStage === 'worlds' || activeStage === 'choose' || activeStage === 'unfold' || activeStage === 'trace' || activeStage === 'refine' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
+        {/* Provider Fallback Toast Banner */}
+        {providerFallbackWarning && (
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center justify-between gap-3 text-xs shadow-lg shadow-amber-500/5 animate-fade-in">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>{providerFallbackWarning}</span>
+            </div>
+            <button
+              onClick={() => setProviderFallbackWarning(null)}
+              className="p-1 rounded text-amber-400/60 hover:text-amber-300 hover:bg-amber-500/20 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
         {/* Dynamic Stage Canvas View */}
         {activeStage === 'seed' && <SeedInputCanvas />}
 
@@ -113,6 +212,12 @@ export const WorkspaceCanvas: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 7-Stage Guided Demo Tour Overlay */}
+      <GuidedTourOverlay />
+
+      {/* Keyboard Shortcuts Cheatsheet Modal */}
+      <KeyboardShortcutsModal />
     </main>
   );
 };

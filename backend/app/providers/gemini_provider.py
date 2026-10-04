@@ -20,6 +20,10 @@ class GeminiProvider(AIProvider):
     or when API calls encounter network/validation errors.
     """
 
+    FALLBACK_WARNING_MESSAGE = (
+        "AI Provider Throttled/Unavailable — Gracefully transitioned to deterministic mock fixtures"
+    )
+
     def __init__(
         self,
         api_key: Optional[str] = None,
@@ -28,6 +32,7 @@ class GeminiProvider(AIProvider):
         self.api_key = api_key if api_key is not None else settings.GEMINI_API_KEY
         self.model = model if model is not None else settings.GEMINI_MODEL
         self._mock_provider = MockProvider()
+        self.last_fallback_warning: Optional[str] = None
 
     async def health_check(self) -> Dict[str, Any]:
         """Perform a liveness and authentication status check."""
@@ -49,12 +54,14 @@ class GeminiProvider(AIProvider):
         """Extract structured Seed DNA from raw user seed text using Gemini REST API."""
         if not self.api_key:
             logger.info("No Gemini API key configured. Using MockProvider fallback.")
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
             mock_res = await self._mock_provider.extract_dna(seed)
             return {
                 "raw_seed": seed,
                 "seed_dna": mock_res["seed_dna"],
                 "model_used": f"{self.model}-mock-fallback",
                 "fallback_used": True,
+                "warning": self.FALLBACK_WARNING_MESSAGE,
             }
 
         endpoint_url = (
@@ -156,12 +163,14 @@ class GeminiProvider(AIProvider):
                 type(exc).__name__,
                 exc,
             )
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
             mock_res = await self._mock_provider.extract_dna(seed)
             return {
                 "raw_seed": seed,
                 "seed_dna": mock_res["seed_dna"],
                 "model_used": f"{self.model}-mock-fallback",
                 "fallback_used": True,
+                "warning": self.FALLBACK_WARNING_MESSAGE,
             }
 
     async def generate_worlds(self, dna: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -287,6 +296,7 @@ class GeminiProvider(AIProvider):
                 type(exc).__name__,
                 exc,
             )
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
             return await self._mock_provider.generate_worlds(dna)
 
     async def unfold_stage(
@@ -368,5 +378,9 @@ class GeminiProvider(AIProvider):
                 type(exc).__name__,
                 exc,
             )
-            return await self._mock_provider.unfold_universe(context)
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+            res = await self._mock_provider.unfold_universe(context)
+            if isinstance(res, dict):
+                res["_warning"] = self.FALLBACK_WARNING_MESSAGE
+            return res
 

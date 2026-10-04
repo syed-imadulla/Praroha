@@ -127,4 +127,6 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. Canonical demo seed (*"A child discovers a forgotten city beneath the ocean"*) works instantly with cached fixtures.
   2. Network disconnection or API failure triggers clean fallback without UI crash.
   3. End-to-end journey completes cleanly in under 5 minutes for judging demonstrations.  
-**Plans**: TBD
+**Plans**: 2 plans (all completed)
+- [x] **08-01-PLAN.md** (Wave 1): Backend Reliability, Fast Canonical Demo Seeding Endpoint, Provider Fallback & Pytest Suite.
+- [x] **08-02-PLAN.md** (Wave 2): Frontend Guided Demo Tour, Keyboard Shortcuts Modal, DAG Zoom Controls, Preset Highlighting & Playwright E2E Suite.

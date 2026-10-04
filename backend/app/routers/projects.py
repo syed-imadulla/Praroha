@@ -48,6 +48,26 @@ async def create_project(
     return api_success(data=project_read)
 
 
+@router.post("/canonical-demo", response_model=APIResponse[ProjectRead], status_code=status.HTTP_201_CREATED)
+async def create_canonical_demo(
+    session: AsyncSession = Depends(get_session),
+) -> APIResponse[ProjectRead]:
+    repo = ProjectRepository(session)
+    project = await repo.create_canonical_demo_project()
+    project_read = ProjectRead(
+        id=project.id,
+        title=project.title,
+        seed_text=project.seed_text,
+        status=project.status,
+        selected_world_id=project.selected_world_id,
+        parent_project_id=project.parent_project_id,
+        branch_name=project.branch_name,
+        created_at=project.created_at,
+        updated_at=project.updated_at,
+    )
+    return api_success(data=project_read)
+
+
 @router.get("/{project_id}", response_model=APIResponse[ProjectRead])
 async def get_project(
     project_id: str,
