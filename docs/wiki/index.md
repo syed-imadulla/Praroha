@@ -18,6 +18,7 @@ Welcome to the **Seed Unfold** knowledge base. This wiki provides direct access 
 - [PROJECT_RULES.md](file:///home/syed-imadulla/Desktop/Praroha/PROJECT_RULES.md) — Permanent Product, UX, and Architecture rules
 - [ADR-001: Architecture Foundation](file:///home/syed-imadulla/Desktop/Praroha/docs/decisions/ADR-001-architecture-foundation.md)
 - [ADR-002: Three-World Branching & Traceability](file:///home/syed-imadulla/Desktop/Praroha/docs/decisions/ADR-002-branching-and-traceability.md)
+- [ADR-003: Cloud Object Storage & Asset Management](file:///home/syed-imadulla/Desktop/Praroha/docs/decisions/ADR-003-cloud-object-storage.md)
 
 ## 4. Planning & Execution (GSD)
 - [GSD Project Context](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md)

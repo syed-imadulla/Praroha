@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 - **FastAPI + Pydantic v2**: Chosen for asynchronous backend performance and strict schema validation of all AI outputs.
 - **Provider Abstraction**: Model access is decoupled behind `AIProvider` to allow hot-swapping between Gemini, OpenAI, Claude, and offline mocks.
 - **PostgreSQL / Supabase Persistence**: Intended relational persistence direction for core domain entities; SQLite recognized strictly as an optional local development / offline demo fallback.
+- **Cloud Object Storage (`StorageProvider`)**: Supabase Storage as primary object-storage target with local filesystem fallback for zero-cloud local dev; strict separation between binary payloads (object storage), relational metadata (PostgreSQL), and causal provenance (Traceability DAG) (ADR-003).
 - **Exactly Three Worlds**: Strict architectural constraint reflecting Tattva 2 (latent forms from formlessness) without cognitive overload.
 - **Human Choice Gate**: AI generation strictly halts at three worlds until human selection is registered.
 - **Traceability / Provenance DAG**: Provenance and causal relationships are modeled via explicit parent-child nodes and edge relations connecting entities, without requiring an external graph database.
@@ -62,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 ### Important Constraints & Guardrails
 - Never mutate or discard the raw user seed.
 - Never expose raw model chain-of-thought or internal prompts in user-facing provenance nodes.
+- Binary files must never be stored directly in PostgreSQL; only asset metadata and storage keys are stored relationally.
 - Media generation (images/audio/video) must remain strictly optional and non-blocking.
 - Do not introduce microservices or autonomous multi-agent swarms.
 

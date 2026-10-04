@@ -54,6 +54,8 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - Backend: Python 3.11+ with FastAPI, Pydantic v2 schemas for strict structured LLM outputs.
 - AI Provider: Provider abstraction (`AIProvider`) decoupling Gemini or other LLMs with deterministic fallbacks.
 - Persistence: PostgreSQL / Supabase as the intended persistence direction with a relational data model; SQLite strictly as local development / offline demo fallback.
+- Object Storage: Supabase Storage for user-uploaded and AI-generated binary assets, abstracted via `StorageProvider` with a local filesystem fallback for zero-cloud local development.
+- Asset Separation: Binary assets live in object storage; PostgreSQL stores asset metadata and relational links; Traceability stores causal provenance.
 - Traceability: Modeled as explicit nodes and edges / DAG relationships across core entities, not as a specialized graph database engine.
 
 ## Constraints
@@ -63,6 +65,7 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - **Traceability**: Every generated entity must record its lineage back to Seed DNA and parent decisions.
 - **Canon Preservation**: Established canon facts and previous versions cannot be silently overwritten.
 - **No Chain-of-Thought Leakage**: Provenance explains *why* an output exists without exposing raw model internal scratchpads.
+- **No Binary Storage in Database**: Raw files must not be stored directly in PostgreSQL; only asset metadata and storage keys are stored relationally.
 
 ## Key Decisions
 
@@ -70,6 +73,7 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 |----------|-----------|---------|
 | React + Vite + FastAPI | Fast development velocity, async execution, clean typing across full stack | ✓ Accepted (ADR-001) |
 | PostgreSQL / Supabase Relational Model | Primary persistence target for core entities; SQLite strictly as local/demo fallback | ✓ Accepted (ADR-001) |
+| Cloud Object Storage & Asset Separation | Supabase Storage for binaries with local filesystem fallback; PostgreSQL stores metadata; Traceability tracks causal origin | ✓ Accepted (ADR-003) |
 | Exactly 3 Worlds | Balances creative diversity with decision focus; embodies Tattva 2 | ✓ Accepted (ADR-002) |
 | Normalized Seed DNA Schema | Provides strict, immutable anchor for all downstream unfolding | ✓ Accepted |
 | DAG Lineage Model (No Graph DB) | Relational node/edge structures model provenance cleanly without graph DB complexity | ✓ Accepted (ADR-002) |

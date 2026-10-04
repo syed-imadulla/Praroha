@@ -12,6 +12,7 @@ Phase 1 delivers the full-stack foundation and application shell for **Seed Unfo
 - Standardized API communication contract: typed API client wrapper, Vite dev proxy to FastAPI on port 8000, and standardized `{ success, data, error }` response envelopes.
 - AI Provider abstraction layer: abstract base class (`AIProvider`), dynamic factory (`AI_PROVIDER`), and deterministic Mock Provider returning the canonical underwater city fixtures for zero-key local testing.
 - Persistence foundation: SQLModel / SQLAlchemy 2.0 async engine defaulting to SQLite fallback when `DATABASE_URL` is unset, with full PostgreSQL / Supabase connection capability via a clean Repository pattern (`ProjectRepository`).
+- Object Storage foundation: abstract `StorageProvider` interface in backend supporting Supabase Storage with local filesystem fallback (`./uploads/`) for zero-cloud local execution.
 - Client-side reactive state: Zustand store with localStorage persistence for active session recovery.
 
 </domain>
@@ -43,6 +44,10 @@ Phase 1 delivers the full-stack foundation and application shell for **Seed Unfo
 - **D-15:** Browser `localStorage` session caching so refreshing or reconnecting preserves the active workspace in progress. — **Reversibility:** reversible.
 - **D-16:** Clean Repository pattern (`ProjectRepository`) abstracting DB queries from route handlers, making storage interchangeable and testable. — **Reversibility:** costly — service layer architecture.
 
+### Object Storage & Asset Foundation
+- **D-17:** StorageProvider abstraction: `upload(bytes, key, mime_type) -> str`, `get_url(key) -> str`, `delete(key) -> bool` defined as an ABC in backend, with Supabase Storage as primary and local filesystem fallback (`./uploads/`) as default for zero-cloud local dev. — **Reversibility:** costly — sets asset handling contract.
+- **D-18:** Asset Separation Contract: Binary files are never stored in PostgreSQL; asset metadata (`asset_id`, `project_id`, `asset_type`, `mime_type`, `storage_key`, `size_bytes`, `source_ref`, `version`, `created_at`, foreign keys) is defined in SQLModel/Pydantic schemas; causal provenance remains the domain of the Traceability DAG. — **Reversibility:** one-way — fundamental data separation rule.
+
 ### The Agent's Discretion
 - Concrete utility naming, CSS animation durations, and initial toast UI library choice are left to implementation discretion.
 
@@ -57,6 +62,7 @@ Phase 1 delivers the full-stack foundation and application shell for **Seed Unfo
 - `PROJECT_RULES.md` — Permanent Product, UX, and Architecture rules
 - `docs/decisions/ADR-001-architecture-foundation.md` — Core architecture, PostgreSQL/Supabase persistence direction, and SQLite fallback
 - `docs/decisions/ADR-002-branching-and-traceability.md` — Exactly 3 Worlds branching model, human choice gate, and DAG provenance model
+- `docs/decisions/ADR-003-cloud-object-storage.md` — Cloud object storage direction (Supabase Storage), StorageProvider abstraction, local fallback, and asset separation
 
 ### Architecture & Provenance Specifications
 - `docs/architecture/SYSTEM_ARCHITECTURE.md` — High-level stack overview, provider abstraction, data flow
