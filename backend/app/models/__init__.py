@@ -45,6 +45,17 @@ from backend.app.models.lineage import (
     AncestorPathRead,
 )
 
+from backend.app.models.persistence import (
+    EntityRevisionRecord,
+    EntityRevisionRead,
+    BranchCreate,
+    BranchRead,
+    CharacterRefineRequest,
+    SceneRefineRequest,
+    ProjectBundle,
+    SnapshotRead,
+)
+
 __all__ = [
     "Project",
     "ProjectCreate",
@@ -87,5 +98,13 @@ __all__ = [
     "TraceEdge",
     "TraceGraphRead",
     "AncestorPathRead",
+    "EntityRevisionRecord",
+    "EntityRevisionRead",
+    "BranchCreate",
+    "BranchRead",
+    "CharacterRefineRequest",
+    "SceneRefineRequest",
+    "ProjectBundle",
+    "SnapshotRead",
 ]
 

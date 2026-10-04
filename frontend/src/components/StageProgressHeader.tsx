@@ -25,7 +25,7 @@ export const StageProgressHeader: React.FC = () => {
         activeProject?.status === 'universe_unfolded'
       );
     }
-    if (stageId === 'trace') {
+    if (stageId === 'trace' || stageId === 'refine') {
       return activeProject?.status === 'universe_unfolded';
     }
     return false;
@@ -52,6 +52,7 @@ export const StageProgressHeader: React.FC = () => {
                 <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0 mx-0.5" />
               )}
               <button
+                id={`stage-nav-${stage.id}`}
                 onClick={() => {
                   if (unlocked) {
                     setActiveStage(stage.id);

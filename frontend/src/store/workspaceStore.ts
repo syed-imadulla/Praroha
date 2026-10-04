@@ -10,6 +10,13 @@ import {
   WorldSelectionRead,
   UnfoldedUniverseRead,
   TraceGraphRead,
+  BranchRead,
+  CharacterRead,
+  SceneRead,
+  CharacterRefineRequest,
+  SceneRefineRequest,
+  EntityRevisionRead,
+  SnapshotRead,
 } from '../types';
 
 interface WorkspaceState {
@@ -40,6 +47,12 @@ interface WorkspaceState {
   inspectorTab: 'dna' | 'provenance' | 'worlds';
   health: SystemHealthData | null;
   isSyncing: boolean;
+  projectBranches: BranchRead[];
+  entityRevisions: EntityRevisionRead[];
+  snapshots: SnapshotRead[];
+  refiningEntity: { type: 'character' | 'scene'; data: CharacterRead | SceneRead } | null;
+  isBranching: boolean;
+  isSavingSnapshot: boolean;
 
   // Actions
   setActiveStage: (stage: StageType) => void;
@@ -59,6 +72,15 @@ interface WorkspaceState {
   setSelectedNodeId: (nodeId: string | null) => void;
   setLineageFilter: (filter: 'all' | 'characters' | 'scenes' | 'locations' | 'lore') => void;
   jumpToTraceNode: (nodeId: string) => void;
+  fetchBranches: () => Promise<void>;
+  switchBranch: (targetProjectId: string) => Promise<boolean>;
+  forkBranch: (branchName: string, stage?: number, rationale?: string) => Promise<boolean>;
+  refineCharacterAction: (charId: string, updates: CharacterRefineRequest) => Promise<boolean>;
+  refineSceneAction: (sceneId: string, updates: SceneRefineRequest) => Promise<boolean>;
+  fetchEntityRevisions: () => Promise<void>;
+  fetchSnapshots: () => Promise<void>;
+  createSnapshotAction: () => Promise<boolean>;
+  setRefiningEntity: (entity: { type: 'character' | 'scene'; data: CharacterRead | SceneRead } | null) => void;
   setExtracting: (isExtracting: boolean, step?: string) => void;
   extractSeedDNA: (customSeed?: string) => Promise<boolean>;
   generateWorlds: () => Promise<boolean>;
@@ -102,6 +124,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       inspectorTab: 'dna',
       health: null,
       isSyncing: false,
+      projectBranches: [],
+      entityRevisions: [],
+      snapshots: [],
+      refiningEntity: null,
+      isBranching: false,
+      isSavingSnapshot: false,
 
       setActiveStage: (stage) => set({ activeStage: stage }),
       unlockStage: (stage) =>
@@ -217,9 +245,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             activeProject: s.activeProject
               ? { ...s.activeProject, status: 'universe_unfolded' }
               : null,
-            unlockedStages: s.unlockedStages.includes('trace')
-              ? s.unlockedStages
-              : [...s.unlockedStages, 'trace'],
+            unlockedStages: Array.from(new Set([...s.unlockedStages, 'unfold', 'trace', 'refine'])),
           }));
           return true;
         } catch (err: unknown) {
@@ -249,7 +275,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           const res = await apiClient.getUnfoldedUniverse(project.id);
           if (res.success && res.data) {
-            set({ unfoldedUniverse: res.data });
+            set((s) => ({
+              unfoldedUniverse: res.data,
+              unlockedStages: Array.from(new Set([...s.unlockedStages, 'unfold', 'trace', 'refine'])),
+            }));
           }
         } catch (err) {
           console.debug('No existing unfolded universe to fetch:', err);
@@ -282,13 +311,214 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         set((state) => ({
           activeStage: 'trace',
           selectedNodeId: nodeId,
-          unlockedStages: state.unlockedStages.includes('trace')
-            ? state.unlockedStages
-            : [...state.unlockedStages, 'trace'],
+          unlockedStages: Array.from(new Set([...state.unlockedStages, 'trace'])),
         }));
         const state = get();
         state.fetchLineage();
       },
+
+      fetchBranches: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        try {
+          const res = await apiClient.listBranches(activeProject.id);
+          if (res.success && res.data) {
+            set({ projectBranches: res.data });
+          }
+        } catch (err) {
+          console.error('Failed to fetch branches:', err);
+        }
+      },
+
+      switchBranch: async (targetProjectId: string) => {
+        try {
+          const projRes = await apiClient.getProject(targetProjectId);
+          if (!projRes.success || !projRes.data) return false;
+          const targetProject = projRes.data;
+          set({
+            activeProject: targetProject,
+            seedDNA: null,
+            worlds: [],
+            selectedWorldId: targetProject.selected_world_id || null,
+            activeSelection: null,
+            unfoldedUniverse: null,
+            lineageGraph: null,
+            entityRevisions: [],
+          });
+
+          await get().fetchBranches();
+
+          const dnaRes = await apiClient.getLatestDNA(targetProjectId);
+          if (dnaRes.success && dnaRes.data) {
+            set({ seedDNA: dnaRes.data });
+          }
+
+          const worldsRes = await apiClient.getLatestWorlds(targetProjectId);
+          if (worldsRes.success && worldsRes.data && worldsRes.data.length > 0) {
+            set({ worlds: worldsRes.data });
+          }
+
+          const selRes = await apiClient.getActiveSelection(targetProjectId);
+          if (selRes.success && selRes.data) {
+            set({ activeSelection: selRes.data, selectedWorldId: selRes.data.world_candidate_id });
+          }
+
+          const unfoldRes = await apiClient.getUnfoldedUniverse(targetProjectId);
+          if (unfoldRes.success && unfoldRes.data) {
+            set({
+              unfoldedUniverse: unfoldRes.data,
+              unlockedStages: ['seed', 'understand', 'worlds', 'choose', 'unfold', 'trace', 'refine'],
+              activeStage: 'refine',
+            });
+            await get().fetchLineage();
+            await get().fetchEntityRevisions();
+            await get().fetchSnapshots();
+          } else if (selRes.success && selRes.data) {
+            set({
+              unlockedStages: ['seed', 'understand', 'worlds', 'choose', 'unfold'],
+              activeStage: 'unfold',
+            });
+          } else if (worldsRes.success && worldsRes.data && worldsRes.data.length > 0) {
+            set({
+              unlockedStages: ['seed', 'understand', 'worlds', 'choose'],
+              activeStage: 'choose',
+            });
+          } else if (dnaRes.success && dnaRes.data) {
+            set({
+              unlockedStages: ['seed', 'understand', 'worlds'],
+              activeStage: 'worlds',
+            });
+          }
+          return true;
+        } catch (err) {
+          console.error('Failed to switch branch:', err);
+          return false;
+        }
+      },
+
+      forkBranch: async (branchName: string, stage: number = 5, rationale?: string) => {
+        const { activeProject } = get();
+        if (!activeProject) return false;
+        set({ isBranching: true });
+        try {
+          const res = await apiClient.branchProject(activeProject.id, branchName, stage, rationale);
+          if (res.success && res.data) {
+            await get().switchBranch(res.data.id);
+            set({ isBranching: false });
+            return true;
+          }
+          set({ isBranching: false });
+          return false;
+        } catch (err) {
+          console.error('Failed to fork branch:', err);
+          set({ isBranching: false });
+          return false;
+        }
+      },
+
+      refineCharacterAction: async (charId: string, updates: CharacterRefineRequest) => {
+        const { activeProject, unfoldedUniverse } = get();
+        if (!activeProject) return false;
+        try {
+          const res = await apiClient.refineCharacter(activeProject.id, charId, updates);
+          if (res.success && res.data && unfoldedUniverse) {
+            const updatedChars = unfoldedUniverse.characters.map((c) =>
+              c.id === charId ? res.data! : c
+            );
+            set({
+              unfoldedUniverse: {
+                ...unfoldedUniverse,
+                characters: updatedChars,
+              },
+              refiningEntity: null,
+            });
+            await get().fetchEntityRevisions();
+            await get().fetchLineage();
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error('Failed to refine character:', err);
+          return false;
+        }
+      },
+
+      refineSceneAction: async (sceneId: string, updates: SceneRefineRequest) => {
+        const { activeProject, unfoldedUniverse } = get();
+        if (!activeProject) return false;
+        try {
+          const res = await apiClient.refineScene(activeProject.id, sceneId, updates);
+          if (res.success && res.data && unfoldedUniverse) {
+            const updatedScenes = unfoldedUniverse.scenes.map((s) =>
+              s.id === sceneId ? res.data! : s
+            );
+            set({
+              unfoldedUniverse: {
+                ...unfoldedUniverse,
+                scenes: updatedScenes,
+              },
+              refiningEntity: null,
+            });
+            await get().fetchEntityRevisions();
+            await get().fetchLineage();
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error('Failed to refine scene:', err);
+          return false;
+        }
+      },
+
+      fetchEntityRevisions: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        try {
+          const res = await apiClient.listRevisions(activeProject.id);
+          if (res.success && res.data) {
+            set({ entityRevisions: res.data });
+          }
+        } catch (err) {
+          console.error('Failed to fetch entity revisions:', err);
+        }
+      },
+
+      fetchSnapshots: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        try {
+          const res = await apiClient.listSnapshots(activeProject.id);
+          if (res.success && res.data) {
+            set({ snapshots: res.data });
+          }
+        } catch (err) {
+          console.error('Failed to fetch snapshots:', err);
+        }
+      },
+
+      createSnapshotAction: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return false;
+        set({ isSavingSnapshot: true });
+        try {
+          const res = await apiClient.createSnapshot(activeProject.id);
+          if (res.success && res.data) {
+            set((s) => ({
+              snapshots: [res.data!, ...s.snapshots],
+              isSavingSnapshot: false,
+            }));
+            return true;
+          }
+          set({ isSavingSnapshot: false });
+          return false;
+        } catch (err) {
+          console.error('Failed to create snapshot:', err);
+          set({ isSavingSnapshot: false });
+          return false;
+        }
+      },
+
+      setRefiningEntity: (refiningEntity) => set({ refiningEntity }),
 
       setExtracting: (isExtracting, step = '') =>
         set({ isExtracting, extractionStep: step }),
@@ -439,6 +669,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           selectedNodeId: null,
           isLoadingLineage: false,
           lineageFilter: 'all',
+          projectBranches: [],
+          entityRevisions: [],
+          snapshots: [],
+          refiningEntity: null,
+          isBranching: false,
+          isSavingSnapshot: false,
           isExtracting: false,
           extractionStep: '',
           isGeneratingWorlds: false,

@@ -155,6 +155,12 @@ class LineageService:
                 )
             )
 
+        # Fetch entity revisions for version lineage chaining (PERS-01 & Phase 7)
+        revisions = await self.repo.get_entity_revisions(project_id)
+        revisions_by_entity: Dict[str, List[Any]] = {}
+        for rev in revisions:
+            revisions_by_entity.setdefault(rev.entity_id, []).append(rev)
+
         # ---------------------------------------------------------
         # Layer 5: Unfolded Universe Codex (Stage 5)
         # ---------------------------------------------------------
@@ -229,43 +235,137 @@ class LineageService:
                     )
                 )
 
-            # 5c. Characters & Name Map
+            # 5c. Characters & Name Map (with version chaining)
             char_map: Dict[str, str] = {c.id: c.name for c in unfolded.characters}
             char_node_map: Dict[str, str] = {c.name: f"node-char-{c.id}" for c in unfolded.characters}
 
             for c in unfolded.characters:
                 char_node_id = f"node-char-{c.id}"
-                char_node = TraceNode(
-                    id=char_node_id,
-                    entity_id=c.id,
-                    entity_type="character",
-                    label=f"{c.name} ({c.role})",
-                    title=c.name,
-                    stage=5,
-                    summary=f"Motivation: {c.motivation} • Conflict: {c.core_conflict}",
-                    causal_explanation=(
-                        f"Cast as {c.role} ({c.archetype}) in {chosen_world.title} to embody the narrative tension "
-                        f"between '{c.motivation}' and '{c.core_conflict}' under canon physical rules."
-                    ),
-                    parent_ids=["node-bible"],
-                    metadata={
-                        "role": c.role,
-                        "archetype": c.archetype,
-                        "motivation": c.motivation,
-                        "core_conflict": c.core_conflict,
-                        "visual_prompt": c.visual_prompt,
-                    },
-                )
-                nodes.append(char_node)
-                edges.append(
-                    TraceEdge(
-                        id=f"edge-bible-char-{c.id}",
-                        source="node-bible",
-                        target=char_node_id,
-                        relation_type="constrained_by",
-                        label="Inhabits Canon",
+                char_revs = [r for r in revisions_by_entity.get(c.id, []) if r.version < c.version]
+                char_revs.sort(key=lambda r: (r.version, r.created_at))
+                seen_versions: Set[int] = set()
+                unique_char_revs = []
+                for r in char_revs:
+                    if r.version not in seen_versions:
+                        seen_versions.add(r.version)
+                        unique_char_revs.append(r)
+
+                if not unique_char_revs:
+                    # Baseline v1 character
+                    char_node = TraceNode(
+                        id=char_node_id,
+                        entity_id=c.id,
+                        entity_type="character",
+                        label=f"{c.name} ({c.role})" if c.version == 1 else f"{c.name} ({c.role}) [v{c.version}]",
+                        title=c.name,
+                        stage=5,
+                        summary=f"Motivation: {c.motivation} • Conflict: {c.core_conflict}",
+                        causal_explanation=(
+                            f"Cast as {c.role} ({c.archetype}) in {chosen_world.title} to embody the narrative tension "
+                            f"between '{c.motivation}' and '{c.core_conflict}' under canon physical rules."
+                        ),
+                        parent_ids=["node-bible"],
+                        metadata={
+                            "role": c.role,
+                            "archetype": c.archetype,
+                            "motivation": c.motivation,
+                            "core_conflict": c.core_conflict,
+                            "version": c.version,
+                            "revision_notes": c.revision_notes,
+                            "visual_prompt": c.visual_prompt,
+                        },
                     )
-                )
+                    nodes.append(char_node)
+                    edges.append(
+                        TraceEdge(
+                            id=f"edge-bible-char-{c.id}",
+                            source="node-bible",
+                            target=char_node_id,
+                            relation_type="constrained_by",
+                            label="Inhabits Canon",
+                        )
+                    )
+                else:
+                    # Version chaining: node-bible -> v1 -> ... -> latest
+                    prev_node_id = "node-bible"
+                    for r in unique_char_revs:
+                        rev_node_id = f"node-char-{c.id}-v{r.version}"
+                        rev_node = TraceNode(
+                            id=rev_node_id,
+                            entity_id=r.id,
+                            entity_type="character_revision",
+                            label=f"{c.name} (v{r.version})",
+                            title=f"{c.name} v{r.version}",
+                            stage=5,
+                            summary=f"Historical Snapshot: {r.revision_notes or 'Baseline revision'}",
+                            causal_explanation=(
+                                f"Historical snapshot of {c.name} preserved prior to revision v{r.version + 1}. "
+                                f"Creator notes: '{r.revision_notes or 'Baseline version'}'. Immutable audit record."
+                            ),
+                            parent_ids=[prev_node_id],
+                            metadata={
+                                "version": r.version,
+                                "revision_notes": r.revision_notes,
+                                "created_at": str(r.created_at),
+                            },
+                        )
+                        nodes.append(rev_node)
+                        if prev_node_id == "node-bible":
+                            edges.append(
+                                TraceEdge(
+                                    id=f"edge-bible-char-{c.id}-v{r.version}",
+                                    source="node-bible",
+                                    target=rev_node_id,
+                                    relation_type="constrained_by",
+                                    label="Inhabits Canon (v1)",
+                                )
+                            )
+                        else:
+                            edges.append(
+                                TraceEdge(
+                                    id=f"edge-char-{c.id}-rev-{r.version}",
+                                    source=prev_node_id,
+                                    target=rev_node_id,
+                                    relation_type="refined_from",
+                                    label="Creator Refinement",
+                                )
+                            )
+                        prev_node_id = rev_node_id
+
+                    # Current / latest character node
+                    char_node = TraceNode(
+                        id=char_node_id,
+                        entity_id=c.id,
+                        entity_type="character",
+                        label=f"{c.name} ({c.role}) [v{c.version}]",
+                        title=f"{c.name} v{c.version}" if c.version > 1 else c.name,
+                        stage=5,
+                        summary=f"Motivation: {c.motivation} • Conflict: {c.core_conflict}",
+                        causal_explanation=(
+                            f"Active refined incarnation of {c.name} ({c.role}, {c.archetype}) in {chosen_world.title}. "
+                            f"Refined from v{c.version - 1} with creator notes: '{c.revision_notes or 'Refined parameter update'}'."
+                        ),
+                        parent_ids=[prev_node_id],
+                        metadata={
+                            "role": c.role,
+                            "archetype": c.archetype,
+                            "motivation": c.motivation,
+                            "core_conflict": c.core_conflict,
+                            "version": c.version,
+                            "revision_notes": c.revision_notes,
+                            "visual_prompt": c.visual_prompt,
+                        },
+                    )
+                    nodes.append(char_node)
+                    edges.append(
+                        TraceEdge(
+                            id=f"edge-char-{c.id}-latest-refined",
+                            source=prev_node_id,
+                            target=char_node_id,
+                            relation_type="refined_from",
+                            label="Creator Refinement",
+                        )
+                    )
 
             # 5d. Character Relationships (resolving names against char_map)
             for r in unfolded.relationships:
@@ -315,7 +415,7 @@ class LineageService:
                     )
                 )
 
-            # 5e. Story Scenes
+            # 5e. Story Scenes (with version chaining)
             for s in unfolded.scenes:
                 scene_node_id = f"node-scene-{s.id}"
                 scene_parents: List[str] = ["node-bible"]
@@ -326,50 +426,157 @@ class LineageService:
                     if matching_node_id and matching_node_id not in scene_parents:
                         scene_parents.append(matching_node_id)
 
-                scene_node = TraceNode(
-                    id=scene_node_id,
-                    entity_id=s.id,
-                    entity_type="scene",
-                    label=f"Scene {s.scene_number}: {s.title}",
-                    title=s.title,
-                    stage=5,
-                    summary=f"Dramatic Q: {s.dramatic_question}",
-                    causal_explanation=(
-                        f"Dramatic scenario staged at {s.location_setting} putting characters into active conflict. "
-                        f"Tests the question: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'."
-                    ),
-                    parent_ids=scene_parents,
-                    metadata={
-                        "scene_number": s.scene_number,
-                        "location_setting": s.location_setting,
-                        "characters_involved": s.characters_involved,
-                        "dramatic_question": s.dramatic_question,
-                        "pivotal_outcome": s.pivotal_outcome,
-                        "visual_prompt": s.visual_prompt,
-                    },
-                )
-                nodes.append(scene_node)
-                edges.append(
-                    TraceEdge(
-                        id=f"edge-bible-scene-{s.id}",
-                        source="node-bible",
-                        target=scene_node_id,
-                        relation_type="appears_in",
-                        label="Enacts World Canon",
-                    )
-                )
+                scene_revs = [r for r in revisions_by_entity.get(s.id, []) if r.version < s.version]
+                scene_revs.sort(key=lambda r: (r.version, r.created_at))
+                seen_scene_versions: Set[int] = set()
+                unique_scene_revs = []
+                for r in scene_revs:
+                    if r.version not in seen_scene_versions:
+                        seen_scene_versions.add(r.version)
+                        unique_scene_revs.append(r)
 
-                for parent_char_node in scene_parents:
-                    if parent_char_node != "node-bible":
-                        edges.append(
-                            TraceEdge(
-                                id=f"edge-char-scene-{parent_char_node}-{s.id}",
-                                source=parent_char_node,
-                                target=scene_node_id,
-                                relation_type="appears_in",
-                                label="Features Character",
-                            )
+                if not unique_scene_revs:
+                    # Baseline v1 scene
+                    scene_node = TraceNode(
+                        id=scene_node_id,
+                        entity_id=s.id,
+                        entity_type="scene",
+                        label=f"Scene {s.scene_number}: {s.title}" if s.version == 1 else f"Scene {s.scene_number}: {s.title} [v{s.version}]",
+                        title=s.title,
+                        stage=5,
+                        summary=f"Dramatic Q: {s.dramatic_question}",
+                        causal_explanation=(
+                            f"Dramatic scenario staged at {s.location_setting} putting characters into active conflict. "
+                            f"Tests the question: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'."
+                        ),
+                        parent_ids=scene_parents,
+                        metadata={
+                            "scene_number": s.scene_number,
+                            "location_setting": s.location_setting,
+                            "characters_involved": s.characters_involved,
+                            "dramatic_question": s.dramatic_question,
+                            "pivotal_outcome": s.pivotal_outcome,
+                            "version": s.version,
+                            "revision_notes": s.revision_notes,
+                            "visual_prompt": s.visual_prompt,
+                        },
+                    )
+                    nodes.append(scene_node)
+                    edges.append(
+                        TraceEdge(
+                            id=f"edge-bible-scene-{s.id}",
+                            source="node-bible",
+                            target=scene_node_id,
+                            relation_type="appears_in",
+                            label="Enacts World Canon",
                         )
+                    )
+
+                    for parent_char_node in scene_parents:
+                        if parent_char_node != "node-bible":
+                            edges.append(
+                                TraceEdge(
+                                    id=f"edge-char-scene-{parent_char_node}-{s.id}",
+                                    source=parent_char_node,
+                                    target=scene_node_id,
+                                    relation_type="appears_in",
+                                    label="Features Character",
+                                )
+                            )
+                else:
+                    # Version chaining for scene: scene_parents -> v1 -> ... -> latest
+                    prev_scene_id = "node-bible"
+                    for r in unique_scene_revs:
+                        rev_node_id = f"node-scene-{s.id}-v{r.version}"
+                        rev_node = TraceNode(
+                            id=rev_node_id,
+                            entity_id=r.id,
+                            entity_type="scene_revision",
+                            label=f"Scene {s.scene_number}: {s.title} (v{r.version})",
+                            title=f"{s.title} v{r.version}",
+                            stage=5,
+                            summary=f"Historical Scene Snapshot: {r.revision_notes or 'Baseline revision'}",
+                            causal_explanation=(
+                                f"Historical snapshot of Scene {s.scene_number} preserved prior to revision v{r.version + 1}. "
+                                f"Creator notes: '{r.revision_notes or 'Baseline version'}'. Immutable audit record."
+                            ),
+                            parent_ids=scene_parents if prev_scene_id == "node-bible" else [prev_scene_id],
+                            metadata={
+                                "version": r.version,
+                                "revision_notes": r.revision_notes,
+                                "created_at": str(r.created_at),
+                            },
+                        )
+                        nodes.append(rev_node)
+                        if prev_scene_id == "node-bible":
+                            edges.append(
+                                TraceEdge(
+                                    id=f"edge-bible-scene-{s.id}-v{r.version}",
+                                    source="node-bible",
+                                    target=rev_node_id,
+                                    relation_type="appears_in",
+                                    label="Enacts World Canon (v1)",
+                                )
+                            )
+                            for parent_char_node in scene_parents:
+                                if parent_char_node != "node-bible":
+                                    edges.append(
+                                        TraceEdge(
+                                            id=f"edge-char-scene-{parent_char_node}-{s.id}-v{r.version}",
+                                            source=parent_char_node,
+                                            target=rev_node_id,
+                                            relation_type="appears_in",
+                                            label="Features Character",
+                                        )
+                                    )
+                        else:
+                            edges.append(
+                                TraceEdge(
+                                    id=f"edge-scene-{s.id}-rev-{r.version}",
+                                    source=prev_scene_id,
+                                    target=rev_node_id,
+                                    relation_type="refined_from",
+                                    label="Creator Refinement",
+                                )
+                            )
+                        prev_scene_id = rev_node_id
+
+                    # Current / latest scene node
+                    scene_node = TraceNode(
+                        id=scene_node_id,
+                        entity_id=s.id,
+                        entity_type="scene",
+                        label=f"Scene {s.scene_number}: {s.title} [v{s.version}]",
+                        title=f"{s.title} v{s.version}" if s.version > 1 else s.title,
+                        stage=5,
+                        summary=f"Dramatic Q: {s.dramatic_question}",
+                        causal_explanation=(
+                            f"Active refined scenario staged at {s.location_setting}. Refined from v{s.version - 1} "
+                            f"with creator notes: '{s.revision_notes or 'Refined scene outcome'}'. "
+                            f"Dramatic Q: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'."
+                        ),
+                        parent_ids=[prev_scene_id],
+                        metadata={
+                            "scene_number": s.scene_number,
+                            "location_setting": s.location_setting,
+                            "characters_involved": s.characters_involved,
+                            "dramatic_question": s.dramatic_question,
+                            "pivotal_outcome": s.pivotal_outcome,
+                            "version": s.version,
+                            "revision_notes": s.revision_notes,
+                            "visual_prompt": s.visual_prompt,
+                        },
+                    )
+                    nodes.append(scene_node)
+                    edges.append(
+                        TraceEdge(
+                            id=f"edge-scene-{s.id}-latest-refined",
+                            source=prev_scene_id,
+                            target=scene_node_id,
+                            relation_type="refined_from",
+                            label="Creator Refinement",
+                        )
+                    )
 
         return TraceGraphRead(
             project_id=project_id,

@@ -17,8 +17,10 @@ import {
   Shield,
   Layers,
   AlertTriangle,
+  Edit3,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
+import { RefinementModal } from './RefinementModal';
 
 export const UniverseCodexCanvas: React.FC = () => {
   const {
@@ -35,6 +37,7 @@ export const UniverseCodexCanvas: React.FC = () => {
     jumpToTraceNode,
     toggleInspector,
     setInspectorTab,
+    setRefiningEntity,
   } = useWorkspaceStore();
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -543,6 +546,17 @@ export const UniverseCodexCanvas: React.FC = () => {
                                 {char.name}
                               </h3>
                               <div className="flex items-center gap-2">
+                                <span className="char-version-badge px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                  v{char.version || 1}
+                                </span>
+                                <button
+                                  onClick={() => setRefiningEntity({ type: 'character', data: char })}
+                                  className="refine-character-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition font-medium"
+                                  title="Refine character traits and motivation (PERS-01)"
+                                >
+                                  <Edit3 className="w-3 h-3" />
+                                  <span>Refine</span>
+                                </button>
                                 <button
                                   onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
                                   className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition"
@@ -686,6 +700,17 @@ export const UniverseCodexCanvas: React.FC = () => {
                           </h3>
                         </div>
                         <div className="flex items-center gap-2">
+                          <span className="scene-version-badge px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                            v{scene.version || 1}
+                          </span>
+                          <button
+                            onClick={() => setRefiningEntity({ type: 'scene', data: scene })}
+                            className="refine-scene-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 transition font-medium"
+                            title="Refine scene beats and outcomes (PERS-01)"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Refine</span>
+                          </button>
                           <button
                             onClick={() => jumpToTraceNode(`node-scene-${scene.id}`)}
                             className="trace-lineage-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 transition"
@@ -759,6 +784,9 @@ export const UniverseCodexCanvas: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Refinement Modal (PERS-01) */}
+      <RefinementModal />
     </div>
   );
 };

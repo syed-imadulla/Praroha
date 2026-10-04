@@ -9,6 +9,7 @@ from backend.app.repositories.project_repo import init_db
 from backend.app.routers.dna import router as dna_router
 from backend.app.routers.health import router as health_router
 from backend.app.routers.lineage import router as lineage_router
+from backend.app.routers.persistence import router as persistence_router
 from backend.app.routers.projects import router as projects_router
 from backend.app.routers.selection import router as selection_router
 from backend.app.routers.unfold import router as unfold_router
@@ -61,3 +62,5 @@ app.include_router(worlds_router, prefix=settings.API_V1_PREFIX)
 app.include_router(selection_router, prefix=settings.API_V1_PREFIX)
 app.include_router(unfold_router, prefix=settings.API_V1_PREFIX)
 app.include_router(lineage_router, prefix=settings.API_V1_PREFIX)
+app.include_router(persistence_router, prefix=settings.API_V1_PREFIX)
+

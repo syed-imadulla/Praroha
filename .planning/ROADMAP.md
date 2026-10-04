@@ -113,7 +113,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. User can modify a character or scene, creating an auditable new version.
   2. User can branch the story-world timeline without destroying the original branch.
   3. Full universe state exports to and imports from persistent storage.  
-**Plans**: TBD
+**Plans**: 2 plans (all completed)
+- [x] **07-01-PLAN.md** (Wave 1): Backend Model & Repository Extensions, Persistence & Branching Service, Component Refinement, Portable Bundle Export/Import, Storage Snapshots, and Pytest Suite.
+- [x] **07-02-PLAN.md** (Wave 2): Frontend Types & Store Extensions, Refinement Modal, TopBar Branch Switcher Dropdown, Stage 7 Refine Canvas, and Playwright E2E Suite.
 
 ---
 

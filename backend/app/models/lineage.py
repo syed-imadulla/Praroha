@@ -10,8 +10,10 @@ TraceNodeType = Literal[
     "world_bible",
     "key_location",
     "character",
+    "character_revision",
     "relationship",
     "scene",
+    "scene_revision",
 ]
 
 TraceRelationType = Literal[
@@ -20,6 +22,7 @@ TraceRelationType = Literal[
     "constrained_by",
     "appears_in",
     "generated_for",
+    "refined_from",
 ]
 
 

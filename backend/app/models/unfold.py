@@ -121,6 +121,8 @@ class CharacterBase(SQLModel):
     motivation: str
     core_conflict: str
     visual_prompt: str
+    version: int = Field(default=1)
+    revision_notes: Optional[str] = Field(default=None, nullable=True)
 
 
 class CharacterRecord(CharacterBase, table=True):
@@ -144,6 +146,8 @@ class CharacterRecord(CharacterBase, table=True):
             motivation=self.motivation,
             core_conflict=self.core_conflict,
             visual_prompt=self.visual_prompt,
+            version=self.version,
+            revision_notes=self.revision_notes,
             created_at=self.created_at,
         )
 
@@ -158,6 +162,8 @@ class CharacterRead(BaseModel):
     motivation: str
     core_conflict: str
     visual_prompt: str
+    version: int = 1
+    revision_notes: Optional[str] = None
     created_at: datetime
 
 
@@ -231,6 +237,8 @@ class SceneBase(SQLModel):
     conflict_narrative: str
     pivotal_outcome: str
     visual_prompt: str
+    version: int = Field(default=1)
+    revision_notes: Optional[str] = Field(default=None, nullable=True)
 
 
 class SceneRecord(SceneBase, table=True):
@@ -263,6 +271,8 @@ class SceneRecord(SceneBase, table=True):
             conflict_narrative=self.conflict_narrative,
             pivotal_outcome=self.pivotal_outcome,
             visual_prompt=self.visual_prompt,
+            version=self.version,
+            revision_notes=self.revision_notes,
             created_at=self.created_at,
         )
 
@@ -279,6 +289,8 @@ class SceneRead(BaseModel):
     conflict_narrative: str
     pivotal_outcome: str
     visual_prompt: str
+    version: int = 1
+    revision_notes: Optional[str] = None
     created_at: datetime
 
 

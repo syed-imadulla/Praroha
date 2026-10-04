@@ -1,4 +1,5 @@
-import { GitBranch, RefreshCw, PanelRight, Sparkles, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { GitBranch, RefreshCw, PanelRight, Sparkles, AlertCircle, ChevronDown, Check, Plus } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 
 export const TopBar: React.FC = () => {
@@ -8,7 +9,15 @@ export const TopBar: React.FC = () => {
     inspectorOpen,
     toggleInspector,
     resetWorkspace,
+    projectBranches,
+    fetchBranches,
+    switchBranch,
+    forkBranch,
   } = useWorkspaceStore();
+
+  const [branchMenuOpen, setBranchMenuOpen] = useState(false);
+  const [isForking, setIsForking] = useState(false);
+  const [newBranchName, setNewBranchName] = useState('');
 
   const handleReset = () => {
     if (window.confirm('Start a new seed? This will reset the current workspace progress.')) {
@@ -41,11 +50,117 @@ export const TopBar: React.FC = () => {
           </div>
         </div>
 
-        {/* Branch Badge */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-canvas-card border border-canvas-border text-xs text-slate-300">
-          <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-slate-400">Branch:</span>
-          <span className="font-mono text-cyan-300 font-medium">prime / main</span>
+        {/* Interactive Branch Switcher Dropdown (PERS-02) */}
+        <div className="relative">
+          <button
+            onClick={() => {
+              setBranchMenuOpen(!branchMenuOpen);
+              fetchBranches();
+            }}
+            id="branch-switcher-btn"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-canvas-card hover:bg-neutral-800 border border-canvas-border text-xs text-slate-300 transition"
+          >
+            <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-slate-400">Branch:</span>
+            <span className="font-mono text-cyan-300 font-medium truncate max-w-[120px]">
+              {activeProject?.branch_name || 'main'}
+            </span>
+            <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+          </button>
+
+          {branchMenuOpen && (
+            <div id="branch-switcher-popover" className="absolute left-0 mt-2 w-72 bg-neutral-900 border border-neutral-700/80 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-neutral-800 mb-1.5">
+                <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                  Timeline Branches
+                </span>
+                <span className="text-[10px] text-neutral-500">
+                  {projectBranches.length} branch(es)
+                </span>
+              </div>
+
+              <div className="max-h-48 overflow-y-auto space-y-1">
+                {projectBranches.map((branch) => {
+                  const isActive = branch.id === activeProject?.id;
+                  return (
+                    <button
+                      key={branch.id}
+                      onClick={async () => {
+                        await switchBranch(branch.id);
+                        setBranchMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition ${
+                        isActive
+                          ? 'bg-cyan-950/70 text-cyan-300 font-medium border border-cyan-800/40'
+                          : 'text-neutral-300 hover:bg-neutral-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <GitBranch className={`w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'text-neutral-500'}`} />
+                        <span className="truncate">{branch.branch_name}</span>
+                      </div>
+                      {isActive && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Fork Form / Button */}
+              <div className="pt-2 mt-1.5 border-t border-neutral-800">
+                {isForking ? (
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="New branch name..."
+                      value={newBranchName}
+                      onChange={(e) => setNewBranchName(e.target.value)}
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter' && newBranchName.trim()) {
+                          await forkBranch(newBranchName.trim());
+                          setNewBranchName('');
+                          setIsForking(false);
+                          setBranchMenuOpen(false);
+                        } else if (e.key === 'Escape') {
+                          setIsForking(false);
+                        }
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-neutral-950 border border-cyan-500/50 rounded-md text-neutral-200 outline-none"
+                    />
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        onClick={() => setIsForking(false)}
+                        className="px-2 py-0.5 text-[11px] text-neutral-400 hover:text-neutral-200"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (newBranchName.trim()) {
+                            await forkBranch(newBranchName.trim());
+                            setNewBranchName('');
+                            setIsForking(false);
+                            setBranchMenuOpen(false);
+                          }
+                        }}
+                        className="px-2 py-0.5 text-[11px] bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium"
+                      >
+                        Fork
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsForking(true)}
+                    className="w-full flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-cyan-400 hover:bg-cyan-950/40 rounded-lg transition font-medium"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Fork New Branch</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

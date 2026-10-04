@@ -30,10 +30,10 @@ export const TraceabilityCanvas: React.FC = () => {
   } = useWorkspaceStore();
 
   useEffect(() => {
-    if (activeProject && !lineageGraph) {
+    if (activeProject) {
       fetchLineage();
     }
-  }, [activeProject, lineageGraph, fetchLineage]);
+  }, [activeProject?.id]);
 
   // Compute ancestor node IDs and active edges when a node is selected
   const { ancestorNodeIds, ancestorNodesOrdered } = useMemo(() => {
@@ -610,7 +610,15 @@ const NodeCard: React.FC<NodeCardProps> = ({
             S0{node.stage}
           </span>
         </div>
-        <h4 className="text-xs font-bold text-slate-100 truncate">{node.title || node.label}</h4>
+
+        <div className="flex items-center justify-between gap-2">
+          <h4 className="text-xs font-bold text-slate-100 truncate">{node.title || node.label}</h4>
+          {node.metadata?.version !== undefined && (
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+              v{String(node.metadata.version)}
+            </span>
+          )}
+        </div>
         <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{node.summary}</p>
       </div>
 

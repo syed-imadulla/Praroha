@@ -33,6 +33,8 @@ export interface Project {
   seed_text: string;
   status: string;
   selected_world_id?: string | null;
+  parent_project_id?: string | null;
+  branch_name?: string;
   created_at: string;
   updated_at: string;
 }
@@ -173,6 +175,8 @@ export interface CharacterRead {
   motivation: string;
   core_conflict: string;
   visual_prompt: string;
+  version: number;
+  revision_notes?: string | null;
   created_at: string;
 }
 
@@ -201,6 +205,8 @@ export interface SceneRead {
   conflict_narrative: string;
   pivotal_outcome: string;
   visual_prompt: string;
+  version: number;
+  revision_notes?: string | null;
   created_at: string;
 }
 
@@ -219,15 +225,18 @@ export type TraceNodeType =
   | "world_bible"
   | "key_location"
   | "character"
+  | "character_revision"
   | "relationship"
-  | "scene";
+  | "scene"
+  | "scene_revision";
 
 export type TraceRelationType =
   | "derived_from"
   | "selected_by"
   | "constrained_by"
   | "appears_in"
-  | "generated_for";
+  | "generated_for"
+  | "refined_from";
 
 export interface TraceNode {
   id: string;
@@ -264,4 +273,60 @@ export interface AncestorPathRead {
   ancestor_edges: TraceEdge[];
   summary_explanation: string;
 }
+
+export interface EntityRevisionRead {
+  id: string;
+  project_id: string;
+  entity_type: string;
+  entity_id: string;
+  version: number;
+  snapshot_json: string;
+  revision_notes: string;
+  created_at: string;
+}
+
+export interface BranchRead {
+  id: string;
+  parent_project_id: string | null;
+  branch_name: string;
+  title: string;
+  status: string;
+  created_at: string;
+}
+
+export interface CharacterRefineRequest {
+  motivation?: string;
+  core_conflict?: string;
+  role?: string;
+  revision_notes: string;
+}
+
+export interface SceneRefineRequest {
+  dramatic_question?: string;
+  conflict_narrative?: string;
+  pivotal_outcome?: string;
+  revision_notes: string;
+}
+
+export interface ProjectBundle {
+  format_version: string;
+  exported_at: string;
+  project: Project;
+  seed_dna: SeedDNARead | null;
+  worlds: WorldCandidateRead[];
+  selection: WorldSelectionRead | null;
+  unfolded_universe: UnfoldedUniverseRead | null;
+  revisions: EntityRevisionRead[];
+  lineage: TraceGraphRead | null;
+}
+
+export interface SnapshotRead {
+  id: string;
+  project_id: string;
+  storage_key: string;
+  size_bytes: number;
+  version: number;
+  created_at: string;
+}
+
 

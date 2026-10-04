@@ -13,6 +13,8 @@ class ProjectBase(SQLModel):
     seed_text: str = Field(default="")
     status: str = Field(default="draft")
     selected_world_id: Optional[str] = Field(default=None, nullable=True)
+    parent_project_id: Optional[str] = Field(default=None, index=True, nullable=True)
+    branch_name: str = Field(default="main", index=True)
 
 
 class Project(ProjectBase, table=True):
@@ -25,6 +27,9 @@ class Project(ProjectBase, table=True):
     )
     created_at: datetime = Field(default_factory=get_utc_now)
     updated_at: datetime = Field(default_factory=get_utc_now)
+
+    def to_read_schema(self) -> "ProjectRead":
+        return ProjectRead.model_validate(self)
 
 
 class ProjectCreate(SQLModel):

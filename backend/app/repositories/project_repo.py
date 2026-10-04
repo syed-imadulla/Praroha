@@ -14,6 +14,11 @@ from backend.app.models.unfold import (
     UnfoldedUniverseRead,
 )
 from backend.app.models.world import WorldCandidate, WorldCandidateRecord
+from backend.app.models.persistence import (
+    EntityRevisionRecord,
+    CharacterRefineRequest,
+    SceneRefineRequest,
+)
 
 engine = create_async_engine(
     settings.DATABASE_URL,
@@ -36,10 +41,30 @@ async def init_db() -> None:
         def _migrate_columns(connection):
             from sqlalchemy import inspect, text
             inspector = inspect(connection)
-            if "projects" in inspector.get_table_names():
+            table_names = inspector.get_table_names()
+
+            if "projects" in table_names:
                 cols = [c["name"] for c in inspector.get_columns("projects")]
                 if "selected_world_id" not in cols:
                     connection.execute(text("ALTER TABLE projects ADD COLUMN selected_world_id VARCHAR"))
+                if "parent_project_id" not in cols:
+                    connection.execute(text("ALTER TABLE projects ADD COLUMN parent_project_id VARCHAR"))
+                if "branch_name" not in cols:
+                    connection.execute(text("ALTER TABLE projects ADD COLUMN branch_name VARCHAR DEFAULT 'main'"))
+
+            if "characters" in table_names:
+                cols = [c["name"] for c in inspector.get_columns("characters")]
+                if "version" not in cols:
+                    connection.execute(text("ALTER TABLE characters ADD COLUMN version INTEGER DEFAULT 1"))
+                if "revision_notes" not in cols:
+                    connection.execute(text("ALTER TABLE characters ADD COLUMN revision_notes VARCHAR"))
+
+            if "scenes" in table_names:
+                cols = [c["name"] for c in inspector.get_columns("scenes")]
+                if "version" not in cols:
+                    connection.execute(text("ALTER TABLE scenes ADD COLUMN version INTEGER DEFAULT 1"))
+                if "revision_notes" not in cols:
+                    connection.execute(text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
 
         await conn.run_sync(_migrate_columns)
 
@@ -486,6 +511,197 @@ class ProjectRepository:
             ],
             scenes=[s.to_read_schema() for s in scenes],
         )
+
+    async def get_raw_unfolded_records(
+        self, project_id: str
+    ) -> Tuple[
+        Optional[WorldBibleRecord],
+        List[CharacterRecord],
+        List[CharacterRelationshipRecord],
+        List[SceneRecord],
+    ]:
+        bible_stmt = select(WorldBibleRecord).where(WorldBibleRecord.project_id == project_id)
+        bible_res = await self.session.execute(bible_stmt)
+        bible = bible_res.scalars().first()
+
+        char_stmt = (
+            select(CharacterRecord)
+            .where(CharacterRecord.project_id == project_id)
+            .order_by(CharacterRecord.created_at.asc())
+        )
+        char_res = await self.session.execute(char_stmt)
+        characters = list(char_res.scalars().all())
+
+        rel_stmt = (
+            select(CharacterRelationshipRecord)
+            .where(CharacterRelationshipRecord.project_id == project_id)
+            .order_by(CharacterRelationshipRecord.created_at.asc())
+        )
+        rel_res = await self.session.execute(rel_stmt)
+        relationships = list(rel_res.scalars().all())
+
+        scene_stmt = (
+            select(SceneRecord)
+            .where(SceneRecord.project_id == project_id)
+            .order_by(SceneRecord.scene_number.asc())
+        )
+        scene_res = await self.session.execute(scene_stmt)
+        scenes = list(scene_res.scalars().all())
+
+        return bible, characters, relationships, scenes
+
+    async def create_entity_revision(self, revision: EntityRevisionRecord) -> EntityRevisionRecord:
+        self.session.add(revision)
+        await self.session.commit()
+        await self.session.refresh(revision)
+        return revision
+
+    async def get_entity_revisions(
+        self, project_id: str, entity_id: Optional[str] = None
+    ) -> List[EntityRevisionRecord]:
+        query = select(EntityRevisionRecord).where(EntityRevisionRecord.project_id == project_id)
+        if entity_id:
+            query = query.where(EntityRevisionRecord.entity_id == entity_id)
+        query = query.order_by(EntityRevisionRecord.created_at.desc(), EntityRevisionRecord.version.desc())
+        res = await self.session.execute(query)
+        return list(res.scalars().all())
+
+    async def get_project_branches(self, project_id: str) -> List[Project]:
+        curr = await self.get_project(project_id)
+        if not curr:
+            return []
+        root_id = curr.parent_project_id or curr.id
+        stmt = (
+            select(Project)
+            .where((Project.id == root_id) | (Project.parent_project_id == root_id))
+            .order_by(Project.created_at.asc())
+        )
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
+
+    async def refine_character(
+        self, project_id: str, char_id: str, updates: CharacterRefineRequest
+    ) -> Optional[CharacterRecord]:
+        stmt = select(CharacterRecord).where(
+            CharacterRecord.id == char_id,
+            CharacterRecord.project_id == project_id,
+        )
+        res = await self.session.execute(stmt)
+        record = res.scalars().first()
+        if not record:
+            return None
+
+        # Capture snapshot before mutating
+        snapshot_before = json.dumps(record.to_read_schema().model_dump(), default=str)
+        rev_before = EntityRevisionRecord(
+            project_id=project_id,
+            entity_type="character",
+            entity_id=char_id,
+            version=record.version,
+            snapshot_json=snapshot_before,
+            revision_notes=f"Snapshot before revision v{record.version + 1}: {updates.revision_notes}",
+        )
+        self.session.add(rev_before)
+
+        # Mutate
+        if updates.motivation is not None:
+            record.motivation = updates.motivation
+        if updates.core_conflict is not None:
+            record.core_conflict = updates.core_conflict
+        if updates.role is not None:
+            record.role = updates.role
+        record.revision_notes = updates.revision_notes
+        record.version += 1
+
+        # Capture snapshot after mutating
+        snapshot_after = json.dumps(record.to_read_schema().model_dump(), default=str)
+        rev_after = EntityRevisionRecord(
+            project_id=project_id,
+            entity_type="character",
+            entity_id=char_id,
+            version=record.version,
+            snapshot_json=snapshot_after,
+            revision_notes=updates.revision_notes,
+        )
+        self.session.add(rev_after)
+
+        self.session.add(record)
+        await self.session.commit()
+        await self.session.refresh(record)
+        return record
+
+    async def refine_scene(
+        self, project_id: str, scene_id: str, updates: SceneRefineRequest
+    ) -> Optional[SceneRecord]:
+        stmt = select(SceneRecord).where(
+            SceneRecord.id == scene_id,
+            SceneRecord.project_id == project_id,
+        )
+        res = await self.session.execute(stmt)
+        record = res.scalars().first()
+        if not record:
+            return None
+
+        snapshot_before = json.dumps(record.to_read_schema().model_dump(), default=str)
+        rev_before = EntityRevisionRecord(
+            project_id=project_id,
+            entity_type="scene",
+            entity_id=scene_id,
+            version=record.version,
+            snapshot_json=snapshot_before,
+            revision_notes=f"Snapshot before revision v{record.version + 1}: {updates.revision_notes}",
+        )
+        self.session.add(rev_before)
+
+        if updates.dramatic_question is not None:
+            record.dramatic_question = updates.dramatic_question
+        if updates.conflict_narrative is not None:
+            record.conflict_narrative = updates.conflict_narrative
+        if updates.pivotal_outcome is not None:
+            record.pivotal_outcome = updates.pivotal_outcome
+        record.revision_notes = updates.revision_notes
+        record.version += 1
+
+        snapshot_after = json.dumps(record.to_read_schema().model_dump(), default=str)
+        rev_after = EntityRevisionRecord(
+            project_id=project_id,
+            entity_type="scene",
+            entity_id=scene_id,
+            version=record.version,
+            snapshot_json=snapshot_after,
+            revision_notes=updates.revision_notes,
+        )
+        self.session.add(rev_after)
+
+        self.session.add(record)
+        await self.session.commit()
+        await self.session.refresh(record)
+        return record
+
+    async def create_snapshot_asset(
+        self, project_id: str, storage_key: str, size_bytes: int, version: int = 1
+    ) -> Asset:
+        asset = Asset(
+            project_id=project_id,
+            asset_type="project_snapshot",
+            mime_type="application/json",
+            storage_key=storage_key,
+            size_bytes=size_bytes,
+            version=version,
+        )
+        self.session.add(asset)
+        await self.session.commit()
+        await self.session.refresh(asset)
+        return asset
+
+    async def list_project_snapshots(self, project_id: str) -> List[Asset]:
+        stmt = (
+            select(Asset)
+            .where(Asset.project_id == project_id, Asset.asset_type == "project_snapshot")
+            .order_by(Asset.created_at.desc())
+        )
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
 
 
 

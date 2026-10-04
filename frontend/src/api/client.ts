@@ -8,6 +8,14 @@ import {
   UnfoldedUniverseRead,
   TraceGraphRead,
   AncestorPathRead,
+  BranchRead,
+  CharacterRefineRequest,
+  SceneRefineRequest,
+  CharacterRead,
+  SceneRead,
+  EntityRevisionRead,
+  ProjectBundle,
+  SnapshotRead,
 } from '../types';
 
 class ApiClient {
@@ -120,6 +128,79 @@ class ApiClient {
 
   async getNodeAncestors(projectId: string, nodeId: string): Promise<APIResponse<AncestorPathRead>> {
     return this.request<AncestorPathRead>(`/projects/${projectId}/lineage/node/${nodeId}/ancestors`);
+  }
+
+  async branchProject(
+    projectId: string,
+    branchName: string,
+    stage: number = 5,
+    rationale?: string
+  ): Promise<APIResponse<Project>> {
+    return this.request<Project>(`/projects/${projectId}/branch`, {
+      method: 'POST',
+      body: JSON.stringify({
+        branch_name: branchName,
+        branch_point_stage: stage,
+        rationale: rationale || null,
+      }),
+    });
+  }
+
+  async listBranches(projectId: string): Promise<APIResponse<BranchRead[]>> {
+    return this.request<BranchRead[]>(`/projects/${projectId}/branches`);
+  }
+
+  async refineCharacter(
+    projectId: string,
+    charId: string,
+    req: CharacterRefineRequest
+  ): Promise<APIResponse<CharacterRead>> {
+    return this.request<CharacterRead>(`/projects/${projectId}/characters/${charId}/refine`, {
+      method: 'PATCH',
+      body: JSON.stringify(req),
+    });
+  }
+
+  async refineScene(
+    projectId: string,
+    sceneId: string,
+    req: SceneRefineRequest
+  ): Promise<APIResponse<SceneRead>> {
+    return this.request<SceneRead>(`/projects/${projectId}/scenes/${sceneId}/refine`, {
+      method: 'PATCH',
+      body: JSON.stringify(req),
+    });
+  }
+
+  async listRevisions(
+    projectId: string,
+    entityId?: string
+  ): Promise<APIResponse<EntityRevisionRead[]>> {
+    const url = entityId
+      ? `/projects/${projectId}/revisions?entity_id=${encodeURIComponent(entityId)}`
+      : `/projects/${projectId}/revisions`;
+    return this.request<EntityRevisionRead[]>(url);
+  }
+
+  async getProjectBundle(projectId: string): Promise<APIResponse<ProjectBundle>> {
+    return this.request<ProjectBundle>(`/projects/${projectId}/bundle`);
+  }
+
+  async importProjectBundle(bundle: ProjectBundle): Promise<APIResponse<Project>> {
+    return this.request<Project>(`/projects/import`, {
+      method: 'POST',
+      body: JSON.stringify(bundle),
+    });
+  }
+
+  async createSnapshot(projectId: string): Promise<APIResponse<SnapshotRead>> {
+    return this.request<SnapshotRead>(`/projects/${projectId}/snapshots`, {
+      method: 'POST',
+    });
+  }
+
+  async listSnapshots(projectId: string): Promise<APIResponse<SnapshotRead[]>> {
+    return this.request<SnapshotRead[]>(`/projects/${projectId}/snapshots`);
   }
 }
 
