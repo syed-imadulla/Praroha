@@ -1,0 +1,17 @@
+{
+  "name": "seed-unfold",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Human-guided generative AI engine turning seeds into traceable mini-universes",
+  "scripts": {
+    "dev": "concurrently -n \"api,web\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && uvicorn app.main:app --reload --port 8000",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "test:backend": "pytest -v backend/tests",
+    "test:frontend": "npm test --prefix frontend",
+    "install:all": "npm install && npm install --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
