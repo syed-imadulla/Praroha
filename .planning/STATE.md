@@ -1,0 +1,77 @@
+---
+gsd_state_version: '1.0'
+status: planning
+progress:
+  total_phases: 8
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
+---
+
+# Project State: Seed Unfold
+
+## Project Reference
+
+See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (initialized 2026-10-04)
+
+**Core value:** One incomplete seed becomes structured intent, exactly three distinct creative worlds, a human-selected direction, and then a coherent persistent mini-universe whose evolution can be inspected and traced.  
+**Current focus:** Phase 1: Foundation / Project Shell (Ready to plan)
+
+## Current Position
+
+Phase: 1 of 8 (Foundation / Project Shell)  
+Plan: 0 of TBD in Phase 1  
+Status: Ready to plan Phase 1  
+Last activity: 2026-10-04 — Workspace initialized with GSD, project rules, project memory, Graphify, and organized documentation.
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0
+- Average duration: 0 min
+- Total execution time: 0 hours
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|---|---|---|---|
+| Phase 1: Foundation / Project Shell | - | - | - |
+| Phase 2: Seed Understanding + Seed DNA | - | - | - |
+| Phase 3: Three World Generation | - | - | - |
+| Phase 4: Human World Selection | - | - | - |
+| Phase 5: Progressive World Unfolding | - | - | - |
+| Phase 6: Traceability / Provenance | - | - | - |
+| Phase 7: Refine / Branch / Save | - | - | - |
+| Phase 8: Polish / Reliability / Demo | - | - | - |
+
+## Accumulated Context
+
+### Architectural & Product Decisions
+- **React + Vite + TypeScript**: Chosen for rapid frontend build velocity, strong typing, and rich animation support.
+- **FastAPI + Pydantic v2**: Chosen for asynchronous backend performance and strict schema validation of all AI outputs.
+- **Provider Abstraction**: Model access is decoupled behind `AIProvider` to allow hot-swapping between Gemini, OpenAI, Claude, and offline mocks.
+- **Exactly Three Worlds**: Strict architectural constraint reflecting Tattva 2 (latent forms from formlessness) without cognitive overload.
+- **Human Choice Gate**: AI generation strictly halts at three worlds until human selection is registered.
+- **Relational / JSON DAG Traceability**: No external graph database needed for MVP; parent-child DAG relations are modeled directly in SQLite/JSON.
+- **Canonical Demo Fixture**: "A child discovers a forgotten city beneath the ocean" configured with three pre-baked worlds for 100% demo resilience.
+
+### Important Constraints & Guardrails
+- Never mutate or discard the raw user seed.
+- Never expose raw model chain-of-thought or internal prompts in user-facing provenance nodes.
+- Media generation (images/audio/video) must remain strictly optional and non-blocking.
+- Do not introduce microservices or autonomous multi-agent swarms.
+
+### Pending Todos
+None yet.
+
+### Blockers / Concerns
+None.
+
+## Session Continuity
+
+Last session: 2026-10-04
+Stopped at: Workspace initialization complete with GSD, Project Memory, Project Rules, Graphify integration, and Documentation structure.
+Resume file: None (Ready for `/gsd-plan-phase 1`)

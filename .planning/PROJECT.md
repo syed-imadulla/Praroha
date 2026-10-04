@@ -2,71 +2,76 @@
 
 ## What This Is
 
-Seed Unfold is an AI-powered creative development engine that transforms a compact, incomplete idea or problem (the "seed") into multiple structured solution paths, empowers human choice, and progressively unfolds the selected direction into a comprehensive, buildable solution. Built around the theme *Tattva 2: Forms Hidden in the Formless*, it makes latent possibilities visible while maintaining end-to-end traceability from final artifacts back to the original seed.
+Seed Unfold is an AI-powered creative development workspace that transforms a single, incomplete idea or prompt (the "seed") into structured intent, generates exactly three distinct creative solution worlds, empowers the human user to choose a direction, and progressively unfolds the selected world into a coherent, persistent, and traceable mini-universe. Built around the philosophical theme *Tattva 2: Forms Hidden in the Formless*, it surfaces latent creative potential while maintaining strict parent-child lineage and explainability from the final artifacts back to the root seed.
 
 ## Core Value
 
-Progressive unfolding from normalized Seed DNA into exactly three distinct solution worlds, guided by explicit human choice, with transparent parent-child lineage tracing every generated artifact back to the root idea.
+One incomplete seed becomes structured intent, exactly three distinct creative worlds, a human-selected direction, and then a coherent persistent mini-universe whose evolution can be inspected and traced.
 
-## Business Context
+## Business & Hackathon Context
 
-- **Customer**: Hackathon teams, early-stage innovators, students, and project builders seeking rapid, explainable paths from idea to buildable prototype.
-- **Revenue model**: Hackathon project / Open developer tool / Future API-first SaaS.
-- **Success metric**: Time from seed input to complete buildable specification (< 5 minutes) with 100% lineage graph integrity.
-- **Strategy notes**: Aligned with Tattva 2 (*Forms Hidden in the Formless*) as specified in `startDocs/`.
+- **Customer / User**: Writers, game designers, filmmakers, hackathon builders, and creative technologists moving from ambiguity to concrete, buildable worlds.
+- **Product Metaphor**: A creative ideation IDE (not a chatbot; not an unguided text generator).
+- **Core Loop**: Seed → Understanding → Seed DNA → Exactly 3 Worlds → Human Choice → Selected World → Progressive Unfolding (World Bible, Characters, Relationships, Scenes, Assets) → Traceability → Refine / Branch → Save / Load.
+- **Theme Alignment**: *Tattva 2: Forms Hidden in the Formless*. The seed is formless potential; the three worlds expose multiple latent forms; human choice provides direction; unfolding manifests the chosen form into reality.
 
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Permanent project rules defined in `PROJECT_RULES.md`
+- [x] Documentation organized into `docs/` (`product/`, `architecture/`, `decisions/`, `wiki/`)
+- [x] GSD planning and state management initialized
+- [x] Graphify knowledge graph integration configured
 
-### Active
+### Active (MVP Scope)
 
-- [ ] Interactive Landing Page with central "unfolding seed" visual metaphor and product explanation
-- [ ] Seed input ingestion with validation, guidelines, and pre-seeded curated examples
-- [ ] Understand Stage constructing normalized Seed DNA (intent, problem, users, context, constraints, tone, domain, keywords)
-- [ ] Branching engine generating exactly three meaningfully distinct solution worlds (World A, B, C) with titles, loglines, and trade-offs
-- [ ] Human Comparison & Selection interface enabling side-by-side trade-off review and explicit selection
-- [ ] Visible Progressive Unfolding through 5–7 structured stages (e.g. Concept, World Bible / Context, Requirements, Feature Hierarchy, Tech & Prototype blueprint)
-- [ ] Traceability Lineage Graph dynamically rendering parent-child relationships from each output node back to Seed DNA
-- [ ] Project persistence storing projects, seeds, DNA, branches, selections, unfolded stages, and trace nodes
-- [ ] Refine and regenerate controls allowing modification of constraints or regeneration of specific stage outputs
-- [ ] Offline / Demo Fallback Mode with cached outputs to guarantee zero-downtime demonstration resilience
+- [ ] Interactive, calm dark workspace UI centered on progressive unfolding
+- [ ] Seed input ingestion with validation, input tips, and pre-seeded demo fixtures
+- [ ] Understanding stage extracting structured, canonical Seed DNA (premise, themes, entities, constraints, tone, domain keywords)
+- [ ] Branching engine generating exactly three meaningfully distinct solution/creative worlds
+- [ ] Human selection gate for side-by-side world comparison, trade-off review, and explicit choice
+- [ ] Progressive unfolding engine generating World Bible, Characters, Relationships, and Scenes
+- [ ] Traceability engine recording and displaying DAG parent-child lineage without exposing internal model chain-of-thought
+- [ ] Project persistence (saving/loading seeds, DNA, chosen worlds, unfolded universes, and lineage DAGs)
+- [ ] Refine (localized iteration) and Branch (timeline forking) controls
+- [ ] Deterministic demo fallback mode using the canonical underwater city fixtures for 100% demo resilience
 
-### Out of Scope
+### Out of Scope (MVP)
 
-- Microservices architecture — A clean React + Vite frontend and FastAPI backend is specified for high agility and reliability.
-- Mandatory video/audio generation — Multimodal audio/video are optional enhancements; core workflow must operate independently.
-- Custom model fine-tuning or training — Prompt engineering and structured Pydantic schemas over LLM provider adapters fulfill all requirements.
-- Real-time collaborative editing / multi-user concurrency — Focus is on single-user hackathon/innovator project creation.
-- Complex external vector database — Relational/JSON persistence and explicit trace graphs satisfy all lineage and retrieval needs without added operational overhead.
+- Full movie or high-fidelity video generation
+- Mandatory audio / voice cloning infrastructure
+- Real-time collaborative multi-user editing
+- Marketplace / community publishing platform
+- Autonomous multi-agent swarm orchestration
+- Complex external graph databases (e.g. Neo4j)
+- Custom model fine-tuning or training
 
 ## Context
 
-- The project specifications, architecture, and workflow are strictly defined in `startDocs/` (`Seed_Unfold_Complete_Project_Documentation.pdf`, `Seed Unfold technical project documentation.pdf`, `SEED UNFOLD product documentation.pdf`, and `Seed Unfold Architecture and Workflow.png`).
-- The workspace directory is named `Praroha` (Sanskrit/Hindi for "sprout / shoot / unfolding from a seed").
-- Frontend: React + Vite + Tailwind CSS / Vanilla CSS with rich animations highlighting progressive unfolding.
-- Backend: FastAPI, Pydantic schemas for structured LLM outputs, provider adapter pattern (`generate_text`, `generate_image`, etc.), and SQLite/JSON persistence.
-- Provider reliability: Keys reside exclusively on backend; graceful degradation to demo seeds if providers fail or timeout.
+- Workspace directory: `Praroha` (Sanskrit/Hindi for sprout / shoot / unfolding from a seed).
+- Frontend: React + Vite + TypeScript, styled with Tailwind CSS (calm dark theme) and Framer Motion for progressive disclosure.
+- Backend: Python 3.11+ with FastAPI, Pydantic v2 schemas for strict structured LLM outputs.
+- AI Provider: Provider abstraction (`AIProvider`) decoupling Gemini or other LLMs with deterministic fallbacks.
+- Lineage: In-memory and relational DAG nodes (`derived_from`, `selected_by`, `constrained_by`, `appears_in`, `generated_for`, `revised_from`, `branched_from`).
 
 ## Constraints
 
-- **Exact Three Worlds**: The branching engine must generate exactly three meaningfully distinct worlds (no more, no less).
-- **Human Choice Gate**: Unfolding cannot proceed autonomously without explicit human selection of a branch.
-- **Traceability**: Every generated artifact must store and display its lineage back to the root Seed DNA.
-- **Resilience**: The application must remain fully testable and demonstrable offline via curated demo seeds.
-- **Scope Discipline**: Scope cannot be expanded beyond the documented MVP without explicit user approval.
+- **Exact Three Worlds**: Exactly three distinct candidates must be generated before human selection—never fewer, never more.
+- **Human Choice Gate**: Generation cannot autonomously bypass the human selection step.
+- **Traceability**: Every generated entity must record its lineage back to Seed DNA and parent decisions.
+- **Canon Preservation**: Established canon facts and previous versions cannot be silently overwritten.
+- **No Chain-of-Thought Leakage**: Provenance explains *why* an output exists without exposing raw model internal scratchpads.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| React + Vite + FastAPI | Standardized, robust full-stack architecture recommended in technical project docs | ✓ Good |
-| Exactly 3 Worlds branching | Core USP embodying Tattva 2: multiple latent forms extracted from a single formless seed | ✓ Good |
-| Normalized Seed DNA schema | Preserves core intent and constraints across all downstream unfolding steps | ✓ Good |
-| Parent-Child Traceability Graph | Directly addresses the "AI black-box" gap by mapping every feature to root intent | ✓ Good |
-| Provider Adapter + Demo Fallbacks | Decouples AI providers and protects against live demo rate-limits/outages | ✓ Good |
+| React + Vite + FastAPI | Fast development velocity, async execution, clean typing across full stack | ✓ Accepted (ADR-001) |
+| Exactly 3 Worlds | Balances creative diversity with decision focus; embodies Tattva 2 | ✓ Accepted (ADR-002) |
+| Normalized Seed DNA Schema | Provides strict, immutable anchor for all downstream unfolding | ✓ Accepted |
+| DAG-based Traceability (No Graph DB) | Relational/JSON structures are simple, robust, and zero-dependency for MVP | ✓ Accepted (ADR-002) |
+| Provider Adapter + Demo Fallbacks | Decouples LLM vendor and guarantees 100% demo uptime | ✓ Accepted (ADR-001) |
 
 ---
-*Last updated: 2026-10-04 after project initialization*
+*Last updated: 2026-10-04 during initial workspace setup*
