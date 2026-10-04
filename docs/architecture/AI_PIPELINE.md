@@ -20,7 +20,7 @@ The AI layer in Praroha is decoupled behind an abstract base class [`AIProvider`
              ▼                                     ▼
    ┌───────────────────┐                 ┌───────────────────┐
    │  GeminiProvider   │                 │   MockProvider    │
-   │ (Gemini 2.5 Flash)│                 │  (Deterministic)  │
+   │ (Gemini 3.5 Flash)│                 │  (Deterministic)  │
    └─────────┬─────────┘                 └───────────────────┘
              │                                     ▲
              └────── [On Error / No Key / 429] ────┘
@@ -30,7 +30,7 @@ The AI layer in Praroha is decoupled behind an abstract base class [`AIProvider`
 ### Components
 1. **`AIProvider` (Abstract Base Class)**: Defines contract for `health_check()`, `extract_dna(seed)`, `generate_worlds(dna)`, `unfold_stage(stage, context)`, and `unfold_universe(context)`.
 2. **`GeminiProvider`**: Concrete provider communicating with Google's Generative Language REST API (`https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`).
-   - Configured Model: **`gemini-2.5-flash`** (`settings.GEMINI_MODEL`).
+   - Configured Model: **`gemini-3.5-flash`** (`settings.GEMINI_MODEL`).
    - Structured Outputs: Enforced via `generationConfig.responseMimeType = "application/json"` and strict `responseSchema` definitions.
    - Pydantic v2 Validation: Validates raw LLM outputs through `SeedDNA` and `WorldCandidate` models.
 3. **`MockProvider`**: High-fidelity deterministic provider returning structured domain fixtures for zero-cloud testing, offline development, and instantaneous competition judging.
@@ -46,10 +46,10 @@ The AI layer in Praroha is decoupled behind an abstract base class [`AIProvider`
 | Product Stage | Operation | AI Model | Request / Prompt | Output Schema | Database Record | Fallback Behavior |
 |---|---|---|---|---|---|---|
 | **Stage 1: Seed** | Creative Premise Capture | None (User Input) | Formless user premise string | Plain text string | `ProjectRecord.seed_text` | N/A |
-| **Stage 2: Understand** | Seed DNA Distillation | `gemini-2.5-flash` | System instruction + Seed text prompt asking for premise, themes, entities, constraints, tone, domain keywords | `SeedDNA` JSON object | `SeedDNARecord` (FK: `project_id`) | Falls back to `MockProvider.extract_dna()` with client toast warning |
-| **Stage 3: 3 Worlds** | World Manifestation Generation | `gemini-2.5-flash` | System prompt + Seed DNA JSON asking for exactly 3 high-contrast archetypes (Mythic, Ecological, Technological) | Array of 3 `WorldCandidate` objects | 3x `WorldCandidateRecord` (FK: `project_id`, `seed_dna_id`, `batch_id`) | Canonical ocean seed uses deterministic fixtures; custom seeds fall back to `MockProvider.generate_worlds()` |
+| **Stage 2: Understand** | Seed DNA Distillation | `gemini-3.5-flash` | System instruction + Seed text prompt asking for premise, themes, entities, constraints, tone, domain keywords | `SeedDNA` JSON object | `SeedDNARecord` (FK: `project_id`) | Falls back to `MockProvider.extract_dna()` with client toast warning |
+| **Stage 3: 3 Worlds** | World Manifestation Generation | `gemini-3.5-flash` | System prompt + Seed DNA JSON asking for exactly 3 high-contrast archetypes (Mythic, Ecological, Technological) | Array of 3 `WorldCandidate` objects | 3x `WorldCandidateRecord` (FK: `project_id`, `seed_dna_id`, `batch_id`) | Canonical ocean seed uses deterministic fixtures; custom seeds fall back to `MockProvider.generate_worlds()` |
 | **Stage 4: Choose** | Human Direction Gate | None (Human Agency) | Creator commits to 1 candidate with rationale | `WorldSelectionCreate` | `WorldSelectionRecord` (FK: `project_id`, `world_candidate_id`) | Architectural choice gate; stops autonomous generation until user selects |
-| **Stage 5: Unfold** | Multi-Layer Universe Expansion | `gemini-2.5-flash` | System prompt + Seed + Seed DNA + Selected World + Creator Rationale | `UnfoldedUniverseRead` (Bible, 3 Characters, Relationships, 3 Scenes) | `WorldBibleRecord`, `CharacterRecord`s, `SceneRecord`s, `EntityRevisionRecord`s | Canonical ocean seed returns verified Bio-City fixtures; custom seeds fall back to `MockProvider.unfold_universe()` |
+| **Stage 5: Unfold** | Multi-Layer Universe Expansion | `gemini-3.5-flash` | System prompt + Seed + Seed DNA + Selected World + Creator Rationale | `UnfoldedUniverseRead` (Bible, 3 Characters, Relationships, 3 Scenes) | `WorldBibleRecord`, `CharacterRecord`s, `SceneRecord`s, `EntityRevisionRecord`s | Canonical ocean seed returns verified Bio-City fixtures; custom seeds fall back to `MockProvider.unfold_universe()` |
 | **Stage 6: Trace** | Causal Lineage Synthesis | None (Relational DAG Engine) | Database query of entities & relationships | `TraceGraphRead` (Nodes & Directed Edges) | Synthesized dynamically from normalized DB state | Pure relational synthesis (100% deterministic, zero LLM CoT leakage) |
 | **Stage 7: Refine** | Component Refinement & Branching | None (Creator Action / Storage) | User edits character/scene traits with rationale; or forks branch | `EntityRevisionRecord`, `ProjectBundle`, `SnapshotAssetRecord` | `EntityRevisionRecord`, child `ProjectRecord` with remapped IDs | Clones state with zero foreign key leakage; persists snapshots to `StorageProvider` |
 
@@ -89,17 +89,20 @@ FALLBACK_WARNING_MESSAGE = (
 
 ## 4. Canonical Demo vs Live Custom Seed Operation
 
-### Canonical Instant Demo (`POST /api/projects/canonical-demo`)
-- **Nature**: 100% Deterministic Verified Fixture.
+Praroha supports a live Gemini + Supabase cloud pipeline for custom seeds, with deterministic fallback fixtures and local fallback paths for reliable demonstrations.
+
+### Deterministic Canonical Demo (`POST /api/projects/canonical-demo`)
+- **Nature**: Deterministic Canonical Demo — A pre-compiled, verified universe fixture that exercises the same application data model, persistence flow, lineage system, and frontend rendering without depending on an external LLM during presentation.
 - **Trigger**: "🌟 Instant Full Universe (Demo)" button or `TopBar` launcher.
 - **Backend Latency**: `< 50ms`.
 - **Purpose**: Guaranteed presentation resilience for live judge evaluation without latency, quota limits, or network dependencies.
-- **Transparency**: Explicitly documented as pre-compiled canonical fixtures for the canonical premise: *"A child discovers a forgotten city beneath the ocean."*
+- **Transparency**: Not described as a live Gemini generation; explicitly documented as pre-compiled canonical fixtures for the canonical premise: *"A child discovers a forgotten city beneath the ocean."*
 
-### Arbitrary Custom Seeds
+### True Live Generative Pipeline (Custom Seeds)
+- **Nature**: True Live Generative Pipeline: For custom audience prompts, Praroha can connect to the configured Gemini model through its `AIProvider` abstraction and persist application state through Supabase PostgreSQL and Supabase Storage when cloud mode is enabled.
 - **Trigger**: Entering custom premise text on Stage 1 and clicking "Distill Seed DNA".
 - **Execution Path**:
-  - If `GEMINI_API_KEY` is configured and active: Calls live **Gemini 2.5 Flash** endpoint with strict JSON schema.
+  - If `GEMINI_API_KEY` is configured and active: Calls live **Gemini 3.5 Flash** (`gemini-3.5-flash`) endpoint with strict JSON schema.
   - If `GEMINI_API_KEY` is unset or throttled: Gracefully executes deterministic mock generation with amber toast warning.
 
 ---

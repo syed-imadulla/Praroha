@@ -1,7 +1,7 @@
 # Graph Report - Praroha  (2026-10-04)
 
 ## Corpus Check
-- 162 files · ~194,181 words
+- 162 files · ~194,212 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 4 file(s) not represented in the graph (top: .example 1, (none) 1, .css 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a1f5d5f8`
+- Built from commit: `0f794807`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -523,9 +523,9 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `MockProvider` connect `MockProvider` to `Asset`, `routers/persistence.py`, `ProjectRepository`, `LocalStorageProvider`, `WorldCandidate`, `Implementation Decisions`, `GeminiProvider`, `test_providers.py`, `routers/dna.py`, `models/__init__.py`, `useWorkspaceStore`, `extract_seed_dna`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `Delivered Features`, `test_dna.py`, `AIProvider`, `project_repo.py`, `Praroha: Comprehensive Judge Explanation`, `2. Locked Implementation Decisions`?**
   _High betweenness centrality (0.140) - this node is a cross-community bridge._
 - **Why does `ProjectRepository` connect `ProjectRepository` to `Phase 1: Foundation / Project Shell - Research`, `Phase 1: Foundation / Project Shell - Context`, `Asset`, `routers/persistence.py`, `test_selection.py`, `WorldCandidate`, `Phase 1: Foundation / Project Shell - Discussion Log`, `LineageService`, `routers/dna.py`, `main.py`, `project.py`, `models/__init__.py`, `api_success`, `extract_seed_dna`, `world.py`, `Implementation Decisions`, `MockProvider`, `models/selection.py`, `Delivered Features`, `project_repo.py`, `httpx`, `StorageProvider`, `models/dna.py`, `Key Changes`?**
-  _High betweenness centrality (0.137) - this node is a cross-community bridge._
+  _High betweenness centrality (0.138) - this node is a cross-community bridge._
 - **Why does `1. Test Automation Matrix` connect `useWorkspaceStore` to `GeminiProvider`, `models/__init__.py`, `api_success`, `MockProvider`?**
-  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+  _High betweenness centrality (0.113) - this node is a cross-community bridge._
 - **Are the 47 inferred relationships involving `ProjectRepository` (e.g. with `SeedDNA` and `SeedDNARecord`) actually correct?**
   _`ProjectRepository` has 47 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 30 inferred relationships involving `PersistenceService` (e.g. with `branch_project()` and `create_storage_snapshot()`) actually correct?**

@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791105839.794864,
-    "seen": 1791106275.8671625,
-    "ast_hash": "abe4fd4ef0eae95a49c6a79cc7be84e3",
+    "mtime": 1791114033.7960932,
+    "seen": 1791114187.4602225,
+    "ast_hash": "337ba254059e49de572fdff18c2b861a",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorldCandidatesCanvas.tsx": {
-    "mtime": 1791087783.3819215,
-    "seen": 1791088121.363054,
-    "ast_hash": "0cacb1bbb1a22a325b003ccadd9a6c91",
+    "mtime": 1791114021.3572469,
+    "seen": 1791114187.4602187,
+    "ast_hash": "66323e60e110822fce2f4ce46d02a7c9",
     "semantic_hash": ""
   },
   ".planning/phases/03-three-world-generation/03-01-SUMMARY.md": {
@@ -756,9 +756,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase6_traceability.cjs": {
-    "mtime": 1791112844.8537695,
-    "seen": 1791113214.8191788,
-    "ast_hash": "b8785846393756a42c4727c286be8f60",
+    "mtime": 1791113861.46522,
+    "seen": 1791114187.4601893,
+    "ast_hash": "55e9e4a736c5624b4d11d20350ffac98",
     "semantic_hash": ""
   },
   "frontend/src/components/TraceabilityCanvas.tsx": {
@@ -870,9 +870,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase7_refine.cjs": {
-    "mtime": 1791112555.9283376,
-    "seen": 1791113214.8191822,
-    "ast_hash": "5650cb36fbab9bfbb3ea465c9d8a6a71",
+    "mtime": 1791113876.7820308,
+    "seen": 1791114187.4601915,
+    "ast_hash": "b0d5ef56c37b8c2e67d7b7c68b1287e9",
     "semantic_hash": ""
   },
   "frontend/src/components/RefineCanvas.tsx": {

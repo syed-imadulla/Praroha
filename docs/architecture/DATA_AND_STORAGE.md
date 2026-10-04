@@ -16,7 +16,7 @@ Praroha enforces a clean architectural separation between **Structured Relationa
           ▼                       ▼                       ▼
    AIProvider Layer       Relational Database     StorageProvider Layer
   ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────────┐
-  │Gemini 2.5 Flash │    │ SQLModel (ORM)  │    │ LocalStorageProvider│
+  │Gemini 3.5 Flash │    │ SQLModel (ORM)  │    │ LocalStorageProvider│
   │  / MockProvider │    │ SQLite (Dev) /  │    │  (./uploads/)       │
   └─────────────────┘    │ Postgres (Prod) │    ├─────────────────────┤
                          └─────────────────┘    │SupabaseStorageProvider
@@ -76,9 +76,10 @@ Safely inspected from active environment:
 | `AI_PROVIDER` | `mock` | **NOT CONFIGURED** (Using mock default) | `MockProvider` |
 
 ### Key Takeaway for Judges
-- **Active Environment**: 100% self-contained local development environment running SQLite and `LocalStorageProvider`.
-- **Zero Cloud Leakage**: No external cloud service subscriptions or internet connections are required to run, test, or judge the application.
-- **Production Architecture**: The codebase is architected with clean pluggable interfaces ready to connect to PostgreSQL and Supabase Storage simply by setting environment variables in `.env`.
+- **Pipeline Flexibility**: Praroha supports a live Gemini + Supabase cloud pipeline for custom seeds, with deterministic fallback fixtures and local fallback paths for reliable demonstrations.
+- **True Live Generative Pipeline**: For custom audience prompts, Praroha can connect to the configured Gemini model through its `AIProvider` abstraction and persist application state through Supabase PostgreSQL and Supabase Storage when cloud mode is enabled.
+- **Deterministic Canonical Demo**: A pre-compiled, verified universe fixture that exercises the same application data model, persistence flow, lineage system, and frontend rendering without depending on an external LLM during presentation.
+- **Zero-Cloud Local Fallback**: When cloud credentials are not configured or external networks are offline, the local SQLite database and `LocalStorageProvider` fallback paths ensure 100% functionality with zero cloud dependency.
 
 ---
 

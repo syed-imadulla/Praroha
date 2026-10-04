@@ -17796,7 +17796,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/e2e/test_phase6_traceability.cjs",
-      "source_location": "L89",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -17808,7 +17808,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/e2e/test_phase7_refine.cjs",
-      "source_location": "L89",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -18504,7 +18504,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/components/WorldCandidatesCanvas.tsx",
-      "source_location": "L179",
+      "source_location": "L181",
       "weight": 1.0
     },
     {
@@ -48691,5 +48691,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a1f5d5f8eafe2da39eccefa5622ba75ddb27b0d1"
+  "built_at_commit": "0f7948079e9de83f63ffe37996dca19e6932d2fb"
 }

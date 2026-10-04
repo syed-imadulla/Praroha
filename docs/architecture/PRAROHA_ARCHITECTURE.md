@@ -92,7 +92,7 @@ The 7 product stages are the **internal execution pipeline** through which Praro
 │  (Abstract Factory)  │   │  (SQLModel / ORM)    │   │ (Abstract Storage)│
 ├──────────────────────┤   ├──────────────────────┤   ├───────────────────┤
 │ • GeminiProvider     │   │ • SQLite (Dev/Demo)  │   │ • LocalStorage    │
-│   (gemini-2.5-flash) │   │ • PostgreSQL (Prod)  │   │   (./uploads/)    │
+│   (gemini-3.5-flash) │   │ • PostgreSQL (Prod)  │   │   (./uploads/)    │
 │ • MockProvider       │   │ • Tables:            │   │ • SupabaseStorage │
 │   (Deterministic     │   │   - projects         │   │   (Cloud Bucket)  │
 │    Canonical Fixtures│   │   - seed_dna         │   │ • Operations:     │
@@ -115,4 +115,5 @@ The 7 product stages are the **internal execution pipeline** through which Praro
 2. **Immutable Seed & Version History**: The original seed text and entity revision snapshots are immutable. Character and scene refinements generate incremental versioned snapshots (`v1 -> v2`) in the audit log.
 3. **Causal Lineage Synthesis**: The provenance DAG is synthesized dynamically from foreign keys and relational metadata. It is 100% deterministic, auditable, and completely free of raw LLM reasoning tokens.
 4. **Isolated Timeline Branching**: Forking a timeline creates a child project with completely remapped foreign keys, guaranteeing zero cross-branch state mutations.
-5. **Deterministic Demo Resilience**: The canonical ocean seed (*"A child discovers a forgotten city beneath the ocean."*) hydrates in `< 500ms` from verified fixtures, ensuring foolproof hackathon presentations even during network outages.
+5. **Deterministic Canonical Demo**: A pre-compiled, verified universe fixture that exercises the same application data model, persistence flow, lineage system, and frontend rendering without depending on an external LLM during presentation. The canonical ocean seed (*"A child discovers a forgotten city beneath the ocean."*) hydrates in `< 500ms`, ensuring foolproof hackathon presentations even during network outages.
+6. **Pipeline Modes & Fallbacks**: Praroha supports a live Gemini + Supabase cloud pipeline for custom seeds, with deterministic fallback fixtures and local fallback paths for reliable demonstrations. When cloud mode is enabled, custom prompts connect to Gemini 3.5 Flash and persist via Supabase PostgreSQL and Supabase Storage; otherwise, seamless local/mock fallbacks provide complete resilience.

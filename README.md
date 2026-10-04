@@ -84,7 +84,7 @@ Stage 7: Refine (Evolution while Preserving Continuity)
 ┌──────────────────────────────┐ ┌─────────────────────────────┐
 │      AIProvider Layer        │ │    StorageProvider Layer    │
 │ • GeminiProvider             │ │ • LocalStorageProvider      │
-│   (gemini-2.5-flash)         │ │   (./uploads/)              │
+│   (gemini-3.5-flash)         │ │   (./uploads/)              │
 │ • MockProvider               │ │ • SupabaseStorageProvider   │
 │   (Deterministic Fixtures)   │ │   (Cloud Object Storage)    │
 └──────────────────────────────┘ └─────────────────────────────┘
@@ -92,11 +92,14 @@ Stage 7: Refine (Evolution while Preserving Continuity)
 
 ---
 
-## 6. AI Models & Reliability
+## 6. AI Models, Reliability & Architecture Modes
 
-- **Active Model**: Google **Gemini 2.5 Flash** (`gemini-2.5-flash`) via REST API with strict JSON schema enforcement (`responseMimeType: "application/json"`).
-- **Graceful Provider Fallback**: If `GEMINI_API_KEY` is unset, rate-limited (HTTP 429), or disconnected, the backend automatically falls back to deterministic fixtures without crashing.
-- **Deterministic Canonical Demo**: The canonical demo seed (*"A child discovers a forgotten city beneath the ocean"*) hydrates in `< 500ms` from verified fixtures, ensuring foolproof hackathon judging resilience.
+- **Active Model**: Google **Gemini 3.5 Flash** (`gemini-3.5-flash`) via REST API with strict JSON schema enforcement (`responseMimeType: "application/json"`).
+- **Architecture Modes & Reliability**:
+  - **Live Pipeline**: Praroha supports a live Gemini + Supabase cloud pipeline for custom seeds, with deterministic fallback fixtures and local fallback paths for reliable demonstrations.
+  - **True Live Generative Pipeline**: For custom audience prompts, Praroha can connect to the configured Gemini model through its `AIProvider` abstraction and persist application state through Supabase PostgreSQL and Supabase Storage when cloud mode is enabled.
+  - **Deterministic Canonical Demo**: A pre-compiled, verified universe fixture that exercises the same application data model, persistence flow, lineage system, and frontend rendering without depending on an external LLM during presentation. The canonical demo seed (*"A child discovers a forgotten city beneath the ocean"*) hydrates in `< 500ms`, ensuring foolproof hackathon judging resilience.
+  - **Graceful Fallback**: If Gemini is unavailable, the application can gracefully use deterministic `MockProvider` fixtures. If cloud database/storage configuration is unavailable, the existing local fallback (SQLite + local disk storage) remains available.
 
 ---
 
@@ -132,9 +135,9 @@ npm --prefix frontend run dev
 ## 8. Technology Stack
 - **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Framer Motion, Zustand.
 - **Backend**: FastAPI, SQLModel, Pydantic v2, aiosqlite / SQLite (dev) / PostgreSQL (prod).
-- **AI Engine**: Google Gemini 2.5 Flash, MockProvider fallback.
+- **AI Engine**: Google Gemini 3.5 Flash, MockProvider fallback.
 - **Storage**: Local filesystem (`./uploads`), Supabase Storage interface.
-- **Testing**: Pytest (48 backend tests), Playwright E2E suite.
+- **Testing**: Pytest (53 backend tests), Playwright E2E suite.
 
 ---
 
