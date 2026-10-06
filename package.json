@@ -5,7 +5,7 @@
   "description": "Human-guided generative AI engine turning seeds into traceable mini-universes",
   "scripts": {
     "dev": "concurrently -n \"api,web\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd backend && uvicorn app.main:app --reload --port 8000",
+    "dev:backend": "PYTHONPATH=. sh -c '[ -f .venv/bin/uvicorn ] && .venv/bin/uvicorn backend.app.main:app --reload --port 8000 || uvicorn backend.app.main:app --reload --port 8000'",
     "dev:frontend": "npm run dev --prefix frontend",
     "test:backend": "pytest -v backend/tests",
     "test:frontend": "npm test --prefix frontend",
