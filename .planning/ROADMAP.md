@@ -198,6 +198,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Upgrade provenance with universal entity origin classifications and an interactive "Why is this here?" explainer.  
 **Depends on**: Phase 11  
 **Requirements**: ORIG-01, ORIG-02, ORIG-03  
+**Plans**: 2 plans
+- [ ] **12-01-PLAN.md** (Wave 1): Backend Origin Ledger Engine (Entity Models, Non-Destructive DB Migration, Deterministic Causal Explainer & Pytest Suite)
+- [ ] **12-02-PLAN.md** (Wave 2): Frontend Origin Ledger UI (Origin Badges, "Why is this here?" Modal, DAG Accents & Filtering, Lineage Metrics & Playwright E2E Suite)
 **Success Criteria**:
   1. Universe entities carry origin classifications (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, `DERIVED`, `AI_INTRODUCED`, `USER_ADDED`).
   2. Provenance DAG renders origin badges and visual color accents.
