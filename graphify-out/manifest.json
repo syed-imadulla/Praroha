@@ -1204,5 +1204,11 @@
     "seen": 1791375803.2919567,
     "ast_hash": "d54b0c46bc36498789c4adc434e9833f",
     "semantic_hash": ""
+  },
+  ".planning/phases/12-origin-ledger/12-UAT.md": {
+    "mtime": 1791376015.9430225,
+    "seen": 1791376034.4154325,
+    "ast_hash": "8bb98ecf16ec92ecc8b67f4a0ec48093",
+    "semantic_hash": ""
   }
 }
