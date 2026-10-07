@@ -3,6 +3,11 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
 
 
+class ProviderUnavailableError(Exception):
+    """Raised when a media provider is unconfigured, unreachable, or exhausts retries."""
+    pass
+
+
 class MediaPayload(BaseModel):
     """Encapsulates generated binary payload and metadata from any modal provider."""
 

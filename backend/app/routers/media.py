@@ -108,6 +108,10 @@ async def list_media_assets(
             prompt=a.prompt,
             provider_name=a.provider_name,
             error_message=a.error_message,
+            width=a.width,
+            height=a.height,
+            aspect_ratio=a.aspect_ratio,
+            metadata_json=a.metadata_json,
             created_at=a.created_at,
             completed_at=a.completed_at,
         )

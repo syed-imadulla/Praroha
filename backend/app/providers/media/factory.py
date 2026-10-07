@@ -14,6 +14,16 @@ from backend.app.providers.media.mock import (
     MockVideoProvider,
     MockVoiceProvider,
 )
+from backend.app.providers.media.composite import CompositeImageProvider
+from backend.app.providers.media.composite_voice import CompositeVoiceProvider
+from backend.app.providers.media.composite_video import CompositeVideoProvider
+from backend.app.providers.media.composite_audio import CompositeAudioProvider
+from backend.app.providers.media.edge_tts import EdgeTTSProvider
+from backend.app.providers.media.kokoro import KokoroVoiceProvider
+from backend.app.providers.media.pyramid_flow import PyramidFlowProvider
+from backend.app.providers.media.wan import WanVideoProvider
+from backend.app.providers.media.ace_step import ACEStepAudioProvider
+from backend.app.providers.media.stable_audio import StableAudioOpenProvider
 
 
 class ConfiguredMediaProvider(MediaProvider):
@@ -49,35 +59,32 @@ class MediaProviderFactory:
 
     @classmethod
     def get_image_provider(cls) -> ImageProvider:
-        provider_name = os.getenv("IMAGE_PROVIDER", "mock").lower()
+        provider_name = os.getenv("IMAGE_PROVIDER", "pollinations").lower()
         if provider_name == "mock":
             return MockImageProvider()
-        # Downstream (Phase 14): add Pollinations / Flux
-        return MockImageProvider()
+        return CompositeImageProvider()
 
     @classmethod
     def get_voice_provider(cls) -> VoiceProvider:
-        provider_name = os.getenv("VOICE_PROVIDER", "mock").lower()
+        provider_name = os.getenv("VOICE_PROVIDER", "edge_tts").lower()
         if provider_name == "mock":
             return MockVoiceProvider()
-        # Downstream (Phase 15): add Edge TTS / Kokoro
-        return MockVoiceProvider()
+        return CompositeVoiceProvider()
+
 
     @classmethod
     def get_video_provider(cls) -> VideoProvider:
-        provider_name = os.getenv("VIDEO_PROVIDER", "mock").lower()
+        provider_name = os.getenv("VIDEO_PROVIDER", "pyramid_flow").lower()
         if provider_name == "mock":
             return MockVideoProvider()
-        # Downstream (Phase 16): add Pyramid Flow / Wan
-        return MockVideoProvider()
+        return CompositeVideoProvider()
 
     @classmethod
     def get_audio_provider(cls) -> AudioProvider:
-        provider_name = os.getenv("AUDIO_PROVIDER", "mock").lower()
+        provider_name = os.getenv("AUDIO_PROVIDER", "ace_step").lower()
         if provider_name == "mock":
             return MockAudioProvider()
-        # Downstream (Phase 17): add ACE-Step
-        return MockAudioProvider()
+        return CompositeAudioProvider()
 
     @classmethod
     def get_media_provider(cls) -> MediaProvider:

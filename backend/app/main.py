@@ -12,6 +12,8 @@ from backend.app.routers.dna import router as dna_router
 from backend.app.routers.health import router as health_router
 from backend.app.routers.lineage import router as lineage_router
 from backend.app.routers.media import router as media_router
+from backend.app.routers.mutation import router as mutation_router
+from backend.app.routers.counterfactual import router as counterfactual_router
 from backend.app.routers.persistence import router as persistence_router
 from backend.app.routers.potential import router as potential_router
 from backend.app.routers.projects import router as projects_router
@@ -68,6 +70,8 @@ app.include_router(selection_router, prefix=settings.API_V1_PREFIX)
 app.include_router(unfold_router, prefix=settings.API_V1_PREFIX)
 app.include_router(lineage_router, prefix=settings.API_V1_PREFIX)
 app.include_router(persistence_router, prefix=settings.API_V1_PREFIX)
+app.include_router(mutation_router, prefix=settings.API_V1_PREFIX)
+app.include_router(counterfactual_router, prefix=settings.API_V1_PREFIX)
 app.include_router(media_router, prefix=settings.API_V1_PREFIX)
 
 # Ensure upload directory exists and is mounted for static asset retrieval

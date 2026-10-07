@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import math
 import struct
@@ -51,7 +52,12 @@ def _generate_wav_bytes(duration_sec: float = 1.0, freq: float = 330.0, sample_r
 
 def _generate_svg_bytes(title: str, aspect_ratio: str = "1:1") -> bytes:
     """Generate a clean, high-aesthetic responsive SVG graphic."""
-    width, height = (800, 800) if aspect_ratio == "1:1" else (1200, 675)
+    if aspect_ratio == "1:1":
+        width, height = (800, 800)
+    elif aspect_ratio == "9:16":
+        width, height = (720, 1280)
+    else:
+        width, height = (1200, 675)
     clean_title = (title or "Universe Visual Asset")[:60]
     
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="100%">
@@ -105,31 +111,44 @@ def _generate_svg_bytes(title: str, aspect_ratio: str = "1:1") -> bytes:
     return svg.encode("utf-8")
 
 
+_PLAYABLE_MP4_B64 = (
+    "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAARmbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQ"
+    "AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg"
+    "AAA5F0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAA"
+    "AAAAAAAAAAAAAAABAAAAAAUAAAADwAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAEAAABAAAAAAMJbWRpYQAAACBtZG"
+    "hkAAAAAAAAAAAAAAAAAAAyAAAAMgBVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAACtG"
+    "1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAnRzdGJsAAAAwHN0c2"
+    "QAAAAAAAAAAQAAALBhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAUAA8ABIAAAASAAAAAAAAAABFUxhdmM2Mi4xMS4xMDAgbG"
+    "lieDI2NAAAAAAAAAAAAAAAGP//AAAANmF2Y0MBZAAN/+EAGWdkAA2s2UFB+wEQAAADABAAAAMDIPFCmWABAAZo6+PLIsD9+PgAAA"
+    "AAEHBhc3AAAAABAAAAAQAAABRidHJ0AAAAAAAAI1gAAAAAAAAAGHN0dHMAAAAAAAAAAQAAABkAAAIAAAAAFHN0c3MAAAAAAAAAAQ"
+    "AAAAEAAADYY3R0cwAAAAAAAAAZAAAAAQAABAAAAAABAAAKAAAAAAEAAAQAAAAAAQAAAAAAAAABAAACAAAAAAEAAAoAAAAAAQAABAAA"
+    "AAABAAAAAAAAAAEAAAIAAAAAAQAACgAAAAABAAAEAAAAAAEAAAAAAAAAAQAAAgAAAAABAAAKAAAAAAEAAAQAAAAAAQAAAAAAAAAB"
+    "AAACAAAAAAEAAAoAAAAAAQAABAAAAAABAAAAAAAAAAEAAAIAAAAAAQAACgAAAAABAAAEAAAAAAEAAAAAAAAAAQAAAgAAAAAcc3Rz"
+    "YwAAAAAAAAABAAAAAQAAABkAAAABAAAAeHN0c3oAAAAAAAAAAAAAABkAAALjAAAAEQAAAA4AAAAOAAAADgAAABcAAAAQAAAADgAA"
+    "AA4AAAAXAAAAEAAAAA4AAAAOAAAAFwAAABAAAAAOAAAADgAAABYAAAAQAAAADgAAAA4AAAAWAAAAEAAAAA4AAAAOAAAAFHN0Y28A"
+    "AAAAAAAAAQAABJYAAABhdWR0YQAAAFltZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAACxpbHN0AAAA"
+    "JKl0b28AAAAcZGF0YQAAAAEAAAAATGF2ZjYyLjMuMTAwAAAACGZyZWUAAARzbWRhdAAAAqAGBf//nNxF6b3m2Ui3lizYINkj7u94"
+    "MjY0IC0gY29yZSAxNjUgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDI1IC0gaHR0cDovL3d3dy52"
+    "aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MSByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgzOjB4"
+    "MTEzIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21l"
+    "PTEgdHJlbGxpcz0xIDh4OGRjdD0xIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PS0y"
+    "IHRocmVhZHM9NyBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9"
+    "MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTMgYl9weXJhbWlkPTIgYl9hZGFwdD0xIGJfYmlh"
+    "cz0wIGRpcmVjdD0xIHdlaWdodGI9MSBvcGVuX2dvcD0wIHdlaWdodHA9MiBrZXlpbnQ9MjUwIGtleWludF9taW49MjUgc2NlbmVj"
+    "dXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBx"
+    "cG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAA7ZYiEADv//vdOvwKbVMIqA5JXCvbK"
+    "pCZZuVJrAfKmAADzSlmhv3vLXujwBQgAAGzEsx3RIaU4jI83Q4EAAAANQZokbEO//qmWAABvwAAAAApBnkJ4hf8AAIOBAAAACgGe"
+    "YXRCvwAAtoAAAAAKAZ5jakK/AAC2gQAAABNBmmhJqEFomUwId//+qZYAAG/BAAAADEGehkURLC//AACDgQAAAAoBnqV0Qr8AALaB"
+    "AAAAKAGep2pCvwAAtoAAAAATQZqsSahBbJlMCHf//qmWAABvwAAAAAxBnspFFSwv/wAAg4EAAAAKAZ7pdEK/AAC2gAAAAAoBnutq"
+    "Qr8AALaAAAAAE0Ga8EmoQWyZTAhv//6nhAAA3oEAAAAMQZ8ORRUsL/8AAIOBAAAACgGfLXRCvwAAtoEAAAAKAZ8vakK/AAC2gAAA"
+    "ABJBmzRJqEFsmUwIZ//+nhAAA2YAAAAMQZ9SRRUsL/8AAIOBAAAACgGfcXRCvwAAtoAAAAAKAZ9zakK/AAC2gAAAABJBm3hJqEFs"
+    "mUwIV//+OEAADUkAAAAMQZ+WRRUsL/8AAIOAAAAACgGftXRCvwAAtoEAAAAKAZ+3akK/AAC2gQ=="
+)
+
+
 def _generate_minimal_mp4_bytes() -> bytes:
-    """Generate a lightweight valid ISO base media file (MP4 container with ftyp/moov/mdat)."""
-    # Standard ISO-BMFF minimal ftyp box
-    ftyp_data = b"isom" + b"\x00\x00\x02\x00" + b"isom" + b"iso2" + b"mp41"
-    ftyp_box = struct.pack(">I4s", 8 + len(ftyp_data), b"ftyp") + ftyp_data
-    
-    # Empty minimal mdat box
-    mdat_box = struct.pack(">I4s", 8, b"mdat")
-    
-    # Minimal moov box
-    mvhd_data = (
-        b"\x00" * 4 +  # version & flags
-        b"\x00" * 8 +  # creation & modification time
-        struct.pack(">II", 600, 600) +  # timescale (600), duration (600 = 1s)
-        b"\x00\x01\x00\x00" +  # rate 1.0
-        b"\x01\x00" + b"\x00" * 2 +  # volume 1.0 + reserved
-        b"\x00" * 8 +  # reserved
-        b"\x00\x01\x00\x00" + b"\x00" * 12 + b"\x00\x01\x00\x00" + b"\x00" * 16 + b"\x40\x00\x00\x00" +  # unity matrix
-        b"\x00" * 24 +  # pre-defined
-        struct.pack(">I", 2)  # next track id
-    )
-    mvhd_box = struct.pack(">I4s", 8 + len(mvhd_data), b"mvhd") + mvhd_data
-    moov_box = struct.pack(">I4s", 8 + len(mvhd_box), b"moov") + mvhd_box
-    
-    return ftyp_box + moov_box + mdat_box
+    """Generate a valid browser-playable ISO base media file (MP4 container with ftyp/moov/trak/mdat)."""
+    return base64.b64decode(_PLAYABLE_MP4_B64)
 
 
 class MockImageProvider(ImageProvider):
@@ -143,14 +162,23 @@ class MockImageProvider(ImageProvider):
     ) -> MediaPayload:
         title = (context or {}).get("entity_title") or prompt.split(".")[0][:40]
         data = _generate_svg_bytes(title, aspect_ratio)
+        if aspect_ratio == "1:1":
+            width, height = (800, 800)
+        elif aspect_ratio == "9:16":
+            width, height = (720, 1280)
+        else:
+            width, height = (1200, 675)
         file_hash = hashlib.md5(f"{prompt}_{aspect_ratio}".encode("utf-8")).hexdigest()[:10]
         return MediaPayload(
             data=data,
             mime_type="image/svg+xml",
             filename=f"mock_image_{file_hash}.svg",
             metadata={
+                "width": width,
+                "height": height,
                 "aspect_ratio": aspect_ratio,
                 "provider": "MockImageProvider",
+                "resolved_provider": "mock",
                 "mock": True,
                 "prompt": prompt,
             },
@@ -169,12 +197,15 @@ class MockVoiceProvider(VoiceProvider):
         duration = min(6.0, max(1.5, len(text) * 0.05))
         data = _generate_wav_bytes(duration_sec=duration, freq=280.0)
         file_hash = hashlib.md5(f"{text}_{voice_id}".encode("utf-8")).hexdigest()[:10]
+        persona = (context or {}).get("persona") or (voice_id if voice_id != "default" else "narrator-deep")
         return MediaPayload(
             data=data,
             mime_type="audio/wav",
             filename=f"mock_voice_{file_hash}.wav",
             metadata={
                 "voice_id": voice_id,
+                "persona": persona,
+                "resolved_provider": "mock",
                 "duration_sec": duration,
                 "provider": "MockVoiceProvider",
                 "mock": True,
@@ -183,8 +214,9 @@ class MockVoiceProvider(VoiceProvider):
         )
 
 
+
 class MockVideoProvider(VideoProvider):
-    """Deterministic mock video provider generating valid minimal MP4 clip payloads."""
+    """Deterministic mock video provider generating valid, browser-playable MP4 clip payloads."""
 
     async def generate_video(
         self,
@@ -194,12 +226,16 @@ class MockVideoProvider(VideoProvider):
     ) -> MediaPayload:
         data = _generate_minimal_mp4_bytes()
         file_hash = hashlib.md5(f"{prompt}_{duration_sec}".encode("utf-8")).hexdigest()[:10]
+        aspect_ratio = (context or {}).get("aspect_ratio") or "16:9"
         return MediaPayload(
             data=data,
             mime_type="video/mp4",
             filename=f"mock_video_{file_hash}.mp4",
             metadata={
+                "resolved_provider": "mock",
                 "duration_sec": duration_sec,
+                "aspect_ratio": aspect_ratio,
+                "resolution": "720p",
                 "provider": "MockVideoProvider",
                 "mock": True,
                 "prompt": prompt,
@@ -210,6 +246,15 @@ class MockVideoProvider(VideoProvider):
 class MockAudioProvider(AudioProvider):
     """Deterministic mock audio provider generating ambient WAV soundscapes."""
 
+    MOOD_FREQUENCIES = {
+        "serene-ambient": 196.0,   # G3 warm drone
+        "ambient": 196.0,          # G3 warm drone
+        "tense-dramatic": 110.0,   # A2 low tension drone
+        "mystic-ethereal": 329.63, # E4 shimmering resonance
+        "ominous-drone": 73.42,    # D2 sub-bass foundation
+        "epic-orchestral": 220.0,  # A3 brass harmonic
+    }
+
     async def generate_audio(
         self,
         prompt: str,
@@ -217,8 +262,7 @@ class MockAudioProvider(AudioProvider):
         duration_sec: int = 15,
         context: Optional[Dict[str, Any]] = None,
     ) -> MediaPayload:
-        # Lower harmonic frequency for ambient soundscapes
-        freq = 196.0 if mood == "ambient" else 261.63
+        freq = self.MOOD_FREQUENCIES.get(mood, 196.0)
         duration = min(8.0, max(2.0, float(duration_sec)))
         data = _generate_wav_bytes(duration_sec=duration, freq=freq)
         file_hash = hashlib.md5(f"{prompt}_{mood}".encode("utf-8")).hexdigest()[:10]
@@ -227,6 +271,7 @@ class MockAudioProvider(AudioProvider):
             mime_type="audio/wav",
             filename=f"mock_audio_{file_hash}.wav",
             metadata={
+                "resolved_provider": "mock",
                 "mood": mood,
                 "duration_sec": duration,
                 "provider": "MockAudioProvider",

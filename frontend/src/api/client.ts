@@ -24,6 +24,13 @@ import {
   MediaGenerationRequest,
   MediaProviderHealth,
   MediaType,
+  PremiseVariable,
+  SeedMutationRequest,
+  MutationSimulationResponse,
+  ForkMutationRequest,
+  CounterfactualCandidate,
+  CounterfactualDeltaResponse,
+  ForkCounterfactualRequest,
 } from '../types';
 
 class ApiClient {
@@ -281,6 +288,58 @@ class ApiClient {
 
   async getMediaProvidersHealth(): Promise<APIResponse<MediaProviderHealth>> {
     return this.request<MediaProviderHealth>('/media/providers/health');
+  }
+
+  async getPremiseVariables(projectId: string): Promise<APIResponse<PremiseVariable[]>> {
+    return this.request<PremiseVariable[]>(`/projects/${projectId}/mutation/variables`);
+  }
+
+  async simulateMutation(
+    projectId: string,
+    payload: SeedMutationRequest
+  ): Promise<APIResponse<MutationSimulationResponse>> {
+    return this.request<MutationSimulationResponse>(`/projects/${projectId}/mutation/simulate`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async forkMutatedUniverse(
+    projectId: string,
+    payload: ForkMutationRequest
+  ): Promise<APIResponse<Project>> {
+    return this.request<Project>(`/projects/${projectId}/mutation/fork`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getCounterfactualCandidates(
+    projectId: string
+  ): Promise<APIResponse<CounterfactualCandidate[]>> {
+    return this.request<CounterfactualCandidate[]>(
+      `/projects/${projectId}/counterfactual/candidates`
+    );
+  }
+
+  async getCounterfactualDelta(
+    projectId: string,
+    candidateId: string,
+    useAi = true
+  ): Promise<APIResponse<CounterfactualDeltaResponse>> {
+    return this.request<CounterfactualDeltaResponse>(
+      `/projects/${projectId}/counterfactual/delta/${candidateId}?use_ai=${useAi}`
+    );
+  }
+
+  async forkCounterfactualBranch(
+    projectId: string,
+    payload: ForkCounterfactualRequest
+  ): Promise<APIResponse<Project>> {
+    return this.request<Project>(`/projects/${projectId}/counterfactual/fork`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 }
 

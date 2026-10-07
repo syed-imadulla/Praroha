@@ -59,6 +59,7 @@ class PersistenceService:
             parent_project_id=source.id,
             branch_name=request.branch_name,
             selected_world_id=None,
+            mutation_metadata_json=source.mutation_metadata_json,
         )
         self.repo.session.add(child_project)
         await self.repo.session.flush()

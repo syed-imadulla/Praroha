@@ -35,6 +35,8 @@ export interface Project {
   selected_world_id?: string | null;
   parent_project_id?: string | null;
   branch_name?: string;
+  mutation_metadata_json?: string | null;
+  counterfactual_metadata_json?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -420,6 +422,10 @@ export interface MediaAsset {
   prompt: string;
   provider_name: string;
   error_message?: string | null;
+  width?: number | null;
+  height?: number | null;
+  aspect_ratio?: string | null;
+  metadata_json?: string | null;
   created_at: string;
   completed_at?: string | null;
 }
@@ -451,6 +457,238 @@ export interface MediaProviderHealth {
   provider: string;
   modalities: Record<string, string>;
   offline_ready?: boolean;
+}
+
+export interface VoicePersona {
+  id: string;
+  name: string;
+  voice: string;
+  description: string;
+  recommendedFor: string;
+}
+
+export const CURATED_VOICE_PERSONAS: VoicePersona[] = [
+  {
+    id: 'narrator-deep',
+    name: 'Deep Cinematic Narrator',
+    voice: 'en-US-ChristopherNeural',
+    description: 'Deep, steady, authoritative tone',
+    recommendedFor: 'Scenes & World Lore',
+  },
+  {
+    id: 'protagonist-resolute',
+    name: 'Resolute Protagonist',
+    voice: 'en-US-GuyNeural',
+    description: 'Determined, grounded, relatable lead',
+    recommendedFor: 'Heroic & Determined Characters',
+  },
+  {
+    id: 'inquiring-youth',
+    name: 'Inquiring Youth',
+    voice: 'en-US-JennyNeural',
+    description: 'Expressive, bright, curious explorer',
+    recommendedFor: 'Scientists & Youthful Explorers',
+  },
+  {
+    id: 'mentor-sage',
+    name: 'Contemplative Mentor',
+    voice: 'en-GB-RyanNeural',
+    description: 'Wise, contemplative British guide',
+    recommendedFor: 'Mentors & Philosophical Figures',
+  },
+  {
+    id: 'calm-mystic',
+    name: 'Calm Mystic',
+    voice: 'en-GB-SoniaNeural',
+    description: 'Ethereal, measured, mysterious cadence',
+    recommendedFor: 'Mystics & Spiritual Guides',
+  },
+  {
+    id: 'brooding-antagonist',
+    name: 'Brooding Antagonist',
+    voice: 'en-US-EricNeural',
+    description: 'Intense, sharp, commanding presence',
+    recommendedFor: 'Antagonists & Stern Leaders',
+  },
+];
+
+export interface AudioMoodPreset {
+  id: string;
+  name: string;
+  description: string;
+  harmonicFreq?: number;
+}
+
+export const CURATED_AUDIO_MOODS: AudioMoodPreset[] = [
+  {
+    id: 'serene-ambient',
+    name: 'Serene Ambient',
+    description: 'Tranquil environmental drone and gentle organic resonance',
+    harmonicFreq: 196.0,
+  },
+  {
+    id: 'tense-dramatic',
+    name: 'Tense Dramatic',
+    description: 'Low-frequency suspense, subtle pulse, and dark undertones',
+    harmonicFreq: 110.0,
+  },
+  {
+    id: 'mystic-ethereal',
+    name: 'Mystic Ethereal',
+    description: 'Shimmering celestial pads, crystalline reverb, and airy depth',
+    harmonicFreq: 329.63,
+  },
+  {
+    id: 'ominous-drone',
+    name: 'Ominous Drone',
+    description: 'Subterranean sub-bass, cavernous rumble, and brooding tension',
+    harmonicFreq: 73.42,
+  },
+  {
+    id: 'epic-orchestral',
+    name: 'Epic Orchestral',
+    description: 'Stirring cinematic brass, majestic motifs, and dynamic swells',
+    harmonicFreq: 220.0,
+  },
+];
+
+export type CodexTab = 'bible' | 'characters' | 'scenes' | 'mutation' | 'replay';
+
+export type PremiseVariableType =
+  | 'core_premise'
+  | 'tone_atmosphere'
+  | 'central_conflict'
+  | 'world_rule';
+
+export interface PremiseVariable {
+  id: string;
+  variable_type: PremiseVariableType;
+  label: string;
+  original_value: string;
+  source_entity: string;
+}
+
+export interface SeedMutationRequest {
+  mutated_variable: PremiseVariableType | string;
+  original_value: string;
+  new_value: string;
+  hypothesis_prompt?: string;
+}
+
+export type EntityImpactCategory = 'AFFECTED' | 'CONDITIONAL' | 'PRESERVED';
+
+export interface EntityImpactItem {
+  entity_id: string;
+  entity_type: string;
+  title: string;
+  impact_category: EntityImpactCategory;
+  causal_justification: string;
+  projected_impact: string;
+  original_summary: string;
+}
+
+export interface MutationSimulationResponse {
+  project_id: string;
+  mutated_variable: string;
+  original_value: string;
+  new_value: string;
+  hypothesis_prompt?: string;
+  suggested_branch_name: string;
+  impacted_entities: EntityImpactItem[];
+  summary_counts: {
+    affected: number;
+    conditional: number;
+    preserved: number;
+  };
+}
+
+export interface ForkMutationRequest {
+  mutated_variable: string;
+  original_value: string;
+  new_value: string;
+  hypothesis_prompt?: string;
+  branch_name: string;
+  rationale?: string;
+}
+
+export interface MutationMetadata {
+  mutated_variable: string;
+  original_value: string;
+  new_value: string;
+  hypothesis_prompt?: string;
+  impact_summary: {
+    affected: number;
+    conditional: number;
+    preserved: number;
+  };
+  applied_at: string;
+}
+
+export type DeltaDimensionType =
+  | 'protagonist'
+  | 'tone_atmosphere'
+  | 'central_conflict'
+  | 'world_rules'
+  | 'trade_offs';
+
+export interface CounterfactualCandidate {
+  id: string;
+  index: number;
+  title: string;
+  archetype: string;
+  concept: string;
+  aesthetic: string;
+  core_tension: string;
+  trade_offs: string;
+  key_visual: string;
+  divergence_archetype: 'familiar' | 'radical' | 'inverse' | string;
+  exploration_profile: ExplorationProfile;
+  inferred_exclusion: string;
+}
+
+export interface CounterfactualDeltaDimension {
+  dimension: DeltaDimensionType;
+  title: string;
+  canon_value: string;
+  counterfactual_value: string;
+  divergence_analysis: string;
+  divergence_level: 'subtle' | 'moderate' | 'radical' | 'inverse';
+}
+
+export interface ExplorationProfileComparison {
+  canon_profile: ExplorationProfile;
+  counterfactual_profile: ExplorationProfile;
+  seed_fidelity_delta: number;
+  novelty_delta: number;
+  conceptual_distance_delta: number;
+  feasibility_delta: number;
+  summary: string;
+}
+
+export interface CounterfactualDeltaResponse {
+  project_id: string;
+  canon_world_id: string;
+  counterfactual_world_id: string;
+  canon_title: string;
+  counterfactual_title: string;
+  decision_dna_rationale?: string | null;
+  dimensions: CounterfactualDeltaDimension[];
+  profile_comparison: ExplorationProfileComparison;
+  suggested_branch_name: string;
+}
+
+export interface ForkCounterfactualRequest {
+  candidate_id: string;
+  branch_name?: string;
+  rationale?: string;
+}
+
+export interface CounterfactualMetadata {
+  parent_project_id: string;
+  counterfactual_candidate_id: string;
+  counterfactual_title: string;
+  forked_at: string;
+  rationale?: string;
 }
 
 

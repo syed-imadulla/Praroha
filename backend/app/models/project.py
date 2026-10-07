@@ -15,6 +15,8 @@ class ProjectBase(SQLModel):
     selected_world_id: Optional[str] = Field(default=None, nullable=True)
     parent_project_id: Optional[str] = Field(default=None, index=True, nullable=True)
     branch_name: str = Field(default="main", index=True)
+    mutation_metadata_json: Optional[str] = Field(default=None, nullable=True)
+    counterfactual_metadata_json: Optional[str] = Field(default=None, nullable=True)
 
 
 class Project(ProjectBase, table=True):

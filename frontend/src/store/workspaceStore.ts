@@ -25,6 +25,15 @@ import {
   MediaGenerationRequest,
   MediaProviderHealth,
   MediaType,
+  PremiseVariable,
+  SeedMutationRequest,
+  EntityImpactItem,
+  MutationSimulationResponse,
+  ForkMutationRequest,
+  CodexTab,
+  CounterfactualCandidate,
+  CounterfactualDeltaResponse,
+  ForkCounterfactualRequest,
 } from '../types';
 
 interface WorkspaceState {
@@ -42,7 +51,7 @@ interface WorkspaceState {
   isUnfolding: boolean;
   unfoldingStep: number;
   unfoldError: string | null;
-  activeCodexTab: 'bible' | 'characters' | 'scenes';
+  activeCodexTab: CodexTab;
   lineageGraph: TraceGraphRead | null;
   selectedNodeId: string | null;
   isLoadingLineage: boolean;
@@ -72,8 +81,53 @@ interface WorkspaceState {
   activeMediaJobs: Record<string, MediaJobResponse>;
   isGeneratingMedia: Record<string, boolean>;
   mediaProviderHealth: MediaProviderHealth | null;
+  activeAtmosphereAsset: MediaAsset | null;
+  isAtmospherePlaying: boolean;
+  atmosphereMasterVolume: number;
+  isAtmosphereMuted: boolean;
+  activeMediaBlockers: Set<string>;
+  premiseVariables: PremiseVariable[];
+  selectedPremiseVariable: PremiseVariable | null;
+  mutationHypothesisPrompt: string;
+  mutationNewValue: string;
+  customBranchName: string;
+  mutationSimulation: MutationSimulationResponse | null;
+  isSimulatingMutation: boolean;
+  isForkingMutation: boolean;
+  mutationSelectedNode: EntityImpactItem | null;
+  counterfactualCandidates: CounterfactualCandidate[];
+  selectedCounterfactualCandidateId: string | null;
+  counterfactualDelta: CounterfactualDeltaResponse | null;
+  isLoadingCounterfactual: boolean;
+  isForkingCounterfactual: boolean;
+  counterfactualBranchName: string;
 
   // Actions
+  fetchPremiseVariables: (projectId: string) => Promise<void>;
+  setSelectedPremiseVariable: (variable: PremiseVariable | null) => void;
+  setMutationHypothesisPrompt: (prompt: string) => void;
+  setMutationNewValue: (val: string) => void;
+  setCustomBranchName: (name: string) => void;
+  simulateMutation: (projectId: string, request: SeedMutationRequest) => Promise<void>;
+  forkMutatedUniverse: (projectId: string, request: ForkMutationRequest) => Promise<string>;
+  setMutationSelectedNode: (item: EntityImpactItem | null) => void;
+  resetMutationLab: () => void;
+  fetchCounterfactualCandidates: (projectId: string) => Promise<void>;
+  selectCounterfactualCandidate: (candidateId: string) => Promise<void>;
+  fetchCounterfactualDelta: (candidateId: string, useAi?: boolean) => Promise<void>;
+  setCounterfactualBranchName: (name: string) => void;
+  forkCounterfactualBranch: (projectId: string, request: ForkCounterfactualRequest) => Promise<string>;
+  resetCounterfactualState: () => void;
+  setAtmosphereTrack: (asset: MediaAsset) => void;
+  playAtmosphere: () => void;
+  pauseAtmosphere: () => void;
+  toggleAtmospherePlay: () => void;
+  setAtmosphereMasterVolume: (vol: number) => void;
+  toggleAtmosphereMute: () => void;
+  closeAtmosphereDeck: () => void;
+  registerMediaBlocker: (category: string) => void;
+  unregisterMediaBlocker: (category: string) => void;
+  getEffectiveAtmosphereVolume: () => number;
   setActiveStage: (stage: StageType) => void;
   unlockStage: (stage: StageType) => void;
   setSeedText: (seed: string) => void;
@@ -84,7 +138,7 @@ interface WorkspaceState {
   setSelectedWorldRationale: (rationale: string) => void;
   confirmWorldSelection: (candidateId: string, payload?: WorldSelectionCreate | string) => Promise<boolean>;
   fetchActiveSelection: () => Promise<void>;
-  setActiveCodexTab: (tab: 'bible' | 'characters' | 'scenes') => void;
+  setActiveCodexTab: (tab: CodexTab) => void;
   unfoldUniverse: () => Promise<boolean>;
   fetchUnfoldedUniverse: () => Promise<void>;
   fetchLineage: () => Promise<void>;
@@ -175,6 +229,232 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeMediaJobs: {},
       isGeneratingMedia: {},
       mediaProviderHealth: null,
+      activeAtmosphereAsset: null,
+      isAtmospherePlaying: false,
+      atmosphereMasterVolume: 0.75,
+      isAtmosphereMuted: false,
+      activeMediaBlockers: new Set<string>(),
+      premiseVariables: [],
+      selectedPremiseVariable: null,
+      mutationHypothesisPrompt: '',
+      mutationNewValue: '',
+      customBranchName: '',
+      mutationSimulation: null,
+      isSimulatingMutation: false,
+      isForkingMutation: false,
+      mutationSelectedNode: null,
+      counterfactualCandidates: [],
+      selectedCounterfactualCandidateId: null,
+      counterfactualDelta: null,
+      isLoadingCounterfactual: false,
+      isForkingCounterfactual: false,
+      counterfactualBranchName: '',
+
+      fetchPremiseVariables: async (projectId: string) => {
+        try {
+          const res = await apiClient.getPremiseVariables(projectId);
+          if (res.success && res.data) {
+            const vars = res.data;
+            set({
+              premiseVariables: vars,
+              selectedPremiseVariable: vars.length > 0 ? vars[0] : null,
+              mutationNewValue: vars.length > 0 ? vars[0].original_value : '',
+            });
+          }
+        } catch (err) {
+          console.error('Failed to fetch premise variables:', err);
+        }
+      },
+
+      setSelectedPremiseVariable: (variable: PremiseVariable | null) =>
+        set({
+          selectedPremiseVariable: variable,
+          mutationNewValue: variable ? variable.original_value : '',
+          mutationSimulation: null,
+          mutationSelectedNode: null,
+        }),
+
+      setMutationHypothesisPrompt: (prompt: string) =>
+        set({ mutationHypothesisPrompt: prompt }),
+
+      setMutationNewValue: (val: string) =>
+        set({ mutationNewValue: val }),
+
+      setCustomBranchName: (name: string) =>
+        set({ customBranchName: name }),
+
+      simulateMutation: async (projectId: string, request: SeedMutationRequest) => {
+        set({ isSimulatingMutation: true });
+        try {
+          const res = await apiClient.simulateMutation(projectId, request);
+          if (res.success && res.data) {
+            set({
+              mutationSimulation: res.data,
+              isSimulatingMutation: false,
+              mutationSelectedNode: null,
+            });
+          } else {
+            set({ isSimulatingMutation: false });
+            throw new Error(res.error?.message || 'Failed to simulate mutation');
+          }
+        } catch (err) {
+          console.error('Failed to simulate mutation:', err);
+          set({ isSimulatingMutation: false });
+          throw err;
+        }
+      },
+
+      forkMutatedUniverse: async (projectId: string, request: ForkMutationRequest) => {
+        set({ isForkingMutation: true });
+        try {
+          const res = await apiClient.forkMutatedUniverse(projectId, request);
+          if (res.success && res.data) {
+            const childProject = res.data;
+            await get().switchBranch(childProject.id);
+            set({ isForkingMutation: false });
+            return childProject.id;
+          }
+          set({ isForkingMutation: false });
+          throw new Error(res.error?.message || 'Failed to fork mutated universe');
+        } catch (err: unknown) {
+          console.error('Failed to fork mutated universe:', err);
+          set({ isForkingMutation: false });
+          const errorMsg = err instanceof Error ? err.message : 'Fork failed';
+          throw new Error(errorMsg);
+        }
+      },
+
+      setMutationSelectedNode: (item: EntityImpactItem | null) =>
+        set({ mutationSelectedNode: item }),
+
+      resetMutationLab: () =>
+        set({
+          mutationSimulation: null,
+          mutationHypothesisPrompt: '',
+          mutationNewValue: '',
+          customBranchName: '',
+          mutationSelectedNode: null,
+        }),
+
+      fetchCounterfactualCandidates: async (projectId: string) => {
+        try {
+          const res = await apiClient.getCounterfactualCandidates(projectId);
+          if (res.success && res.data) {
+            set({ counterfactualCandidates: res.data });
+            if (res.data.length > 0 && !get().selectedCounterfactualCandidateId) {
+              await get().selectCounterfactualCandidate(res.data[0].id);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to fetch counterfactual candidates:', err);
+        }
+      },
+
+      selectCounterfactualCandidate: async (candidateId: string) => {
+        set({ selectedCounterfactualCandidateId: candidateId });
+        await get().fetchCounterfactualDelta(candidateId);
+      },
+
+      fetchCounterfactualDelta: async (candidateId: string, useAi = true) => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        set({ isLoadingCounterfactual: true });
+        try {
+          const res = await apiClient.getCounterfactualDelta(activeProject.id, candidateId, useAi);
+          if (res.success && res.data) {
+            set({
+              counterfactualDelta: res.data,
+              counterfactualBranchName: res.data.suggested_branch_name,
+              isLoadingCounterfactual: false,
+            });
+          } else {
+            set({ isLoadingCounterfactual: false });
+          }
+        } catch (err) {
+          console.error('Failed to fetch counterfactual delta:', err);
+          set({ isLoadingCounterfactual: false });
+        }
+      },
+
+      setCounterfactualBranchName: (name: string) => set({ counterfactualBranchName: name }),
+
+      forkCounterfactualBranch: async (projectId: string, request: ForkCounterfactualRequest) => {
+        set({ isForkingCounterfactual: true });
+        try {
+          const res = await apiClient.forkCounterfactualBranch(projectId, request);
+          if (res.success && res.data) {
+            const newBranch = res.data.branch_name || 'counterfactual/fork';
+            await get().fetchBranches();
+            await get().switchBranch(res.data.id);
+            set({ isForkingCounterfactual: false });
+            return newBranch;
+          }
+          set({ isForkingCounterfactual: false });
+          throw new Error(res.error?.message || 'Failed to fork counterfactual branch');
+        } catch (err) {
+          set({ isForkingCounterfactual: false });
+          const msg = err instanceof Error ? err.message : 'Counterfactual fork failed';
+          throw new Error(msg);
+        }
+      },
+
+      resetCounterfactualState: () =>
+        set({
+          counterfactualCandidates: [],
+          selectedCounterfactualCandidateId: null,
+          counterfactualDelta: null,
+          isLoadingCounterfactual: false,
+          isForkingCounterfactual: false,
+          counterfactualBranchName: '',
+        }),
+
+      setAtmosphereTrack: (asset) =>
+        set({
+          activeAtmosphereAsset: asset,
+          isAtmospherePlaying: true,
+        }),
+
+      playAtmosphere: () => set({ isAtmospherePlaying: true }),
+      pauseAtmosphere: () => set({ isAtmospherePlaying: false }),
+      toggleAtmospherePlay: () =>
+        set((state) => ({ isAtmospherePlaying: !state.isAtmospherePlaying })),
+
+      setAtmosphereMasterVolume: (vol) =>
+        set({ atmosphereMasterVolume: Math.max(0, Math.min(1, vol)) }),
+
+      toggleAtmosphereMute: () =>
+        set((state) => ({ isAtmosphereMuted: !state.isAtmosphereMuted })),
+
+      closeAtmosphereDeck: () =>
+        set({
+          activeAtmosphereAsset: null,
+          isAtmospherePlaying: false,
+        }),
+
+      registerMediaBlocker: (category: string) =>
+        set((state) => {
+          const next = new Set(state.activeMediaBlockers);
+          next.add(category);
+          return { activeMediaBlockers: next };
+        }),
+
+      unregisterMediaBlocker: (category: string) =>
+        set((state) => {
+          const next = new Set(state.activeMediaBlockers);
+          next.delete(category);
+          return { activeMediaBlockers: next };
+        }),
+
+      getEffectiveAtmosphereVolume: () => {
+        const { isAtmosphereMuted, atmosphereMasterVolume, activeMediaBlockers } = get();
+        if (isAtmosphereMuted) {
+          return 0;
+        }
+        if (activeMediaBlockers.size > 0) {
+          return atmosphereMasterVolume * 0.2;
+        }
+        return atmosphereMasterVolume;
+      },
 
       setUnderstandSubTab: (tab) => set({ understandSubTab: tab }),
 
@@ -485,9 +765,16 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             unfoldedUniverse: null,
             lineageGraph: null,
             entityRevisions: [],
+            mutationSimulation: null,
+            mutationHypothesisPrompt: '',
+            mutationNewValue: '',
+            customBranchName: '',
+            mutationSelectedNode: null,
           });
 
           await get().fetchBranches();
+          await get().fetchPremiseVariables(targetProjectId);
+          await get().fetchCounterfactualCandidates(targetProjectId);
 
           const dnaRes = await apiClient.getLatestDNA(targetProjectId);
           if (dnaRes.success && dnaRes.data) {
@@ -974,6 +1261,26 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           mediaAssets: {},
           activeMediaJobs: {},
           isGeneratingMedia: {},
+          activeAtmosphereAsset: null,
+          isAtmospherePlaying: false,
+          atmosphereMasterVolume: 0.75,
+          isAtmosphereMuted: false,
+          activeMediaBlockers: new Set<string>(),
+          premiseVariables: [],
+          selectedPremiseVariable: null,
+          mutationHypothesisPrompt: '',
+          mutationNewValue: '',
+          customBranchName: '',
+          mutationSimulation: null,
+          isSimulatingMutation: false,
+          isForkingMutation: false,
+          mutationSelectedNode: null,
+          counterfactualCandidates: [],
+          selectedCounterfactualCandidateId: null,
+          counterfactualDelta: null,
+          isLoadingCounterfactual: false,
+          isForkingCounterfactual: false,
+          counterfactualBranchName: '',
         }),
     }),
     {

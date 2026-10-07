@@ -14,18 +14,7 @@ async def list_projects(
 ) -> APIResponse[List[ProjectRead]]:
     repo = ProjectRepository(session)
     projects = await repo.list_projects()
-    project_reads = [
-        ProjectRead(
-            id=p.id,
-            title=p.title,
-            seed_text=p.seed_text,
-            status=p.status,
-            selected_world_id=p.selected_world_id,
-            created_at=p.created_at,
-            updated_at=p.updated_at,
-        )
-        for p in projects
-    ]
+    project_reads = [p.to_read_schema() for p in projects]
     return api_success(data=project_reads)
 
 
@@ -36,16 +25,7 @@ async def create_project(
 ) -> APIResponse[ProjectRead]:
     repo = ProjectRepository(session)
     project = await repo.create_project(data)
-    project_read = ProjectRead(
-        id=project.id,
-        title=project.title,
-        seed_text=project.seed_text,
-        status=project.status,
-        selected_world_id=project.selected_world_id,
-        created_at=project.created_at,
-        updated_at=project.updated_at,
-    )
-    return api_success(data=project_read)
+    return api_success(data=project.to_read_schema())
 
 
 @router.post("/canonical-demo", response_model=APIResponse[ProjectRead], status_code=status.HTTP_201_CREATED)
@@ -54,18 +34,7 @@ async def create_canonical_demo(
 ) -> APIResponse[ProjectRead]:
     repo = ProjectRepository(session)
     project = await repo.create_canonical_demo_project()
-    project_read = ProjectRead(
-        id=project.id,
-        title=project.title,
-        seed_text=project.seed_text,
-        status=project.status,
-        selected_world_id=project.selected_world_id,
-        parent_project_id=project.parent_project_id,
-        branch_name=project.branch_name,
-        created_at=project.created_at,
-        updated_at=project.updated_at,
-    )
-    return api_success(data=project_read)
+    return api_success(data=project.to_read_schema())
 
 
 @router.get("/{project_id}", response_model=APIResponse[ProjectRead])
@@ -80,13 +49,4 @@ async def get_project(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project with ID '{project_id}' not found.",
         )
-    project_read = ProjectRead(
-        id=project.id,
-        title=project.title,
-        seed_text=project.seed_text,
-        status=project.status,
-        selected_world_id=project.selected_world_id,
-        created_at=project.created_at,
-        updated_at=project.updated_at,
-    )
-    return api_success(data=project_read)
+    return api_success(data=project.to_read_schema())

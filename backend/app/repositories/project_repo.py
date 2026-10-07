@@ -2,7 +2,7 @@ import json
 import uuid
 from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlmodel import SQLModel, delete, select
+from sqlmodel import SQLModel, delete, select, text
 from backend.app.config import settings
 from backend.app.models.dna import SeedDNA, SeedDNARecord
 from backend.app.models.media import MediaAssetRecord
@@ -45,7 +45,7 @@ def build_engine(database_url: str):
             url_str,
             echo=False,
             future=True,
-            connect_args={"check_same_thread": False},
+            connect_args={"check_same_thread": False, "timeout": 30.0},
         )
     else:
         # Optimized for Supabase poolers (pgbouncer transaction & session modes)
@@ -87,6 +87,16 @@ def _migrate_columns(connection):
         if "branch_name" not in cols:
             try:
                 connection.execute(text("ALTER TABLE projects ADD COLUMN branch_name VARCHAR DEFAULT 'main'"))
+            except Exception:
+                pass
+        if "mutation_metadata_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN mutation_metadata_json TEXT"))
+            except Exception:
+                pass
+        if "counterfactual_metadata_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN counterfactual_metadata_json TEXT"))
             except Exception:
                 pass
 
@@ -172,7 +182,29 @@ def _migrate_columns(connection):
             except Exception:
                 pass
 
-    if "media_assets" not in table_names:
+    if "media_assets" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("media_assets")]
+        if "width" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE media_assets ADD COLUMN width INTEGER"))
+            except Exception:
+                pass
+        if "height" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE media_assets ADD COLUMN height INTEGER"))
+            except Exception:
+                pass
+        if "aspect_ratio" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE media_assets ADD COLUMN aspect_ratio VARCHAR DEFAULT '1:1'"))
+            except Exception:
+                pass
+        if "metadata_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE media_assets ADD COLUMN metadata_json TEXT DEFAULT '{}'"))
+            except Exception:
+                pass
+    else:
         try:
             connection.execute(text("""
                 CREATE TABLE IF NOT EXISTS media_assets (
@@ -187,6 +219,10 @@ def _migrate_columns(connection):
                     prompt TEXT NOT NULL,
                     provider_name VARCHAR NOT NULL,
                     error_message TEXT,
+                    width INTEGER,
+                    height INTEGER,
+                    aspect_ratio VARCHAR DEFAULT '1:1',
+                    metadata_json TEXT DEFAULT '{}',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     completed_at TIMESTAMP,
                     FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
@@ -202,6 +238,9 @@ async def init_db() -> None:
     global engine, async_session
     try:
         async with engine.begin() as conn:
+            if str(engine.url).startswith("sqlite"):
+                await conn.execute(text("PRAGMA journal_mode=WAL;"))
+                await conn.execute(text("PRAGMA busy_timeout=15000;"))
             await conn.run_sync(SQLModel.metadata.create_all)
             await conn.run_sync(_migrate_columns)
         logger.info("Database initialized successfully using %s", engine.url.drivername)
@@ -220,6 +259,8 @@ async def init_db() -> None:
                 expire_on_commit=False,
             )
             async with engine.begin() as conn:
+                await conn.execute(text("PRAGMA journal_mode=WAL;"))
+                await conn.execute(text("PRAGMA busy_timeout=15000;"))
                 await conn.run_sync(SQLModel.metadata.create_all)
                 await conn.run_sync(_migrate_columns)
             logger.info("Local SQLite fallback database initialized successfully.")
@@ -323,6 +364,9 @@ class ProjectRepository:
         )
         result = await self.session.execute(statement)
         return result.scalars().first()
+
+    async def get_seed_dna(self, project_id: str) -> Optional[SeedDNARecord]:
+        return await self.get_latest_seed_dna(project_id)
 
     async def save_world_candidates(
         self,
@@ -731,6 +775,38 @@ class ProjectRepository:
 
         return bible, characters, relationships, scenes
 
+    async def get_latest_world_bible(self, project_id: str) -> Optional[WorldBibleRecord]:
+        bible_stmt = select(WorldBibleRecord).where(WorldBibleRecord.project_id == project_id)
+        bible_res = await self.session.execute(bible_stmt)
+        return bible_res.scalars().first()
+
+    async def get_latest_characters(self, project_id: str) -> List[CharacterRecord]:
+        char_stmt = (
+            select(CharacterRecord)
+            .where(CharacterRecord.project_id == project_id)
+            .order_by(CharacterRecord.created_at.asc())
+        )
+        char_res = await self.session.execute(char_stmt)
+        return list(char_res.scalars().all())
+
+    async def get_latest_scenes(self, project_id: str) -> List[SceneRecord]:
+        scene_stmt = (
+            select(SceneRecord)
+            .where(SceneRecord.project_id == project_id)
+            .order_by(SceneRecord.scene_number.asc())
+        )
+        scene_res = await self.session.execute(scene_stmt)
+        return list(scene_res.scalars().all())
+
+    async def get_latest_character_relationships(self, project_id: str) -> List[CharacterRelationshipRecord]:
+        rel_stmt = (
+            select(CharacterRelationshipRecord)
+            .where(CharacterRelationshipRecord.project_id == project_id)
+            .order_by(CharacterRelationshipRecord.created_at.asc())
+        )
+        rel_res = await self.session.execute(rel_stmt)
+        return list(rel_res.scalars().all())
+
     async def create_entity_revision(self, revision: EntityRevisionRecord) -> EntityRevisionRecord:
         self.session.add(revision)
         await self.session.commit()
@@ -858,6 +934,19 @@ class ProjectRepository:
         await self.session.commit()
         await self.session.refresh(record)
         return record
+
+    async def get_character(self, character_id: str) -> Optional[CharacterRecord]:
+        """Fetch a single character record by primary key id."""
+        stmt = select(CharacterRecord).where(CharacterRecord.id == character_id)
+        res = await self.session.execute(stmt)
+        return res.scalars().first()
+
+    async def get_scene(self, scene_id: str) -> Optional[SceneRecord]:
+        """Fetch a single scene record by primary key id."""
+        stmt = select(SceneRecord).where(SceneRecord.id == scene_id)
+        res = await self.session.execute(stmt)
+        return res.scalars().first()
+
 
     async def create_snapshot_asset(
         self, project_id: str, storage_key: str, size_bytes: int, version: int = 1

@@ -24,6 +24,9 @@ import { RefinementModal } from './RefinementModal';
 import { OriginBadge } from './OriginBadge';
 import { WhyIsThisHereModal, WhyIsThisHereData } from './WhyIsThisHereModal';
 import { EntityMediaSection } from './EntityMediaSection';
+import { AtmosphereDeck } from './AtmosphereDeck';
+import { SeedMutationLabCanvas } from './SeedMutationLabCanvas';
+import { CounterfactualReplayCanvas } from './CounterfactualReplayCanvas';
 import type { OriginType } from '../types';
 
 export const UniverseCodexCanvas: React.FC = () => {
@@ -44,6 +47,7 @@ export const UniverseCodexCanvas: React.FC = () => {
     toggleInspector,
     setInspectorTab,
     setRefiningEntity,
+    generateMediaAction,
   } = useWorkspaceStore();
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -119,6 +123,24 @@ export const UniverseCodexCanvas: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
+            <button
+              id="launcher-simulate-what-if-btn"
+              onClick={() => setActiveCodexTab('mutation')}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-950/80 to-purple-950/80 hover:from-amber-900/80 hover:to-purple-900/80 border border-amber-500/50 text-xs text-amber-200 hover:text-amber-100 transition shadow-sm font-semibold"
+              title="Launch Seed Mutation Lab"
+            >
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Simulate "What If?"</span>
+            </button>
+            <button
+              id="launcher-counterfactual-replay-btn"
+              onClick={() => setActiveCodexTab('replay')}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-violet-950/80 to-indigo-950/80 hover:from-violet-900/80 hover:to-indigo-900/80 border border-violet-500/50 text-xs text-violet-200 hover:text-violet-100 transition shadow-sm font-semibold"
+              title="Launch Counterfactual Replay"
+            >
+              <GitFork className="w-4 h-4 text-violet-400" />
+              <span>What If I Chose Another World?</span>
+            </button>
             <button
               onClick={() => {
                 setInspectorTab('provenance');
@@ -422,10 +444,43 @@ export const UniverseCodexCanvas: React.FC = () => {
                     {unfoldedUniverse.scenes.length}
                   </span>
                 </button>
+
+                <button
+                  id="codex-tab-mutation"
+                  onClick={() => setActiveCodexTab('mutation')}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold border-b-2 transition ${
+                    activeCodexTab === 'mutation'
+                      ? 'border-amber-400 text-amber-300 bg-amber-950/30'
+                      : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>Seed Mutation Lab</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+                    NEW
+                  </span>
+                </button>
+
+                <button
+                  id="codex-tab-replay"
+                  onClick={() => setActiveCodexTab('replay')}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold border-b-2 transition ${
+                    activeCodexTab === 'replay'
+                      ? 'border-violet-400 text-violet-300 bg-violet-950/30'
+                      : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  }`}
+                >
+                  <GitFork className="w-4 h-4 text-violet-400" />
+                  <span>Counterfactual Replay</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-violet-500/20 text-violet-300 border border-violet-500/30 font-mono">
+                    NEW
+                  </span>
+                </button>
               </div>
             </div>
 
             {/* Origin Filter Toolbar (ORIG-02) */}
+            {activeCodexTab !== 'mutation' && activeCodexTab !== 'replay' && (
             <div
               className="flex flex-wrap items-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs"
               data-testid="origin-filter-toolbar"
@@ -472,6 +527,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 );
               })}
             </div>
+            )}
 
             {/* TAB 1: World Bible & Locations */}
             {activeCodexTab === 'bible' && (
@@ -480,6 +536,49 @@ export const UniverseCodexCanvas: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
+                {/* World Hero Cover Banner (IMG-03) */}
+                <div
+                  id="codex-world-cover-section"
+                  data-testid="codex-world-cover-section"
+                  className="p-5 rounded-2xl bg-canvas-card border border-canvas-border space-y-3"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4" />
+                      <span>{selectedWorld?.title || 'Active World'} Hero Cover Visual</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const worldId = selectedWorld?.id || unfoldedUniverse?.world_bible.id;
+                          if (!worldId) return;
+                          await generateMediaAction({
+                            entity_type: 'world',
+                            entity_id: worldId,
+                            media_type: 'video',
+                            prompt: '',
+                            duration_sec: 5,
+                          });
+                        }}
+                        data-testid="bring-world-to-life-hero-btn"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-md shadow-purple-900/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                        title="Synthesize 5s cinematic opening teaser video"
+                      >
+                        <Film className="w-3.5 h-3.5" />
+                        <span>Bring This World to Life</span>
+                      </button>
+                      <span className="text-[11px] text-slate-400 font-mono">16:9 Cinematic Video & Cover</span>
+                    </div>
+                  </div>
+                  <EntityMediaSection
+                    entityType="world"
+                    entityId={selectedWorld?.id || unfoldedUniverse.world_bible.id}
+                    defaultPrompt={`Hero visual cover for ${selectedWorld?.title || 'Unfolded World'}. ${unfoldedUniverse.world_bible.geography}. ${unfoldedUniverse.world_bible.physics_rules}`}
+                    availableModalities={['image', 'video', 'audio']}
+                  />
+                </div>
+
                 {/* Environmental Laws & Physical Rules */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-5 rounded-2xl bg-canvas-card border border-canvas-border space-y-2">
@@ -593,6 +692,15 @@ export const UniverseCodexCanvas: React.FC = () => {
                                 "{loc.visual_prompt}"
                               </p>
                             </div>
+
+                            {/* Multimodal Sensory Media */}
+                            <EntityMediaSection
+                              entityType="location"
+                              entityId={`loc-${idx}`}
+                              defaultPrompt={loc.visual_prompt || `${loc.name}: ${loc.description}`}
+                              availableModalities={['image']}
+                              compact={true}
+                            />
                           </div>
                         );
                       })}
@@ -810,7 +918,9 @@ export const UniverseCodexCanvas: React.FC = () => {
                           entityId={char.id}
                           defaultPrompt={char.visual_prompt || `${char.name}, ${char.role}: ${char.motivation}`}
                           availableModalities={['image', 'voice']}
+                          roleHint={`${char.role} ${char.archetype}`}
                         />
+
                       </div>
 
                     );
@@ -995,11 +1105,34 @@ export const UniverseCodexCanvas: React.FC = () => {
                         entityType="scene"
                         entityId={scene.id}
                         defaultPrompt={scene.visual_prompt || `${scene.title} in ${scene.location_setting}: ${scene.conflict_narrative}`}
-                        availableModalities={['image', 'audio', 'video']}
+                        availableModalities={['image', 'voice', 'audio', 'video']}
                       />
+
                     </div>
                   );
                 })}
+              </motion.div>
+            )}
+
+            {/* TAB 4: Seed Mutation Lab (MUT-01 to MUT-04) */}
+            {activeCodexTab === 'mutation' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <SeedMutationLabCanvas />
+              </motion.div>
+            )}
+
+            {/* TAB 5: Counterfactual Replay (CNTR-01, CNTR-02) */}
+            {activeCodexTab === 'replay' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <CounterfactualReplayCanvas />
               </motion.div>
             )}
           </div>
@@ -1016,6 +1149,9 @@ export const UniverseCodexCanvas: React.FC = () => {
 
       {/* Refinement Modal (PERS-01) */}
       <RefinementModal />
+
+      {/* Persistent Atmosphere Deck (D-04) */}
+      <AtmosphereDeck />
     </div>
   );
 };

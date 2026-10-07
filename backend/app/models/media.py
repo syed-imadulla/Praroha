@@ -23,6 +23,10 @@ class MediaAssetBase(SQLModel):
     prompt: str = Field(default="")
     provider_name: str = Field(default="mock")
     error_message: Optional[str] = Field(default=None, nullable=True)
+    width: Optional[int] = Field(default=None, nullable=True)
+    height: Optional[int] = Field(default=None, nullable=True)
+    aspect_ratio: Optional[str] = Field(default="1:1", nullable=True)
+    metadata_json: Optional[str] = Field(default="{}", nullable=True)
 
 
 class MediaAssetRecord(MediaAssetBase, table=True):

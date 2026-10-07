@@ -14,6 +14,18 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 6: Traceability / Provenance** — Construct the DAG lineage graph connecting all entities, enabling interactive drill-down to root seed decisions without CoT leakage.
 - [x] **Phase 7: Refine / Branch / Save** — Implement localized refinement, macro timeline branching, and complete project state persistence (save/load).
 - [x] **Phase 8: Polish / Reliability / Demo** — Integrate canonical underwater city demo fixtures, offline fallback handling, end-to-end testing, and presentation polish.
+- [x] **Phase 9: Seed Potential Map** — Structured extraction and visualization of unspoken themes, latent premises, and hidden tensions.
+- [x] **Phase 10: Divergence Engine** — 3 distinct archetypal exploration vectors (Familiar Ground, Radical Departure, Inverse Premise) with explicit metrics.
+- [x] **Phase 11: Decision DNA** — Capture rationale and creative constraints during world selection, propagating into unfold generation and inspection.
+- [x] **Phase 12: Origin Ledger** — Track granular provenance origins (seed, human, derived, ai, user) on every universe entity with "Why is this here?" explainer.
+- [x] **Phase 13: Media Provider Architecture** — Decoupled, non-blocking MediaProvider architecture with deterministic mock fallback and relational persistence.
+- [x] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — 3-tier concrete image generation engine, Seed DNA aesthetic prompt enrichment, Lightbox modal, and multi-entity visual coverage.
+- [x] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration voiceovers with voice selection and audio playback.
+- [x] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Cinematic scene video rendering with local fallback.
+- [x] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient soundscapes and background audio composition.
+- [x] **Phase 18: Seed Mutation Lab** — What-if seed variable modification and downstream impact preview.
+- [ ] **Phase 19: Counterfactual Replay** — Delta inspection between selected and rejected worlds.
+- [ ] **Phase 20: Human-Only Zones** — Creator-locked creative constraints protected from AI modification.
 
 ---
 
@@ -142,11 +154,11 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 11: Decision DNA** — Rich human choice capture (rationale, priorities, rejected directions) and downstream propagation.
 - [x] **Phase 12: Origin Ledger** — Universal entity origin tagging (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) & "Why is this here?" drilldown.
 - [x] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
-- [ ] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual.
-- [ ] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration.
-- [ ] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation with graceful fallback.
-- [ ] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient atmosphere, soundscape, background audio composition.
-- [ ] **Phase 18: Seed Mutation Lab** — Modify fundamental seed variable, preview impact (Affected/Conditional/Preserved), fork branch.
+- [x] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual.
+- [x] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration.
+- [x] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation with graceful fallback.
+- [x] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient atmosphere, soundscape, background audio composition.
+- [x] **Phase 18: Seed Mutation Lab** — Modify fundamental seed variable, preview impact (Affected/Conditional/Preserved), fork branch.
 - [ ] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
 - [ ] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
 
@@ -226,6 +238,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Integrate Pollinations (as primary image provider where a usable free/team-provided access path is available; with local FLUX.1 schnell fallback where practical, and MockMediaProvider fallback of last resort) for on-demand generation of world covers, character portraits, location concepts, and scene visuals.  
 **Depends on**: Phase 13  
 **Requirements**: IMG-01, IMG-02, IMG-03  
+**Plans**: 2 plans (all completed)
+- [x] **14-01-PLAN.md** (Wave 1): Backend Image Provider Engine (`PollinationsImageProvider`, `FluxSchnellProvider`, 3-Tier Fallback, Seed DNA Enrichment, Metadata Persistence & Pytest Suite)
+- [x] **14-02-PLAN.md** (Wave 2): Frontend Visual Experience & Lightbox Modal (`ImageLightboxModal`, Aspect Ratio Controls, Multi-Entity Generation Coverage, Production Build & Playwright E2E Suite)
 **Success Criteria**:
   1. Concrete `PollinationsProvider` generates images for world, character, location, and scene visual prompts with local `FluxSchnellProvider` fallback.
   2. Generated image binaries are persisted via `StorageProvider` (Supabase / local uploads).
@@ -237,6 +252,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Integrate Edge TTS as primary voice engine with optional local Kokoro-82M fallback for narration voiceovers with voice selection and audio playback.  
 **Depends on**: Phase 13  
 **Requirements**: VOX-01, VOX-02, VOX-03  
+**Plans**: 2 plans (all completed)
+- [x] **15-01-PLAN.md** (Wave 1): Backend Voice Provider Engine (`EdgeTTSProvider`, `KokoroVoiceProvider`, 3-Tier Fallback, Persona Mapping, Spoken Script Synthesis & Pytest Suite)
+- [x] **15-02-PLAN.md** (Wave 2): Frontend Voice Generation Experience & Custom Narrative Audio Player (`MediaPreviewCard` Player, Persona Dropdown, Dual-Target Coverage & Playwright E2E Suite)
 **Success Criteria**:
   1. Concrete `EdgeTTSProvider` generates narration audio without external API keys (with optional local Kokoro-82M fallback).
   2. Backend endpoints support narration generation and audio asset persistence.
@@ -248,6 +266,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Integrate Pyramid Flow as primary video engine supporting cinematic scene rendering, with Wan2.1 T2V-1.3B as practical local fallback, optional/experimental Mochi 1 (not primary due to heavy compute), and MockMediaProvider fallback of last resort.  
 **Depends on**: Phase 13  
 **Requirements**: VID-01, VID-02, VID-03  
+**Plans**: 2 plans (all completed)
+- [x] **16-01-PLAN.md** (Wave 1): Backend Video Provider Engine (`PyramidFlowProvider`, `WanVideoProvider`, 3-Tier Fallback, Cinematic Motion Cues, Metadata Persistence & Pytest Suite)
+- [x] **16-02-PLAN.md** (Wave 2): Frontend Cinematic Video Experience & Lightbox Modal (World Hero CTA, Scene Video Controls, In-Card Player, `VideoLightboxModal`, Production Build & Playwright E2E Suite)
 **Success Criteria**:
   1. Concrete `PyramidFlowProvider` handles cinematic scene rendering asynchronously with Wan2.1 T2V-1.3B practical local fallback.
   2. Graceful fallback to mock video clips if credentials, hardware, or compute resources expire.
@@ -259,6 +280,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Integrate ACE-Step 1.5 as primary audio generator with Stable Audio Open as an optional alternative for ambient soundscapes and background audio composition.  
 **Depends on**: Phase 13  
 **Requirements**: AUD-01, AUD-02, AUD-03  
+**Plans**: 2 plans (all completed)
+- [x] **17-01-PLAN.md** (Wave 1): Backend Audio Engine (`ACEStepAudioProvider`, `StableAudioOpenProvider`, `CompositeAudioProvider`, Canonical Acoustic Derivation, Curated Moods & Pytest Suite)
+- [x] **17-02-PLAN.md** (Wave 2): Frontend Atmosphere Experience & Smart Ducking (`AtmosphereDeck`, In-Card Player, Shared Reference-Counted Blocker Ducking, Intent Invariance, Build & Playwright E2E Suite)
 **Success Criteria**:
   1. Concrete `ACEStepProvider` creates ambient soundscapes for selected worlds (with Stable Audio Open optional alternative).
   2. Frontend ambient player provides background playback with volume control and scene-synced playback.
@@ -270,6 +294,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Provide a "What If?" interface to modify fundamental seed variables and preview downstream impact before branching.  
 **Depends on**: Phase 12 (Origin Ledger)  
 **Requirements**: MUT-01, MUT-02, MUT-03, MUT-04  
+**Plans**: 2 plans (all completed)
+- [x] **18-01-PLAN.md** (Wave 1): Backend Seed Mutation Engine & Branching Integration (`mutation.py` Models, `MutationService`, Downstream Causal Lineage Classification, Zero-Destruction Forking & Pytest Suite)
+- [x] **18-02-PLAN.md** (Wave 2): Frontend Seed Mutation Lab & Causal Diff DAG (`SeedMutationLabCanvas`, `MutationCausalDiffDAG`, Split-View UX, Branch Switching, Production Build & Playwright E2E Suite)
 **Success Criteria**:
   1. User can modify a core seed variable.
   2. Downstream impact preview classifies elements as `AFFECTED`, `CONDITIONAL`, or `PRESERVED`.
@@ -282,9 +309,13 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Allow creators to inspect delta differences between selected and rejected worlds without full universe re-generation.  
 **Depends on**: Phase 11 (Decision DNA)  
 **Requirements**: CNTR-01, CNTR-02  
+**Plans**: 2 plans (all completed)
+- [x] **19-01-PLAN.md** (Wave 1): Backend Counterfactual Delta Engine & Branching Integration (`counterfactual.py` Models, `CounterfactualService`, Hybrid Delta Generation, Isolated Branching & Pytest Suite)
+- [x] **19-02-PLAN.md** (Wave 2): Frontend Counterfactual Replay Canvas & Branching (`CounterfactualReplayCanvas`, 50/50 Comparative Matrix, 4 Divergence Delta Cards, Timeline Forking & Playwright E2E Suite)
 **Success Criteria**:
   1. Delta view compares current universe against rejected candidate worlds.
-  2. Highlights key divergence in protagonist, tone, conflict, and lore assumptions.
+  2. Highlights key divergence in protagonist, tone, conflict, and lore assumptions without re-running full universe generation.
+  3. Actionable timeline forking creates an isolated child branch rooted in the alternative world, keeping the parent universe immutable.
 
 ---
 

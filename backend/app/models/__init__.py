@@ -77,6 +77,25 @@ from backend.app.models.media import (
     MediaJobResponse,
     MediaAssetRead,
 )
+from backend.app.models.mutation import (
+    PremiseVariableType,
+    PremiseVariableRead,
+    SeedMutationRequest,
+    EntityImpactCategory,
+    EntityImpactItem,
+    MutationSimulationResponse,
+    ForkMutationRequest,
+    MutationMetadata,
+)
+from backend.app.models.counterfactual import (
+    DeltaDimensionType,
+    CounterfactualCandidateRead,
+    CounterfactualDeltaDimension,
+    ExplorationProfileComparison,
+    CounterfactualDeltaResponse,
+    ForkCounterfactualRequest,
+    CounterfactualMetadata,
+)
 
 __all__ = [
     "Project",
@@ -143,6 +162,21 @@ __all__ = [
     "MediaGenerationRequest",
     "MediaJobResponse",
     "MediaAssetRead",
+    "PremiseVariableType",
+    "PremiseVariableRead",
+    "SeedMutationRequest",
+    "EntityImpactCategory",
+    "EntityImpactItem",
+    "MutationSimulationResponse",
+    "ForkMutationRequest",
+    "MutationMetadata",
+    "DeltaDimensionType",
+    "CounterfactualCandidateRead",
+    "CounterfactualDeltaDimension",
+    "ExplorationProfileComparison",
+    "CounterfactualDeltaResponse",
+    "ForkCounterfactualRequest",
+    "CounterfactualMetadata",
 ]
 
 
