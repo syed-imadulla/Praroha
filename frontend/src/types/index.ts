@@ -169,10 +169,20 @@ export interface WorldSelectionRead {
   decision_dna?: DecisionDNA;
 }
 
+export type OriginType =
+  | 'SEED_EXPLICIT'
+  | 'SEED_INFERRED'
+  | 'HUMAN_DECISION'
+  | 'DERIVED'
+  | 'AI_INTRODUCED'
+  | 'USER_ADDED';
+
 export interface LocationItem {
   name: string;
   description: string;
   visual_prompt: string;
+  origin_type?: OriginType;
+  origin_source?: string | null;
 }
 
 export interface FactionItem {
@@ -212,6 +222,8 @@ export interface CharacterRead {
   visual_prompt: string;
   version: number;
   revision_notes?: string | null;
+  origin_type?: OriginType;
+  origin_source?: string | null;
   created_at: string;
 }
 
@@ -242,6 +254,8 @@ export interface SceneRead {
   visual_prompt: string;
   version: number;
   revision_notes?: string | null;
+  origin_type?: OriginType;
+  origin_source?: string | null;
   created_at: string;
 }
 
@@ -283,6 +297,8 @@ export interface TraceNode {
   summary: string;
   causal_explanation: string;
   parent_ids: string[];
+  origin_type?: OriginType;
+  origin_source?: string | null;
   metadata?: Record<string, unknown>;
 }
 

@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791372241.2016678,
-    "seen": 1791372283.9588687,
-    "ast_hash": "f62be978fc88785006e554a7e305e81a",
+    "mtime": 1791373355.2529907,
+    "seen": 1791373387.763381,
+    "ast_hash": "9f4873c0af238114ed3240270af46db9",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791372272.7884188,
-    "seen": 1791372283.95887,
-    "ast_hash": "1a5143dff2a634f52eb840aed052ab54",
+    "mtime": 1791373376.5448067,
+    "seen": 1791373387.7633872,
+    "ast_hash": "05069e9b3f5a56fc423d36f88aa1d2ce",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -1161,6 +1161,24 @@
     "mtime": 1791372854.8983319,
     "seen": 1791372877.3760724,
     "ast_hash": "85fb6424a99a10325ddb5c2f5d2f8cfe",
+    "semantic_hash": ""
+  },
+  ".planning/phases/12-origin-ledger/12-01-PLAN.md": {
+    "mtime": 1791373318.1883113,
+    "seen": 1791373387.7638211,
+    "ast_hash": "9e14582d7567f75180de08e8f429bb55",
+    "semantic_hash": ""
+  },
+  ".planning/phases/12-origin-ledger/12-02-PLAN.md": {
+    "mtime": 1791373335.1521647,
+    "seen": 1791373387.7638245,
+    "ast_hash": "da3c6cefcb7797e4dcf22137ca9a7156",
+    "semantic_hash": ""
+  },
+  ".planning/phases/12-origin-ledger/12-RESEARCH.md": {
+    "mtime": 1791373295.898504,
+    "seen": 1791373387.763831,
+    "ast_hash": "181097f0796b08ec70defb3bd70345b7",
     "semantic_hash": ""
   }
 }

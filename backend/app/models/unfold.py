@@ -1,9 +1,19 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field as PydanticField
 from sqlmodel import Field, SQLModel
+
+
+OriginType = Literal[
+    "SEED_EXPLICIT",
+    "SEED_INFERRED",
+    "HUMAN_DECISION",
+    "DERIVED",
+    "AI_INTRODUCED",
+    "USER_ADDED",
+]
 
 
 def get_utc_now() -> datetime:
@@ -18,6 +28,8 @@ class LocationItem(BaseModel):
     name: str
     description: str
     visual_prompt: str
+    origin_type: str = "DERIVED"
+    origin_source: Optional[str] = None
 
 
 class FactionItem(BaseModel):
@@ -130,6 +142,8 @@ class CharacterBase(SQLModel):
     visual_prompt: str
     version: int = Field(default=1)
     revision_notes: Optional[str] = Field(default=None, nullable=True)
+    origin_type: str = Field(default="AI_INTRODUCED")
+    origin_source: Optional[str] = Field(default=None, nullable=True)
 
 
 class CharacterRecord(CharacterBase, table=True):
@@ -155,6 +169,8 @@ class CharacterRecord(CharacterBase, table=True):
             visual_prompt=self.visual_prompt,
             version=self.version,
             revision_notes=self.revision_notes,
+            origin_type=self.origin_type,
+            origin_source=self.origin_source,
             created_at=self.created_at,
         )
 
@@ -171,6 +187,8 @@ class CharacterRead(BaseModel):
     visual_prompt: str
     version: int = 1
     revision_notes: Optional[str] = None
+    origin_type: str = "AI_INTRODUCED"
+    origin_source: Optional[str] = None
     created_at: datetime
 
 
@@ -246,6 +264,8 @@ class SceneBase(SQLModel):
     visual_prompt: str
     version: int = Field(default=1)
     revision_notes: Optional[str] = Field(default=None, nullable=True)
+    origin_type: str = Field(default="AI_INTRODUCED")
+    origin_source: Optional[str] = Field(default=None, nullable=True)
 
 
 class SceneRecord(SceneBase, table=True):
@@ -280,6 +300,8 @@ class SceneRecord(SceneBase, table=True):
             visual_prompt=self.visual_prompt,
             version=self.version,
             revision_notes=self.revision_notes,
+            origin_type=self.origin_type,
+            origin_source=self.origin_source,
             created_at=self.created_at,
         )
 
@@ -298,6 +320,8 @@ class SceneRead(BaseModel):
     visual_prompt: str
     version: int = 1
     revision_notes: Optional[str] = None
+    origin_type: str = "AI_INTRODUCED"
+    origin_source: Optional[str] = None
     created_at: datetime
 
 

@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 from backend.app.models.lineage import (
     AncestorPathRead,
     TraceEdge,
@@ -13,6 +13,56 @@ class LineageService:
 
     def __init__(self, repo: ProjectRepository):
         self.repo = repo
+
+    @staticmethod
+    def generate_origin_explanation(
+        node_type: str,
+        origin_type: str,
+        origin_source: Optional[str] = None,
+        title: Optional[str] = None,
+        context_info: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """
+        Synthesize plain-language, deterministic causal justification for why an entity exists (ORIG-03).
+        Guarantees zero LLM token overhead, zero latency, and zero chain-of-thought leakage.
+        """
+        source_label = origin_source or "Creative Context"
+        title_label = title or "This entity"
+
+        if origin_type == "SEED_EXPLICIT":
+            return (
+                f"Grounded directly in the creator's original seed premise. "
+                f"Direct anchor: '{source_label}'. Serves as an immutable conceptual foundation."
+            )
+        elif origin_type == "SEED_INFERRED":
+            return (
+                f"Developed from an accepted Seed Potential possibility or inferred thematic premise: '{source_label}'. "
+                f"Logically extrapolates foundational seed implications without canon drift."
+            )
+        elif origin_type == "HUMAN_DECISION":
+            return (
+                f"Created to fulfill explicit creator commitment in Stage 4 Decision DNA: '{source_label}'. "
+                f"Embodies chosen archetypes, creative priorities, and custom directives."
+            )
+        elif origin_type == "DERIVED":
+            return (
+                f"Derived logically from established World Bible physics, geography, and systemic rules. "
+                f"Canon anchor: '{source_label}'. Maintains strict ecological and world consistency."
+            )
+        elif origin_type == "AI_INTRODUCED":
+            return (
+                f"Introduced via generative narrative synthesis to expand atmospheric depth, character friction, and dramatic stakes. "
+                f"Source context: '{source_label}'. Strictly constrained by all Decision DNA boundaries."
+            )
+        elif origin_type == "USER_ADDED":
+            return (
+                f"Authored or refined directly by the creator during iterative refinement: '{source_label}'. "
+                f"Represents a verified, creator-committed branch mutation."
+            )
+        return (
+            f"Provenance established under '{origin_type}' classification. "
+            f"Anchor citation: '{source_label}'."
+        )
 
     async def build_project_lineage(self, project_id: str) -> TraceGraphRead:
         """Dynamically synthesize nodes and edges for the entire creative lineage of a project."""
@@ -36,6 +86,8 @@ class LineageService:
             summary=project.seed_text or "No seed text recorded",
             causal_explanation="The immutable root inspiration and starting anchor for all downstream worldbuilding.",
             parent_ids=[],
+            origin_type="SEED_EXPLICIT",
+            origin_source="Raw Seed Text",
             metadata={"seed_text": project.seed_text},
         )
         nodes.append(seed_node)
@@ -61,6 +113,8 @@ class LineageService:
                     f"and thematic pillars ({themes_str}) without altering original seed intent."
                 ),
                 parent_ids=["node-seed"],
+                origin_type="SEED_EXPLICIT",
+                origin_source="Thematic Analysis",
                 metadata={
                     "tone": dna.tone,
                     "themes": dna.themes,
@@ -98,6 +152,8 @@ class LineageService:
                     f"testing the core tension '{w.core_tension}' under Seed DNA constraints."
                 ),
                 parent_ids=["node-dna"] if seed_dna_record else ["node-seed"],
+                origin_type="SEED_INFERRED",
+                origin_source=f"Triad Archetype: {w.archetype}",
                 metadata={
                     "archetype": w.archetype,
                     "aesthetic": w.aesthetic,
@@ -138,6 +194,8 @@ class LineageService:
                     f"for universe expansion. Creator Rationale: '{selection.user_rationale or 'Direct creator commitment'}."
                 ),
                 parent_ids=[chosen_parent_id],
+                origin_type="HUMAN_DECISION",
+                origin_source=f"Committed Direction: {chosen_world.title}",
                 metadata={
                     "chosen_candidate_id": chosen_world.id,
                     "user_rationale": selection.user_rationale,
@@ -186,6 +244,8 @@ class LineageService:
                     f"strictly abiding by Seed DNA parameters and creator commitment."
                 ),
                 parent_ids=["node-selection"],
+                origin_type="DERIVED",
+                origin_source="Stage 5 World Bible Synthesis",
                 metadata={
                     "factions_count": len(bible.factions),
                     "timeline_count": len(bible.history_timeline),
@@ -206,6 +266,8 @@ class LineageService:
             # 5b. Key Locations (Deterministic IDs node-loc-{i})
             for idx, loc in enumerate(bible.key_locations):
                 loc_node_id = f"node-loc-{idx}"
+                loc_orig_type = getattr(loc, "origin_type", None) or "DERIVED"
+                loc_orig_source = getattr(loc, "origin_source", None) or "World Bible Geography"
                 loc_node = TraceNode(
                     id=loc_node_id,
                     entity_id=f"loc-{idx}",
@@ -215,9 +277,12 @@ class LineageService:
                     stage=5,
                     summary=loc.description,
                     causal_explanation=(
-                        f"Established as a landmark location within {chosen_world.title}: {loc.description}"
+                        f"Established as a landmark location within {chosen_world.title}: {loc.description}. "
+                        + LineageService.generate_origin_explanation("key_location", loc_orig_type, loc_orig_source, loc.name)
                     ),
                     parent_ids=["node-bible"],
+                    origin_type=loc_orig_type,
+                    origin_source=loc_orig_source,
                     metadata={
                         "location_index": idx,
                         "location_name": loc.name,
@@ -241,6 +306,8 @@ class LineageService:
 
             for c in unfolded.characters:
                 char_node_id = f"node-char-{c.id}"
+                c_orig_type = getattr(c, "origin_type", None) or "AI_INTRODUCED"
+                c_orig_source = getattr(c, "origin_source", None)
                 char_revs = [r for r in revisions_by_entity.get(c.id, []) if r.version < c.version]
                 char_revs.sort(key=lambda r: (r.version, r.created_at))
                 seen_versions: Set[int] = set()
@@ -262,9 +329,12 @@ class LineageService:
                         summary=f"Motivation: {c.motivation} • Conflict: {c.core_conflict}",
                         causal_explanation=(
                             f"Cast as {c.role} ({c.archetype}) in {chosen_world.title} to embody the narrative tension "
-                            f"between '{c.motivation}' and '{c.core_conflict}' under canon physical rules."
+                            f"between '{c.motivation}' and '{c.core_conflict}' under canon physical rules. "
+                            + LineageService.generate_origin_explanation("character", c_orig_type, c_orig_source, c.name)
                         ),
                         parent_ids=["node-bible"],
+                        origin_type=c_orig_type,
+                        origin_source=c_orig_source,
                         metadata={
                             "role": c.role,
                             "archetype": c.archetype,
@@ -290,6 +360,8 @@ class LineageService:
                     prev_node_id = "node-bible"
                     for r in unique_char_revs:
                         rev_node_id = f"node-char-{c.id}-v{r.version}"
+                        r_orig_type = "USER_ADDED" if r.version > 1 else c_orig_type
+                        r_orig_source = f"Creator Refinement v{r.version}: {r.revision_notes or 'Baseline revision'}"
                         rev_node = TraceNode(
                             id=rev_node_id,
                             entity_id=r.id,
@@ -300,9 +372,12 @@ class LineageService:
                             summary=f"Historical Snapshot: {r.revision_notes or 'Baseline revision'}",
                             causal_explanation=(
                                 f"Historical snapshot of {c.name} preserved prior to revision v{r.version + 1}. "
-                                f"Creator notes: '{r.revision_notes or 'Baseline version'}'. Immutable audit record."
+                                f"Creator notes: '{r.revision_notes or 'Baseline version'}'. Immutable audit record. "
+                                + LineageService.generate_origin_explanation("character_revision", r_orig_type, r_orig_source, c.name)
                             ),
                             parent_ids=[prev_node_id],
+                            origin_type=r_orig_type,
+                            origin_source=r_orig_source,
                             metadata={
                                 "version": r.version,
                                 "revision_notes": r.revision_notes,
@@ -333,6 +408,7 @@ class LineageService:
                         prev_node_id = rev_node_id
 
                     # Current / latest character node
+                    latest_char_orig_source = f"Creator Refinement v{c.version}: {c.revision_notes or 'Refined parameter update'}"
                     char_node = TraceNode(
                         id=char_node_id,
                         entity_id=c.id,
@@ -343,9 +419,12 @@ class LineageService:
                         summary=f"Motivation: {c.motivation} • Conflict: {c.core_conflict}",
                         causal_explanation=(
                             f"Active refined incarnation of {c.name} ({c.role}, {c.archetype}) in {chosen_world.title}. "
-                            f"Refined from v{c.version - 1} with creator notes: '{c.revision_notes or 'Refined parameter update'}'."
+                            f"Refined from v{c.version - 1} with creator notes: '{c.revision_notes or 'Refined parameter update'}'. "
+                            + LineageService.generate_origin_explanation("character", "USER_ADDED", latest_char_orig_source, c.name)
                         ),
                         parent_ids=[prev_node_id],
+                        origin_type="USER_ADDED",
+                        origin_source=latest_char_orig_source,
                         metadata={
                             "role": c.role,
                             "archetype": c.archetype,
@@ -384,9 +463,12 @@ class LineageService:
                     stage=5,
                     summary=r.dynamic_description,
                     causal_explanation=(
-                        f"Interpersonal dynamic connecting {src_name} and {tgt_name} ({r.relation_type}): {r.dynamic_description}"
+                        f"Interpersonal dynamic connecting {src_name} and {tgt_name} ({r.relation_type}): {r.dynamic_description}. "
+                        + LineageService.generate_origin_explanation("relationship", "DERIVED", "Interpersonal Dynamic Synthesis", f"{src_name} ↔ {tgt_name}")
                     ),
                     parent_ids=[src_node_id, tgt_node_id],
+                    origin_type="DERIVED",
+                    origin_source="Interpersonal Dynamic Synthesis",
                     metadata={
                         "source_character_id": r.source_character_id,
                         "target_character_id": r.target_character_id,
@@ -418,6 +500,8 @@ class LineageService:
             # 5e. Story Scenes (with version chaining)
             for s in unfolded.scenes:
                 scene_node_id = f"node-scene-{s.id}"
+                s_orig_type = getattr(s, "origin_type", None) or "AI_INTRODUCED"
+                s_orig_source = getattr(s, "origin_source", None)
                 scene_parents: List[str] = ["node-bible"]
 
                 # Link character parents if characters_involved match
@@ -447,9 +531,12 @@ class LineageService:
                         summary=f"Dramatic Q: {s.dramatic_question}",
                         causal_explanation=(
                             f"Dramatic scenario staged at {s.location_setting} putting characters into active conflict. "
-                            f"Tests the question: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'."
+                            f"Tests the question: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'. "
+                            + LineageService.generate_origin_explanation("scene", s_orig_type, s_orig_source, s.title)
                         ),
                         parent_ids=scene_parents,
+                        origin_type=s_orig_type,
+                        origin_source=s_orig_source,
                         metadata={
                             "scene_number": s.scene_number,
                             "location_setting": s.location_setting,
@@ -488,6 +575,8 @@ class LineageService:
                     prev_scene_id = "node-bible"
                     for r in unique_scene_revs:
                         rev_node_id = f"node-scene-{s.id}-v{r.version}"
+                        sr_orig_type = "USER_ADDED" if r.version > 1 else s_orig_type
+                        sr_orig_source = f"Creator Refinement v{r.version}: {r.revision_notes or 'Baseline scene'}"
                         rev_node = TraceNode(
                             id=rev_node_id,
                             entity_id=r.id,
@@ -498,9 +587,12 @@ class LineageService:
                             summary=f"Historical Scene Snapshot: {r.revision_notes or 'Baseline revision'}",
                             causal_explanation=(
                                 f"Historical snapshot of Scene {s.scene_number} preserved prior to revision v{r.version + 1}. "
-                                f"Creator notes: '{r.revision_notes or 'Baseline version'}'. Immutable audit record."
+                                f"Creator notes: '{r.revision_notes or 'Baseline version'}'. Immutable audit record. "
+                                + LineageService.generate_origin_explanation("scene_revision", sr_orig_type, sr_orig_source, s.title)
                             ),
                             parent_ids=scene_parents if prev_scene_id == "node-bible" else [prev_scene_id],
+                            origin_type=sr_orig_type,
+                            origin_source=sr_orig_source,
                             metadata={
                                 "version": r.version,
                                 "revision_notes": r.revision_notes,
@@ -542,6 +634,7 @@ class LineageService:
                         prev_scene_id = rev_node_id
 
                     # Current / latest scene node
+                    latest_scene_orig_source = f"Creator Refinement v{s.version}: {s.revision_notes or 'Refined scene outcome'}"
                     scene_node = TraceNode(
                         id=scene_node_id,
                         entity_id=s.id,
@@ -553,9 +646,12 @@ class LineageService:
                         causal_explanation=(
                             f"Active refined scenario staged at {s.location_setting}. Refined from v{s.version - 1} "
                             f"with creator notes: '{s.revision_notes or 'Refined scene outcome'}'. "
-                            f"Dramatic Q: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'."
+                            f"Dramatic Q: '{s.dramatic_question}' leading to pivotal outcome '{s.pivotal_outcome}'. "
+                            + LineageService.generate_origin_explanation("scene", "USER_ADDED", latest_scene_orig_source, s.title)
                         ),
                         parent_ids=[prev_scene_id],
+                        origin_type="USER_ADDED",
+                        origin_source=latest_scene_orig_source,
                         metadata={
                             "scene_number": s.scene_number,
                             "location_setting": s.location_setting,

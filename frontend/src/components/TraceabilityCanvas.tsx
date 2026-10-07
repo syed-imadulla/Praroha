@@ -17,7 +17,8 @@ import {
   ZoomOut,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
-import { TraceNode, TraceNodeType } from '../types';
+import { TraceNode, TraceNodeType, OriginType } from '../types';
+import { OriginBadge } from './OriginBadge';
 
 export const TraceabilityCanvas: React.FC = () => {
   const {
@@ -32,6 +33,7 @@ export const TraceabilityCanvas: React.FC = () => {
   } = useWorkspaceStore();
 
   const [zoomLevel, setZoomLevel] = React.useState<number>(1.0);
+  const [selectedOriginFilter, setSelectedOriginFilter] = React.useState<OriginType | 'ALL'>('ALL');
 
   useEffect(() => {
     if (activeProject) {
@@ -83,11 +85,16 @@ export const TraceabilityCanvas: React.FC = () => {
     return lineageGraph.nodes.find((n) => n.id === selectedNodeId) || null;
   }, [lineageGraph, selectedNodeId]);
 
-  // Group nodes by pipeline lanes
+  // Group nodes by pipeline lanes with Origin Tier filtering
   const laneGroups = useMemo(() => {
     if (!lineageGraph) return { lane1: [], lane2: [], lane3: [], lane4: [], lane5: [], lane6: [] };
 
-    const nodes = lineageGraph.nodes;
+    const nodes =
+      selectedOriginFilter === 'ALL'
+        ? lineageGraph.nodes
+        : lineageGraph.nodes.filter(
+            (n) => (n.origin_type || 'DERIVED') === selectedOriginFilter
+          );
 
     return {
       // Lane 1: Root Seed
@@ -103,7 +110,7 @@ export const TraceabilityCanvas: React.FC = () => {
       // Lane 6: Story Scenes
       lane6: nodes.filter((n) => n.entity_type === 'scene'),
     };
-  }, [lineageGraph]);
+  }, [lineageGraph, selectedOriginFilter]);
 
   const getNodeColorClass = (type: TraceNodeType) => {
     switch (type) {
@@ -283,6 +290,54 @@ export const TraceabilityCanvas: React.FC = () => {
             Unrelated Node
           </span>
         </div>
+      </div>
+
+      {/* Origin Tier Filter Toolbar (ORIG-02) */}
+      <div
+        className="flex flex-wrap items-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs"
+        data-testid="dag-origin-filter-toolbar"
+      >
+        <span className="text-[11px] font-mono uppercase text-slate-400 mr-2 flex items-center gap-1">
+          <Compass className="w-3.5 h-3.5 text-cyan-400" />
+          Origin Tier:
+        </span>
+        <button
+          type="button"
+          onClick={() => setSelectedOriginFilter('ALL')}
+          className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition ${
+            selectedOriginFilter === 'ALL'
+              ? 'bg-slate-700 text-slate-100 border border-slate-500 shadow-sm'
+              : 'bg-slate-900/50 text-slate-400 hover:text-slate-200 border border-transparent'
+          }`}
+          data-testid="dag-origin-filter-all"
+        >
+          All
+        </button>
+        {(
+          [
+            'SEED_EXPLICIT',
+            'HUMAN_DECISION',
+            'SEED_INFERRED',
+            'DERIVED',
+            'AI_INTRODUCED',
+            'USER_ADDED',
+          ] as OriginType[]
+        ).map((type) => {
+          const isSelected = selectedOriginFilter === type;
+          return (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setSelectedOriginFilter(isSelected ? 'ALL' : type)}
+              className={`transition ${
+                isSelected ? 'scale-105 ring-2 ring-white/30 rounded-full' : 'opacity-70 hover:opacity-100'
+              }`}
+              data-testid={`dag-origin-filter-${type.toLowerCase()}`}
+            >
+              <OriginBadge originType={type} interactive={false} size="xs" />
+            </button>
+          );
+        })}
       </div>
 
       {/* Main 2-Column Responsive Workspace */}
@@ -523,6 +578,32 @@ export const TraceabilityCanvas: React.FC = () => {
                   <p className="text-xs text-slate-400">{selectedNode.summary}</p>
                 </div>
 
+                {/* Origin Ledger Classification (ORIG-02 / ORIG-03) */}
+                <div
+                  className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-2"
+                  data-testid="inspector-origin-box"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold">
+                      Origin Tier:
+                    </span>
+                    <OriginBadge
+                      originType={selectedNode.origin_type || 'DERIVED'}
+                      originSource={selectedNode.origin_source}
+                      interactive={false}
+                      size="sm"
+                    />
+                  </div>
+                  {selectedNode.origin_source && (
+                    <span
+                      className="text-[10px] font-mono text-slate-400 italic truncate max-w-[150px]"
+                      title={selectedNode.origin_source}
+                    >
+                      {selectedNode.origin_source}
+                    </span>
+                  )}
+                </div>
+
                 {/* "Why Does This Exist?" Box (TRAC-03) */}
                 <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/40 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
@@ -603,6 +684,25 @@ export const TraceabilityCanvas: React.FC = () => {
   );
 };
 
+const getOriginAccentClass = (type?: OriginType) => {
+  switch (type) {
+    case 'SEED_EXPLICIT':
+      return 'border-l-4 border-l-cyan-400';
+    case 'SEED_INFERRED':
+      return 'border-l-4 border-l-indigo-400';
+    case 'HUMAN_DECISION':
+      return 'border-l-4 border-l-amber-400';
+    case 'DERIVED':
+      return 'border-l-4 border-l-sky-400';
+    case 'AI_INTRODUCED':
+      return 'border-l-4 border-l-violet-400';
+    case 'USER_ADDED':
+      return 'border-l-4 border-l-emerald-400';
+    default:
+      return 'border-l-4 border-l-slate-600';
+  }
+};
+
 interface NodeCardProps {
   node: TraceNode;
   isSelected: boolean;
@@ -622,12 +722,14 @@ const NodeCard: React.FC<NodeCardProps> = ({
   icon,
   onClick,
 }) => {
+  const originBorder = getOriginAccentClass(node.origin_type);
+
   return (
     <div
       onClick={onClick}
       id={`node-${node.id}`}
       data-node-id={node.id}
-      className={`p-3.5 rounded-xl border cursor-pointer transition-all duration-200 select-none flex flex-col justify-between ${
+      className={`p-3.5 rounded-xl border cursor-pointer transition-all duration-200 select-none flex flex-col justify-between ${originBorder} ${
         isSelected
           ? 'ring-2 ring-cyan-400 bg-cyan-950/80 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-[1.01]'
           : isHighlighted
@@ -645,9 +747,18 @@ const NodeCard: React.FC<NodeCardProps> = ({
               {node.entity_type.replace('_', ' ')}
             </span>
           </div>
-          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-900/80 text-slate-400 border border-slate-800">
-            S0{node.stage}
-          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <OriginBadge
+              originType={node.origin_type || 'DERIVED'}
+              originSource={node.origin_source}
+              interactive={false}
+              size="xs"
+              showLabel={false}
+            />
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-900/80 text-slate-400 border border-slate-800">
+              S0{node.stage}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-2">

@@ -4,10 +4,10 @@ milestone: 'Milestone 2: Semantic Intelligence + Generative Media'
 status: in_progress
 progress:
   total_phases: 20
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 24
-  completed_plans: 22
-  percent: 50.00
+  completed_plans: 24
+  percent: 60.00
 ---
 
 # Project State: Seed Unfold (Praroha)
@@ -17,26 +17,27 @@ progress:
 See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-07)
 
 **Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media and counterfactual mutation capabilities.  
-**Current focus:** Milestone 2: Semantic Intelligence + Generative Media (Phase 12: Origin Ledger)
+**Current focus:** Milestone 2: Semantic Intelligence + Generative Media (Phase 13: Media Provider Architecture)
 
 ## Current Position
 
-Phase: 12 of 20 (Origin Ledger) — Planning Complete  
+Phase: 12 of 20 (Origin Ledger) — 100% Completed & Verified  
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).  
 Phase 9 (Seed Potential Map): 100% Completed & Verified (59 backend tests, 4 E2E scenarios, 3 visual proofs).  
 Phase 10 (Divergence Engine): 100% Completed & Verified (65 backend tests, 4 E2E scenarios, 3 visual proofs).  
 Phase 11 (Decision DNA): 100% Completed & Verified (71 backend tests, 5 E2E scenarios, 3 visual proofs).  
-Status: Phase 12 research and execution plans complete (12-01-PLAN.md, 12-02-PLAN.md). Ready for execution.  
-Last activity: 2026-10-07 — Phase 12 Origin Ledger planned across 2 waves.
+Phase 12 (Origin Ledger): 100% Completed & Verified (77 backend tests, 5 E2E scenarios, 5 visual proofs).  
+Status: Phase 12 executed and verified across 2 waves. Ready for Phase 13.  
+Last activity: 2026-10-07 — Phase 12 Origin Ledger completed with 6-tier classification, DAG accents, and deterministic causal explainer.
 
-Progress: [█████░░░░░] 50.0%
+Progress: [██████░░░░] 60.0%
 
 ## Performance Metrics
 
 **Milestone 1 & 2 Performance:**
-- Total plans completed: 22 (across 11 phases)
-- Backend tests passing: 71/71
-- E2E scenarios passing: 29/29
+- Total plans completed: 24 (across 12 phases)
+- Backend tests passing: 77/77
+- E2E scenarios passing: 34/34
 - Zero-error demo hydration: < 500ms
 
 **By Phase:**
@@ -54,7 +55,7 @@ Progress: [█████░░░░░] 50.0%
 | Phase 9: Seed Potential Map | complete | Milestone 2 |
 | Phase 10: Divergence Engine | complete | Milestone 2 |
 | Phase 11: Decision DNA | complete | Milestone 2 |
-| Phase 12: Origin Ledger | pending | Milestone 2 |
+| Phase 12: Origin Ledger | complete | Milestone 2 |
 | Phase 13: Media Provider Architecture | pending | Milestone 2 |
 | Phase 14: Image Generation (Pollinations / FLUX) | pending | Milestone 2 |
 | Phase 15: Voice Generation (Edge TTS / Kokoro) | pending | Milestone 2 |

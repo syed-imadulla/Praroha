@@ -101,6 +101,16 @@ def _migrate_columns(connection):
                 connection.execute(text("ALTER TABLE characters ADD COLUMN revision_notes VARCHAR"))
             except Exception:
                 pass
+        if "origin_type" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN origin_type VARCHAR DEFAULT 'AI_INTRODUCED'"))
+            except Exception:
+                pass
+        if "origin_source" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN origin_source TEXT"))
+            except Exception:
+                pass
 
     if "scenes" in table_names:
         cols = [c["name"] for c in inspector.get_columns("scenes")]
@@ -112,6 +122,16 @@ def _migrate_columns(connection):
         if "revision_notes" not in cols:
             try:
                 connection.execute(text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
+            except Exception:
+                pass
+        if "origin_type" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN origin_type VARCHAR DEFAULT 'AI_INTRODUCED'"))
+            except Exception:
+                pass
+        if "origin_source" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN origin_source TEXT"))
             except Exception:
                 pass
 
@@ -509,6 +529,8 @@ class ProjectRepository:
                     motivation=c.get("motivation", ""),
                     core_conflict=c.get("core_conflict") or c.get("conflict", ""),
                     visual_prompt=c.get("visual_prompt", ""),
+                    origin_type=c.get("origin_type", "AI_INTRODUCED"),
+                    origin_source=c.get("origin_source"),
                 )
                 self.session.add(char_record)
                 created_characters.append(char_record)
@@ -556,6 +578,8 @@ class ProjectRepository:
                     conflict_narrative=s.get("conflict_narrative") or s.get("conflict", ""),
                     pivotal_outcome=s.get("pivotal_outcome") or s.get("outcome", ""),
                     visual_prompt=s.get("visual_prompt", ""),
+                    origin_type=s.get("origin_type", "AI_INTRODUCED"),
+                    origin_source=s.get("origin_source"),
                 )
                 self.session.add(scene_record)
 
@@ -934,7 +958,28 @@ class ProjectRepository:
         timeline_items = bible_data.get("history_timeline", [])
         factions_items = bible_data.get("factions", [])
         canon_facts = bible_data.get("canon_facts", [])
-        locations_items = bible_data.get("key_locations", [])
+        raw_locations = bible_data.get("key_locations", [])
+        locations_items = []
+        for loc in raw_locations:
+            loc_name = loc.get("name", "")
+            if "Spire" in loc_name:
+                locations_items.append({
+                    **loc,
+                    "origin_type": "HUMAN_DECISION",
+                    "origin_source": "Custom Directive: Enzyme bio-physics",
+                })
+            elif "Trench" in loc_name or "Nursery" in loc_name:
+                locations_items.append({
+                    **loc,
+                    "origin_type": "DERIVED",
+                    "origin_source": "World Bible: Thermal vent biology",
+                })
+            else:
+                locations_items.append({
+                    **loc,
+                    "origin_type": loc.get("origin_type", "DERIVED"),
+                    "origin_source": loc.get("origin_source", "World Bible Geography"),
+                })
 
         bible_record = WorldBibleRecord(
             project_id=project.id,
@@ -950,8 +995,18 @@ class ProjectRepository:
         self.session.add(bible_record)
 
         # 7. Save Characters
+        char_origin_map = {
+            "dr. althea thorne": ("HUMAN_DECISION", "Decision DNA: Ecological / Symbiotic Mystery"),
+            "sentry unit nereus": ("SEED_INFERRED", "Seed Potential: Ancient Symbiotic Technology"),
+            "kaelen": ("SEED_EXPLICIT", "Seed Anchor: Child Protagonist"),
+        }
         created_characters: List[CharacterRecord] = []
         for c in unfold_data.get("characters", []):
+            c_name = c.get("name", "Unnamed").strip().lower()
+            orig_t, orig_s = char_origin_map.get(
+                c_name,
+                (c.get("origin_type", "AI_INTRODUCED"), c.get("origin_source"))
+            )
             char_record = CharacterRecord(
                 project_id=project.id,
                 world_candidate_id=bio_city_candidate.id,
@@ -962,6 +1017,8 @@ class ProjectRepository:
                 core_conflict=c.get("core_conflict") or c.get("conflict", ""),
                 visual_prompt=c.get("visual_prompt", ""),
                 version=1,
+                origin_type=orig_t,
+                origin_source=orig_s,
             )
             self.session.add(char_record)
             created_characters.append(char_record)
@@ -999,12 +1056,22 @@ class ProjectRepository:
                 "visual_prompt": "Climactic sci-fi underwater chamber, massive translucent siphonophore floating in a crystal sphere, glowing neural sparks, human figures backlit by cyan and gold bioluminescence, photorealistic 8k",
             })
 
+        scene_origin_map = {
+            1: ("SEED_EXPLICIT", "Seed Anchor: Sunken metropolis discovery"),
+            2: ("AI_INTRODUCED", "Generative Synthesis: Narrative Tension"),
+            3: ("HUMAN_DECISION", "Custom Directive: Enzyme bio-physics"),
+        }
         created_scenes: List[SceneRecord] = []
         for s in scene_items:
+            s_num = s.get("scene_number", 1)
+            orig_t, orig_s = scene_origin_map.get(
+                s_num,
+                (s.get("origin_type", "AI_INTRODUCED"), s.get("origin_source"))
+            )
             scene_rec = SceneRecord(
                 project_id=project.id,
                 world_candidate_id=bio_city_candidate.id,
-                scene_number=s.get("scene_number", 1),
+                scene_number=s_num,
                 title=s.get("title", "Untitled Scene"),
                 location_setting=s.get("location_setting") or s.get("setting", ""),
                 characters_involved_json=json.dumps(s.get("characters_involved", [])),
@@ -1013,6 +1080,8 @@ class ProjectRepository:
                 pivotal_outcome=s.get("pivotal_outcome") or s.get("outcome", ""),
                 visual_prompt=s.get("visual_prompt", ""),
                 version=1,
+                origin_type=orig_t,
+                origin_source=orig_s,
             )
             self.session.add(scene_rec)
             created_scenes.append(scene_rec)

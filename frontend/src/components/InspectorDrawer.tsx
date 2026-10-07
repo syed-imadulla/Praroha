@@ -385,6 +385,77 @@ export const InspectorDrawer: React.FC = () => {
                           </span>
                         </div>
                       </div>
+
+                      {/* Origin Ledger Distribution (ORIG-01 / ORIG-03) */}
+                      {(() => {
+                        const counts: Record<string, number> = {
+                          SEED_EXPLICIT: 0,
+                          SEED_INFERRED: 0,
+                          HUMAN_DECISION: 0,
+                          DERIVED: 0,
+                          AI_INTRODUCED: 0,
+                          USER_ADDED: 0,
+                        };
+
+                        unfoldedUniverse.world_bible.key_locations.forEach((loc) => {
+                          const o = loc.origin_type || 'DERIVED';
+                          counts[o] = (counts[o] || 0) + 1;
+                        });
+                        unfoldedUniverse.characters.forEach((char) => {
+                          const o = char.origin_type || 'SEED_INFERRED';
+                          counts[o] = (counts[o] || 0) + 1;
+                        });
+                        unfoldedUniverse.scenes.forEach((sc) => {
+                          const o = sc.origin_type || 'SEED_EXPLICIT';
+                          counts[o] = (counts[o] || 0) + 1;
+                        });
+
+                        const totalEntities =
+                          unfoldedUniverse.world_bible.key_locations.length +
+                          unfoldedUniverse.characters.length +
+                          unfoldedUniverse.scenes.length;
+
+                        const originLabels: Record<string, { label: string; color: string; border: string }> = {
+                          SEED_EXPLICIT: { label: 'Seed Explicit', color: 'text-cyan-300 bg-cyan-950/70', border: 'border-cyan-800/70' },
+                          SEED_INFERRED: { label: 'Seed Inferred', color: 'text-indigo-300 bg-indigo-950/70', border: 'border-indigo-800/70' },
+                          HUMAN_DECISION: { label: 'Human Choice', color: 'text-amber-300 bg-amber-950/70', border: 'border-amber-800/70' },
+                          DERIVED: { label: 'Derived', color: 'text-sky-300 bg-sky-950/70', border: 'border-sky-800/70' },
+                          AI_INTRODUCED: { label: 'AI Introduced', color: 'text-violet-300 bg-violet-950/70', border: 'border-violet-800/70' },
+                          USER_ADDED: { label: 'User Added', color: 'text-emerald-300 bg-emerald-950/70', border: 'border-emerald-800/70' },
+                        };
+
+                        return (
+                          <div className="pt-2 border-t border-slate-800 space-y-2" data-testid="origin-ledger-distribution">
+                            <div className="flex items-center justify-between text-[10px] font-mono">
+                              <span className="text-slate-400 font-bold uppercase tracking-wider">
+                                Origin Ledger Breakdown
+                              </span>
+                              <span className="text-cyan-400 font-bold">{totalEntities} Entities</span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {Object.entries(counts)
+                                .filter(([, cnt]) => cnt > 0)
+                                .map(([key, cnt]) => {
+                                  const cfg = originLabels[key] || {
+                                    label: key,
+                                    color: 'text-slate-300 bg-slate-900',
+                                    border: 'border-slate-800',
+                                  };
+                                  return (
+                                    <div
+                                      key={key}
+                                      className={`px-2 py-1 rounded-lg border text-[10px] font-mono flex items-center justify-between ${cfg.color} ${cfg.border}`}
+                                    >
+                                      <span className="truncate">{cfg.label}</span>
+                                      <span className="font-bold ml-1">{cnt}</span>
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </>
                 )}

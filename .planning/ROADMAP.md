@@ -140,7 +140,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 9: Seed Potential Map** — Semantic classification layer (Explicit, Inferred, Open) between Seed DNA and Worlds.
 - [x] **Phase 10: Divergence Engine** — Exactly 3 intentional exploration archetypes (Familiar, Radical, Inverse) with exploration profile.
 - [x] **Phase 11: Decision DNA** — Rich human choice capture (rationale, priorities, rejected directions) and downstream propagation.
-- [ ] **Phase 12: Origin Ledger** — Universal entity origin tagging (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) & "Why is this here?" drilldown.
+- [x] **Phase 12: Origin Ledger** — Universal entity origin tagging (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) & "Why is this here?" drilldown.
 - [ ] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
 - [ ] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual.
 - [ ] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration.
@@ -184,7 +184,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Capture rich human rationale, priorities, and rejected directions during world selection, injecting them into subsequent universe unfolding.  
 **Depends on**: Phase 10  
 **Requirements**: DDNA-01, DDNA-02, DDNA-03  
-**Plans**: 2 plans
+**Plans**: 2 plans (all completed)
 - [x] **11-01-PLAN.md** (Wave 1): Backend Decision DNA Engine (Models, Persistence, DB Migration, Stable Snapshot Strategy, Provider Creative Contract & Pytest Suite)
 - [x] **11-02-PLAN.md** (Wave 2): Frontend Decision DNA UI (Priorities Chips, Inferred Exclusions, Codex Anchor Pill Bar, Lineage Provenance & Playwright E2E Suite)
 **Success Criteria**:
@@ -198,9 +198,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Upgrade provenance with universal entity origin classifications and an interactive "Why is this here?" explainer.  
 **Depends on**: Phase 11  
 **Requirements**: ORIG-01, ORIG-02, ORIG-03  
-**Plans**: 2 plans
-- [ ] **12-01-PLAN.md** (Wave 1): Backend Origin Ledger Engine (Entity Models, Non-Destructive DB Migration, Deterministic Causal Explainer & Pytest Suite)
-- [ ] **12-02-PLAN.md** (Wave 2): Frontend Origin Ledger UI (Origin Badges, "Why is this here?" Modal, DAG Accents & Filtering, Lineage Metrics & Playwright E2E Suite)
+**Plans**: 2 plans (all completed)
+- [x] **12-01-PLAN.md** (Wave 1): Backend Origin Ledger Engine (Entity Models, Non-Destructive DB Migration, Deterministic Causal Explainer & Pytest Suite)
+- [x] **12-02-PLAN.md** (Wave 2): Frontend Origin Ledger UI (Origin Badges, "Why is this here?" Modal, DAG Accents & Filtering, Lineage Metrics & Playwright E2E Suite)
 **Success Criteria**:
   1. Universe entities carry origin classifications (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, `DERIVED`, `AI_INTRODUCED`, `USER_ADDED`).
   2. Provenance DAG renders origin badges and visual color accents.

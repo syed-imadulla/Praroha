@@ -21,6 +21,9 @@ import {
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { RefinementModal } from './RefinementModal';
+import { OriginBadge } from './OriginBadge';
+import { WhyIsThisHereModal, WhyIsThisHereData } from './WhyIsThisHereModal';
+import type { OriginType } from '../types';
 
 export const UniverseCodexCanvas: React.FC = () => {
   const {
@@ -44,6 +47,8 @@ export const UniverseCodexCanvas: React.FC = () => {
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [selectedOriginFilter, setSelectedOriginFilter] = useState<OriginType | 'ALL'>('ALL');
+  const [whyModalData, setWhyModalData] = useState<WhyIsThisHereData | null>(null);
 
   useEffect(() => {
     if (!activeSelection) {
@@ -419,6 +424,54 @@ export const UniverseCodexCanvas: React.FC = () => {
               </div>
             </div>
 
+            {/* Origin Filter Toolbar (ORIG-02) */}
+            <div
+              className="flex flex-wrap items-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs"
+              data-testid="origin-filter-toolbar"
+            >
+              <span className="text-[11px] font-mono uppercase text-slate-400 mr-2 flex items-center gap-1">
+                <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                Origin Filter:
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedOriginFilter('ALL')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition ${
+                  selectedOriginFilter === 'ALL'
+                    ? 'bg-slate-700 text-slate-100 border border-slate-500 shadow-sm'
+                    : 'bg-slate-900/50 text-slate-400 hover:text-slate-200 border border-transparent'
+                }`}
+                data-testid="origin-filter-all"
+              >
+                All
+              </button>
+              {(
+                [
+                  'SEED_EXPLICIT',
+                  'HUMAN_DECISION',
+                  'SEED_INFERRED',
+                  'DERIVED',
+                  'AI_INTRODUCED',
+                  'USER_ADDED',
+                ] as OriginType[]
+              ).map((type) => {
+                const isSelected = selectedOriginFilter === type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setSelectedOriginFilter(isSelected ? 'ALL' : type)}
+                    className={`transition ${
+                      isSelected ? 'scale-105 ring-2 ring-white/30 rounded-full' : 'opacity-70 hover:opacity-100'
+                    }`}
+                    data-testid={`origin-filter-${type.toLowerCase()}`}
+                  >
+                    <OriginBadge originType={type} interactive={false} size="xs" />
+                  </button>
+                );
+              })}
+            </div>
+
             {/* TAB 1: World Bible & Locations */}
             {activeCodexTab === 'bible' && (
               <motion.div
@@ -462,65 +515,86 @@ export const UniverseCodexCanvas: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {unfoldedUniverse.world_bible.key_locations.map((loc, idx) => {
-                      const copyKey = `location-${idx}`;
-                      return (
-                        <div
-                          key={idx}
-                          className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-3 flex flex-col justify-between"
-                        >
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-bold text-slate-100 text-sm">{loc.name}</h3>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => jumpToTraceNode(`node-loc-${idx}`)}
-                                  className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition"
-                                  title="Trace causal lineage in DAG"
-                                >
-                                  <GitFork className="w-3 h-3" />
-                                  <span>Trace Lineage</span>
-                                </button>
-                                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                                  Location {idx + 1}
-                                </span>
+                    {unfoldedUniverse.world_bible.key_locations
+                      .filter(
+                        (loc) =>
+                          selectedOriginFilter === 'ALL' ||
+                          (loc.origin_type || 'DERIVED') === selectedOriginFilter
+                      )
+                      .map((loc, idx) => {
+                        const copyKey = `location-${idx}`;
+                        return (
+                          <div
+                            key={idx}
+                            className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-3 flex flex-col justify-between"
+                          >
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-bold text-slate-100 text-sm">{loc.name}</h3>
+                                <div className="flex items-center gap-2">
+                                  <OriginBadge
+                                    originType={loc.origin_type || 'DERIVED'}
+                                    originSource={loc.origin_source || 'World Bible Geography'}
+                                    interactive={true}
+                                    onClick={() =>
+                                      setWhyModalData({
+                                        title: loc.name,
+                                        entityType: 'Key Location',
+                                        originType: loc.origin_type || 'DERIVED',
+                                        originSource: loc.origin_source || 'World Bible Geography',
+                                        nodeId: `node-loc-${idx}`,
+                                      })
+                                    }
+                                    size="xs"
+                                  />
+                                  <button
+                                    onClick={() => jumpToTraceNode(`node-loc-${idx}`)}
+                                    className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition"
+                                    title="Trace causal lineage in DAG"
+                                  >
+                                    <GitFork className="w-3 h-3" />
+                                    <span>Trace Lineage</span>
+                                  </button>
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                                    Location {idx + 1}
+                                  </span>
+                                </div>
                               </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">{loc.description}</p>
                             </div>
-                            <p className="text-xs text-slate-300 leading-relaxed">{loc.description}</p>
-                          </div>
 
-                          {/* Visual Prompt Callout */}
-                          <div className="pt-2 border-t border-slate-800/80 space-y-2">
-                            <div className="flex items-center justify-between text-[11px]">
-                              <span className="text-slate-400 font-mono flex items-center gap-1">
-                                <Sparkles className="w-3 h-3 text-cyan-400" />
-                                Visual Prompt
-                              </span>
-                              <button
-                                onClick={() => handleCopyPrompt(copyKey, loc.visual_prompt, loc.name)}
-                                className="copy-prompt-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-cyan-950 text-[11px] text-cyan-300 hover:text-cyan-200 border border-slate-700 hover:border-cyan-500/50 transition"
-                                title="Copy visual prompt to clipboard"
-                              >
-                                {copiedId === copyKey ? (
-                                  <>
-                                    <Check className="w-3 h-3 text-cyan-400" />
-                                    <span>Copied!</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-3 h-3" />
-                                    <span>Copy Visual Prompt</span>
-                                  </>
-                                )}
-                              </button>
+                            {/* Visual Prompt Callout */}
+                            <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="text-slate-400 font-mono flex items-center gap-1">
+                                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                                  Visual Prompt
+                                </span>
+                                <button
+                                  onClick={() => handleCopyPrompt(copyKey, loc.visual_prompt, loc.name)}
+                                  className="copy-prompt-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-cyan-950 text-[11px] text-cyan-300 hover:text-cyan-200 border border-slate-700 hover:border-cyan-500/50 transition"
+                                  title="Copy visual prompt to clipboard"
+                                >
+                                  {copiedId === copyKey ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-cyan-400" />
+                                      <span>Copied!</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      <span>Copy Visual Prompt</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                              <p className="text-[11px] text-slate-400 italic bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 line-clamp-3">
+                                "{loc.visual_prompt}"
+                              </p>
                             </div>
-                            <p className="text-[11px] text-slate-400 italic bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 line-clamp-3">
-                              "{loc.visual_prompt}"
-                            </p>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
                   </div>
                 </div>
 
@@ -580,9 +654,28 @@ export const UniverseCodexCanvas: React.FC = () => {
                     </h3>
                     <ul className="space-y-2 text-xs text-slate-300">
                       {unfoldedUniverse.world_bible.canon_facts.map((fact, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                          <span className="leading-relaxed">{fact}</span>
+                        <li key={idx} className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                            <span className="leading-relaxed">{fact}</span>
+                          </div>
+                          <OriginBadge
+                            originType="DERIVED"
+                            originSource="World Bible: Canon Lore Laws"
+                            interactive={true}
+                            onClick={() =>
+                              setWhyModalData({
+                                title: `Canon Lore Law #${idx + 1}`,
+                                entityType: 'Canon Lore Fact',
+                                originType: 'DERIVED',
+                                originSource: 'World Bible: Canon Lore Laws',
+                                causalExplanation: `Established in Stage 5 World Bible to enforce physical, geographical, and ecological consistency: "${fact}"`,
+                                nodeId: 'node-bible',
+                              })
+                            }
+                            size="xs"
+                            showLabel={false}
+                          />
                         </li>
                       ))}
                     </ul>
@@ -600,7 +693,13 @@ export const UniverseCodexCanvas: React.FC = () => {
               >
                 {/* Character Cards */}
                 <div id="codex-characters-grid" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {unfoldedUniverse.characters.map((char, idx) => {
+                  {unfoldedUniverse.characters
+                    .filter(
+                      (char) =>
+                        selectedOriginFilter === 'ALL' ||
+                        (char.origin_type || 'SEED_INFERRED') === selectedOriginFilter
+                    )
+                    .map((char, idx) => {
                     const copyKey = `char-${idx}`;
                     return (
                       <div
@@ -613,7 +712,22 @@ export const UniverseCodexCanvas: React.FC = () => {
                               <h3 className="font-extrabold text-slate-100 text-sm md:text-base">
                                 {char.name}
                               </h3>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <OriginBadge
+                                  originType={char.origin_type || 'SEED_INFERRED'}
+                                  originSource={char.origin_source || 'Character Roster'}
+                                  interactive={true}
+                                  onClick={() =>
+                                    setWhyModalData({
+                                      title: char.name,
+                                      entityType: 'Character',
+                                      originType: char.origin_type || 'SEED_INFERRED',
+                                      originSource: char.origin_source || 'Character Roster',
+                                      nodeId: `node-char-${char.id}`,
+                                    })
+                                  }
+                                  size="xs"
+                                />
                                 <span className="char-version-badge px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
                                   v{char.version || 1}
                                 </span>
@@ -751,7 +865,13 @@ export const UniverseCodexCanvas: React.FC = () => {
                 id="codex-scenes-grid"
                 className="space-y-4"
               >
-                {unfoldedUniverse.scenes.map((scene, idx) => {
+                {unfoldedUniverse.scenes
+                  .filter(
+                    (scene) =>
+                      selectedOriginFilter === 'ALL' ||
+                      (scene.origin_type || 'SEED_EXPLICIT') === selectedOriginFilter
+                  )
+                  .map((scene, idx) => {
                   const copyKey = `scene-${idx}`;
                   return (
                     <div
@@ -767,7 +887,22 @@ export const UniverseCodexCanvas: React.FC = () => {
                             {scene.title}
                           </h3>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <OriginBadge
+                            originType={scene.origin_type || 'SEED_EXPLICIT'}
+                            originSource={scene.origin_source || `Story Beat #${scene.scene_number}`}
+                            interactive={true}
+                            onClick={() =>
+                              setWhyModalData({
+                                title: scene.title,
+                                entityType: 'Scene / Story Beat',
+                                originType: scene.origin_type || 'SEED_EXPLICIT',
+                                originSource: scene.origin_source || `Story Beat #${scene.scene_number}`,
+                                nodeId: `node-scene-${scene.id}`,
+                              })
+                            }
+                            size="xs"
+                          />
                           <span className="scene-version-badge px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
                             v{scene.version || 1}
                           </span>
@@ -805,7 +940,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                         </div>
 
                         <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-                          <span className="text-[10px] uppercase font-bold text-slate-400">
+                          <span className="text-[10px] uppercase font-bold text-purple-400">
                             Conflict Narrative
                           </span>
                           <p className="text-slate-300 leading-relaxed">
@@ -852,6 +987,14 @@ export const UniverseCodexCanvas: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Why is this here? Explainer Modal (ORIG-03) */}
+      <WhyIsThisHereModal
+        isOpen={!!whyModalData}
+        onClose={() => setWhyModalData(null)}
+        data={whyModalData}
+        onJumpToDAG={(nodeId) => jumpToTraceNode(nodeId || '')}
+      />
 
       {/* Refinement Modal (PERS-01) */}
       <RefinementModal />

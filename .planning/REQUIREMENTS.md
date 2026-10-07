@@ -71,9 +71,9 @@
 - [x] **DDNA-03**: Decision DNA is injected as an explicit constraint into downstream universe unfolding prompts.
 
 ### Origin Ledger (ORIG) — Phase 12
-- [ ] **ORIG-01**: Every universe entity (character, rule, location, scene) is tagged with an origin classification (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, `DERIVED`, `AI_INTRODUCED`, `USER_ADDED`).
-- [ ] **ORIG-02**: Causal Lineage DAG integrates origin metadata badges and color accents.
-- [ ] **ORIG-03**: "Why is this here?" drawer interaction provides human-intelligible causal provenance based on stored metadata without exposing raw LLM reasoning tokens.
+- [x] **ORIG-01**: Every universe entity (character, rule, location, scene) is tagged with an origin classification (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, `DERIVED`, `AI_INTRODUCED`, `USER_ADDED`).
+- [x] **ORIG-02**: Causal Lineage DAG integrates origin metadata badges and color accents.
+- [x] **ORIG-03**: "Why is this here?" drawer interaction provides human-intelligible causal provenance based on stored metadata without exposing raw LLM reasoning tokens.
 
 ### Media Provider Architecture (MED) — Phase 13
 - [ ] **MED-01**: Abstract `MediaProvider` base class defining `ImageProvider`, `VoiceProvider`, `VideoProvider`, and `AudioProvider` interfaces.
@@ -131,7 +131,7 @@
 | POT-01 – POT-04 | Phase 9 | Complete |
 | DIV-01 – DIV-03 | Phase 10 | Complete |
 | DDNA-01 – DDNA-03 | Phase 11 | Complete |
-| ORIG-01 – ORIG-03 | Phase 12 | Pending |
+| ORIG-01 – ORIG-03 | Phase 12 | Complete |
 | MED-01 – MED-03 | Phase 13 | Pending |
 | IMG-01 – IMG-03 | Phase 14 | Pending |
 | VOX-01 – VOX-03 | Phase 15 | Pending |

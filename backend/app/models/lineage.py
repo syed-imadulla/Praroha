@@ -47,6 +47,14 @@ class TraceNode(BaseModel):
         default_factory=dict,
         description="Arbitrary structured metadata (e.g. location_index, archetype).",
     )
+    origin_type: Optional[str] = Field(
+        default=None,
+        description="Universal origin classification: SEED_EXPLICIT, SEED_INFERRED, HUMAN_DECISION, DERIVED, AI_INTRODUCED, USER_ADDED.",
+    )
+    origin_source: Optional[str] = Field(
+        default=None,
+        description="Specific origin anchor or decision citation.",
+    )
 
 
 class TraceEdge(BaseModel):
