@@ -15,6 +15,8 @@ from backend.app.models.world import (
     WorldCandidateRead,
 )
 from backend.app.models.selection import (
+    HumanOnlyZones,
+    DecisionDNA,
     WorldSelectionBase,
     WorldSelectionRecord,
     WorldSelectionCreate,
@@ -177,6 +179,8 @@ __all__ = [
     "CounterfactualDeltaResponse",
     "ForkCounterfactualRequest",
     "CounterfactualMetadata",
+    "HumanOnlyZones",
+    "DecisionDNA",
 ]
 
 

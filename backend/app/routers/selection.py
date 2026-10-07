@@ -37,6 +37,7 @@ async def select_world_candidate(
     creative_priorities = body.creative_priorities if body else None
     rejected_directions = body.rejected_directions if body else None
     custom_directives = body.custom_directives if body else None
+    human_only_zones = body.human_only_zones if body else None
 
     try:
         selection = await repo.save_world_selection(
@@ -46,6 +47,7 @@ async def select_world_candidate(
             creative_priorities=creative_priorities,
             rejected_directions=rejected_directions,
             custom_directives=custom_directives,
+            human_only_zones=human_only_zones,
         )
     except KeyError as exc:
         raise HTTPException(

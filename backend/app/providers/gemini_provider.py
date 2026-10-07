@@ -559,6 +559,33 @@ class GeminiProvider(AIProvider):
             if directives:
                 contract_lines.append(f"   - Directives: {directives}")
 
+        hoz = decision_dna.get("human_only_zones")
+        if hoz:
+            if hasattr(hoz, "model_dump"):
+                hoz_dict = hoz.model_dump()
+            elif hasattr(hoz, "dict"):
+                hoz_dict = hoz.dict()
+            elif isinstance(hoz, dict):
+                hoz_dict = hoz
+            else:
+                hoz_dict = {}
+
+            if hoz_dict.get("is_locked", True) and any([
+                hoz_dict.get("core_theme"),
+                hoz_dict.get("protagonist_motivation"),
+                hoz_dict.get("central_conflict"),
+            ]):
+                contract_lines.append("\n=== IMMUTABLE HUMAN-ONLY ZONES (CREATOR LOCKS) ===")
+                contract_lines.append("The following parameters were locked by the human creator and are INVIOLABLE AXIOMS:")
+                if hoz_dict.get("core_theme"):
+                    contract_lines.append(f"- CORE THEME: {hoz_dict['core_theme']}")
+                if hoz_dict.get("protagonist_motivation"):
+                    contract_lines.append(f"- PROTAGONIST MOTIVATION: {hoz_dict['protagonist_motivation']}")
+                if hoz_dict.get("central_conflict"):
+                    contract_lines.append(f"- CENTRAL CONFLICT: {hoz_dict['central_conflict']}")
+                contract_lines.append("STRICT ZERO-OVERRIDE RULE: You MUST construct all world bible lore, character motivations, and narrative beats strictly around these exact anchors. Do NOT alter, soften, replace, or reinterpret these locked principles.")
+                contract_lines.append("==================================================")
+
         contract_lines.append("=======================================")
         return "\n".join(contract_lines)
 

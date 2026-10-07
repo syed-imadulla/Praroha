@@ -84,7 +84,7 @@ class WorldBibleRecord(WorldBibleBase, table=True):
                 canon_facts = []
             else:
                 canon_facts = [
-                    (item.get("fact") or item.get("text") or item.get("description") or str(item))
+                    (item.get("fact") or item.get("rule") or item.get("text") or item.get("description") or str(item))
                     if isinstance(item, dict)
                     else str(item)
                     for item in canon_facts_raw

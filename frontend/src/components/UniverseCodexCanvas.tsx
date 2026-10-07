@@ -18,6 +18,7 @@ import {
   Layers,
   AlertTriangle,
   Edit3,
+  Lock,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { RefinementModal } from './RefinementModal';
@@ -48,6 +49,7 @@ export const UniverseCodexCanvas: React.FC = () => {
     setInspectorTab,
     setRefiningEntity,
     generateMediaAction,
+    humanOnlyZones,
   } = useWorkspaceStore();
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -63,6 +65,7 @@ export const UniverseCodexCanvas: React.FC = () => {
 
   const selectedWorld = worlds.find((w) => w.id === selectedWorldId);
   const decisionDNA = activeSelection?.decision_dna;
+  const hoz = activeSelection?.human_only_zones || decisionDNA?.human_only_zones || humanOnlyZones;
 
   const handleCopyPrompt = async (id: string, text: string, label: string) => {
     try {
@@ -230,6 +233,67 @@ export const UniverseCodexCanvas: React.FC = () => {
                 <span>Inspect Full DNA</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Human-Only Zones Summary Banner (HOZ-01 & HOZ-02) */}
+        {hoz && hoz.is_locked && (
+          <div
+            id="human-only-zones-summary-banner"
+            className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.12)] space-y-3"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-900/40 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="p-1 rounded-md bg-amber-500/20 text-amber-400">
+                  <Lock className="w-4 h-4" />
+                </span>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-300">
+                  Human-Only Zones: Inviolable Creative Axioms
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold">
+                  CREATOR LOCKED
+                </span>
+              </div>
+              <span className="text-[11px] text-amber-300/80 font-mono">
+                Dual-Layer AI Invariance Enforced
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              {hoz.core_theme && (
+                <div className="p-2.5 rounded-xl bg-slate-950/70 border border-amber-600/30 space-y-1">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>Core Theme</span>
+                  </div>
+                  <p className="text-slate-200 line-clamp-2 leading-relaxed font-medium">
+                    {hoz.core_theme}
+                  </p>
+                </div>
+              )}
+              {hoz.protagonist_motivation && (
+                <div className="p-2.5 rounded-xl bg-slate-950/70 border border-amber-600/30 space-y-1">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>Protagonist Motivation</span>
+                  </div>
+                  <p className="text-slate-200 line-clamp-2 leading-relaxed font-medium">
+                    {hoz.protagonist_motivation}
+                  </p>
+                </div>
+              )}
+              {hoz.central_conflict && (
+                <div className="p-2.5 rounded-xl bg-slate-950/70 border border-amber-600/30 space-y-1">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>Central Conflict</span>
+                  </div>
+                  <p className="text-slate-200 line-clamp-2 leading-relaxed font-medium">
+                    {hoz.central_conflict}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -762,31 +826,45 @@ export const UniverseCodexCanvas: React.FC = () => {
                       <span>Canon Lore Facts</span>
                     </h3>
                     <ul className="space-y-2 text-xs text-slate-300">
-                      {unfoldedUniverse.world_bible.canon_facts.map((fact, idx) => (
-                        <li key={idx} className="flex items-start justify-between gap-2">
-                          <div className="flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                            <span className="leading-relaxed">{fact}</span>
-                          </div>
-                          <OriginBadge
-                            originType="DERIVED"
-                            originSource="World Bible: Canon Lore Laws"
-                            interactive={true}
-                            onClick={() =>
-                              setWhyModalData({
-                                title: `Canon Lore Law #${idx + 1}`,
-                                entityType: 'Canon Lore Fact',
-                                originType: 'DERIVED',
-                                originSource: 'World Bible: Canon Lore Laws',
-                                causalExplanation: `Established in Stage 5 World Bible to enforce physical, geographical, and ecological consistency: "${fact}"`,
-                                nodeId: 'node-bible',
-                              })
-                            }
-                            size="xs"
-                            showLabel={false}
-                          />
-                        </li>
-                      ))}
+                      {unfoldedUniverse.world_bible.canon_facts.map((fact, idx) => {
+                        const isHozTheme =
+                          Boolean(hoz &&
+                          hoz.is_locked &&
+                          hoz.core_theme &&
+                          (fact === hoz.core_theme || fact.includes(hoz.core_theme) || idx === 0));
+                        return (
+                          <li key={idx} className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                              <span className="leading-relaxed">{fact}</span>
+                              {isHozTheme && (
+                                <span className="creator-locked-badge px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-mono font-bold flex items-center gap-1 shrink-0">
+                                  <Lock className="w-2.5 h-2.5" /> CREATOR LOCKED
+                                </span>
+                              )}
+                            </div>
+                            <OriginBadge
+                              originType={isHozTheme ? 'HUMAN_DECISION' : 'DERIVED'}
+                              originSource={isHozTheme ? 'Human-Only Zone: Core Theme' : 'World Bible: Canon Lore Laws'}
+                              interactive={true}
+                              onClick={() =>
+                                setWhyModalData({
+                                  title: `Canon Lore Law #${idx + 1}`,
+                                  entityType: 'Canon Lore Fact',
+                                  originType: isHozTheme ? 'HUMAN_DECISION' : 'DERIVED',
+                                  originSource: isHozTheme ? 'Human-Only Zone: Core Theme' : 'World Bible: Canon Lore Laws',
+                                  causalExplanation: isHozTheme
+                                    ? `Locked by the human creator as an inviolable Human-Only Zone before universe expansion: "${fact}"`
+                                    : `Established in Stage 5 World Bible to enforce physical, geographical, and ecological consistency: "${fact}"`,
+                                  nodeId: 'node-bible',
+                                })
+                              }
+                              size="xs"
+                              showLabel={false}
+                            />
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>
@@ -868,9 +946,16 @@ export const UniverseCodexCanvas: React.FC = () => {
 
                           <div className="space-y-2 text-xs">
                             <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-slate-400">
-                                Motivation
-                              </span>
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] uppercase font-bold text-slate-400">
+                                  Motivation
+                                </span>
+                                {hoz && hoz.is_locked && hoz.protagonist_motivation && (char.motivation === hoz.protagonist_motivation || (char.origin_source && char.origin_source.includes('Human-Only Zone'))) && (
+                                  <span className="creator-locked-badge px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-mono font-bold flex items-center gap-1 shadow-sm">
+                                    <Lock className="w-2.5 h-2.5" /> CREATOR LOCKED
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-slate-200 leading-relaxed">{char.motivation}</p>
                             </div>
 
@@ -1060,9 +1145,16 @@ export const UniverseCodexCanvas: React.FC = () => {
                         </div>
 
                         <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-                          <span className="text-[10px] uppercase font-bold text-purple-400">
-                            Conflict Narrative
-                          </span>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase font-bold text-purple-400">
+                              Conflict Narrative
+                            </span>
+                            {hoz && hoz.is_locked && hoz.central_conflict && (scene.conflict_narrative === hoz.central_conflict || (scene.origin_source && scene.origin_source.includes('Human-Only Zone'))) && (
+                              <span className="creator-locked-badge px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-mono font-bold flex items-center gap-1 shadow-sm">
+                                <Lock className="w-2.5 h-2.5" /> CREATOR LOCKED
+                              </span>
+                            )}
+                          </div>
                           <p className="text-slate-300 leading-relaxed">
                             {scene.conflict_narrative}
                           </p>

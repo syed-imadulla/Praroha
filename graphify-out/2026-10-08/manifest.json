@@ -30,15 +30,15 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1791397953.1514728,
-    "seen": 1791399961.4547527,
-    "ast_hash": "d146232d9a06ceaa6e67478af4551db3",
+    "mtime": 1791407161.1522975,
+    "seen": 1791408312.262002,
+    "ast_hash": "ed0787114726e8ad72a0b2f5f4b07c53",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
-    "mtime": 1791397748.778216,
-    "seen": 1791399961.4547744,
-    "ast_hash": "85f6782d38a9f8934b459baa6061a644",
+    "mtime": 1791406942.7404413,
+    "seen": 1791408312.2620184,
+    "ast_hash": "9768575a68b3b327dfc669ea4d3a4596",
     "semantic_hash": ""
   },
   "backend/app/providers/base.py": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791398093.1503239,
-    "seen": 1791399961.4548264,
-    "ast_hash": "f57611060e5c55d9fedb361c0794de22",
+    "mtime": 1791406971.2124977,
+    "seen": 1791408312.2620554,
+    "ast_hash": "42653ca4a31f7b4bf5e7e0797c94f079",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791398460.087343,
-    "seen": 1791399961.4549327,
-    "ast_hash": "e6642151e2de111f16a696316f632cd4",
+    "mtime": 1791407543.5088356,
+    "seen": 1791408312.2621453,
+    "ast_hash": "73fa7d3f3c7d4a93aad80a2c23e91987",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -156,15 +156,15 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791398781.147735,
-    "seen": 1791399961.454976,
-    "ast_hash": "701fa480d3cbad48b1e8d7d214bfcced",
+    "mtime": 1791408080.5274422,
+    "seen": 1791408312.2621813,
+    "ast_hash": "a5874d6c52c76f8a28c6b5f242328e5a",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1791398327.759418,
-    "seen": 1791399961.4549778,
-    "ast_hash": "8d99836680e628464151707ccd516642",
+    "mtime": 1791407507.269738,
+    "seen": 1791408312.262183,
+    "ast_hash": "041a4a381b5a077bfb00e6f3a750fe64",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791399842.8317947,
-    "seen": 1791399961.454994,
-    "ast_hash": "0afc84f58649c58d5f18bd8fc28b66bb",
+    "mtime": 1791409048.6412487,
+    "seen": 1791409074.3545065,
+    "ast_hash": "be51950fe466b36a08e723f335c6f37a",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791399949.3608892,
-    "seen": 1791399961.4549954,
-    "ast_hash": "658b17d246e4444ae606c814ddb75fbe",
+    "mtime": 1791409060.9321923,
+    "seen": 1791409074.3545096,
+    "ast_hash": "3eb51b198d10e0c200bec120f3b4a262",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1791397801.2137687,
-    "seen": 1791399961.4547565,
-    "ast_hash": "3dc11ac6c9919519a9f287151a3e20a7",
+    "mtime": 1791407024.1467428,
+    "seen": 1791408312.2620041,
+    "ast_hash": "816b0afb5b3aee9473db96aec25b0063",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/UniverseCodexCanvas.tsx": {
-    "mtime": 1791398746.6270154,
-    "seen": 1791399961.4549634,
-    "ast_hash": "478cab91b2485d90ae6c069b469b1f7a",
+    "mtime": 1791407707.4745662,
+    "seen": 1791408312.262171,
+    "ast_hash": "47d7f717f388ebe3a7704d64df54dd56",
     "semantic_hash": ""
   },
   ".planning/phases/05-progressive-world-unfolding/05-SUMMARY.md": {
@@ -1404,9 +1404,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_voice_generation.py": {
-    "mtime": 1791387602.7516816,
-    "seen": 1791388014.7887578,
-    "ast_hash": "680a8309c8bd0868ed01948640c8c90d",
+    "mtime": 1791407398.6685014,
+    "seen": 1791408312.2621062,
+    "ast_hash": "19ed112109f27194c1f67b1a091d98db",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase15_voice_generation.cjs": {
@@ -1599,6 +1599,84 @@
     "mtime": 1791397006.947543,
     "seen": 1791399961.4551556,
     "ast_hash": "0bce895bdbb5b0fcca727551c137998e",
+    "semantic_hash": ""
+  },
+  "backend/app/models/counterfactual.py": {
+    "mtime": 1791406984.748049,
+    "seen": 1791408312.2620065,
+    "ast_hash": "812753417b284f4b4b7d8682e96edb69",
+    "semantic_hash": ""
+  },
+  "backend/app/routers/counterfactual.py": {
+    "mtime": 1791407136.2825303,
+    "seen": 1791408312.2620564,
+    "ast_hash": "661ec94d3dc78b0cb7276e6200cdbc62",
+    "semantic_hash": ""
+  },
+  "backend/app/services/counterfactual_service.py": {
+    "mtime": 1791407313.8333812,
+    "seen": 1791408312.2620702,
+    "ast_hash": "990d4fce9a25e7354393a04e5651954d",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_counterfactual_replay.py": {
+    "mtime": 1791407265.699355,
+    "seen": 1791408312.2620797,
+    "ast_hash": "4f59739e78d364d6e2f99321f4a98422",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase19_counterfactual_replay.cjs": {
+    "mtime": 1791407970.8593013,
+    "seen": 1791408312.2621293,
+    "ast_hash": "4219687b4553efa178ab65fd98786c71",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/CounterfactualReplayCanvas.tsx": {
+    "mtime": 1791407732.3759642,
+    "seen": 1791408312.262148,
+    "ast_hash": "f181425c083c79f27c6fc372e0a5b63d",
+    "semantic_hash": ""
+  },
+  ".planning/phases/19-counterfactual-replay/19-01-PLAN.md": {
+    "mtime": 1791407446.5441718,
+    "seen": 1791408312.2623174,
+    "ast_hash": "5162d7926e897f04bcdddbce90b7cf67",
+    "semantic_hash": ""
+  },
+  ".planning/phases/19-counterfactual-replay/19-02-PLAN.md": {
+    "mtime": 1791408222.9187415,
+    "seen": 1791408312.2623184,
+    "ast_hash": "3bf186e2da7e91b6d1b5936459f7c100",
+    "semantic_hash": ""
+  },
+  ".planning/phases/19-counterfactual-replay/19-CONTEXT.md": {
+    "mtime": 1791400656.8596354,
+    "seen": 1791408312.262319,
+    "ast_hash": "cf28e834c87b7aad0a3b4a91ccdeb9b3",
+    "semantic_hash": ""
+  },
+  ".planning/phases/19-counterfactual-replay/19-UAT.md": {
+    "mtime": 1791408528.3388472,
+    "seen": 1791409074.3548007,
+    "ast_hash": "7120d1b318cd91f1fdad6fb5f8d14e45",
+    "semantic_hash": ""
+  },
+  ".planning/phases/20-human-only-zones/20-01-PLAN.md": {
+    "mtime": 1791409014.2294064,
+    "seen": 1791409074.3548043,
+    "ast_hash": "b1734edb7e77dbba0d9c8bbfffb6f573",
+    "semantic_hash": ""
+  },
+  ".planning/phases/20-human-only-zones/20-02-PLAN.md": {
+    "mtime": 1791409036.0393064,
+    "seen": 1791409074.3548064,
+    "ast_hash": "43b1b44ea867c28f54eb16b6f18094ef",
+    "semantic_hash": ""
+  },
+  ".planning/phases/20-human-only-zones/20-CONTEXT.md": {
+    "mtime": 1791408746.5571356,
+    "seen": 1791409074.354809,
+    "ast_hash": "dbd77f665149a7ec62d5446aae8309fa",
     "semantic_hash": ""
   }
 }

@@ -29,6 +29,12 @@ class LineageService:
         source_label = origin_source or "Creative Context"
         title_label = title or "This entity"
 
+        if source_label and "Human-Only Zone" in source_label:
+            return (
+                f"Locked by the human creator as an inviolable Human-Only Zone before universe expansion. "
+                f"Creator lock: '{source_label}'."
+            )
+
         if origin_type == "SEED_EXPLICIT":
             return (
                 f"Grounded directly in the creator's original seed premise. "
@@ -181,6 +187,16 @@ class LineageService:
         if selection_tuple:
             selection, chosen_world = selection_tuple
             chosen_parent_id = f"node-world-{chosen_world.id}"
+            sel_metadata = {
+                "chosen_candidate_id": chosen_world.id,
+                "user_rationale": selection.user_rationale,
+                "archetype": chosen_world.archetype,
+            }
+            if getattr(selection, "human_only_zones_json", None):
+                hoz_obj = selection.get_human_only_zones()
+                if hoz_obj and hoz_obj.is_locked:
+                    sel_metadata["human_only_zones"] = hoz_obj.model_dump()
+
             selection_node = TraceNode(
                 id="node-selection",
                 entity_id=selection.id,
@@ -196,11 +212,7 @@ class LineageService:
                 parent_ids=[chosen_parent_id],
                 origin_type="HUMAN_DECISION",
                 origin_source=f"Committed Direction: {chosen_world.title}",
-                metadata={
-                    "chosen_candidate_id": chosen_world.id,
-                    "user_rationale": selection.user_rationale,
-                    "archetype": chosen_world.archetype,
-                },
+                metadata=sel_metadata,
             )
             nodes.append(selection_node)
             edges.append(
@@ -268,6 +280,8 @@ class LineageService:
                 loc_node_id = f"node-loc-{idx}"
                 loc_orig_type = getattr(loc, "origin_type", None) or "DERIVED"
                 loc_orig_source = getattr(loc, "origin_source", None) or "World Bible Geography"
+                if loc_orig_source and "Human-Only Zone" in loc_orig_source:
+                    loc_orig_type = "HUMAN_DECISION"
                 loc_node = TraceNode(
                     id=loc_node_id,
                     entity_id=f"loc-{idx}",
@@ -308,6 +322,8 @@ class LineageService:
                 char_node_id = f"node-char-{c.id}"
                 c_orig_type = getattr(c, "origin_type", None) or "AI_INTRODUCED"
                 c_orig_source = getattr(c, "origin_source", None)
+                if c_orig_source and "Human-Only Zone" in c_orig_source:
+                    c_orig_type = "HUMAN_DECISION"
                 char_revs = [r for r in revisions_by_entity.get(c.id, []) if r.version < c.version]
                 char_revs.sort(key=lambda r: (r.version, r.created_at))
                 seen_versions: Set[int] = set()
@@ -502,6 +518,8 @@ class LineageService:
                 scene_node_id = f"node-scene-{s.id}"
                 s_orig_type = getattr(s, "origin_type", None) or "AI_INTRODUCED"
                 s_orig_source = getattr(s, "origin_source", None)
+                if s_orig_source and "Human-Only Zone" in s_orig_source:
+                    s_orig_type = "HUMAN_DECISION"
                 scene_parents: List[str] = ["node-bible"]
 
                 # Link character parents if characters_involved match

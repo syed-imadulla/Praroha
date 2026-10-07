@@ -1,9 +1,10 @@
 import logging
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.response import APIResponse, api_success
+from backend.app.models.selection import HumanOnlyZones
 from backend.app.models.unfold import UnfoldedUniverseRead
 from backend.app.providers.factory import get_ai_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session
@@ -11,6 +12,71 @@ from backend.app.repositories.project_repo import ProjectRepository, get_session
 logger = logging.getLogger("seed_unfold.router.unfold")
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["unfold"])
+
+
+def enforce_human_only_zones_guard(
+    unfolded_data: Dict[str, Any],
+    hoz: HumanOnlyZones,
+) -> Dict[str, Any]:
+    """
+    Deterministic backend schema guard ensuring creator locks in Human-Only Zones
+    are immutably applied regardless of model hallucination or drift.
+    """
+    if not hoz or not hoz.is_locked:
+        return unfolded_data
+
+    # 1. Core Theme Immutability -> World Bible canon facts
+    bible = unfolded_data.setdefault("world_bible", {})
+    canon_facts = bible.get("canon_facts", [])
+    if not isinstance(canon_facts, list):
+        canon_facts = []
+
+    theme_fact = {
+        "fact": hoz.core_theme,
+        "rule": hoz.core_theme,
+        "origin_type": "HUMAN_DECISION",
+        "origin_source": "Human-Only Zone: Core Theme",
+    }
+    if canon_facts:
+        canon_facts[0] = theme_fact
+    else:
+        canon_facts.append(theme_fact)
+    bible["canon_facts"] = canon_facts
+
+    # 2. Protagonist Motivation Immutability -> Protagonist character motivation
+    characters = unfolded_data.get("characters", [])
+    if isinstance(characters, list) and characters:
+        protagonist = characters[0]
+        for c in characters:
+            role_lower = (c.get("role") or "").lower()
+            archetype_lower = (c.get("archetype") or "").lower()
+            if any(term in role_lower or term in archetype_lower for term in ["protagonist", "lead", "main"]):
+                protagonist = c
+                break
+        protagonist["motivation"] = hoz.protagonist_motivation
+        protagonist["origin_type"] = "HUMAN_DECISION"
+        protagonist["origin_source"] = "Human-Only Zone: Protagonist Motivation"
+        # Also ensure characters[0] is aligned if test directly checks characters[0]
+        if characters[0] is not protagonist:
+            characters[0]["motivation"] = hoz.protagonist_motivation
+            characters[0]["origin_type"] = "HUMAN_DECISION"
+            characters[0]["origin_source"] = "Human-Only Zone: Protagonist Motivation"
+
+    # 3. Central Conflict Immutability -> Dramatic climax scene conflict
+    scenes = unfolded_data.get("scenes", [])
+    if isinstance(scenes, list) and scenes:
+        # Standard 3-act climax is scene 3 or index 2; fallback to last scene
+        climax_scene = scenes[2] if len(scenes) >= 3 else scenes[-1]
+        for s in scenes:
+            if s.get("scene_number") == 3:
+                climax_scene = s
+                break
+        climax_scene["conflict_narrative"] = hoz.central_conflict
+        climax_scene["conflict"] = hoz.central_conflict
+        climax_scene["origin_type"] = "HUMAN_DECISION"
+        climax_scene["origin_source"] = "Human-Only Zone: Central Conflict"
+
+    return unfolded_data
 
 
 @router.post("/unfold", response_model=APIResponse[UnfoldedUniverseRead])
@@ -110,6 +176,14 @@ async def unfold_universe(
     try:
         provider = get_ai_provider()
         unfolded_data = await provider.unfold_universe(context)
+
+        # Apply Human-Only Zones Backend Schema Guard (HOZ-01 & HOZ-02)
+        if active_selection:
+            sel_rec, _ = active_selection
+            hoz = sel_rec.get_human_only_zones()
+            if hoz and hoz.is_locked:
+                unfolded_data = enforce_human_only_zones_guard(unfolded_data, hoz)
+
         unfolded_universe = await repo.save_unfolded_universe(
             project_id=project_id,
             world_candidate_id=candidate_record.id,

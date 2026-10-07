@@ -142,6 +142,13 @@ export interface WorldCandidateRead {
   emphasized_potential_labels?: string[];
 }
 
+export interface HumanOnlyZones {
+  core_theme?: string;
+  protagonist_motivation?: string;
+  central_conflict?: string;
+  is_locked: boolean;
+}
+
 export interface DecisionDNA {
   selected_world_id: string;
   selected_title: string;
@@ -150,6 +157,7 @@ export interface DecisionDNA {
   creative_priorities: string[];
   rejected_directions: string[];
   custom_directives?: string | null;
+  human_only_zones?: HumanOnlyZones;
   created_at: string;
 }
 
@@ -158,6 +166,7 @@ export interface WorldSelectionCreate {
   creative_priorities?: string[];
   rejected_directions?: string[];
   custom_directives?: string | null;
+  human_only_zones?: HumanOnlyZones;
 }
 
 export interface WorldSelectionRead {
@@ -169,6 +178,7 @@ export interface WorldSelectionRead {
   selected_world: WorldCandidateRead;
   created_at: string;
   decision_dna?: DecisionDNA;
+  human_only_zones?: HumanOnlyZones;
 }
 
 export type OriginType =

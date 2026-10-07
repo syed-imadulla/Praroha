@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, GitCommit, Compass, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X, GitCommit, Compass, Sparkles, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
 import type { OriginType } from '../types';
 import { OriginBadge, ORIGIN_CONFIG } from './OriginBadge';
 import { useWorkspaceStore } from '../store/workspaceStore';
@@ -48,6 +47,9 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
       case 'SEED_INFERRED':
         return `Developed from an accepted Seed Potential possibility or inferred thematic premise: "${sourceLabel}". It logically extrapolates foundational seed implications without introducing canon drift.`;
       case 'HUMAN_DECISION':
+        if (sourceLabel.includes('Human-Only Zone')) {
+          return `Locked by the human creator as an inviolable Human-Only Zone before universe expansion: "${sourceLabel}". AI models are strictly prohibited from overriding or softening this constraint.`;
+        }
         return `Created to fulfill your explicit creator commitment in Stage 4 Decision DNA: "${sourceLabel}". It directly embodies chosen archetypes, creative priorities, and custom directives.`;
       case 'DERIVED':
         return `Derived logically from established World Bible physics, geography, and systemic rules. Canon Anchor: "${sourceLabel}". It maintains strict ecological and world consistency.`;
@@ -147,6 +149,24 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
               data-testid="why-modal-citation"
             >
               {data.originSource}
+            </div>
+          </div>
+        )}
+
+        {/* Human-Only Zone Creator Lock Callout Banner */}
+        {sourceLabel.includes('Human-Only Zone') && (
+          <div
+            id="why-modal-hoz-callout"
+            className="mb-4 p-3 rounded-xl bg-amber-950/40 border border-amber-500/50 flex items-start gap-2.5 text-xs text-amber-200"
+          >
+            <Lock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <div className="font-mono font-bold text-amber-300 uppercase text-[10px]">
+                Inviolable Human-Only Zone Lock
+              </div>
+              <p className="text-[11.5px] text-amber-200/90 leading-relaxed">
+                Locked by human creator before universe expansion. AI models are strictly prohibited from overriding this constraint.
+              </p>
             </div>
           </div>
         )}

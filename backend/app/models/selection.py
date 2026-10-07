@@ -11,6 +11,13 @@ def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+class HumanOnlyZones(BaseModel):
+    core_theme: Optional[str] = None
+    protagonist_motivation: Optional[str] = None
+    central_conflict: Optional[str] = None
+    is_locked: bool = True
+
+
 class DecisionDNA(BaseModel):
     selected_world_id: str
     selected_title: str
@@ -19,6 +26,7 @@ class DecisionDNA(BaseModel):
     creative_priorities: List[str] = PydanticField(default_factory=list)
     rejected_directions: List[str] = PydanticField(default_factory=list)
     custom_directives: Optional[str] = None
+    human_only_zones: Optional[HumanOnlyZones] = None
     created_at: datetime
 
 
@@ -27,6 +35,7 @@ class WorldSelectionCreate(BaseModel):
     creative_priorities: List[str] = PydanticField(default_factory=list)
     rejected_directions: List[str] = PydanticField(default_factory=list)
     custom_directives: Optional[str] = None
+    human_only_zones: Optional[HumanOnlyZones] = None
 
 
 class WorldSelectionBase(SQLModel):
@@ -37,6 +46,7 @@ class WorldSelectionBase(SQLModel):
     creative_priorities_json: str = Field(default="[]")
     rejected_directions_json: str = Field(default="[]")
     custom_directives: Optional[str] = Field(default=None, nullable=True)
+    human_only_zones_json: Optional[str] = Field(default="{}", nullable=True)
 
 
 class WorldSelectionRecord(WorldSelectionBase, table=True):
@@ -48,6 +58,16 @@ class WorldSelectionRecord(WorldSelectionBase, table=True):
         index=True,
     )
     created_at: datetime = Field(default_factory=get_utc_now)
+
+    def get_human_only_zones(self) -> Optional[HumanOnlyZones]:
+        try:
+            if self.human_only_zones_json:
+                hoz_dict = json.loads(self.human_only_zones_json)
+                if isinstance(hoz_dict, dict) and any(hoz_dict.values()):
+                    return HumanOnlyZones(**hoz_dict)
+        except Exception:
+            return None
+        return None
 
     def to_decision_dna(self, candidate: WorldCandidateRead) -> DecisionDNA:
         try:
@@ -64,6 +84,8 @@ class WorldSelectionRecord(WorldSelectionBase, table=True):
         except Exception:
             rejected = []
 
+        hoz = self.get_human_only_zones()
+
         return DecisionDNA(
             selected_world_id=self.world_candidate_id,
             selected_title=candidate.title,
@@ -72,10 +94,13 @@ class WorldSelectionRecord(WorldSelectionBase, table=True):
             creative_priorities=priorities,
             rejected_directions=rejected,
             custom_directives=self.custom_directives,
+            human_only_zones=hoz,
             created_at=self.created_at,
         )
 
     def to_read_schema(self, candidate: WorldCandidateRead) -> "WorldSelectionRead":
+        hoz = self.get_human_only_zones()
+
         return WorldSelectionRead(
             id=self.id,
             project_id=self.project_id,
@@ -85,6 +110,7 @@ class WorldSelectionRecord(WorldSelectionBase, table=True):
             selected_world=candidate,
             created_at=self.created_at,
             decision_dna=self.to_decision_dna(candidate),
+            human_only_zones=hoz,
         )
 
 
@@ -97,4 +123,5 @@ class WorldSelectionRead(BaseModel):
     selected_world: WorldCandidateRead
     created_at: datetime
     decision_dna: Optional[DecisionDNA] = None
+    human_only_zones: Optional[HumanOnlyZones] = None
 

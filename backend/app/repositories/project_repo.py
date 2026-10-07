@@ -181,6 +181,11 @@ def _migrate_columns(connection):
                 connection.execute(text("ALTER TABLE world_selections ADD COLUMN custom_directives TEXT"))
             except Exception:
                 pass
+        if "human_only_zones_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_selections ADD COLUMN human_only_zones_json TEXT DEFAULT '{}'"))
+            except Exception:
+                pass
 
     if "media_assets" in table_names:
         cols = [c["name"] for c in inspector.get_columns("media_assets")]
@@ -440,6 +445,7 @@ class ProjectRepository:
         creative_priorities: Optional[List[str]] = None,
         rejected_directions: Optional[List[str]] = None,
         custom_directives: Optional[str] = None,
+        human_only_zones: Optional[Any] = None,
     ) -> WorldSelectionRecord:
         """
         Enforce selection validation:
@@ -478,7 +484,19 @@ class ProjectRepository:
         if candidate.batch_id != latest_batch_id:
             raise ValueError("Candidate belongs to an older generation batch. Only candidates from the latest batch can be selected.")
 
-        # 4. Create and persist selection record (preserving history)
+        # 4. Serialize human only zones if provided
+        hoz_json = "{}"
+        if human_only_zones is not None:
+            if hasattr(human_only_zones, "model_dump"):
+                hoz_json = json.dumps(human_only_zones.model_dump())
+            elif hasattr(human_only_zones, "dict"):
+                hoz_json = json.dumps(human_only_zones.dict())
+            elif isinstance(human_only_zones, dict):
+                hoz_json = json.dumps(human_only_zones)
+            elif isinstance(human_only_zones, str):
+                hoz_json = human_only_zones
+
+        # 5. Create and persist selection record (preserving history)
         selection = WorldSelectionRecord(
             project_id=project_id,
             world_candidate_id=candidate.id,
@@ -487,6 +505,7 @@ class ProjectRepository:
             creative_priorities_json=json.dumps(creative_priorities or []),
             rejected_directions_json=json.dumps(rejected_directions or []),
             custom_directives=custom_directives,
+            human_only_zones_json=hoz_json,
         )
         self.session.add(selection)
 
@@ -564,7 +583,8 @@ class ProjectRepository:
             locations_items = bible_data.get("key_locations", [])
 
             clean_canon_facts = [
-                (f.get("fact") or f.get("text") or f.get("description") or str(f)) if isinstance(f, dict) else str(f)
+                f if (isinstance(f, dict) and "origin_type" in f)
+                else ((f.get("fact") or f.get("rule") or f.get("text") or f.get("description") or str(f)) if isinstance(f, dict) else str(f))
                 for f in (canon_facts if isinstance(canon_facts, list) else [])
             ]
             raw_physics = bible_data.get("physics_rules", "")
@@ -1041,7 +1061,13 @@ class ProjectRepository:
         project.selected_world_id = bio_city_candidate.id
         self.session.add(project)
 
-        # 4. Add World Selection Record
+        # 4. Add World Selection Record with Canonical Human-Only Zones
+        canonical_hoz = {
+            "core_theme": "Coexistence between synthetic human biology and ancient abyssal intelligence",
+            "protagonist_motivation": "Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive",
+            "central_conflict": "Bio-symbiont collective survival vs. extractive corporate exploitation",
+            "is_locked": True,
+        }
         selection = WorldSelectionRecord(
             project_id=project.id,
             world_candidate_id=bio_city_candidate.id,
@@ -1057,6 +1083,7 @@ class ProjectRepository:
                 "Cold War militarized technology",
             ]),
             custom_directives="Ensure coral bio-luminescence and symbiotic sentience remain central across all layers.",
+            human_only_zones_json=json.dumps(canonical_hoz),
         )
         self.session.add(selection)
 
@@ -1071,7 +1098,24 @@ class ProjectRepository:
         bible_data = unfold_data.get("world_bible", {})
         timeline_items = bible_data.get("history_timeline", [])
         factions_items = bible_data.get("factions", [])
-        canon_facts = bible_data.get("canon_facts", [])
+        raw_facts = bible_data.get("canon_facts", [])
+        canon_facts = []
+        for idx, fact in enumerate(raw_facts):
+            if idx == 0:
+                canon_facts.append({
+                    "rule": canonical_hoz["core_theme"],
+                    "origin_type": "HUMAN_DECISION",
+                    "origin_source": "Human-Only Zone: Core Theme",
+                })
+            else:
+                canon_facts.append(fact)
+        if not canon_facts:
+            canon_facts.append({
+                "rule": canonical_hoz["core_theme"],
+                "origin_type": "HUMAN_DECISION",
+                "origin_source": "Human-Only Zone: Core Theme",
+            })
+
         raw_locations = bible_data.get("key_locations", [])
         locations_items = []
         for loc in raw_locations:
@@ -1110,7 +1154,7 @@ class ProjectRepository:
 
         # 7. Save Characters
         char_origin_map = {
-            "dr. althea thorne": ("HUMAN_DECISION", "Decision DNA: Ecological / Symbiotic Mystery"),
+            "dr. althea thorne": ("HUMAN_DECISION", "Human-Only Zone: Protagonist Motivation"),
             "sentry unit nereus": ("SEED_INFERRED", "Seed Potential: Ancient Symbiotic Technology"),
             "kaelen": ("SEED_EXPLICIT", "Seed Anchor: Child Protagonist"),
         }
@@ -1121,13 +1165,16 @@ class ProjectRepository:
                 c_name,
                 (c.get("origin_type", "AI_INTRODUCED"), c.get("origin_source"))
             )
+            motivation = c.get("motivation", "")
+            if "althea" in c_name:
+                motivation = canonical_hoz["protagonist_motivation"]
             char_record = CharacterRecord(
                 project_id=project.id,
                 world_candidate_id=bio_city_candidate.id,
                 name=c.get("name", "Unnamed"),
                 role=c.get("role", "Cast Member"),
                 archetype=c.get("archetype", "Archetype"),
-                motivation=c.get("motivation", ""),
+                motivation=motivation,
                 core_conflict=c.get("core_conflict") or c.get("conflict", ""),
                 visual_prompt=c.get("visual_prompt", ""),
                 version=1,
@@ -1165,7 +1212,7 @@ class ProjectRepository:
                 "location_setting": "The Abyssal Coral Neural Core",
                 "characters_involved": ["Dr. Althea Thorne", "Kaelen"],
                 "dramatic_question": "Can Althea and Kaelen prevent the neural core from severing its link with the surface world?",
-                "conflict_narrative": "Toxic runoff from an illegal deep-sea drilling rig penetrates the outer caldera, threatening the core with irreparable necrotic collapse.",
+                "conflict_narrative": canonical_hoz["central_conflict"],
                 "pivotal_outcome": "Althea integrates her biometric slate into the neural core, reversing the necrosis and broadcasting a distress beacon across the ocean shelf.",
                 "visual_prompt": "Climactic sci-fi underwater chamber, massive translucent siphonophore floating in a crystal sphere, glowing neural sparks, human figures backlit by cyan and gold bioluminescence, photorealistic 8k",
             })
@@ -1173,7 +1220,7 @@ class ProjectRepository:
         scene_origin_map = {
             1: ("SEED_EXPLICIT", "Seed Anchor: Sunken metropolis discovery"),
             2: ("AI_INTRODUCED", "Generative Synthesis: Narrative Tension"),
-            3: ("HUMAN_DECISION", "Custom Directive: Enzyme bio-physics"),
+            3: ("HUMAN_DECISION", "Human-Only Zone: Central Conflict"),
         }
         created_scenes: List[SceneRecord] = []
         for s in scene_items:

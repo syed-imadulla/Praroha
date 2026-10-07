@@ -159,8 +159,8 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation with graceful fallback.
 - [x] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient atmosphere, soundscape, background audio composition.
 - [x] **Phase 18: Seed Mutation Lab** — Modify fundamental seed variable, preview impact (Affected/Conditional/Preserved), fork branch.
-- [ ] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
-- [ ] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
+- [x] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
+- [x] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
 
 ---
 
@@ -322,7 +322,10 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 ### Phase 20: Human-Only Zones
 **Goal**: Provide creator-locked creative controls for defining core theme and motivations before AI expansion, protected from AI override.  
 **Depends on**: Phase 11 (Decision DNA), Phase 12 (Origin Ledger)  
-**Requirements**: HOZ-01, HOZ-02  
+**Plans**: 2 plans (all completed)
+- [x] **20-01-PLAN.md** (Wave 1): Backend Human-Only Zones & AI Protection Engine (`selection.py` Models, `ProjectRepository` Migration, Dual-Layer Prompt Invariance & Schema Guard, Pytest Suite)
+- [x] **20-02-PLAN.md** (Wave 2): Frontend Creator Lock Controls & Visual Indicators (`WorldSelectionCanvas` Panel, Stage 5 Banner, Codex Card Lock Badges, Production Build & Playwright E2E Suite)
 **Success Criteria**:
-  1. Creator-locked input fields for core theme, protagonist motivation, and central conflict.
-  2. Locked parameters are marked `HUMAN_DECISION` in Decision DNA and Origin Ledger.
+  1. Creator-locked input fields for core theme, protagonist motivation, and central conflict in Stage 4.
+  2. Locked parameters are marked `HUMAN_DECISION` in Decision DNA, Origin Ledger, and Causal Lineage DAG.
+  3. AI models are strictly prohibited from overriding or diluting locked zones via dual-layer defense (prompt contract + backend schema guard).

@@ -34,6 +34,7 @@ import {
   CounterfactualCandidate,
   CounterfactualDeltaResponse,
   ForkCounterfactualRequest,
+  HumanOnlyZones,
 } from '../types';
 
 interface WorkspaceState {
@@ -135,6 +136,9 @@ interface WorkspaceState {
   setSeedDNA: (seedDNA: SeedDNARead | null) => void;
   setWorlds: (worlds: WorldCandidateRead[]) => void;
   setSelectedWorldId: (id: string | null) => void;
+  humanOnlyZones: HumanOnlyZones | null;
+  setHumanOnlyZones: (zones: Partial<HumanOnlyZones>) => void;
+  toggleZoneLock: () => void;
   setSelectedWorldRationale: (rationale: string) => void;
   confirmWorldSelection: (candidateId: string, payload?: WorldSelectionCreate | string) => Promise<boolean>;
   fetchActiveSelection: () => Promise<void>;
@@ -200,6 +204,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       unfoldingStep: 0,
       unfoldError: null,
       activeCodexTab: 'bible',
+      humanOnlyZones: {
+        core_theme: '',
+        protagonist_motivation: '',
+        central_conflict: '',
+        is_locked: false,
+      },
       lineageGraph: null,
       selectedNodeId: null,
       isLoadingLineage: false,
@@ -562,6 +572,30 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setWorlds: (worlds) => set({ worlds }),
       setSelectedWorldId: (selectedWorldId) => set({ selectedWorldId }),
       setSelectedWorldRationale: (selectedWorldRationale) => set({ selectedWorldRationale }),
+      setHumanOnlyZones: (zones) =>
+        set((state) => ({
+          humanOnlyZones: {
+            ...(state.humanOnlyZones || {
+              core_theme: '',
+              protagonist_motivation: '',
+              central_conflict: '',
+              is_locked: false,
+            }),
+            ...zones,
+          },
+        })),
+      toggleZoneLock: () =>
+        set((state) => ({
+          humanOnlyZones: {
+            ...(state.humanOnlyZones || {
+              core_theme: '',
+              protagonist_motivation: '',
+              central_conflict: '',
+              is_locked: false,
+            }),
+            is_locked: !state.humanOnlyZones?.is_locked,
+          },
+        })),
 
       confirmWorldSelection: async (
         candidateId: string,
@@ -571,9 +605,23 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         const project = state.activeProject;
         if (!project) return false;
 
+        let finalPayload: WorldSelectionCreate;
+        if (typeof payload === 'string') {
+          finalPayload = { user_rationale: payload };
+        } else if (payload) {
+          finalPayload = { ...payload };
+        } else {
+          finalPayload = {};
+        }
+
+        const hoz = state.humanOnlyZones;
+        if (hoz && hoz.is_locked && !finalPayload.human_only_zones) {
+          finalPayload.human_only_zones = hoz;
+        }
+
         set({ isSelectingWorld: true });
         try {
-          const res = await apiClient.selectWorld(project.id, candidateId, payload);
+          const res = await apiClient.selectWorld(project.id, candidateId, finalPayload);
           if (!res.success || !res.data) {
             throw new Error(res.error?.message || 'Failed to select world candidate');
           }
@@ -583,6 +631,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             selectedWorldId: selectionData.world_candidate_id,
             selectedWorldRationale: selectionData.user_rationale || '',
             activeSelection: selectionData,
+            humanOnlyZones: selectionData.human_only_zones || s.humanOnlyZones,
             isSelectingWorld: false,
             activeProject: s.activeProject
               ? {
@@ -616,6 +665,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
               activeSelection: res.data,
               selectedWorldId: res.data.world_candidate_id,
               selectedWorldRationale: res.data.user_rationale || '',
+              humanOnlyZones: res.data.human_only_zones || get().humanOnlyZones,
             });
           }
         } catch (err) {
