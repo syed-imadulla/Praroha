@@ -94,6 +94,16 @@ export interface SeedPreset {
   tagline: string;
 }
 
+export type DivergenceArchetype = 'familiar' | 'radical' | 'inverse';
+
+export interface ExplorationProfile {
+  seed_fidelity: number;
+  novelty: number;
+  conceptual_distance: number;
+  feasibility: number;
+  summary: string;
+}
+
 export interface WorldCandidate {
   id: string;
   index: number;
@@ -104,6 +114,9 @@ export interface WorldCandidate {
   core_tension: string;
   trade_offs: string;
   key_visual: string;
+  divergence_archetype?: DivergenceArchetype;
+  exploration_profile?: ExplorationProfile;
+  emphasized_potential_labels?: string[];
 }
 
 export interface WorldCandidateRead {
@@ -122,6 +135,9 @@ export interface WorldCandidateRead {
   model_used: string;
   fallback_used: boolean;
   created_at: string;
+  divergence_archetype?: DivergenceArchetype;
+  exploration_profile?: ExplorationProfile;
+  emphasized_potential_labels?: string[];
 }
 
 export interface WorldSelectionRead {
@@ -327,6 +343,31 @@ export interface SnapshotRead {
   size_bytes: number;
   version: number;
   created_at: string;
+}
+
+export type SeedPotentialCategory = 'explicit' | 'inferred' | 'open';
+export type PotentialItemStatus = 'pending' | 'accepted' | 'rejected';
+
+export interface SeedPotentialItem {
+  id: string;
+  project_id: string;
+  label: string;
+  category: SeedPotentialCategory;
+  confidence: number;
+  source_evidence: string;
+  user_status: PotentialItemStatus;
+  created_at: string;
+}
+
+export interface SeedPotentialItemUpdatePayload {
+  user_status: PotentialItemStatus;
+}
+
+export interface BatchPotentialStatusUpdatePayload {
+  items: {
+    id: string;
+    user_status: PotentialItemStatus;
+  }[];
 }
 
 

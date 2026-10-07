@@ -42,6 +42,19 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
         "core_tension": "Decoding the technology of ancestors before deep-sea pressure compromises the ruins or greedy surface scavengers locate it.",
         "trade_offs": "Deep historical lore and archaeological mystery; less biological weirdness.",
         "key_visual": "A lone child in a copper diving bell illuminating a 40-foot marble library archway covered in barnacles.",
+        "divergence_archetype": "familiar",
+        "exploration_profile": {
+            "seed_fidelity": 92,
+            "novelty": 54,
+            "conceptual_distance": 28,
+            "feasibility": 88,
+            "summary": "Direct, mythic realization of submerged ruins with high historical grounding.",
+        },
+        "emphasized_potential_labels": [
+            "Child Protagonist",
+            "Forgotten Sunken Metropolis",
+            "Abyssal Marine Environment",
+        ],
     },
     {
         "id": "world-2",
@@ -53,6 +66,18 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
         "core_tension": "The child discovers that the city is dying because surface runoff is poisoning the coral nervous system.",
         "trade_offs": "High visual novelty and strong ecological theme; requires explaining biological survival mechanics.",
         "key_visual": "Towering coral spires pulsing with turquoise light inside an atmospheric pressure bubble amidst deep sea trenches.",
+        "divergence_archetype": "radical",
+        "exploration_profile": {
+            "seed_fidelity": 68,
+            "novelty": 94,
+            "conceptual_distance": 82,
+            "feasibility": 72,
+            "summary": "Radical symbiotic mutation transforming urban decay into living, breathing coral nervous systems.",
+        },
+        "emphasized_potential_labels": [
+            "Ancient Symbiotic Technology",
+            "Sentient Deep-Sea Ecosystem",
+        ],
     },
     {
         "id": "world-3",
@@ -64,6 +89,101 @@ CANONICAL_WORLDS: List[Dict[str, Any]] = [
         "core_tension": "Automated defense protocols treat the child as an intruder, and isolated descendants believe the surface remains incinerated.",
         "trade_offs": "Grounded human drama and psychological tension; smaller physical scale.",
         "key_visual": "Rusted titanium airlock door opening into an eerie hallway lined with flickering vacuum tubes and faded safety posters.",
+        "divergence_archetype": "inverse",
+        "exploration_profile": {
+            "seed_fidelity": 58,
+            "novelty": 82,
+            "conceptual_distance": 88,
+            "feasibility": 65,
+            "summary": "Conceptual subversion flipping oceanic fantasy into claustrophobic retro-futuristic paranoia.",
+        },
+        "emphasized_potential_labels": [
+            "Archaeological Scavenger Conflict",
+            "Surface Ecological Rupture",
+        ],
+    },
+]
+
+
+CANONICAL_SEED_TEXT = "A child discovers a forgotten city beneath the ocean."
+
+CANONICAL_SEED_POTENTIAL = [
+    {
+        "label": "Child Protagonist",
+        "category": "explicit",
+        "confidence": 1.0,
+        "source_evidence": "A child",
+        "user_status": "pending",
+    },
+    {
+        "label": "Accidental Discovery",
+        "category": "explicit",
+        "confidence": 1.0,
+        "source_evidence": "discovers",
+        "user_status": "pending",
+    },
+    {
+        "label": "Forgotten Sunken Metropolis",
+        "category": "explicit",
+        "confidence": 1.0,
+        "source_evidence": "forgotten city",
+        "user_status": "pending",
+    },
+    {
+        "label": "Abyssal Marine Environment",
+        "category": "explicit",
+        "confidence": 1.0,
+        "source_evidence": "beneath the ocean",
+        "user_status": "pending",
+    },
+    {
+        "label": "Symbiotic Living Architecture",
+        "category": "inferred",
+        "confidence": 0.88,
+        "source_evidence": "deep ocean survival implies non-terrestrial engineering",
+        "user_status": "pending",
+    },
+    {
+        "label": "Surface Ecological Rupture",
+        "category": "inferred",
+        "confidence": 0.75,
+        "source_evidence": "abandoned/forgotten status implies rupture between surface and deep",
+        "user_status": "pending",
+    },
+    {
+        "label": "Sentient Bioluminescent Ecology",
+        "category": "inferred",
+        "confidence": 0.82,
+        "source_evidence": "deep-sea fauna adaptation around artificial habitat",
+        "user_status": "pending",
+    },
+    {
+        "label": "Ancient Technological Heritage",
+        "category": "inferred",
+        "confidence": 0.78,
+        "source_evidence": "city built to withstand extreme hydro-static pressure",
+        "user_status": "pending",
+    },
+    {
+        "label": "Who built the submerged sanctuary?",
+        "category": "open",
+        "confidence": 0.95,
+        "source_evidence": "forgotten city origin",
+        "user_status": "pending",
+    },
+    {
+        "label": "What power source maintains breathable pressure bubbles?",
+        "category": "open",
+        "confidence": 0.90,
+        "source_evidence": "survival mechanism beneath the ocean",
+        "user_status": "pending",
+    },
+    {
+        "label": "Was abandonment forced by cataclysm or voluntary migration?",
+        "category": "open",
+        "confidence": 0.85,
+        "source_evidence": "why it became forgotten",
+        "user_status": "pending",
     },
 ]
 
@@ -86,9 +206,155 @@ class MockProvider(AIProvider):
             "seed_dna": CANONICAL_SEED_DNA,
         }
 
-    async def generate_worlds(self, dna: Dict[str, Any]) -> List[Dict[str, Any]]:
-        # Return exactly three contrasting candidates
-        return CANONICAL_WORLDS
+    async def extract_potential(
+        self, seed: str, dna: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        normalized = seed.strip().lower().rstrip(".")
+        if "forgotten city" in normalized and "ocean" in normalized:
+            return [dict(item) for item in CANONICAL_SEED_POTENTIAL]
+
+        # Dynamic fallback for arbitrary seeds
+        themes = dna.get("themes", []) if isinstance(dna, dict) else []
+        entities = dna.get("entities", []) if isinstance(dna, dict) else []
+        words = [w for w in seed.split() if len(w) > 3][:4]
+
+        results = []
+        for w in words:
+            results.append({
+                "label": w.capitalize(),
+                "category": "explicit",
+                "confidence": 0.95,
+                "source_evidence": w,
+                "user_status": "pending",
+            })
+        for t in themes[:3]:
+            results.append({
+                "label": f"Thematic: {t}",
+                "category": "inferred",
+                "confidence": 0.80,
+                "source_evidence": f"theme {t}",
+                "user_status": "pending",
+            })
+        for e in entities[:2]:
+            results.append({
+                "label": f"Role of {e}",
+                "category": "inferred",
+                "confidence": 0.75,
+                "source_evidence": f"entity {e}",
+                "user_status": "pending",
+            })
+        if not themes and not entities:
+            anchor = words[0] if words else "seed"
+            results.append({
+                "label": f"Emergent dynamic around {anchor}",
+                "category": "inferred",
+                "confidence": 0.78,
+                "source_evidence": f"inferred from {anchor}",
+                "user_status": "pending",
+            })
+        results.append({
+            "label": f"What was the catalytic origin of this world?",
+            "category": "open",
+            "confidence": 0.90,
+            "source_evidence": "catalytic premise",
+            "user_status": "pending",
+        })
+        results.append({
+            "label": f"What hidden force prevents resolution?",
+            "category": "open",
+            "confidence": 0.85,
+            "source_evidence": "core tension",
+            "user_status": "pending",
+        })
+        return results
+
+    async def generate_worlds(
+        self, dna: Dict[str, Any], potential_items: Optional[List[Dict[str, Any]]] = None
+    ) -> List[Dict[str, Any]]:
+        raw_seed = (dna.get("raw_seed") or "").strip().lower().rstrip(".")
+        if not raw_seed or ("forgotten city" in raw_seed and "ocean" in raw_seed):
+            # Deterministically return canonical demo fixtures
+            return [dict(w) for w in CANONICAL_WORLDS]
+
+        # Extract accepted items if provided
+        accepted_labels = []
+        if potential_items:
+            accepted_labels = [
+                item["label"] for item in potential_items
+                if item.get("user_status") == "accepted"
+            ]
+
+        premise = dna.get("premise", "An uncharted world of mysterious origins.")
+        tone = dna.get("tone", "Atmospheric and evocative")
+        themes = dna.get("themes", ["Discovery", "Survival", "Mystery"])
+        lead_theme = themes[0] if themes else "Discovery"
+
+        w1_pot = accepted_labels[:2] if accepted_labels else [lead_theme]
+        w2_pot = accepted_labels[1:3] if len(accepted_labels) > 1 else accepted_labels[:1]
+        w3_pot = accepted_labels[2:4] if len(accepted_labels) > 2 else (accepted_labels[-1:] if accepted_labels else [])
+
+        return [
+            {
+                "id": "world-1",
+                "index": 1,
+                "title": f"The Grounded Expanse: {lead_theme}",
+                "archetype": f"{lead_theme} (Classical / Grounded)",
+                "concept": f"A faithful, evocative expansion of the core premise: {premise}",
+                "aesthetic": f"Grounded, rich textures, resonant {tone.lower()} atmosphere.",
+                "core_tension": "Preserving traditional continuity while unraveling the central conflict.",
+                "trade_offs": "High narrative accessibility and grounding; lower paradigm subversion.",
+                "key_visual": f"A panoramic vista illuminating the focal anchor of {premise.lower()}.",
+                "divergence_archetype": "familiar",
+                "exploration_profile": {
+                    "seed_fidelity": 90,
+                    "novelty": 55,
+                    "conceptual_distance": 30,
+                    "feasibility": 85,
+                    "summary": "Familiar archetype maximizing direct adherence to the original seed premise.",
+                },
+                "emphasized_potential_labels": w1_pot,
+            },
+            {
+                "id": "world-2",
+                "index": 2,
+                "title": "The Metamorphic Nexus",
+                "archetype": "Symbiotic Paradigm Shift",
+                "concept": f"A radical biological and metaphysical transformation of {premise.lower()}.",
+                "aesthetic": "Bioluminescent veins, shimmering crystalline architectures, living organic matter.",
+                "core_tension": "The price of radical symbiosis threatens individual human identity.",
+                "trade_offs": "Extreme visual and conceptual novelty; requires adapting to unconventional physics.",
+                "key_visual": "A towering morphogenetic structure breathing in sync with the atmospheric tide.",
+                "divergence_archetype": "radical",
+                "exploration_profile": {
+                    "seed_fidelity": 65,
+                    "novelty": 95,
+                    "conceptual_distance": 80,
+                    "feasibility": 70,
+                    "summary": "Radical archetype transforming premises into an expansive symbiotic ecosystem.",
+                },
+                "emphasized_potential_labels": w2_pot,
+            },
+            {
+                "id": "world-3",
+                "index": 3,
+                "title": "The Inverted Sanctuary",
+                "archetype": "Subversive Reality Reversal",
+                "concept": "An inverse subversion of assumptions: what appeared as safe sanctuary is the ultimate containment crucible.",
+                "aesthetic": "Harsh monochromatic brutalism, inverted geometry, stark high-contrast chiaroscuro.",
+                "core_tension": "Breaking through the illusion of reality without triggering systemic annihilation.",
+                "trade_offs": "Intense psychological stakes and philosophical depth; challenging tonal barrier.",
+                "key_visual": "A solitary observer staring upward into a mirror sky that reflects an empty abyss.",
+                "divergence_archetype": "inverse",
+                "exploration_profile": {
+                    "seed_fidelity": 55,
+                    "novelty": 85,
+                    "conceptual_distance": 92,
+                    "feasibility": 60,
+                    "summary": "Inverse archetype challenging assumptions through conceptual mirror subversion.",
+                },
+                "emphasized_potential_labels": w3_pot,
+            },
+        ]
 
     async def unfold_stage(
         self, stage: str, context: Dict[str, Any]

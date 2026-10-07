@@ -1,12 +1,29 @@
+import json
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from enum import Enum
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field as PydanticField
 from sqlmodel import Field, SQLModel
 
 
 def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
+
+
+class DivergenceArchetype(str, Enum):
+    familiar = "familiar"
+    radical = "radical"
+    inverse = "inverse"
+
+
+class ExplorationProfile(BaseModel):
+    """Normalized metrics (0-100%) capturing the divergence dimensions of a world."""
+    seed_fidelity: int = PydanticField(default=80, ge=0, le=100, description="Alignment with seed anchors (0-100%)")
+    novelty: int = PydanticField(default=70, ge=0, le=100, description="Conceptual originality and surprise (0-100%)")
+    conceptual_distance: int = PydanticField(default=50, ge=0, le=100, description="Departure from genre tropes (0-100%)")
+    feasibility: int = PydanticField(default=80, ge=0, le=100, description="World stability and narrative tractability (0-100%)")
+    summary: str = PydanticField(default="Balanced exploration profile", description="Profile rationale summary")
 
 
 class WorldCandidate(BaseModel):
@@ -20,6 +37,9 @@ class WorldCandidate(BaseModel):
     core_tension: str = PydanticField(description="Central dramatic conflict, crisis, or stakes")
     trade_offs: str = PydanticField(description="Creative pros/cons, emphasis vs sacrifices")
     key_visual: str = PydanticField(description="Signature scene vignette or focal cinematic visual")
+    divergence_archetype: str = PydanticField(default="familiar", description="Divergence archetype: familiar, radical, or inverse")
+    exploration_profile: ExplorationProfile = PydanticField(default_factory=ExplorationProfile)
+    emphasized_potential_labels: List[str] = PydanticField(default_factory=list, description="Seed potential labels emphasized in this candidate")
 
 
 class WorldCandidateBase(SQLModel):
@@ -36,6 +56,9 @@ class WorldCandidateBase(SQLModel):
     key_visual: str
     model_used: str = Field(default="mock")
     fallback_used: bool = Field(default=False)
+    divergence_archetype: str = Field(default="familiar")
+    exploration_profile_json: str = Field(default="{}")
+    emphasized_potential_labels_json: str = Field(default="[]")
 
 
 class WorldCandidateRecord(WorldCandidateBase, table=True):
@@ -49,6 +72,17 @@ class WorldCandidateRecord(WorldCandidateBase, table=True):
     created_at: datetime = Field(default_factory=get_utc_now)
 
     def to_candidate(self) -> WorldCandidate:
+        try:
+            profile_dict = json.loads(self.exploration_profile_json) if self.exploration_profile_json else {}
+            profile = ExplorationProfile.model_validate(profile_dict)
+        except Exception:
+            profile = ExplorationProfile()
+
+        try:
+            potential_labels = json.loads(self.emphasized_potential_labels_json) if self.emphasized_potential_labels_json else []
+        except Exception:
+            potential_labels = []
+
         return WorldCandidate(
             id=self.id,
             index=self.candidate_index,
@@ -59,9 +93,23 @@ class WorldCandidateRecord(WorldCandidateBase, table=True):
             core_tension=self.core_tension,
             trade_offs=self.trade_offs,
             key_visual=self.key_visual,
+            divergence_archetype=self.divergence_archetype or "familiar",
+            exploration_profile=profile,
+            emphasized_potential_labels=potential_labels,
         )
 
     def to_read_schema(self) -> "WorldCandidateRead":
+        try:
+            profile_dict = json.loads(self.exploration_profile_json) if self.exploration_profile_json else {}
+            profile = ExplorationProfile.model_validate(profile_dict)
+        except Exception:
+            profile = ExplorationProfile()
+
+        try:
+            potential_labels = json.loads(self.emphasized_potential_labels_json) if self.emphasized_potential_labels_json else []
+        except Exception:
+            potential_labels = []
+
         return WorldCandidateRead(
             id=self.id,
             project_id=self.project_id,
@@ -78,6 +126,9 @@ class WorldCandidateRecord(WorldCandidateBase, table=True):
             model_used=self.model_used,
             fallback_used=self.fallback_used,
             created_at=self.created_at,
+            divergence_archetype=self.divergence_archetype or "familiar",
+            exploration_profile=profile,
+            emphasized_potential_labels=potential_labels,
         )
 
 
@@ -97,3 +148,6 @@ class WorldCandidateRead(BaseModel):
     model_used: str
     fallback_used: bool
     created_at: datetime
+    divergence_archetype: str = "familiar"
+    exploration_profile: ExplorationProfile = PydanticField(default_factory=ExplorationProfile)
+    emphasized_potential_labels: List[str] = PydanticField(default_factory=list)

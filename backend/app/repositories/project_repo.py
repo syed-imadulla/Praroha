@@ -20,9 +20,14 @@ from backend.app.models.persistence import (
     CharacterRefineRequest,
     SceneRefineRequest,
 )
+from backend.app.models.potential import (
+    SeedPotentialItemRecord,
+    PotentialItemStatus,
+)
 from backend.app.providers.mock_provider import (
     CANONICAL_SEED_DNA,
     CANONICAL_WORLDS,
+    CANONICAL_SEED_POTENTIAL,
     MockProvider,
 )
 
@@ -107,6 +112,24 @@ def _migrate_columns(connection):
         if "revision_notes" not in cols:
             try:
                 connection.execute(text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
+            except Exception:
+                pass
+
+    if "world_candidates" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("world_candidates")]
+        if "divergence_archetype" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_candidates ADD COLUMN divergence_archetype VARCHAR DEFAULT 'familiar'"))
+            except Exception:
+                pass
+        if "exploration_profile_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_candidates ADD COLUMN exploration_profile_json TEXT DEFAULT '{}'"))
+            except Exception:
+                pass
+        if "emphasized_potential_labels_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_candidates ADD COLUMN emphasized_potential_labels_json TEXT DEFAULT '[]'"))
             except Exception:
                 pass
 
@@ -249,6 +272,7 @@ class ProjectRepository:
     ) -> List[WorldCandidateRecord]:
         records = []
         for cand in candidates:
+            profile_dump = cand.exploration_profile.model_dump() if hasattr(cand.exploration_profile, "model_dump") else (cand.exploration_profile or {})
             rec = WorldCandidateRecord(
                 project_id=project_id,
                 seed_dna_id=seed_dna_id,
@@ -263,6 +287,9 @@ class ProjectRepository:
                 key_visual=cand.key_visual,
                 model_used=model_used,
                 fallback_used=fallback_used,
+                divergence_archetype=cand.divergence_archetype or "familiar",
+                exploration_profile_json=json.dumps(profile_dump),
+                emphasized_potential_labels_json=json.dumps(cand.emphasized_potential_labels or []),
             )
             self.session.add(rec)
             records.append(rec)
@@ -838,6 +865,9 @@ class ProjectRepository:
                 core_tension=w["core_tension"],
                 trade_offs=w["trade_offs"],
                 key_visual=w["key_visual"],
+                divergence_archetype=w.get("divergence_archetype", "familiar"),
+                exploration_profile_json=json.dumps(w.get("exploration_profile", {})),
+                emphasized_potential_labels_json=json.dumps(w.get("emphasized_potential_labels", [])),
             )
             self.session.add(world_rec)
             created_worlds.append(world_rec)
@@ -992,10 +1022,103 @@ class ProjectRepository:
             )
             self.session.add(rev_scene)
 
+        # 11. Seed Canonical Potential Map Items
+        for pot in CANONICAL_SEED_POTENTIAL:
+            pot_rec = SeedPotentialItemRecord(
+                project_id=project.id,
+                label=pot["label"],
+                category=pot["category"],
+                confidence=pot["confidence"],
+                source_evidence=pot["source_evidence"],
+                user_status="accepted" if pot["category"] in ("explicit", "inferred") else "pending",
+            )
+            self.session.add(pot_rec)
+
         # Commit everything in this atomic transaction
         await self.session.commit()
         await self.session.refresh(project)
         return project
+
+    async def save_potential_items(
+        self, project_id: str, items: List[dict]
+    ) -> List[SeedPotentialItemRecord]:
+        """Save extracted potential items for a project, clearing previous pending ones if needed."""
+        await self.session.execute(
+            delete(SeedPotentialItemRecord).where(SeedPotentialItemRecord.project_id == project_id)
+        )
+        records = []
+        for item in items:
+            rec = SeedPotentialItemRecord(
+                project_id=project_id,
+                label=item.get("label", ""),
+                category=item.get("category", "inferred"),
+                confidence=float(item.get("confidence", 0.85)),
+                source_evidence=item.get("source_evidence", ""),
+                user_status=item.get("user_status", PotentialItemStatus.PENDING.value),
+            )
+            self.session.add(rec)
+            records.append(rec)
+        await self.session.commit()
+        for r in records:
+            await self.session.refresh(r)
+        return records
+
+    async def get_potential_items(
+        self, project_id: str
+    ) -> List[SeedPotentialItemRecord]:
+        """Get all potential items for a project."""
+        stmt = (
+            select(SeedPotentialItemRecord)
+            .where(SeedPotentialItemRecord.project_id == project_id)
+            .order_by(SeedPotentialItemRecord.created_at.asc())
+        )
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
+
+    async def update_potential_item_status(
+        self, project_id: str, item_id: str, status: str
+    ) -> Optional[SeedPotentialItemRecord]:
+        """Update user_status of a specific potential item."""
+        stmt = select(SeedPotentialItemRecord).where(
+            SeedPotentialItemRecord.id == item_id,
+            SeedPotentialItemRecord.project_id == project_id,
+        )
+        res = await self.session.execute(stmt)
+        rec = res.scalar_one_or_none()
+        if not rec:
+            return None
+        rec.user_status = status
+        self.session.add(rec)
+        await self.session.commit()
+        await self.session.refresh(rec)
+        return rec
+
+    async def batch_update_potential_item_statuses(
+        self, project_id: str, updates: List[dict]
+    ) -> List[SeedPotentialItemRecord]:
+        """Batch update statuses for potential items."""
+        updated = []
+        for up in updates:
+            item_id = up.get("id")
+            status = up.get("user_status")
+            if not item_id or not status:
+                continue
+            stmt = select(SeedPotentialItemRecord).where(
+                SeedPotentialItemRecord.id == item_id,
+                SeedPotentialItemRecord.project_id == project_id,
+            )
+            res = await self.session.execute(stmt)
+            rec = res.scalar_one_or_none()
+            if rec:
+                rec.user_status = status
+                self.session.add(rec)
+                updated.append(rec)
+        if updated:
+            await self.session.commit()
+            for rec in updated:
+                await self.session.refresh(rec)
+        return updated
+
 
 
 

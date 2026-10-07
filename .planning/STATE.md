@@ -1,80 +1,83 @@
 ---
 gsd_state_version: '1.0'
-status: completed
+milestone: 'Milestone 2: Semantic Intelligence + Generative Media'
+status: in_progress
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 16
-  completed_plans: 16
-  percent: 100.0
+  total_phases: 20
+  completed_phases: 10
+  total_plans: 20
+  completed_plans: 20
+  percent: 50.0
 ---
 
-# Project State: Seed Unfold
+# Project State: Seed Unfold (Praroha)
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (initialized 2026-10-04)
+See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-07)
 
-**Core value:** One incomplete seed becomes structured intent, exactly three distinct creative worlds, a human-selected direction, and then a coherent persistent mini-universe whose evolution can be inspected and traced.  
-**Current focus:** All 8 Phases Complete (Full MVP Milestone Achieved)
+**Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media and counterfactual mutation capabilities.  
+**Current focus:** Milestone 2: Semantic Intelligence + Generative Media (Phase 11: Decision DNA)
 
 ## Current Position
 
-Phase: 8 of 8 (Polish / Reliability / Demo) — Completed & Verified  
-Plan: 2 of 2 in Phase 8 completed  
-Status: Phase 8 execution and verification complete. Fast canonical demo seeding, AI provider graceful fallback, 7-stage guided demo tour, global keyboard shortcuts, and lineage DAG zoom controls fully operational.  
-Last activity: 2026-10-04 — Phase 8 execution, E2E verification, and UAT pass complete.
+Phase: 11 of 20 (Decision DNA) — Next  
+Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).  
+Phase 9 (Seed Potential Map): 100% Completed & Verified (59 backend tests, 4 E2E scenarios, 3 visual proofs).  
+Phase 10 (Divergence Engine): 100% Completed & Verified (65 backend tests, 4 E2E scenarios, 3 visual proofs).  
+Status: Phase 10 complete. Ready for Phase 11 planning.  
+Last activity: 2026-10-07 — Phase 10 Divergent Worlds Engine implemented and verified.
 
-Progress: [██████████] 100.0%
+Progress: [█████░░░░░] 50.0%
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 14
-- Average duration: 15 min
-- Total execution time: 3.5 hours
+**Milestone 1 & 2 Performance:**
+- Total plans completed: 20 (across 10 phases)
+- Backend tests passing: 65/65
+- E2E scenarios passing: 24/24
+- Zero-error demo hydration: < 500ms
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|---|---|---|---|
-| Phase 1: Foundation / Project Shell | 2 | 2 | complete |
-| Phase 2: Seed Understanding + Seed DNA | 2 | 2 | complete |
-| Phase 3: Three World Generation | 2 | 2 | complete |
-| Phase 4: Human World Selection | 2 | 2 | complete |
-| Phase 5: Progressive World Unfolding | 2 | 2 | complete |
-| Phase 6: Traceability / Provenance | 2 | 2 | complete |
-| Phase 7: Refine / Branch / Save | 2 | 2 | complete |
-| Phase 8: Polish / Reliability / Demo | 2 | 2 | complete |
+| Phase | Status | Milestone |
+|---|---|---|
+| Phase 1: Foundation / Project Shell | complete | Milestone 1 |
+| Phase 2: Seed Understanding + Seed DNA | complete | Milestone 1 |
+| Phase 3: Three World Generation | complete | Milestone 1 |
+| Phase 4: Human World Selection | complete | Milestone 1 |
+| Phase 5: Progressive World Unfolding | complete | Milestone 1 |
+| Phase 6: Traceability / Provenance | complete | Milestone 1 |
+| Phase 7: Refine / Branch / Save | complete | Milestone 1 |
+| Phase 8: Polish / Reliability / Demo | complete | Milestone 1 |
+| Phase 9: Seed Potential Map | complete | Milestone 2 |
+| Phase 10: Divergence Engine | complete | Milestone 2 |
+| Phase 11: Decision DNA | pending | Milestone 2 |
+| Phase 12: Origin Ledger | pending | Milestone 2 |
+| Phase 13: Media Provider Architecture | pending | Milestone 2 |
+| Phase 14: Image Generation (Pollinations / FLUX) | pending | Milestone 2 |
+| Phase 15: Voice Generation (Edge TTS / Kokoro) | pending | Milestone 2 |
+| Phase 16: Video Generation (Pyramid Flow / Wan2.1) | pending | Milestone 2 |
+| Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio) | pending | Milestone 2 |
+| Phase 18: Seed Mutation Lab | pending | Milestone 2 |
+| Phase 19: Counterfactual Replay | pending | Milestone 2 |
+| Phase 20: Human-Only Zones | pending | Milestone 2 |
 
 ## Accumulated Context
 
 ### Architectural & Product Decisions
-- **React + Vite + TypeScript**: Chosen for rapid frontend build velocity, strong typing, and rich animation support.
-- **FastAPI + Pydantic v2**: Chosen for asynchronous backend performance and strict schema validation of all AI outputs.
-- **Provider Abstraction**: Model access is decoupled behind `AIProvider` to allow hot-swapping between Gemini, OpenAI, Claude, and offline mocks.
-- **PostgreSQL / Supabase Persistence**: Intended relational persistence direction for core domain entities; SQLite recognized strictly as an optional local development / offline demo fallback.
-- **Cloud Object Storage (`StorageProvider`)**: Supabase Storage as primary object-storage target with local filesystem fallback for zero-cloud local dev; strict separation between binary payloads (object storage), relational metadata (PostgreSQL), and causal provenance (Traceability DAG) (ADR-003).
-- **Exactly Three Worlds**: Strict architectural constraint reflecting Tattva 2 (latent forms from formlessness) without cognitive overload.
-- **Human Choice Gate**: AI generation strictly halts at three worlds until human selection is registered.
-- **Traceability / Provenance DAG**: Provenance and causal relationships are modeled via explicit parent-child nodes and edge relations connecting entities, without requiring an external graph database.
-- **Canonical Demo Fixture**: "A child discovers a forgotten city beneath the ocean" configured with three pre-baked worlds for 100% demo resilience.
+- **React + Vite + TypeScript**: Rapid frontend build velocity, strong typing, and rich animation support.
+- **FastAPI + SQLModel + Pydantic v2**: High-performance async backend and strict schema validation of all AI outputs.
+- **Provider Abstraction**: Model access decoupled behind `AIProvider` (Gemini 3.5 Flash default, MockProvider fallback).
+- **PostgreSQL / Supabase Persistence**: Supabase Session Pooler in cloud mode; SQLite fallback locally.
+- **Cloud Object Storage (`StorageProvider`)**: Supabase Storage for binary assets with local filesystem fallback (`./uploads`).
+- **Traceability / Provenance DAG**: Relational DAG modeling parent-child provenance without external graph database.
+- **Deterministic Canonical Demo**: Pre-compiled fixture (*"A child discovers a forgotten city beneath the ocean"*) for sub-second demo resilience.
+- **Non-blocking Media Architecture**: Media generation (images, voice, video, audio) is strictly progressive enhancement. Media failure never blocks core universe generation.
+- **No Chain-of-Thought Leakage**: Origin explanations use stored metadata, never raw LLM reasoning tokens.
 
-### Important Constraints & Guardrails
-- Never mutate or discard the raw user seed.
-- Never expose raw model chain-of-thought or internal prompts in user-facing provenance nodes.
-- Binary files must never be stored directly in PostgreSQL; only asset metadata and storage keys are stored relationally.
-- Media generation (images/audio/video) must remain strictly optional and non-blocking.
-- Do not introduce microservices or autonomous multi-agent swarms.
+### Next Action
+Ready to execute Phase 9: Seed Potential Map.
 
-### Pending Todos
-None yet.
-
-### Blockers / Concerns
-None.
-
-## Session Continuity
-
-Last session: 2026-10-04
-Stopped at: Workspace initialization complete with GSD, Project Memory, Project Rules, Graphify integration, and Documentation structure.
-Resume file: None (Ready for `/gsd-plan-phase 1`)
+---
+*Updated: 2026-10-07 for Milestone 2*

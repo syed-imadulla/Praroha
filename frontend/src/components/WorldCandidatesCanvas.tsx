@@ -7,6 +7,9 @@ import {
   ArrowRight,
   Dna,
   Info,
+  Zap,
+  Orbit,
+  Compass,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { WorldCandidateCard } from './WorldCandidateCard';
@@ -55,20 +58,28 @@ export const WorldCandidatesCanvas: React.FC = () => {
     <div className="w-full max-w-7xl mx-auto space-y-8 py-4 sm:py-6 px-2 sm:px-4">
       {/* Top Header & Stage Context */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-canvas-border">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2">
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-400">
               <Globe className="w-4 h-4" />
             </span>
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
-              Stage 3 / 07
+              Stage 3 / 07 — Divergent Worlds
             </span>
+            {/* Triad Balance Badge */}
+            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10.5px] font-mono text-slate-400">
+              <span className="text-cyan-400">1 Familiar</span>
+              <span>•</span>
+              <span className="text-violet-400">1 Radical</span>
+              <span>•</span>
+              <span className="text-rose-400">1 Inverse</span>
+            </div>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold font-sans text-slate-100 tracking-tight">
-            Three Contrasting Creative Worlds
+            Divergent Worlds Engine
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm max-w-2xl">
-            Branched directly from your Seed DNA constraints. Three radically divergent creative archetypes exploring different possibilities for your setting.
+            Synthesizes exactly three intentional exploration archetypes (Familiar, Radical, Inverse) with 4-metric exploration profiles anchored to your accepted Seed Potential.
           </p>
         </div>
 
@@ -82,7 +93,7 @@ export const WorldCandidatesCanvas: React.FC = () => {
             title="Generate a fresh set of three world candidates"
           >
             <RotateCw className={`w-3.5 h-3.5 ${isGeneratingWorlds ? 'animate-spin text-cyan-400' : ''}`} />
-            <span>{isGeneratingWorlds ? 'Branching Worlds...' : 'Re-generate'}</span>
+            <span>{isGeneratingWorlds ? 'Synthesizing Worlds...' : 'Re-generate'}</span>
           </button>
 
           <button
@@ -145,26 +156,26 @@ export const WorldCandidatesCanvas: React.FC = () => {
 
             <div className="space-y-2 max-w-md">
               <h3 className="text-lg font-bold text-slate-200">
-                World Branching Engine Running
+                Divergent Worlds Engine Running
               </h3>
               <p className="text-xs text-cyan-400 font-mono animate-pulse">
-                {worldBranchingStep || 'Branching Seed DNA into 3 contrasting creative archetypes...'}
+                {worldBranchingStep || 'Synthesizing Divergence Triad (Familiar / Radical / Inverse)...'}
               </p>
             </div>
 
             {/* Candidate archetypes pulse indicators */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-xl pt-2">
               <div className="p-3 rounded-lg bg-cyan-950/30 border border-cyan-800/40 text-[11px] text-cyan-300 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span>1. Mythic / Archaeological</span>
+                <Compass className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                <span>1. Familiar (High Fidelity)</span>
               </div>
-              <div className="p-3 rounded-lg bg-emerald-950/30 border border-emerald-800/40 text-[11px] text-emerald-300 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>2. Ecological / Organic</span>
+              <div className="p-3 rounded-lg bg-violet-950/30 border border-violet-800/40 text-[11px] text-violet-300 flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                <span>2. Radical (Paradigm Shift)</span>
               </div>
-              <div className="p-3 rounded-lg bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-300 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span>3. Retro-Tech / Cold War</span>
+              <div className="p-3 rounded-lg bg-rose-950/30 border border-rose-800/40 text-[11px] text-rose-300 flex items-center gap-2">
+                <Orbit className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                <span>3. Inverse (Subversion)</span>
               </div>
             </div>
           </motion.div>
@@ -214,7 +225,7 @@ export const WorldCandidatesCanvas: React.FC = () => {
               No Worlds Generated Yet
             </h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Extract Seed DNA first, then trigger the World Branching Engine to generate 3 candidates.
+              Extract Seed DNA first, then trigger the Divergent Worlds Engine to synthesize the triad.
             </p>
             <button
               type="button"

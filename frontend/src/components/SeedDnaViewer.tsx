@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { SeedDNARead } from '../types';
+import { SeedPotentialCanvas } from './SeedPotentialCanvas';
 
 interface SeedDnaViewerProps {
   dnaRecord?: SeedDNARead | null;
@@ -28,6 +29,9 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
     seedDNA: storeDna,
     setActiveStage,
     unlockStage,
+    understandSubTab,
+    setUnderstandSubTab,
+    potentialItems,
   } = useWorkspaceStore();
   const [copied, setCopied] = useState(false);
 
@@ -69,9 +73,51 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
   };
 
   return (
-    <div className={`space-y-6 ${compact ? 'text-xs' : 'w-full max-w-4xl py-4'}`}>
-      {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-canvas-border">
+    <div className={`space-y-6 ${compact ? 'text-xs' : 'w-full max-w-5xl py-2'}`}>
+      {/* Sub-stage Lens Switcher (DNA Blueprint vs Seed Potential Map) */}
+      {!compact && (
+        <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-900/80 border border-slate-800 w-fit">
+          <button
+            type="button"
+            data-testid="tab-dna-blueprint"
+            onClick={() => setUnderstandSubTab('dna')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+              understandSubTab === 'dna'
+                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 border border-transparent'
+            }`}
+          >
+            <Dna className="w-3.5 h-3.5" />
+            <span>Seed DNA Blueprint</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="tab-seed-potential"
+            onClick={() => setUnderstandSubTab('potential')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+              understandSubTab === 'potential'
+                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-indigo-300 border border-transparent'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Seed Potential Map</span>
+            {potentialItems.length > 0 && (
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">
+                {potentialItems.length}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
+
+      {!compact && understandSubTab === 'potential' ? (
+        <SeedPotentialCanvas compact={compact} />
+      ) : (
+        <>
+          {/* Header bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-canvas-border">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-400">
@@ -256,18 +302,31 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
       {!compact && (
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-canvas-border">
           <div className="text-xs text-slate-400">
-            Seed DNA is locked and immutable for this project. Ready to branch into 3 distinct worlds in Stage 3.
+            Seed DNA is locked and immutable for this project. Ready to explore semantic potential or branch into 3 distinct worlds.
           </div>
 
-          <button
-            type="button"
-            onClick={handleProceedToWorlds}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-glow-cyan transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <span>Generate 3 Worlds (Stage 3)</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setUnderstandSubTab('potential')}
+              className="px-4 py-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-300 font-semibold text-xs flex items-center justify-center gap-2 transition"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Explore Potential Map ({potentialItems.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleProceedToWorlds}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-glow-cyan transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span>Generate 3 Worlds (Stage 3)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

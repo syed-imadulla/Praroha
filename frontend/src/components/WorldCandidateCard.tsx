@@ -9,6 +9,9 @@ import {
   Layers,
   Sparkles,
   CheckCircle2,
+  Activity,
+  Zap,
+  Orbit,
 } from 'lucide-react';
 import { WorldCandidateRead } from '../types';
 
@@ -35,10 +38,13 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
 }) => {
   const candidateNumber = String(candidate.candidate_index || index + 1).padStart(2, '0');
 
-  // Theme configuration according to D-08 (Cyan, Emerald, Amber)
+  // Archetype resolution (Familiar, Radical, Inverse)
+  const archetypeType = candidate.divergence_archetype || (index === 0 ? 'familiar' : index === 1 ? 'radical' : 'inverse');
+
+  // Theme configuration according to archetype & index
   const themeStyles = [
     {
-      // Index 1: Cyan (Mythic / Ancient)
+      // Index 1 / Familiar: Cyan (Mythic / Grounded)
       border: 'border-cyan-500/40 hover:border-cyan-400/80',
       activeBorder: 'border-cyan-400 ring-2 ring-cyan-400/30',
       glow: 'shadow-[0_0_25px_rgba(6,182,212,0.15)]',
@@ -50,7 +56,7 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
       chipColor: 'bg-cyan-950/60 border-cyan-800/60 text-cyan-300',
     },
     {
-      // Index 2: Emerald (Ecological / Organic)
+      // Index 2 / Radical: Emerald / Violet (Ecological / Symbiotic)
       border: 'border-emerald-500/40 hover:border-emerald-400/80',
       activeBorder: 'border-emerald-400 ring-2 ring-emerald-400/30',
       glow: 'shadow-[0_0_25px_rgba(16,185,129,0.15)]',
@@ -62,7 +68,7 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
       chipColor: 'bg-emerald-950/60 border-emerald-800/60 text-emerald-300',
     },
     {
-      // Index 3: Amber (Technological / Retro)
+      // Index 3 / Inverse: Amber / Rose (Retro / Subversive)
       border: 'border-amber-500/40 hover:border-amber-400/80',
       activeBorder: 'border-amber-400 ring-2 ring-amber-400/30',
       glow: 'shadow-[0_0_25px_rgba(245,158,11,0.15)]',
@@ -103,8 +109,8 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
         className={`absolute inset-x-0 top-0 h-28 rounded-t-2xl bg-gradient-to-b ${currentTheme.headerGlow} pointer-events-none`}
       />
 
-      <div className="relative p-5 sm:p-6 space-y-5 flex-1 flex flex-col">
-        {/* Header: Candidate badge & Archetype tag */}
+      <div className="relative p-5 sm:p-6 space-y-4 flex-1 flex flex-col">
+        {/* Header: Candidate badge & Divergence Archetype tag */}
         <div className="flex items-center justify-between gap-2">
           <div
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-mono font-bold tracking-wide ${currentTheme.badgeBg}`}
@@ -113,21 +119,49 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
             <span>Candidate {candidateNumber}</span>
           </div>
 
+          {/* Divergence Archetype Banner Pill */}
+          {archetypeType === 'radical' ? (
+            <div
+              className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-violet-950/80 text-violet-300 border border-violet-500/40 flex items-center gap-1"
+              title="Radical Archetype: High novelty and transformative paradigm shift"
+            >
+              <Zap className="w-3 h-3 text-violet-400" />
+              <span>Radical</span>
+            </div>
+          ) : archetypeType === 'inverse' ? (
+            <div
+              className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-950/80 text-rose-300 border border-rose-500/40 flex items-center gap-1"
+              title="Inverse Archetype: Conceptual flip & dramatic subversion of core assumptions"
+            >
+              <Orbit className="w-3 h-3 text-rose-400" />
+              <span>Inverse</span>
+            </div>
+          ) : (
+            <div
+              className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 flex items-center gap-1"
+              title="Familiar Archetype: Grounded realization maximizing seed fidelity"
+            >
+              <Compass className="w-3 h-3 text-cyan-400" />
+              <span>Familiar</span>
+            </div>
+          )}
+        </div>
+
+        {/* Title & Theme chip */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <h3
+              className={`text-xl font-bold font-sans tracking-tight transition-colors ${currentTheme.titleColor}`}
+            >
+              {candidate.title}
+            </h3>
+          </div>
           <div
-            className={`text-[11px] font-medium px-2.5 py-0.5 rounded-md border font-sans truncate max-w-[180px] ${currentTheme.chipColor}`}
+            className={`inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-md border font-sans max-w-full truncate ${currentTheme.chipColor}`}
             title={candidate.archetype}
           >
             {candidate.archetype}
           </div>
-        </div>
-
-        {/* Title */}
-        <div>
-          <h3
-            className={`text-xl font-bold font-sans tracking-tight transition-colors ${currentTheme.titleColor}`}
-          >
-            {candidate.title}
-          </h3>
         </div>
 
         {/* High-Concept Logline */}
@@ -141,10 +175,108 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
           </p>
         </div>
 
+        {/* Emphasized Potential Items (Phase 9 Bridge) */}
+        {candidate.emphasized_potential_labels && candidate.emphasized_potential_labels.length > 0 && (
+          <div className="space-y-1.5 pt-0.5">
+            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+              Emphasized Potential Pillars:
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {candidate.emphasized_potential_labels.map((lbl, lIdx) => (
+                <span
+                  key={lIdx}
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium bg-cyan-950/50 text-cyan-300 border border-cyan-700/50 shadow-sm"
+                  title={`Accepted potential element incorporated into ${candidate.title}`}
+                >
+                  <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
+                  <span>{lbl}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AI Exploration Profile (DIV-02: 4 normalized metrics) */}
+        {candidate.exploration_profile && (
+          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-2.5">
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Exploration Profile</span>
+              </span>
+              <span className="font-mono text-slate-500 font-normal">Divergence Metrics</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+              {/* Seed Fidelity */}
+              <div className="space-y-1" title="Seed Fidelity: Alignment with explicit seed anchors and tone">
+                <div className="flex justify-between text-[10.5px]">
+                  <span className="text-slate-400">Fidelity</span>
+                  <span className="font-mono font-bold text-cyan-400">{candidate.exploration_profile.seed_fidelity}%</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-cyan-400 transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(0, candidate.exploration_profile.seed_fidelity))}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Novelty */}
+              <div className="space-y-1" title="Novelty: Conceptual originality and surprise factor">
+                <div className="flex justify-between text-[10.5px]">
+                  <span className="text-slate-400">Novelty</span>
+                  <span className="font-mono font-bold text-violet-400">{candidate.exploration_profile.novelty}%</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-violet-400 transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(0, candidate.exploration_profile.novelty))}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Conceptual Distance */}
+              <div className="space-y-1" title="Conceptual Distance: How far the world departs from conventional genre tropes">
+                <div className="flex justify-between text-[10.5px]">
+                  <span className="text-slate-400">Distance</span>
+                  <span className="font-mono font-bold text-rose-400">{candidate.exploration_profile.conceptual_distance}%</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-rose-400 transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(0, candidate.exploration_profile.conceptual_distance))}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Feasibility */}
+              <div className="space-y-1" title="Feasibility: Internal world stability and narrative tractability">
+                <div className="flex justify-between text-[10.5px]">
+                  <span className="text-slate-400">Feasibility</span>
+                  <span className="font-mono font-bold text-emerald-400">{candidate.exploration_profile.feasibility}%</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(0, candidate.exploration_profile.feasibility))}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {candidate.exploration_profile.summary && (
+              <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-800/80 leading-relaxed">
+                "{candidate.exploration_profile.summary}"
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Key Dimensions Stack */}
-        <div className="space-y-3.5 flex-1 text-xs">
+        <div className="space-y-3 flex-1 text-xs pt-1">
           {/* Aesthetic & Mood */}
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <div className="flex items-center gap-1.5 text-slate-400 font-semibold text-[11px]">
               <Palette className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Aesthetic & Atmosphere</span>
@@ -155,7 +287,7 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
           </div>
 
           {/* Core Tension */}
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <div className="flex items-center gap-1.5 text-slate-400 font-semibold text-[11px]">
               <Flame className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Core Dramatic Stakes</span>
@@ -166,7 +298,7 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
           </div>
 
           {/* Trade-Offs */}
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <div className="flex items-center gap-1.5 text-slate-400 font-semibold text-[11px]">
               <Scale className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Narrative Balance & Trade-offs</span>

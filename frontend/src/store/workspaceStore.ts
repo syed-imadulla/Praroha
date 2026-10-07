@@ -17,6 +17,8 @@ import {
   SceneRefineRequest,
   EntityRevisionRead,
   SnapshotRead,
+  SeedPotentialItem,
+  PotentialItemStatus,
 } from '../types';
 
 interface WorkspaceState {
@@ -57,6 +59,9 @@ interface WorkspaceState {
   tourStep: number;
   shortcutsModalOpen: boolean;
   providerFallbackWarning: string | null;
+  potentialItems: SeedPotentialItem[];
+  isExtractingPotential: boolean;
+  understandSubTab: 'dna' | 'potential';
 
   // Actions
   setActiveStage: (stage: StageType) => void;
@@ -92,6 +97,11 @@ interface WorkspaceState {
   setInspectorTab: (tab: 'dna' | 'provenance' | 'worlds') => void;
   setHealth: (health: SystemHealthData | null) => void;
   setSyncing: (syncing: boolean) => void;
+  setUnderstandSubTab: (tab: 'dna' | 'potential') => void;
+  fetchPotentialItems: () => Promise<void>;
+  extractPotentialItemsAction: () => Promise<boolean>;
+  updatePotentialStatusAction: (itemId: string, status: PotentialItemStatus) => Promise<boolean>;
+  batchUpdatePotentialStatusesAction: (items: { id: string; user_status: PotentialItemStatus }[]) => Promise<boolean>;
   startTour: () => void;
   nextTourStep: () => void;
   prevTourStep: () => void;
@@ -145,6 +155,102 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       tourStep: 0,
       shortcutsModalOpen: false,
       providerFallbackWarning: null,
+      potentialItems: [],
+      isExtractingPotential: false,
+      understandSubTab: 'dna',
+
+      setUnderstandSubTab: (tab) => set({ understandSubTab: tab }),
+
+      fetchPotentialItems: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        try {
+          const res = await apiClient.getPotential(activeProject.id);
+          if (res.success && res.data) {
+            set({ potentialItems: res.data });
+          }
+        } catch (err) {
+          console.error('Failed to fetch potential items:', err);
+        }
+      },
+
+      extractPotentialItemsAction: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return false;
+        set({ isExtractingPotential: true });
+        try {
+          const res = await apiClient.extractPotential(activeProject.id);
+          if (res.success && res.data) {
+            set({ potentialItems: res.data, isExtractingPotential: false });
+            return true;
+          }
+          set({ isExtractingPotential: false });
+          return false;
+        } catch (err) {
+          console.error('Failed to extract potential items:', err);
+          set({ isExtractingPotential: false });
+          return false;
+        }
+      },
+
+      updatePotentialStatusAction: async (itemId: string, status: PotentialItemStatus) => {
+        const { activeProject, potentialItems } = get();
+        if (!activeProject) return false;
+
+        // Optimistic UI update
+        const prevItems = [...potentialItems];
+        set({
+          potentialItems: potentialItems.map((item) =>
+            item.id === itemId ? { ...item, user_status: status } : item
+          ),
+        });
+
+        try {
+          const res = await apiClient.updatePotentialItem(activeProject.id, itemId, status);
+          if (res.success && res.data) {
+            set({
+              potentialItems: get().potentialItems.map((item) =>
+                item.id === itemId ? res.data! : item
+              ),
+            });
+            return true;
+          }
+          set({ potentialItems: prevItems });
+          return false;
+        } catch (err) {
+          console.error('Failed to update potential item status:', err);
+          set({ potentialItems: prevItems });
+          return false;
+        }
+      },
+
+      batchUpdatePotentialStatusesAction: async (items: { id: string; user_status: PotentialItemStatus }[]) => {
+        const { activeProject, potentialItems } = get();
+        if (!activeProject) return false;
+
+        const updateMap = new Map(items.map((i) => [i.id, i.user_status]));
+        const prevItems = [...potentialItems];
+        set({
+          potentialItems: potentialItems.map((item) => {
+            const nextStatus = updateMap.get(item.id);
+            return nextStatus ? { ...item, user_status: nextStatus } : item;
+          }),
+        });
+
+        try {
+          const res = await apiClient.batchUpdatePotentialItems(activeProject.id, items);
+          if (res.success && res.data) {
+            set({ potentialItems: res.data });
+            return true;
+          }
+          set({ potentialItems: prevItems });
+          return false;
+        } catch (err) {
+          console.error('Failed to batch update potential statuses:', err);
+          set({ potentialItems: prevItems });
+          return false;
+        }
+      },
 
       setActiveStage: (stage) => set({ activeStage: stage }),
       unlockStage: (stage) =>
@@ -366,6 +472,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           const dnaRes = await apiClient.getLatestDNA(targetProjectId);
           if (dnaRes.success && dnaRes.data) {
             set({ seedDNA: dnaRes.data });
+          }
+
+          const potRes = await apiClient.getPotential(targetProjectId);
+          if (potRes.success && potRes.data) {
+            set({ potentialItems: potRes.data });
           }
 
           const worldsRes = await apiClient.getLatestWorlds(targetProjectId);
@@ -760,6 +871,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           tourStep: 0,
           shortcutsModalOpen: false,
           providerFallbackWarning: null,
+          potentialItems: [],
+          isExtractingPotential: false,
+          understandSubTab: 'dna',
         }),
     }),
     {
@@ -770,6 +884,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         seedText: state.seedText,
         activeProject: state.activeProject,
         seedDNA: state.seedDNA,
+        potentialItems: state.potentialItems,
         worlds: state.worlds,
         selectedWorldId: state.selectedWorldId,
         selectedWorldRationale: state.selectedWorldRationale,

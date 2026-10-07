@@ -16,6 +16,8 @@ import {
   EntityRevisionRead,
   ProjectBundle,
   SnapshotRead,
+  SeedPotentialItem,
+  PotentialItemStatus,
 } from '../types';
 
 class ApiClient {
@@ -207,6 +209,37 @@ class ApiClient {
 
   async listSnapshots(projectId: string): Promise<APIResponse<SnapshotRead[]>> {
     return this.request<SnapshotRead[]>(`/projects/${projectId}/snapshots`);
+  }
+
+  async extractPotential(projectId: string): Promise<APIResponse<SeedPotentialItem[]>> {
+    return this.request<SeedPotentialItem[]>(`/projects/${projectId}/potential/extract`, {
+      method: 'POST',
+    });
+  }
+
+  async getPotential(projectId: string): Promise<APIResponse<SeedPotentialItem[]>> {
+    return this.request<SeedPotentialItem[]>(`/projects/${projectId}/potential`);
+  }
+
+  async updatePotentialItem(
+    projectId: string,
+    itemId: string,
+    status: PotentialItemStatus
+  ): Promise<APIResponse<SeedPotentialItem>> {
+    return this.request<SeedPotentialItem>(`/projects/${projectId}/potential/${itemId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ user_status: status }),
+    });
+  }
+
+  async batchUpdatePotentialItems(
+    projectId: string,
+    items: { id: string; user_status: PotentialItemStatus }[]
+  ): Promise<APIResponse<SeedPotentialItem[]>> {
+    return this.request<SeedPotentialItem[]>(`/projects/${projectId}/potential/batch`, {
+      method: 'POST',
+      body: JSON.stringify({ items }),
+    });
   }
 }
 

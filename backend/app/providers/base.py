@@ -16,8 +16,17 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
-    async def generate_worlds(self, dna: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Generate exactly three high-contrast candidate worlds based on Seed DNA."""
+    async def extract_potential(
+        self, seed: str, dna: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """Extract explicit, inferred, and open possibilities from seed and DNA."""
+        pass
+
+    @abstractmethod
+    async def generate_worlds(
+        self, dna: Dict[str, Any], potential_items: Optional[List[Dict[str, Any]]] = None
+    ) -> List[Dict[str, Any]]:
+        """Generate exactly three high-contrast candidate worlds based on Seed DNA and Seed Potential items."""
         pass
 
     @abstractmethod

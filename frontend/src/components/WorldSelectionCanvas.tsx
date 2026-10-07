@@ -197,6 +197,11 @@ export const WorldSelectionCanvas: React.FC = () => {
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-800 text-cyan-300 font-normal">
                     {chosenCandidate.archetype}
                   </span>
+                  {chosenCandidate.divergence_archetype && (
+                    <span className="text-[10.5px] uppercase font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-cyan-300">
+                      {chosenCandidate.divergence_archetype}
+                    </span>
+                  )}
                 </h3>
               </div>
 

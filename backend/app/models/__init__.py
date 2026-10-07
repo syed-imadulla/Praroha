@@ -7,6 +7,8 @@ from backend.app.models.dna import (
     SeedDNARead,
 )
 from backend.app.models.world import (
+    DivergenceArchetype,
+    ExplorationProfile,
     WorldCandidate,
     WorldCandidateBase,
     WorldCandidateRecord,
@@ -54,6 +56,16 @@ from backend.app.models.persistence import (
     SceneRefineRequest,
     ProjectBundle,
     SnapshotRead,
+)
+from backend.app.models.potential import (
+    SeedPotentialCategory,
+    PotentialItemStatus,
+    SeedPotentialItemBase,
+    SeedPotentialItemRecord,
+    SeedPotentialItemRead,
+    SeedPotentialItemUpdate,
+    SinglePotentialItemStatusUpdate,
+    BatchPotentialStatusUpdate,
 )
 
 __all__ = [
@@ -106,5 +118,14 @@ __all__ = [
     "SceneRefineRequest",
     "ProjectBundle",
     "SnapshotRead",
+    "SeedPotentialCategory",
+    "PotentialItemStatus",
+    "SeedPotentialItemBase",
+    "SeedPotentialItemRecord",
+    "SeedPotentialItemRead",
+    "SeedPotentialItemUpdate",
+    "SinglePotentialItemStatusUpdate",
+    "BatchPotentialStatusUpdate",
 ]
+
 

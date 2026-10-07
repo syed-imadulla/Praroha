@@ -36,8 +36,21 @@ async def generate_world_candidates(
     dna_dict = latest_dna_record.to_seed_dna().model_dump()
     dna_dict["raw_seed"] = latest_dna_record.raw_seed
 
+    # Fetch creator Seed Potential items if any exist
+    potential_records = await repo.get_potential_items(project_id)
+    potential_items = [
+        {
+            "label": r.label,
+            "category": r.category,
+            "confidence": r.confidence,
+            "source_evidence": r.source_evidence,
+            "user_status": r.user_status,
+        }
+        for r in potential_records
+    ] if potential_records else None
+
     ai_provider = get_ai_provider()
-    raw_candidates = await ai_provider.generate_worlds(dna_dict)
+    raw_candidates = await ai_provider.generate_worlds(dna_dict, potential_items=potential_items)
 
     if not isinstance(raw_candidates, list) or len(raw_candidates) != 3:
         raise HTTPException(

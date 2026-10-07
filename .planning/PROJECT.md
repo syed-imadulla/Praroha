@@ -12,72 +12,74 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 
 - **Customer / User**: Writers, game designers, filmmakers, hackathon builders, and creative technologists moving from ambiguity to concrete, buildable worlds.
 - **Product Metaphor**: A creative ideation IDE (not a chatbot; not an unguided text generator).
-- **Core Loop**: Seed → Understanding → Seed DNA → Exactly 3 Worlds → Human Choice → Selected World → Progressive Unfolding (World Bible, Characters, Relationships, Scenes, Assets) → Traceability → Refine / Branch → Save / Load.
-- **Theme Alignment**: *Tattva 2: Forms Hidden in the Formless*. The seed is formless potential; the three worlds expose multiple latent forms; human choice provides direction; unfolding manifests the chosen form into reality.
+- **Core Loop (Milestone 1 MVP)**: Seed → Understanding → Seed DNA → Exactly 3 Worlds → Human Choice → Selected World → Progressive Unfolding (World Bible, Characters, Relationships, Scenes, Assets) → Traceability → Refine / Branch → Save / Load.
+- **Evolved Core Loop (Milestone 2)**: Seed → Seed Potential → Divergent Worlds → Human Decision (Decision DNA) → Universe → Origin Ledger → Media (Image, Voice, Video, Audio) → Mutation Lab → Counterfactual Replay.
+- **Theme Alignment**: *Tattva 2: Forms Hidden in the Formless*. The seed is formless potential; the Seed Potential Map surfaces explicit vs inferred vs open possibilities; Divergent Worlds explore distinct possibility regions; human decision anchors the path; progressive unfolding manifests the world; the Origin Ledger traces causal genesis; and the Mutation Lab proves how changes to the root seed propagate downstream.
 
-## Requirements
+## Milestone Status
 
-### Validated
-
+### Milestone 1: Core MVP (Completed & Verified)
 - [x] Permanent project rules defined in `PROJECT_RULES.md`
-- [x] Documentation organized into `docs/` (`product/`, `architecture/`, `decisions/`, `wiki/`)
+- [x] Documentation organized into `docs/` (`product/`, `architecture/`, `decisions/`, `presentation/`, `wiki/`)
 - [x] GSD planning and state management initialized
 - [x] Graphify knowledge graph integration configured
+- [x] Interactive, calm dark workspace UI centered on progressive unfolding
+- [x] Seed input ingestion with validation, input tips, and pre-seeded demo fixtures
+- [x] Understanding stage extracting structured, canonical Seed DNA (premise, themes, entities, constraints, tone, domain keywords)
+- [x] Branching engine generating exactly three meaningfully distinct solution/creative worlds
+- [x] Human selection gate for side-by-side world comparison, trade-off review, and explicit choice
+- [x] Progressive unfolding engine generating World Bible, Characters, Relationships, and Scenes
+- [x] Traceability engine recording and displaying DAG parent-child lineage without exposing internal model chain-of-thought
+- [x] Project persistence (saving/loading seeds, DNA, chosen worlds, unfolded universes, and lineage DAGs)
+- [x] Refine (localized iteration) and Branch (timeline forking) controls
+- [x] Deterministic demo fallback mode using the canonical underwater city fixtures for 100% demo resilience
+- [x] Full test verification: 53/53 backend tests, 16/16 E2E tests, clean frontend build
 
-### Active (MVP Scope)
+### Milestone 2: Semantic Intelligence + Generative Media (Active)
+- [x] **Phase 9: Seed Potential Map** — Explicit, Inferred, Open possibilities layer between Seed DNA and Worlds.
+- [ ] **Phase 10: Divergence Engine** — Exactly 3 worlds with intentional divergence (Familiar, Radical, Inverse) and exploration profile.
+- [ ] **Phase 11: Decision DNA** — Capture rich human choice rationale, priorities, rejected directions, and propagate downstream.
+- [ ] **Phase 12: Origin Ledger** — Entity origin classification (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) and "Why is this here?" explanation.
+- [ ] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
+- [ ] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual (Primary: Pollinations where usable free/team-provided path available; Fallback: local FLUX.1 schnell; Last resort: MockMediaProvider).
+- [ ] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration (Primary: Edge TTS; Optional local fallback: Kokoro-82M; Fallback: MockMediaProvider).
+- [ ] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation (Primary: Pyramid Flow for cinematic workflow; Practical local fallback: Wan2.1 T2V-1.3B; Experimental: Mochi 1; Last resort: MockMediaProvider).
+- [ ] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient atmosphere, soundscape, background audio composition (Primary: ACE-Step 1.5; Optional alternative: Stable Audio Open; Fallback: MockMediaProvider).
+- [ ] **Phase 18: Seed Mutation Lab** — Modify fundamental seed variable, preview impact (Affected/Conditional/Preserved), fork branch.
+- [ ] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
+- [ ] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
 
-- [ ] Interactive, calm dark workspace UI centered on progressive unfolding
-- [ ] Seed input ingestion with validation, input tips, and pre-seeded demo fixtures
-- [ ] Understanding stage extracting structured, canonical Seed DNA (premise, themes, entities, constraints, tone, domain keywords)
-- [ ] Branching engine generating exactly three meaningfully distinct solution/creative worlds
-- [ ] Human selection gate for side-by-side world comparison, trade-off review, and explicit choice
-- [ ] Progressive unfolding engine generating World Bible, Characters, Relationships, and Scenes
-- [ ] Traceability engine recording and displaying DAG parent-child lineage without exposing internal model chain-of-thought
-- [ ] Project persistence (saving/loading seeds, DNA, chosen worlds, unfolded universes, and lineage DAGs)
-- [ ] Refine (localized iteration) and Branch (timeline forking) controls
-- [ ] Deterministic demo fallback mode using the canonical underwater city fixtures for 100% demo resilience
-
-### Out of Scope (MVP)
-
-- Full movie or high-fidelity video generation
-- Mandatory audio / voice cloning infrastructure
-- Real-time collaborative multi-user editing
-- Marketplace / community publishing platform
-- Autonomous multi-agent swarm orchestration
-- Complex external graph databases (e.g. Neo4j)
-- Custom model fine-tuning or training
+### Out of Scope (Milestone 2)
+- Autonomous multi-agent swarms (preserves human agency and single-creator focus).
+- Mandatory media generation (all media is progressive enhancement; core universe never fails on media error).
+- Real-time collaborative multi-user sockets.
 
 ## Context
+- Workspace directory: `Praroha` (Sanskrit for sprout / shoot / unfolding from a seed).
+- Frontend: React + Vite + TypeScript, styled with Tailwind CSS (calm dark theme) and Framer Motion.
+- Backend: Python 3.11+ with FastAPI, SQLModel, Pydantic v2 schemas.
+- AI Provider: Provider abstraction (`AIProvider` with `GeminiProvider` using `gemini-3.5-flash` and `MockProvider` fallback).
+- Storage Provider: `StorageProvider` with `SupabaseStorageProvider` and `LocalStorageProvider` fallback.
+- Database: Supabase PostgreSQL via Session Pooler with local SQLite fallback.
+- Traceability: Relational DAG lineage synthesis without external graph database.
 
-- Workspace directory: `Praroha` (Sanskrit/Hindi for sprout / shoot / unfolding from a seed).
-- Frontend: React + Vite + TypeScript, styled with Tailwind CSS (calm dark theme) and Framer Motion for progressive disclosure.
-- Backend: Python 3.11+ with FastAPI, Pydantic v2 schemas for strict structured LLM outputs.
-- AI Provider: Provider abstraction (`AIProvider`) decoupling Gemini or other LLMs with deterministic fallbacks.
-- Persistence: PostgreSQL / Supabase as the intended persistence direction with a relational data model; SQLite strictly as local development / offline demo fallback.
-- Object Storage: Supabase Storage for user-uploaded and AI-generated binary assets, abstracted via `StorageProvider` with a local filesystem fallback for zero-cloud local development.
-- Asset Separation: Binary assets live in object storage; PostgreSQL stores asset metadata and relational links; Traceability stores causal provenance.
-- Traceability: Modeled as explicit nodes and edges / DAG relationships across core entities, not as a specialized graph database engine.
+## Constraints & Guardrails
+- **Exact Three Worlds**: Exactly three candidates generated before human selection.
+- **Human Choice Gate**: Generation strictly halts at candidate stage until human commits.
+- **Traceability Integrity**: Every entity records provenance back to Seed DNA and creator decisions.
+- **Non-blocking Media**: External media failure must never crash or block core universe operations.
+- **No Chain-of-Thought Leakage**: Origin explanations use stored metadata, never raw LLM scratchpads.
+- **Secrets & Credentials**: Never hardcode API keys or commit `.env`.
 
-## Constraints
-
-- **Exact Three Worlds**: Exactly three distinct candidates must be generated before human selection—never fewer, never more.
-- **Human Choice Gate**: Generation cannot autonomously bypass the human selection step.
-- **Traceability**: Every generated entity must record its lineage back to Seed DNA and parent decisions.
-- **Canon Preservation**: Established canon facts and previous versions cannot be silently overwritten.
-- **No Chain-of-Thought Leakage**: Provenance explains *why* an output exists without exposing raw model internal scratchpads.
-- **No Binary Storage in Database**: Raw files must not be stored directly in PostgreSQL; only asset metadata and storage keys are stored relationally.
-
-## Key Decisions
-
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| React + Vite + FastAPI | Fast development velocity, async execution, clean typing across full stack | ✓ Accepted (ADR-001) |
-| PostgreSQL / Supabase Relational Model | Primary persistence target for core entities; SQLite strictly as local/demo fallback | ✓ Accepted (ADR-001) |
-| Cloud Object Storage & Asset Separation | Supabase Storage for binaries with local filesystem fallback; PostgreSQL stores metadata; Traceability tracks causal origin | ✓ Accepted (ADR-003) |
-| Exactly 3 Worlds | Balances creative diversity with decision focus; embodies Tattva 2 | ✓ Accepted (ADR-002) |
-| Normalized Seed DNA Schema | Provides strict, immutable anchor for all downstream unfolding | ✓ Accepted |
-| DAG Lineage Model (No Graph DB) | Relational node/edge structures model provenance cleanly without graph DB complexity | ✓ Accepted (ADR-002) |
-| Provider Adapter + Demo Fallbacks | Decouples LLM vendor and guarantees 100% demo uptime | ✓ Accepted (ADR-001) |
+### Media Architecture & Design Principles (Phases 13–17)
+- **Decoupled Abstraction**: All media modalities sit behind `MediaProvider` (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`). Conceptual routing:
+  - `IMAGE_PROVIDER=pollinations` (fallback: `flux_schnell`, last resort: `mock`)
+  - `VOICE_PROVIDER=edge_tts` (fallback: `kokoro`, last resort: `mock`)
+  - `VIDEO_PROVIDER=pyramid_flow` (fallback: `wan_2_1`, experimental: `mochi`, last resort: `mock`)
+  - `AUDIO_PROVIDER=ace_step` (fallback: `stable_audio_open`, last resort: `mock`)
+- **Progressive Enhancement**: Media failure never blocks Seed → Universe unfolding; the entire narrative and visual layout functions gracefully without media.
+- **Cost Discipline**: ₹0/free/local options prioritized across all modalities.
+- **Provider Transparency**: Clearly distinguish free-tier API, local model, and makeathon-provided services; do not claim unlimited-free unless verified.
 
 ---
-*Last updated: 2026-10-04 during initial workspace setup*
+*Updated: 2026-10-07 for Milestone 2: Semantic Intelligence + Generative Media (Finalized Media Strategy)*
