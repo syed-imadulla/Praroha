@@ -5,7 +5,7 @@ status: in_progress
 progress:
   total_phases: 20
   completed_phases: 12
-  total_plans: 24
+  total_plans: 26
   completed_plans: 24
   percent: 60.00
 ---

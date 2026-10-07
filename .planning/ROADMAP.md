@@ -212,6 +212,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Build a decoupled, non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`) with deterministic mock fallback.  
 **Depends on**: Phase 12  
 **Requirements**: MED-01, MED-02, MED-03  
+**Plans**: 2 plans
+- [ ] **13-01-PLAN.md** (Wave 1): Backend Media Provider Engine (Sub-interfaces, Mock Provider, Models, Migrations, Async Service & Pytest Suite)
+- [ ] **13-02-PLAN.md** (Wave 2): Frontend Media Architecture (Types, Client, Store, Reusable MediaPreviewCard & Playwright E2E Suite)
 **Success Criteria**:
   1. Clean `MediaProvider` interfaces defined for all 4 media modalities.
   2. `MockMediaProvider` returns reliable, offline test fixtures.
