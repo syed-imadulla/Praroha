@@ -15,6 +15,7 @@ export const InspectorDrawer: React.FC = () => {
     seedText,
     selectedWorldId,
     selectedWorldRationale,
+    activeSelection,
     unfoldedUniverse,
   } = useWorkspaceStore();
 
@@ -276,6 +277,54 @@ export const InspectorDrawer: React.FC = () => {
                               <p className="text-[11px] text-slate-300 italic leading-relaxed">
                                 "{selectedWorldRationale}"
                               </p>
+                            </div>
+                          )}
+
+                          {/* Decision DNA Details */}
+                          {activeSelection?.decision_dna && (
+                            <div className="space-y-2 pt-1 border-t border-slate-800/60">
+                              {activeSelection.decision_dna.creative_priorities.length > 0 && (
+                                <div className="space-y-1">
+                                  <span className="text-[9.5px] uppercase font-mono font-bold text-cyan-400">
+                                    Creative Priorities:
+                                  </span>
+                                  <div className="flex flex-wrap gap-1">
+                                    {activeSelection.decision_dna.creative_priorities.map((p) => (
+                                      <span
+                                        key={p}
+                                        className="px-2 py-0.5 rounded-md bg-cyan-950/80 text-cyan-300 border border-cyan-800 text-[10px]"
+                                      >
+                                        ★ {p}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {activeSelection.decision_dna.rejected_directions.length > 0 && (
+                                <div className="space-y-1">
+                                  <span className="text-[9.5px] uppercase font-mono font-bold text-rose-400">
+                                    Negative Guardrails:
+                                  </span>
+                                  <div className="flex flex-wrap gap-1">
+                                    {activeSelection.decision_dna.rejected_directions.map((r) => (
+                                      <span
+                                        key={r}
+                                        className="px-2 py-0.5 rounded-md bg-rose-950/80 text-rose-300 border border-rose-800 text-[10px]"
+                                      >
+                                        ⊘ {r}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {activeSelection.decision_dna.custom_directives && (
+                                <div className="p-2 rounded bg-slate-950 border border-slate-800 text-[10.5px] text-slate-400">
+                                  <span className="font-semibold text-amber-300">Directive:</span>{' '}
+                                  {activeSelection.decision_dna.custom_directives}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

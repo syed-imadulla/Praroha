@@ -8,6 +8,7 @@ import {
   SystemHealthData,
   WorldCandidateRead,
   WorldSelectionRead,
+  WorldSelectionCreate,
   UnfoldedUniverseRead,
   TraceGraphRead,
   BranchRead,
@@ -72,7 +73,7 @@ interface WorkspaceState {
   setWorlds: (worlds: WorldCandidateRead[]) => void;
   setSelectedWorldId: (id: string | null) => void;
   setSelectedWorldRationale: (rationale: string) => void;
-  confirmWorldSelection: (candidateId: string, rationale?: string) => Promise<boolean>;
+  confirmWorldSelection: (candidateId: string, payload?: WorldSelectionCreate | string) => Promise<boolean>;
   fetchActiveSelection: () => Promise<void>;
   setActiveCodexTab: (tab: 'bible' | 'characters' | 'scenes') => void;
   unfoldUniverse: () => Promise<boolean>;
@@ -266,14 +267,17 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setSelectedWorldId: (selectedWorldId) => set({ selectedWorldId }),
       setSelectedWorldRationale: (selectedWorldRationale) => set({ selectedWorldRationale }),
 
-      confirmWorldSelection: async (candidateId: string, rationale?: string) => {
+      confirmWorldSelection: async (
+        candidateId: string,
+        payload?: WorldSelectionCreate | string
+      ) => {
         const state = get();
         const project = state.activeProject;
         if (!project) return false;
 
         set({ isSelectingWorld: true });
         try {
-          const res = await apiClient.selectWorld(project.id, candidateId, rationale);
+          const res = await apiClient.selectWorld(project.id, candidateId, payload);
           if (!res.success || !res.data) {
             throw new Error(res.error?.message || 'Failed to select world candidate');
           }
@@ -896,4 +900,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     }
   )
 );
+
+if (typeof window !== 'undefined') {
+  (window as any).__workspaceStore = useWorkspaceStore;
+}
 

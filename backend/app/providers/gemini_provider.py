@@ -473,8 +473,15 @@ class GeminiProvider(AIProvider):
                 "2. Characters (2 to 4 core cast members grounded in World Bible rules, with archetypes, motivations, conflicts, visual prompts).\n"
                 "3. Relationships (socio-emotional dynamics, tension/alliance types between characters).\n"
                 "4. Scenes (2 to 3 pivotal narrative scenes with dramatic questions, conflicts, outcomes, and visual prompts).\n"
+                "Strictly adhere to the DECISION DNA CREATIVE CONTRACT if present:\n"
+                "- Emphasize mandatory creative priorities across all 4 layers.\n"
+                "- Strictly avoid negative guardrails and rejected directions.\n"
+                "- Ground all character motivations, lore rules, and scene conflicts in the creator rationale.\n"
                 "Output strictly a valid JSON object matching the required schema."
             )
+
+            # Assemble Decision DNA contract if available
+            contract_text = self.format_decision_dna_contract(context)
 
             user_prompt = (
                 f"SEED: {context.get('seed')}\n"
@@ -482,6 +489,8 @@ class GeminiProvider(AIProvider):
                 f"SELECTED WORLD: {json.dumps(context.get('selected_world', {}), default=str)}\n"
                 f"CREATOR RATIONALE: {context.get('creator_rationale') or 'Focus on world depth and dynamic tension'}\n"
             )
+            if contract_text:
+                user_prompt += f"\n{contract_text}\n"
 
             payload = {
                 "systemInstruction": {"parts": [{"text": system_instruction}]},
@@ -520,4 +529,37 @@ class GeminiProvider(AIProvider):
             if isinstance(res, dict):
                 res["_warning"] = self.FALLBACK_WARNING_MESSAGE
             return res
+
+    @staticmethod
+    def format_decision_dna_contract(context: Dict[str, Any]) -> str:
+        """Format the DECISION DNA CREATIVE CONTRACT into an explicit LLM instruction block."""
+        decision_dna = context.get("decision_dna")
+        if not decision_dna:
+            return ""
+
+        contract_lines = ["=== DECISION DNA CREATIVE CONTRACT ==="]
+        priorities = decision_dna.get("creative_priorities") or []
+        if priorities:
+            contract_lines.append("1. MANDATORY CREATIVE PRIORITIES:")
+            for p in priorities:
+                contract_lines.append(f"   - {p}")
+
+        rejected = decision_dna.get("rejected_directions") or []
+        if rejected:
+            contract_lines.append("2. NEGATIVE GUARDRAILS & REJECTED DIRECTIONS:")
+            for r in rejected:
+                contract_lines.append(f"   - STRICTLY AVOID: {r}")
+
+        rationale = decision_dna.get("user_rationale") or context.get("creator_rationale")
+        directives = decision_dna.get("custom_directives")
+        if rationale or directives:
+            contract_lines.append("3. CREATOR RATIONALE & DIRECTIVES:")
+            if rationale:
+                contract_lines.append(f"   - Rationale: {rationale}")
+            if directives:
+                contract_lines.append(f"   - Directives: {directives}")
+
+        contract_lines.append("=======================================")
+        return "\n".join(contract_lines)
+
 

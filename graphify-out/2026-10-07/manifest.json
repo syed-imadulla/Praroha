@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/base.py": {
-    "mtime": 1791363340.0540671,
-    "seen": 1791364675.7880802,
-    "ast_hash": "c47ba0d40671baf19a19b65ff6a3eb80",
+    "mtime": 1791368456.3371828,
+    "seen": 1791369155.276205,
+    "ast_hash": "2dc642b9a1d8a0b14d3c9237333b9a43",
     "semantic_hash": ""
   },
   "backend/app/providers/factory.py": {
@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/mock_provider.py": {
-    "mtime": 1791363850.1013162,
-    "seen": 1791364675.788087,
-    "ast_hash": "2cbf02dbcefe55efbb454cbe1b970a4a",
+    "mtime": 1791368713.3171718,
+    "seen": 1791369155.2762094,
+    "ast_hash": "676662567ba09e247648cfa0437b6c77",
     "semantic_hash": ""
   },
   "backend/app/providers/storage.py": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791363502.144198,
-    "seen": 1791364675.7880917,
-    "ast_hash": "2691ee6daf72c18747bfe96dceb336d1",
+    "mtime": 1791368628.3848283,
+    "seen": 1791369155.276212,
+    "ast_hash": "756ad57a453bf0bfa2c5c26b47dd08ac",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1791363898.6268806,
-    "seen": 1791364675.788224,
-    "ast_hash": "1990b6264e9b737a005c329b89a89c1b",
+    "mtime": 1791368745.6089222,
+    "seen": 1791369155.2762947,
+    "ast_hash": "7ad9d3c507dc584fd84c80db70837ecb",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -216,21 +216,21 @@
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
-    "mtime": 1791365375.4919467,
-    "seen": 1791365509.8364418,
-    "ast_hash": "9f1d0d5cc95f5433208488c07585af7b",
+    "mtime": 1791369554.2468898,
+    "seen": 1791369656.0086129,
+    "ast_hash": "39f4a2ed42c1f136be5d5ccde7cf1a47",
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791366468.2079275,
-    "seen": 1791366500.3904407,
-    "ast_hash": "04c9e4102e213c37c2ed709b5b5973de",
+    "mtime": 1791370327.3179522,
+    "seen": 1791370356.8846185,
+    "ast_hash": "0663c62b962892d67ca70b868e78d064",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791366488.3827612,
-    "seen": 1791366500.3904426,
-    "ast_hash": "55aae18bae0cc4e2de20654d062de81c",
+    "mtime": 1791370346.7747905,
+    "seen": 1791370356.8846204,
+    "ast_hash": "06c0e7002f455bd8415ef0a6177d6c5d",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1791363321.1677494,
-    "seen": 1791364675.788052,
-    "ast_hash": "d69e73230e57c8953286d33961cd424a",
+    "mtime": 1791368366.6669436,
+    "seen": 1791369155.2761877,
+    "ast_hash": "0622e61a9ac84ce4993ae3a2319bb89f",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/gemini_provider.py": {
-    "mtime": 1791363431.6676428,
-    "seen": 1791364675.788085,
-    "ast_hash": "02a3a70d7417ca0fe37f921e4a9a8df3",
+    "mtime": 1791368552.2844167,
+    "seen": 1791369155.2762082,
+    "ast_hash": "e8e0473b3d709a130d2ae2beff509605",
     "semantic_hash": ""
   },
   "backend/app/routers/dna.py": {
@@ -528,15 +528,15 @@
     "semantic_hash": ""
   },
   "backend/app/models/world.py": {
-    "mtime": 1791087292.3246362,
-    "seen": 1791088121.3629837,
-    "ast_hash": "ec03fe90b57559f956517a627422dd50",
+    "mtime": 1791368354.7200449,
+    "seen": 1791369155.2762039,
+    "ast_hash": "c6172b98a018655f8d47f28c265398b4",
     "semantic_hash": ""
   },
   "backend/app/routers/worlds.py": {
-    "mtime": 1791087529.3828776,
-    "seen": 1791088121.3630052,
-    "ast_hash": "6acd050c471ab774ccad50b3057c62c0",
+    "mtime": 1791368565.2123168,
+    "seen": 1791369155.2762253,
+    "ast_hash": "6795fcc9420934eb6c4ae38de140951c",
     "semantic_hash": ""
   },
   "backend/tests/test_worlds.py": {
@@ -558,15 +558,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorldCandidateCard.tsx": {
-    "mtime": 1791092590.2946832,
-    "seen": 1791092668.9946272,
-    "ast_hash": "15eb13fe0eb109bde129a31d70f3b19a",
+    "mtime": 1791368809.6074276,
+    "seen": 1791369155.276288,
+    "ast_hash": "0d6d4be9f9a8006e00a2ac7e147700ef",
     "semantic_hash": ""
   },
   "frontend/src/components/WorldCandidatesCanvas.tsx": {
-    "mtime": 1791114021.3572469,
-    "seen": 1791114187.4602187,
-    "ast_hash": "66323e60e110822fce2f4ce46d02a7c9",
+    "mtime": 1791368865.6689942,
+    "seen": 1791369155.276289,
+    "ast_hash": "8098b107791c5e4b0e7c63695e0b6a44",
     "semantic_hash": ""
   },
   ".planning/phases/03-three-world-generation/03-01-SUMMARY.md": {
@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorldSelectionCanvas.tsx": {
-    "mtime": 1791093164.3637445,
-    "seen": 1791093703.6648643,
-    "ast_hash": "7526371406eef07180ec8e97e6a52991",
+    "mtime": 1791368893.9727755,
+    "seen": 1791369155.2762904,
+    "ast_hash": "b744ceae37b657bbf1fd66a495747087",
     "semantic_hash": ""
   },
   ".planning/phases/04-human-world-selection/04-SUMMARY.md": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": ""
   },
   "backend/app/routers/potential.py": {
-    "mtime": 1791363802.0876372,
-    "seen": 1791364675.7881036,
-    "ast_hash": "234c1b68d08e9e0ee82e5276e3ac9ffd",
+    "mtime": 1791368683.1914048,
+    "seen": 1791369155.2762194,
+    "ast_hash": "b9c9357a7835689dabb8b7af3699ff65",
     "semantic_hash": ""
   },
   "backend/tests/test_potential.py": {
@@ -1101,6 +1101,48 @@
     "mtime": 1791366412.841372,
     "seen": 1791366500.3905544,
     "ast_hash": "0d7dd2330f3e19159e0686c08bb33ec3",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_divergence.py": {
+    "mtime": 1791368658.692594,
+    "seen": 1791369155.2762337,
+    "ast_hash": "9c7d61ec78cd20bdae812f26530ab4ec",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase10_divergence.cjs": {
+    "mtime": 1791368948.1803565,
+    "seen": 1791369155.2762535,
+    "ast_hash": "7ea0e02c948267968360e4239c2a9eff",
+    "semantic_hash": ""
+  },
+  ".planning/phases/10-divergent-worlds/10-UAT.md": {
+    "mtime": 1791369093.736265,
+    "seen": 1791369155.2764003,
+    "ast_hash": "99bd5bea73a55eb9c939361034cc6404",
+    "semantic_hash": ""
+  },
+  ".planning/phases/11-decision-dna/11-CONTEXT.md": {
+    "mtime": 1791369643.876233,
+    "seen": 1791369656.0088906,
+    "ast_hash": "f8fad0e0b6f76250bebfa19bc576b996",
+    "semantic_hash": ""
+  },
+  ".planning/phases/11-decision-dna/11-01-PLAN.md": {
+    "mtime": 1791370287.2862842,
+    "seen": 1791370356.884702,
+    "ast_hash": "9ee1f41bb52e5948e3265a3ec633e4d9",
+    "semantic_hash": ""
+  },
+  ".planning/phases/11-decision-dna/11-02-PLAN.md": {
+    "mtime": 1791370314.0600622,
+    "seen": 1791370356.8847032,
+    "ast_hash": "2f4272e7c79dac44b6a939be1af43451",
+    "semantic_hash": ""
+  },
+  ".planning/phases/11-decision-dna/11-RESEARCH.md": {
+    "mtime": 1791370263.8904784,
+    "seen": 1791370356.8847053,
+    "ast_hash": "6f8718cb422d9b4249e54f4608e08f65",
     "semantic_hash": ""
   }
 }

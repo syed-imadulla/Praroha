@@ -140,6 +140,24 @@ export interface WorldCandidateRead {
   emphasized_potential_labels?: string[];
 }
 
+export interface DecisionDNA {
+  selected_world_id: string;
+  selected_title: string;
+  selected_archetype: string;
+  user_rationale?: string | null;
+  creative_priorities: string[];
+  rejected_directions: string[];
+  custom_directives?: string | null;
+  created_at: string;
+}
+
+export interface WorldSelectionCreate {
+  user_rationale?: string | null;
+  creative_priorities?: string[];
+  rejected_directions?: string[];
+  custom_directives?: string | null;
+}
+
 export interface WorldSelectionRead {
   id: string;
   project_id: string;
@@ -148,6 +166,7 @@ export interface WorldSelectionRead {
   user_rationale: string | null;
   selected_world: WorldCandidateRead;
   created_at: string;
+  decision_dna?: DecisionDNA;
 }
 
 export interface LocationItem {

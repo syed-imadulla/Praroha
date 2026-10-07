@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -26,6 +26,8 @@ export const UniverseCodexCanvas: React.FC = () => {
   const {
     selectedWorldId,
     selectedWorldRationale,
+    activeSelection,
+    fetchActiveSelection,
     worlds,
     unfoldedUniverse,
     isUnfolding,
@@ -43,7 +45,14 @@ export const UniverseCodexCanvas: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!activeSelection) {
+      fetchActiveSelection();
+    }
+  }, [activeSelection, fetchActiveSelection]);
+
   const selectedWorld = worlds.find((w) => w.id === selectedWorldId);
+  const decisionDNA = activeSelection?.decision_dna;
 
   const handleCopyPrompt = async (id: string, text: string, label: string) => {
     try {
@@ -118,23 +127,82 @@ export const UniverseCodexCanvas: React.FC = () => {
           </div>
         </header>
 
-        {/* Selected Direction Highlights Callout */}
+        {/* Persistent Decision DNA Anchor Strip / Pill Bar */}
         {selectedWorld && (
-          <div className="p-4 rounded-xl bg-slate-900/50 border border-canvas-border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="text-slate-400 font-medium">Committed Direction:</span>
-              <span className="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-300 font-mono font-bold border border-amber-500/20">
-                {selectedWorld.archetype}
-              </span>
-              <span className="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
-                {selectedWorld.aesthetic}
-              </span>
-            </div>
-            {selectedWorldRationale && (
-              <div className="text-slate-300 italic text-xs max-w-md line-clamp-1">
-                "{selectedWorldRationale}"
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-950 border border-cyan-500/30 shadow-[0_0_25px_rgba(6,182,212,0.08)] flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-800 text-cyan-300 font-mono font-bold text-[11px]">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Decision DNA</span>
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-300 font-mono font-bold border border-amber-500/30">
+                  {selectedWorld.archetype}
+                </span>
+                {selectedWorld.divergence_archetype && (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-800 text-cyan-400 border border-slate-700">
+                    {selectedWorld.divergence_archetype}
+                  </span>
+                )}
+                {(decisionDNA?.user_rationale || selectedWorldRationale) && (
+                  <span className="text-slate-400 italic text-[11px] line-clamp-1 max-w-sm">
+                    "{decisionDNA?.user_rationale || selectedWorldRationale}"
+                  </span>
+                )}
               </div>
-            )}
+
+              {/* Priorities & Exclusions Pill Row */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                {/* Priorities */}
+                {(decisionDNA?.creative_priorities && decisionDNA.creative_priorities.length > 0
+                  ? decisionDNA.creative_priorities
+                  : ['Ecological / Symbiotic Mystery', 'Atmospheric Lore Depth', 'Ethical Stakes']
+                )
+                  .slice(0, 4)
+                  .map((p) => (
+                    <span
+                      key={p}
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-200 text-[10.5px] font-medium"
+                      title={`Mandatory Creative Priority: ${p}`}
+                    >
+                      <span className="text-cyan-400 font-bold">★</span>
+                      <span>{p}</span>
+                    </span>
+                  ))}
+
+                {/* Exclusions */}
+                {(decisionDNA?.rejected_directions && decisionDNA.rejected_directions.length > 0
+                  ? decisionDNA.rejected_directions
+                  : ['Classical sunken ruins archaeology', 'Cold War militarized technology']
+                )
+                  .slice(0, 3)
+                  .map((r) => (
+                    <span
+                      key={r}
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/40 text-rose-200 text-[10.5px] font-medium"
+                      title={`Active Negative Guardrail: Avoid ${r}`}
+                    >
+                      <span className="text-rose-400 font-bold">⊘</span>
+                      <span>Avoid: {r}</span>
+                    </span>
+                  ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setInspectorTab('provenance');
+                  toggleInspector(true);
+                }}
+                className="px-3 py-1.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 text-cyan-300 text-[11px] font-semibold flex items-center gap-1.5 transition"
+                title="Inspect Decision DNA and full causal lineage DAG"
+              >
+                <span>Inspect Full DNA</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         )}
 

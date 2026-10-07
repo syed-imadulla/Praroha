@@ -61,14 +61,14 @@
 - [x] **POT-04**: User can review and accept/reject inferred possibilities, anchoring what enters downstream world synthesis.
 
 ### Divergence Engine (DIV) — Phase 10
-- [ ] **DIV-01**: World generation synthesizes exactly three intentional exploration archetypes: World A (Familiar), World B (Radical), World C (Inverse).
-- [ ] **DIV-02**: Each candidate includes an AI-generated exploration profile across Seed Fidelity, Novelty, Conceptual Distance, and Feasibility.
-- [ ] **DIV-03**: World generation incorporates accepted Seed Potential items into generation constraints.
+- [x] **DIV-01**: World generation synthesizes exactly three intentional exploration archetypes: World A (Familiar), World B (Radical), World C (Inverse).
+- [x] **DIV-02**: Each candidate includes an AI-generated exploration profile across Seed Fidelity, Novelty, Conceptual Distance, and Feasibility.
+- [x] **DIV-03**: World generation incorporates accepted Seed Potential items into generation constraints.
 
 ### Decision DNA (DDNA) — Phase 11
-- [ ] **DDNA-01**: World selection records comprehensive Decision DNA: selected world, creator rationale, creative priorities, rejected directions, and custom notes.
-- [ ] **DDNA-02**: Decision DNA is persisted relationally and linked to the project lifecycle.
-- [ ] **DDNA-03**: Decision DNA is injected as an explicit constraint into downstream universe unfolding prompts.
+- [x] **DDNA-01**: World selection records comprehensive Decision DNA: selected world, creator rationale, creative priorities, rejected directions, and custom notes.
+- [x] **DDNA-02**: Decision DNA is persisted relationally and linked to the project lifecycle.
+- [x] **DDNA-03**: Decision DNA is injected as an explicit constraint into downstream universe unfolding prompts.
 
 ### Origin Ledger (ORIG) — Phase 12
 - [ ] **ORIG-01**: Every universe entity (character, rule, location, scene) is tagged with an origin classification (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, `DERIVED`, `AI_INTRODUCED`, `USER_ADDED`).
@@ -128,9 +128,9 @@
 | TRAC-01 – TRAC-03 | Phase 6 | Complete |
 | PERS-01 – PERS-03 | Phase 7 | Complete |
 | DEMO-01 – DEMO-02 | Phase 8 | Complete |
-| POT-01 – POT-04 | Phase 9 | Pending |
-| DIV-01 – DIV-03 | Phase 10 | Pending |
-| DDNA-01 – DDNA-03 | Phase 11 | Pending |
+| POT-01 – POT-04 | Phase 9 | Complete |
+| DIV-01 – DIV-03 | Phase 10 | Complete |
+| DDNA-01 – DDNA-03 | Phase 11 | Complete |
 | ORIG-01 – ORIG-03 | Phase 12 | Pending |
 | MED-01 – MED-03 | Phase 13 | Pending |
 | IMG-01 – IMG-03 | Phase 14 | Pending |

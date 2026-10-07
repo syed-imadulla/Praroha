@@ -5,6 +5,7 @@ import {
   SystemHealthData,
   WorldCandidateRead,
   WorldSelectionRead,
+  WorldSelectionCreate,
   UnfoldedUniverseRead,
   TraceGraphRead,
   AncestorPathRead,
@@ -103,15 +104,17 @@ class ApiClient {
   async selectWorld(
     projectId: string,
     candidateId: string,
-    rationale?: string
+    payload?: WorldSelectionCreate | string
   ): Promise<APIResponse<WorldSelectionRead>> {
+    const bodyObj =
+      typeof payload === 'string'
+        ? { user_rationale: payload }
+        : payload || {};
     return this.request<WorldSelectionRead>(
       `/projects/${projectId}/worlds/${candidateId}/select`,
       {
         method: 'POST',
-        body: JSON.stringify({
-          user_rationale: rationale || null,
-        }),
+        body: JSON.stringify(bodyObj),
       }
     );
   }

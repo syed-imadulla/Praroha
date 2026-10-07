@@ -133,6 +133,24 @@ def _migrate_columns(connection):
             except Exception:
                 pass
 
+    if "world_selections" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("world_selections")]
+        if "creative_priorities_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_selections ADD COLUMN creative_priorities_json TEXT DEFAULT '[]'"))
+            except Exception:
+                pass
+        if "rejected_directions_json" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_selections ADD COLUMN rejected_directions_json TEXT DEFAULT '[]'"))
+            except Exception:
+                pass
+        if "custom_directives" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_selections ADD COLUMN custom_directives TEXT"))
+            except Exception:
+                pass
+
 
 async def init_db() -> None:
     """Initialize database tables asynchronously with automatic fallback to local SQLite."""
@@ -330,6 +348,9 @@ class ProjectRepository:
         project_id: str,
         candidate_id: str,
         user_rationale: Optional[str] = None,
+        creative_priorities: Optional[List[str]] = None,
+        rejected_directions: Optional[List[str]] = None,
+        custom_directives: Optional[str] = None,
     ) -> WorldSelectionRecord:
         """
         Enforce selection validation:
@@ -374,6 +395,9 @@ class ProjectRepository:
             world_candidate_id=candidate.id,
             batch_id=candidate.batch_id,
             user_rationale=user_rationale,
+            creative_priorities_json=json.dumps(creative_priorities or []),
+            rejected_directions_json=json.dumps(rejected_directions or []),
+            custom_directives=custom_directives,
         )
         self.session.add(selection)
 
@@ -885,6 +909,16 @@ class ProjectRepository:
             world_candidate_id=bio_city_candidate.id,
             batch_id=batch_id,
             user_rationale="Selected Bio-City (Symbiotic / Ecological) for deep biopunk exploration and rich ecological tension.",
+            creative_priorities_json=json.dumps([
+                "Ecological / Symbiotic Mystery",
+                "Atmospheric Lore Depth",
+                "Ethical Stakes",
+            ]),
+            rejected_directions_json=json.dumps([
+                "Classical sunken ruins archaeology",
+                "Cold War militarized technology",
+            ]),
+            custom_directives="Ensure coral bio-luminescence and symbiotic sentience remain central across all layers.",
         )
         self.session.add(selection)
 

@@ -77,6 +77,7 @@ export const WorldCandidatesCanvas: React.FC = () => {
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold font-sans text-slate-100 tracking-tight">
             Divergent Worlds Engine
+            <span className="sr-only">Three Contrasting Creative Worlds</span>
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm max-w-2xl">
             Synthesizes exactly three intentional exploration archetypes (Familiar, Radical, Inverse) with 4-metric exploration profiles anchored to your accepted Seed Potential.

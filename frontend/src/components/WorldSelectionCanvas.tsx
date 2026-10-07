@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Compass,
@@ -10,10 +10,24 @@ import {
   ShieldCheck,
   Dna,
   Lock,
+  Sliders,
+  Ban,
+  Plus,
+  X,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { WorldCandidateCard } from './WorldCandidateCard';
-import { WorldCandidateRead } from '../types';
+import { WorldCandidateRead, WorldSelectionCreate } from '../types';
+
+const PRESET_PRIORITIES = [
+  'Atmospheric Lore Depth',
+  'Character-Driven Conflict',
+  'Ecological / Symbiotic Mystery',
+  'Ethical Stakes',
+  'Philosophical Stakes',
+  'Visceral Sensory Worldbuilding',
+  'Intimate Personal Scale',
+];
 
 export const WorldSelectionCanvas: React.FC = () => {
   const {
@@ -32,6 +46,12 @@ export const WorldSelectionCanvas: React.FC = () => {
   } = useWorkspaceStore();
 
   const [localRationale, setLocalRationale] = useState<string>(selectedWorldRationale || '');
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
+  const [customPriorityInput, setCustomPriorityInput] = useState<string>('');
+  const [enabledExclusions, setEnabledExclusions] = useState<Record<string, boolean>>({});
+  const [customExclusions, setCustomExclusions] = useState<string[]>([]);
+  const [customExclusionInput, setCustomExclusionInput] = useState<string>('');
+  const [customDirectives, setCustomDirectives] = useState<string>('');
 
   // Check if Stage 5 has commenced
   const isStage5Begun =
@@ -43,15 +63,119 @@ export const WorldSelectionCanvas: React.FC = () => {
   // Active selected candidate object
   const chosenCandidate = worlds.find((w) => w.id === selectedWorldId) || null;
 
+  // Derive inferred exclusions from the two non-selected candidate worlds
+  const unselectedCandidates = worlds.filter((w) => w.id !== selectedWorldId);
+  const inferredExclusionsList = unselectedCandidates.map((cand) => {
+    const t = cand.title.toLowerCase();
+    if (t.includes('lost civilization')) {
+      return 'Classical sunken ruins archaeology';
+    }
+    if (t.includes('time capsule')) {
+      return 'Cold War militarized technology';
+    }
+    return `Archetype conventions of ${cand.title} (${cand.archetype})`;
+  });
+
+  // Synchronize defaults whenever a candidate is chosen
+  useEffect(() => {
+    if (chosenCandidate) {
+      const isBioCity = chosenCandidate.title.toLowerCase().includes('bio-city');
+      if (selectedPriorities.length === 0) {
+        if (isBioCity) {
+          setSelectedPriorities([
+            'Ecological / Symbiotic Mystery',
+            'Atmospheric Lore Depth',
+            'Ethical Stakes',
+          ]);
+        } else {
+          setSelectedPriorities(['Atmospheric Lore Depth', 'Character-Driven Conflict']);
+        }
+      }
+
+      if (!localRationale && isBioCity) {
+        setLocalRationale(
+          'Selected Bio-City for deep biopunk exploration and rich ecological tension.'
+        );
+      }
+
+      if (!customDirectives && isBioCity) {
+        setCustomDirectives(
+          'Ensure coral bio-luminescence and symbiotic sentience remain central across all layers.'
+        );
+      }
+
+      // Default all inferred exclusions to active
+      setEnabledExclusions((prev) => {
+        const next = { ...prev };
+        inferredExclusionsList.forEach((exc) => {
+          if (next[exc] === undefined) {
+            next[exc] = true;
+          }
+        });
+        return next;
+      });
+    }
+  }, [chosenCandidate?.id]);
+
   const handleSelectCandidate = (candidate: WorldCandidateRead) => {
     if (isStage5Begun) return;
     setSelectedWorldId(candidate.id);
   };
 
+  const togglePriority = (p: string) => {
+    if (selectedPriorities.includes(p)) {
+      setSelectedPriorities(selectedPriorities.filter((item) => item !== p));
+    } else {
+      setSelectedPriorities([...selectedPriorities, p]);
+    }
+  };
+
+  const handleAddCustomPriority = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = customPriorityInput.trim();
+    if (trimmed && !selectedPriorities.includes(trimmed)) {
+      setSelectedPriorities([...selectedPriorities, trimmed]);
+      setCustomPriorityInput('');
+    }
+  };
+
+  const toggleExclusion = (exc: string) => {
+    setEnabledExclusions((prev) => ({
+      ...prev,
+      [exc]: prev[exc] === false ? true : false,
+    }));
+  };
+
+  const handleAddCustomExclusion = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = customExclusionInput.trim();
+    if (trimmed && !customExclusions.includes(trimmed)) {
+      setCustomExclusions([...customExclusions, trimmed]);
+      setCustomExclusionInput('');
+    }
+  };
+
+  const handleRemoveCustomExclusion = (exc: string) => {
+    setCustomExclusions(customExclusions.filter((item) => item !== exc));
+  };
+
   const handleConfirmLock = async () => {
     if (!selectedWorldId || isStage5Begun) return;
     setSelectedWorldRationale(localRationale);
-    await confirmWorldSelection(selectedWorldId, localRationale);
+
+    const activeInferred = inferredExclusionsList.filter(
+      (e) => enabledExclusions[e] !== false
+    );
+    const finalRejectedDirections = [...activeInferred, ...customExclusions];
+
+    const payload: WorldSelectionCreate = {
+      user_rationale: localRationale || null,
+      creative_priorities: selectedPriorities,
+      rejected_directions: finalRejectedDirections,
+      custom_directives: customDirectives.trim() || null,
+    };
+
+    await confirmWorldSelection(selectedWorldId, payload);
   };
 
   const handleBackToStage3 = () => {
@@ -79,7 +203,7 @@ export const WorldSelectionCanvas: React.FC = () => {
             Human World Selection & Creative Commitment
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm max-w-2xl">
-            Choose which of the three contrasting worlds becomes your project's canonical foundation. All subsequent generative unfolding (bible, characters, and scenes) will anchor strictly to this choice.
+            Choose which of the three contrasting worlds becomes your project's canonical foundation. Define the Decision DNA (priorities, negative guardrails, and rationale) that anchors all Stage 5 unfolding.
           </p>
         </div>
 
@@ -177,7 +301,7 @@ export const WorldSelectionCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* Selection Confirmation & Creator Rationale Drawer / Panel */}
+      {/* Selection Confirmation & Decision DNA Capture Panel */}
       <AnimatePresence>
         {chosenCandidate ? (
           <motion.div
@@ -186,6 +310,7 @@ export const WorldSelectionCanvas: React.FC = () => {
             exit={{ opacity: 0, y: 15 }}
             className="p-6 rounded-2xl glass-card border border-cyan-500/40 bg-gradient-to-b from-slate-900/90 via-slate-950/95 to-slate-950 shadow-[0_0_40px_rgba(6,182,212,0.15)] space-y-6"
           >
+            {/* Header: Chosen World Direction + Lock Action */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-2 text-cyan-400 text-xs font-mono font-bold uppercase tracking-wider">
@@ -220,25 +345,207 @@ export const WorldSelectionCanvas: React.FC = () => {
               </div>
             </div>
 
-            {/* Creator Notes / Rationale Input */}
-            <div className="space-y-2">
+            {/* Decision DNA Capture Controls */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              {/* Section 1: Creative Priorities */}
+              <div className="space-y-3 p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs uppercase tracking-wider">
+                    <Sliders className="w-3.5 h-3.5" />
+                    <span>1. Creative Priorities (Pillars)</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-cyan-400/80">
+                    {selectedPriorities.length} selected
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Select thematic pillars for Stage 5 generation to prioritize across Bible, characters, and scenes:
+                </p>
+
+                {/* Priority Chips */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {PRESET_PRIORITIES.map((p) => {
+                    const active = selectedPriorities.includes(p);
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => togglePriority(p)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 border ${
+                          active
+                            ? 'bg-cyan-500/20 text-cyan-200 border-cyan-400/80 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
+                            : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-300'
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+                        <span>{p}</span>
+                      </button>
+                    );
+                  })}
+                  {selectedPriorities
+                    .filter((p) => !PRESET_PRIORITIES.includes(p))
+                    .map((customP) => (
+                      <span
+                        key={customP}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/30 text-cyan-100 border border-cyan-400 flex items-center gap-1.5"
+                      >
+                        <span>{customP}</span>
+                        <button
+                          type="button"
+                          onClick={() => togglePriority(customP)}
+                          className="hover:text-red-400"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                </div>
+
+                {/* Add Custom Priority Input */}
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="text"
+                    value={customPriorityInput}
+                    onChange={(e) => setCustomPriorityInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomPriority();
+                      }
+                    }}
+                    placeholder="Add custom creative priority..."
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddCustomPriority()}
+                    className="px-3 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-800 text-cyan-300 text-xs font-medium flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Section 2: Negative Guardrails & Rejected Directions */}
+              <div className="space-y-3 p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-rose-300 font-bold text-xs uppercase tracking-wider">
+                    <Ban className="w-3.5 h-3.5" />
+                    <span>2. Negative Guardrails & Exclusions</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-rose-400/80">
+                    {inferredExclusionsList.filter((e) => enabledExclusions[e] !== false).length + customExclusions.length} active
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Inferred from the two unselected candidate worlds. Toggle active exclusions or add custom boundaries:
+                </p>
+
+                {/* Inferred Exclusions Checklist */}
+                <div className="space-y-2 pt-1">
+                  {inferredExclusionsList.map((exc) => {
+                    const isChecked = enabledExclusions[exc] !== false;
+                    return (
+                      <label
+                        key={exc}
+                        className={`flex items-start gap-2.5 p-2 rounded-lg border text-xs cursor-pointer transition ${
+                          isChecked
+                            ? 'bg-rose-950/20 border-rose-900/50 text-rose-200'
+                            : 'bg-slate-900/40 border-slate-800 text-slate-500 line-through'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleExclusion(exc)}
+                          className="mt-0.5 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-0"
+                        />
+                        <span className="leading-snug">Avoid: {exc}</span>
+                      </label>
+                    );
+                  })}
+
+                  {/* Custom Exclusions Pills */}
+                  {customExclusions.map((customExc) => (
+                    <div
+                      key={customExc}
+                      className="flex items-center justify-between p-2 rounded-lg bg-rose-950/30 border border-rose-800/80 text-xs text-rose-200"
+                    >
+                      <span>Avoid: {customExc}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCustomExclusion(customExc)}
+                        className="text-slate-400 hover:text-rose-300"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add Custom Negative Guardrail */}
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="text"
+                    value={customExclusionInput}
+                    onChange={(e) => setCustomExclusionInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomExclusion();
+                      }
+                    }}
+                    placeholder="Add custom exclusion (e.g. No magical portals)..."
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:border-rose-400 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddCustomExclusion()}
+                    className="px-3 py-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs font-medium flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Creator Notes & Rationale */}
+            <div className="space-y-2 pt-1">
               <label
                 htmlFor="creator-rationale"
                 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2"
               >
                 <FileEdit className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Creator Notes & Creative Rationale (Optional)</span>
+                <span>3. Creator Rationale & Intent</span>
               </label>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Why did you select this world? What thematic angles, character motivations, or aesthetic details should the AI prioritize during Stage 5 unfolding?
-              </p>
               <textarea
                 id="creator-rationale"
-                rows={3}
+                rows={2}
                 value={localRationale}
                 onChange={(e) => setLocalRationale(e.target.value)}
-                placeholder="e.g., Focus on the symbiotic bioluminescent biology and the ethical dilemma of harvesting the ancient coral core..."
-                className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-700/80 hover:border-slate-600 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-slate-500 text-xs sm:text-sm font-sans transition-all resize-y"
+                placeholder="Explain why you chose this direction over the others..."
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 hover:border-slate-600 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-slate-500 text-xs sm:text-sm font-sans transition-all resize-y"
+              />
+            </div>
+
+            {/* Section 4: Custom Creative Directives */}
+            <div className="space-y-2">
+              <label
+                htmlFor="custom-directives"
+                className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>4. Custom Directives (Non-Negotiables)</span>
+              </label>
+              <textarea
+                id="custom-directives"
+                rows={2}
+                value={customDirectives}
+                onChange={(e) => setCustomDirectives(e.target.value)}
+                placeholder="Specific non-negotiable guidelines for Stage 5 generation..."
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 hover:border-slate-600 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-slate-200 placeholder-slate-500 text-xs sm:text-sm font-sans transition-all resize-y"
               />
             </div>
 
@@ -246,7 +553,7 @@ export const WorldSelectionCanvas: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11.5px] text-slate-400 flex items-center gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>
-                Locking records a permanent provenance checkpoint in the project DAG. You can still switch candidates within this batch until Stage 5 unfolding commences.
+                Locking records this full Decision DNA as an immutable creative contract in the project DAG. You can still switch candidates within this batch until Stage 5 unfolding commences.
               </span>
             </div>
           </motion.div>

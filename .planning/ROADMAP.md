@@ -139,7 +139,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 
 - [x] **Phase 9: Seed Potential Map** — Semantic classification layer (Explicit, Inferred, Open) between Seed DNA and Worlds.
 - [x] **Phase 10: Divergence Engine** — Exactly 3 intentional exploration archetypes (Familiar, Radical, Inverse) with exploration profile.
-- [ ] **Phase 11: Decision DNA** — Rich human choice capture (rationale, priorities, rejected directions) and downstream propagation.
+- [x] **Phase 11: Decision DNA** — Rich human choice capture (rationale, priorities, rejected directions) and downstream propagation.
 - [ ] **Phase 12: Origin Ledger** — Universal entity origin tagging (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) & "Why is this here?" drilldown.
 - [ ] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
 - [ ] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual.
@@ -184,6 +184,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Capture rich human rationale, priorities, and rejected directions during world selection, injecting them into subsequent universe unfolding.  
 **Depends on**: Phase 10  
 **Requirements**: DDNA-01, DDNA-02, DDNA-03  
+**Plans**: 2 plans
+- [x] **11-01-PLAN.md** (Wave 1): Backend Decision DNA Engine (Models, Persistence, DB Migration, Stable Snapshot Strategy, Provider Creative Contract & Pytest Suite)
+- [x] **11-02-PLAN.md** (Wave 2): Frontend Decision DNA UI (Priorities Chips, Inferred Exclusions, Codex Anchor Pill Bar, Lineage Provenance & Playwright E2E Suite)
 **Success Criteria**:
   1. World selection records full Decision DNA (selected world, rationale, priorities, rejected directions, notes).
   2. Decision DNA is persisted relationally and linked to the project lifecycle.

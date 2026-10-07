@@ -80,11 +80,15 @@ async def unfold_universe(
             detail=f"Project '{project_id}' has no Seed DNA. Complete Stage 2 before unfolding.",
         )
 
-    # Fetch creator selection rationale if present
+    # Fetch creator selection record & assemble stable Decision DNA snapshot
     active_selection = await repo.get_active_world_selection(project_id)
-    creator_rationale = (
-        active_selection[0].user_rationale if active_selection else None
-    )
+    decision_dna_dict = None
+    creator_rationale = None
+    if active_selection:
+        sel_rec, _ = active_selection
+        creator_rationale = sel_rec.user_rationale
+        decision_dna_snapshot = sel_rec.to_decision_dna(candidate_record.to_read_schema())
+        decision_dna_dict = decision_dna_snapshot.model_dump()
 
     # Transition project status to "unfolding"
     project.status = "unfolding"
@@ -100,6 +104,7 @@ async def unfold_universe(
         "seed_dna": dna_schema.model_dump(),
         "selected_world": candidate_record.to_read_schema().model_dump(),
         "creator_rationale": creator_rationale,
+        "decision_dna": decision_dna_dict,
     }
 
     try:
