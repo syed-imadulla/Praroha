@@ -1156,5 +1156,11 @@
     "seen": 1791372283.95882,
     "ast_hash": "a886f3615f297bcee11820f9d9b42806",
     "semantic_hash": ""
+  },
+  ".planning/phases/12-origin-ledger/12-CONTEXT.md": {
+    "mtime": 1791372854.8983319,
+    "seen": 1791372877.3760724,
+    "ast_hash": "85fb6424a99a10325ddb5c2f5d2f8cfe",
+    "semantic_hash": ""
   }
 }
