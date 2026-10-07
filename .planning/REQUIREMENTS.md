@@ -76,9 +76,9 @@
 - [x] **ORIG-03**: "Why is this here?" drawer interaction provides human-intelligible causal provenance based on stored metadata without exposing raw LLM reasoning tokens.
 
 ### Media Provider Architecture (MED) — Phase 13
-- [ ] **MED-01**: Abstract `MediaProvider` base class defining `ImageProvider`, `VoiceProvider`, `VideoProvider`, and `AudioProvider` interfaces.
-- [ ] **MED-02**: Deterministic `MockMediaProvider` returning verifiable mock media assets for offline/testing resilience.
-- [ ] **MED-03**: All media generation is strictly asynchronous, non-blocking, and gracefully handled on network/credit failures.
+- [x] **MED-01**: Abstract `MediaProvider` base class defining `ImageProvider`, `VoiceProvider`, `VideoProvider`, and `AudioProvider` interfaces.
+- [x] **MED-02**: Deterministic `MockMediaProvider` returning verifiable mock media assets for offline/testing resilience.
+- [x] **MED-03**: All media generation is strictly asynchronous, non-blocking, and gracefully handled on network/credit failures.
 
 ### Image Generation via Pollinations & FLUX (IMG) — Phase 14
 - [ ] **IMG-01**: Concrete `PollinationsProvider` as primary image generator (world covers, character portraits, scene visuals) where usable free/team path is available; with local FLUX.1 schnell fallback where practical, and `MockMediaProvider` as fallback of last resort.
@@ -132,7 +132,7 @@
 | DIV-01 – DIV-03 | Phase 10 | Complete |
 | DDNA-01 – DDNA-03 | Phase 11 | Complete |
 | ORIG-01 – ORIG-03 | Phase 12 | Complete |
-| MED-01 – MED-03 | Phase 13 | Pending |
+| MED-01 – MED-03 | Phase 13 | Complete |
 | IMG-01 – IMG-03 | Phase 14 | Pending |
 | VOX-01 – VOX-03 | Phase 15 | Pending |
 | VID-01 – VID-03 | Phase 16 | Pending |

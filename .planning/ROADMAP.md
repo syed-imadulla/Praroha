@@ -141,7 +141,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 10: Divergence Engine** — Exactly 3 intentional exploration archetypes (Familiar, Radical, Inverse) with exploration profile.
 - [x] **Phase 11: Decision DNA** — Rich human choice capture (rationale, priorities, rejected directions) and downstream propagation.
 - [x] **Phase 12: Origin Ledger** — Universal entity origin tagging (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) & "Why is this here?" drilldown.
-- [ ] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
+- [x] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
 - [ ] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual.
 - [ ] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration.
 - [ ] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation with graceful fallback.
@@ -212,9 +212,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 **Goal**: Build a decoupled, non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`) with deterministic mock fallback.  
 **Depends on**: Phase 12  
 **Requirements**: MED-01, MED-02, MED-03  
-**Plans**: 2 plans
-- [ ] **13-01-PLAN.md** (Wave 1): Backend Media Provider Engine (Sub-interfaces, Mock Provider, Models, Migrations, Async Service & Pytest Suite)
-- [ ] **13-02-PLAN.md** (Wave 2): Frontend Media Architecture (Types, Client, Store, Reusable MediaPreviewCard & Playwright E2E Suite)
+**Plans**: 2 plans (all completed)
+- [x] **13-01-PLAN.md** (Wave 1): Backend Media Provider Engine (Sub-interfaces, Mock Provider, Models, Migrations, Async Service & Pytest Suite)
+- [x] **13-02-PLAN.md** (Wave 2): Frontend Media Architecture (Types, Client, Store, Reusable MediaPreviewCard & Playwright E2E Suite)
 **Success Criteria**:
   1. Clean `MediaProvider` interfaces defined for all 4 media modalities.
   2. `MockMediaProvider` returns reliable, offline test fixtures.

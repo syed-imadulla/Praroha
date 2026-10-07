@@ -405,4 +405,53 @@ export interface BatchPotentialStatusUpdatePayload {
   }[];
 }
 
+export type MediaType = 'image' | 'voice' | 'video' | 'audio';
+export type MediaJobStatus = 'queued' | 'processing' | 'completed' | 'failed';
+
+export interface MediaAsset {
+  id: string;
+  project_id: string;
+  entity_type: string;
+  entity_id: string;
+  media_type: MediaType;
+  status: MediaJobStatus;
+  asset_url?: string | null;
+  mime_type?: string | null;
+  prompt: string;
+  provider_name: string;
+  error_message?: string | null;
+  created_at: string;
+  completed_at?: string | null;
+}
+
+export interface MediaJobResponse {
+  job_id: string;
+  status: MediaJobStatus;
+  media_type: MediaType;
+  entity_type: string;
+  entity_id: string;
+  asset_url?: string | null;
+  error_message?: string | null;
+}
+
+export interface MediaGenerationRequest {
+  entity_type: 'world' | 'character' | 'location' | 'scene';
+  entity_id: string;
+  media_type: MediaType;
+  prompt: string;
+  aspect_ratio?: string;
+  voice_id?: string;
+  duration_sec?: number;
+  mood?: string;
+  context?: Record<string, any>;
+}
+
+export interface MediaProviderHealth {
+  status: string;
+  provider: string;
+  modalities: Record<string, string>;
+  offline_ready?: boolean;
+}
+
+
 

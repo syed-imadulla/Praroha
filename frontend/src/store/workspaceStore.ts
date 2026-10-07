@@ -20,6 +20,11 @@ import {
   SnapshotRead,
   SeedPotentialItem,
   PotentialItemStatus,
+  MediaAsset,
+  MediaJobResponse,
+  MediaGenerationRequest,
+  MediaProviderHealth,
+  MediaType,
 } from '../types';
 
 interface WorkspaceState {
@@ -63,6 +68,10 @@ interface WorkspaceState {
   potentialItems: SeedPotentialItem[];
   isExtractingPotential: boolean;
   understandSubTab: 'dna' | 'potential';
+  mediaAssets: Record<string, MediaAsset[]>;
+  activeMediaJobs: Record<string, MediaJobResponse>;
+  isGeneratingMedia: Record<string, boolean>;
+  mediaProviderHealth: MediaProviderHealth | null;
 
   // Actions
   setActiveStage: (stage: StageType) => void;
@@ -103,6 +112,9 @@ interface WorkspaceState {
   extractPotentialItemsAction: () => Promise<boolean>;
   updatePotentialStatusAction: (itemId: string, status: PotentialItemStatus) => Promise<boolean>;
   batchUpdatePotentialStatusesAction: (items: { id: string; user_status: PotentialItemStatus }[]) => Promise<boolean>;
+  fetchMediaHealth: () => Promise<void>;
+  fetchEntityMedia: (entityId: string, mediaType?: MediaType) => Promise<void>;
+  generateMediaAction: (req: MediaGenerationRequest) => Promise<string | null>;
   startTour: () => void;
   nextTourStep: () => void;
   prevTourStep: () => void;
@@ -159,6 +171,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       potentialItems: [],
       isExtractingPotential: false,
       understandSubTab: 'dna',
+      mediaAssets: {},
+      activeMediaJobs: {},
+      isGeneratingMedia: {},
+      mediaProviderHealth: null,
 
       setUnderstandSubTab: (tab) => set({ understandSubTab: tab }),
 
@@ -813,6 +829,83 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
       setProviderFallbackWarning: (warning) => set({ providerFallbackWarning: warning }),
 
+      fetchMediaHealth: async () => {
+        try {
+          const res = await apiClient.getMediaProvidersHealth();
+          if (res.success && res.data) {
+            set({ mediaProviderHealth: res.data });
+          }
+        } catch (err) {
+          console.error('Failed to fetch media provider health:', err);
+        }
+      },
+
+      fetchEntityMedia: async (entityId: string, mediaType?: MediaType) => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        try {
+          const res = await apiClient.getMediaAssets(activeProject.id, entityId, mediaType);
+          if (res.success && res.data) {
+            set((state) => ({
+              mediaAssets: {
+                ...state.mediaAssets,
+                [entityId]: res.data!,
+              },
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch entity media:', err);
+        }
+      },
+
+      generateMediaAction: async (req: MediaGenerationRequest) => {
+        const { activeProject, fetchEntityMedia } = get();
+        if (!activeProject) return null;
+        const key = `${req.entity_id}_${req.media_type}`;
+        set((state) => ({
+          isGeneratingMedia: { ...state.isGeneratingMedia, [key]: true },
+        }));
+
+        try {
+          const res = await apiClient.generateMedia(activeProject.id, req);
+          if (res.success && res.data) {
+            const job = res.data;
+            set((state) => ({
+              activeMediaJobs: { ...state.activeMediaJobs, [job.job_id]: job },
+            }));
+
+            // Non-blocking poll loop
+            const poll = async () => {
+              for (let i = 0; i < 40; i++) {
+                await new Promise((r) => setTimeout(r, 600));
+                const statusRes = await apiClient.getMediaJob(activeProject.id, job.job_id);
+                if (statusRes.success && statusRes.data) {
+                  const updatedJob = statusRes.data;
+                  set((state) => ({
+                    activeMediaJobs: { ...state.activeMediaJobs, [job.job_id]: updatedJob },
+                  }));
+                  if (updatedJob.status === 'completed' || updatedJob.status === 'failed') {
+                    await fetchEntityMedia(req.entity_id);
+                    set((state) => ({
+                      isGeneratingMedia: { ...state.isGeneratingMedia, [key]: false },
+                    }));
+                    break;
+                  }
+                }
+              }
+            };
+            poll();
+            return job.job_id;
+          }
+        } catch (err) {
+          console.error('Failed to generate media asset:', err);
+        }
+        set((state) => ({
+          isGeneratingMedia: { ...state.isGeneratingMedia, [key]: false },
+        }));
+        return null;
+      },
+
       loadCanonicalDemoUniverse: async () => {
         try {
           set({ isSyncing: true });
@@ -878,6 +971,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           potentialItems: [],
           isExtractingPotential: false,
           understandSubTab: 'dna',
+          mediaAssets: {},
+          activeMediaJobs: {},
+          isGeneratingMedia: {},
         }),
     }),
     {
@@ -896,6 +992,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         unfoldedUniverse: state.unfoldedUniverse,
         activeCodexTab: state.activeCodexTab,
         inspectorTab: state.inspectorTab,
+        mediaAssets: state.mediaAssets,
       }),
     }
   )

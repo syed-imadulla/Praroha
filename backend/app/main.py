@@ -3,12 +3,15 @@ from typing import AsyncGenerator
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 from backend.app.config import settings
 from backend.app.core.response import api_error
 from backend.app.repositories.project_repo import init_db
 from backend.app.routers.dna import router as dna_router
 from backend.app.routers.health import router as health_router
 from backend.app.routers.lineage import router as lineage_router
+from backend.app.routers.media import router as media_router
 from backend.app.routers.persistence import router as persistence_router
 from backend.app.routers.potential import router as potential_router
 from backend.app.routers.projects import router as projects_router
@@ -65,4 +68,10 @@ app.include_router(selection_router, prefix=settings.API_V1_PREFIX)
 app.include_router(unfold_router, prefix=settings.API_V1_PREFIX)
 app.include_router(lineage_router, prefix=settings.API_V1_PREFIX)
 app.include_router(persistence_router, prefix=settings.API_V1_PREFIX)
+app.include_router(media_router, prefix=settings.API_V1_PREFIX)
+
+# Ensure upload directory exists and is mounted for static asset retrieval
+uploads_path = Path(settings.UPLOAD_DIR)
+uploads_path.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(uploads_path)), name="uploads")
 

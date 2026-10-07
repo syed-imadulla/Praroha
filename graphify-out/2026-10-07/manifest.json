@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791375760.467219,
-    "seen": 1791375803.2919774,
-    "ast_hash": "b1f3d485c8b1626b59c838a76385cec9",
+    "mtime": 1791376510.1836863,
+    "seen": 1791376538.6255705,
+    "ast_hash": "6a7d4ad8cd9d2efc03e7fb30a70e434c",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791375786.9839911,
-    "seen": 1791375803.2919786,
-    "ast_hash": "cf7f73b43c032702d8c41b2e90342c1d",
+    "mtime": 1791376518.241614,
+    "seen": 1791376538.6255724,
+    "ast_hash": "66c9b99651afea05d352ab6e4669e169",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -1203,6 +1203,36 @@
     "mtime": 1791375535.94815,
     "seen": 1791375803.2919567,
     "ast_hash": "d54b0c46bc36498789c4adc434e9833f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/12-origin-ledger/12-UAT.md": {
+    "mtime": 1791376015.9430225,
+    "seen": 1791376034.4154325,
+    "ast_hash": "8bb98ecf16ec92ecc8b67f4a0ec48093",
+    "semantic_hash": ""
+  },
+  ".planning/phases/13-media-provider-architecture/13-CONTEXT.md": {
+    "mtime": 1791376184.2795749,
+    "seen": 1791376205.1338682,
+    "ast_hash": "3156dc8abda43b23f766efe14ac6b35f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/13-media-provider-architecture/13-01-PLAN.md": {
+    "mtime": 1791376468.276061,
+    "seen": 1791376538.6256766,
+    "ast_hash": "e460be2b2ea548aff26276359b0df799",
+    "semantic_hash": ""
+  },
+  ".planning/phases/13-media-provider-architecture/13-02-PLAN.md": {
+    "mtime": 1791376491.7378511,
+    "seen": 1791376538.6256778,
+    "ast_hash": "9370e0a0516ca49e6e7480be7f9066f6",
+    "semantic_hash": ""
+  },
+  ".planning/phases/13-media-provider-architecture/13-RESEARCH.md": {
+    "mtime": 1791376440.6013088,
+    "seen": 1791376538.62568,
+    "ast_hash": "b7ac5e4d9e5fd56bbd44d7f7ca83b692",
     "semantic_hash": ""
   }
 }

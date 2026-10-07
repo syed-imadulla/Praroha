@@ -19,6 +19,11 @@ import {
   SnapshotRead,
   SeedPotentialItem,
   PotentialItemStatus,
+  MediaAsset,
+  MediaJobResponse,
+  MediaGenerationRequest,
+  MediaProviderHealth,
+  MediaType,
 } from '../types';
 
 class ApiClient {
@@ -244,7 +249,41 @@ class ApiClient {
       body: JSON.stringify({ items }),
     });
   }
+
+  async generateMedia(
+    projectId: string,
+    payload: MediaGenerationRequest
+  ): Promise<APIResponse<MediaJobResponse>> {
+    return this.request<MediaJobResponse>(`/projects/${projectId}/media/generate`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getMediaJob(
+    projectId: string,
+    jobId: string
+  ): Promise<APIResponse<MediaJobResponse>> {
+    return this.request<MediaJobResponse>(`/projects/${projectId}/media/jobs/${jobId}`);
+  }
+
+  async getMediaAssets(
+    projectId: string,
+    entityId?: string,
+    mediaType?: MediaType
+  ): Promise<APIResponse<MediaAsset[]>> {
+    const params = new URLSearchParams();
+    if (entityId) params.append('entity_id', entityId);
+    if (mediaType) params.append('media_type', mediaType);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.request<MediaAsset[]>(`/projects/${projectId}/media/assets${query}`);
+  }
+
+  async getMediaProvidersHealth(): Promise<APIResponse<MediaProviderHealth>> {
+    return this.request<MediaProviderHealth>('/media/providers/health');
+  }
 }
+
 
 export const apiClient = new ApiClient();
 

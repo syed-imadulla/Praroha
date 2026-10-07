@@ -1,0 +1,270 @@
+import hashlib
+import math
+import struct
+import uuid
+from typing import Any, Dict, Optional
+from backend.app.providers.media.base import (
+    AudioProvider,
+    ImageProvider,
+    MediaPayload,
+    MediaProvider,
+    VideoProvider,
+    VoiceProvider,
+)
+
+
+def _generate_wav_bytes(duration_sec: float = 1.0, freq: float = 330.0, sample_rate: int = 22050) -> bytes:
+    """Generate a clean, valid standard PCM RIFF/WAV binary payload in pure Python."""
+    duration = max(0.5, min(10.0, duration_sec))
+    num_samples = int(duration * sample_rate)
+    subchunk2_size = num_samples * 2  # 16-bit mono = 2 bytes per sample
+    chunk_size = 36 + subchunk2_size
+
+    header = struct.pack(
+        "<4sI4s4sIHHIIHH4sI",
+        b"RIFF",
+        chunk_size,
+        b"WAVE",
+        b"fmt ",
+        16,  # PCM subchunk size
+        1,   # AudioFormat (PCM)
+        1,   # Channels (mono)
+        sample_rate,
+        sample_rate * 2,  # ByteRate
+        2,   # BlockAlign
+        16,  # BitsPerSample
+        b"data",
+        subchunk2_size,
+    )
+
+    fade_samples = int(0.05 * sample_rate)
+    samples = bytearray()
+    for i in range(num_samples):
+        t = i / sample_rate
+        # Avoid clicking with edge envelopes
+        envelope = min(1.0, i / max(1, fade_samples), (num_samples - i) / max(1, fade_samples))
+        val = int(8000 * envelope * math.sin(2 * math.pi * freq * t))
+        samples.extend(struct.pack("<h", max(-32768, min(32767, val))))
+
+    return bytes(header + samples)
+
+
+def _generate_svg_bytes(title: str, aspect_ratio: str = "1:1") -> bytes:
+    """Generate a clean, high-aesthetic responsive SVG graphic."""
+    width, height = (800, 800) if aspect_ratio == "1:1" else (1200, 675)
+    clean_title = (title or "Universe Visual Asset")[:60]
+    
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030712"/>
+      <stop offset="40%" stop-color="#090d1a"/>
+      <stop offset="100%" stop-color="#161b33"/>
+    </linearGradient>
+    <radialGradient id="cyanGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#3b82f6" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="{width}" height="{height}" fill="url(#bg)"/>
+  <circle cx="{width // 2}" cy="{height // 2}" r="{min(width, height) // 2}" fill="url(#cyanGlow)"/>
+
+  <!-- Aesthetic Framing Grid -->
+  <rect x="24" y="24" width="{width - 48}" height="{height - 48}" fill="none" stroke="url(#borderGrad)" stroke-width="2" rx="20"/>
+  <circle cx="40" cy="40" r="4" fill="#06b6d4"/>
+  <circle cx="{width - 40}" cy="40" r="4" fill="#06b6d4"/>
+  <circle cx="40" cy="{height - 40}" r="4" fill="#8b5cf6"/>
+  <circle cx="{width - 40}" cy="{height - 40}" r="4" fill="#8b5cf6"/>
+
+  <!-- Visual Central Emblem -->
+  <g transform="translate({width // 2}, {height // 2 - 40})">
+    <circle r="60" fill="#06b6d4" fill-opacity="0.1" stroke="#06b6d4" stroke-width="1.5"/>
+    <polygon points="0,-35 30,25 -30,25" fill="none" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="0" cy="5" r="8" fill="#a5f3fc"/>
+  </g>
+
+  <!-- Text Hierarchy -->
+  <text x="{width // 2}" y="{height // 2 + 55}" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="0.5">
+    {clean_title}
+  </text>
+  <text x="{width // 2}" y="{height // 2 + 90}" font-family="ui-monospace, monospace" font-size="12" font-weight="bold" fill="#22d3ee" text-anchor="middle" letter-spacing="3">
+    SEED UNFOLD • MOCK VISUAL ENGINE
+  </text>
+  <text x="{width // 2}" y="{height - 48}" font-family="ui-monospace, monospace" font-size="10" fill="#64748b" text-anchor="middle">
+    OFFLINE DETERMINISTIC ASSET • ZERO-COST FALLBACK
+  </text>
+</svg>"""
+    return svg.encode("utf-8")
+
+
+def _generate_minimal_mp4_bytes() -> bytes:
+    """Generate a lightweight valid ISO base media file (MP4 container with ftyp/moov/mdat)."""
+    # Standard ISO-BMFF minimal ftyp box
+    ftyp_data = b"isom" + b"\x00\x00\x02\x00" + b"isom" + b"iso2" + b"mp41"
+    ftyp_box = struct.pack(">I4s", 8 + len(ftyp_data), b"ftyp") + ftyp_data
+    
+    # Empty minimal mdat box
+    mdat_box = struct.pack(">I4s", 8, b"mdat")
+    
+    # Minimal moov box
+    mvhd_data = (
+        b"\x00" * 4 +  # version & flags
+        b"\x00" * 8 +  # creation & modification time
+        struct.pack(">II", 600, 600) +  # timescale (600), duration (600 = 1s)
+        b"\x00\x01\x00\x00" +  # rate 1.0
+        b"\x01\x00" + b"\x00" * 2 +  # volume 1.0 + reserved
+        b"\x00" * 8 +  # reserved
+        b"\x00\x01\x00\x00" + b"\x00" * 12 + b"\x00\x01\x00\x00" + b"\x00" * 16 + b"\x40\x00\x00\x00" +  # unity matrix
+        b"\x00" * 24 +  # pre-defined
+        struct.pack(">I", 2)  # next track id
+    )
+    mvhd_box = struct.pack(">I4s", 8 + len(mvhd_data), b"mvhd") + mvhd_data
+    moov_box = struct.pack(">I4s", 8 + len(mvhd_box), b"moov") + mvhd_box
+    
+    return ftyp_box + moov_box + mdat_box
+
+
+class MockImageProvider(ImageProvider):
+    """Deterministic mock image provider generating aesthetic SVG vector art."""
+
+    async def generate_image(
+        self,
+        prompt: str,
+        aspect_ratio: str = "1:1",
+        context: Optional[Dict[str, Any]] = None,
+    ) -> MediaPayload:
+        title = (context or {}).get("entity_title") or prompt.split(".")[0][:40]
+        data = _generate_svg_bytes(title, aspect_ratio)
+        file_hash = hashlib.md5(f"{prompt}_{aspect_ratio}".encode("utf-8")).hexdigest()[:10]
+        return MediaPayload(
+            data=data,
+            mime_type="image/svg+xml",
+            filename=f"mock_image_{file_hash}.svg",
+            metadata={
+                "aspect_ratio": aspect_ratio,
+                "provider": "MockImageProvider",
+                "mock": True,
+                "prompt": prompt,
+            },
+        )
+
+
+class MockVoiceProvider(VoiceProvider):
+    """Deterministic mock voice provider generating valid WAV speech audio."""
+
+    async def generate_voice(
+        self,
+        text: str,
+        voice_id: str = "default",
+        context: Optional[Dict[str, Any]] = None,
+    ) -> MediaPayload:
+        duration = min(6.0, max(1.5, len(text) * 0.05))
+        data = _generate_wav_bytes(duration_sec=duration, freq=280.0)
+        file_hash = hashlib.md5(f"{text}_{voice_id}".encode("utf-8")).hexdigest()[:10]
+        return MediaPayload(
+            data=data,
+            mime_type="audio/wav",
+            filename=f"mock_voice_{file_hash}.wav",
+            metadata={
+                "voice_id": voice_id,
+                "duration_sec": duration,
+                "provider": "MockVoiceProvider",
+                "mock": True,
+                "text_snippet": text[:50],
+            },
+        )
+
+
+class MockVideoProvider(VideoProvider):
+    """Deterministic mock video provider generating valid minimal MP4 clip payloads."""
+
+    async def generate_video(
+        self,
+        prompt: str,
+        duration_sec: int = 5,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> MediaPayload:
+        data = _generate_minimal_mp4_bytes()
+        file_hash = hashlib.md5(f"{prompt}_{duration_sec}".encode("utf-8")).hexdigest()[:10]
+        return MediaPayload(
+            data=data,
+            mime_type="video/mp4",
+            filename=f"mock_video_{file_hash}.mp4",
+            metadata={
+                "duration_sec": duration_sec,
+                "provider": "MockVideoProvider",
+                "mock": True,
+                "prompt": prompt,
+            },
+        )
+
+
+class MockAudioProvider(AudioProvider):
+    """Deterministic mock audio provider generating ambient WAV soundscapes."""
+
+    async def generate_audio(
+        self,
+        prompt: str,
+        mood: str = "ambient",
+        duration_sec: int = 15,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> MediaPayload:
+        # Lower harmonic frequency for ambient soundscapes
+        freq = 196.0 if mood == "ambient" else 261.63
+        duration = min(8.0, max(2.0, float(duration_sec)))
+        data = _generate_wav_bytes(duration_sec=duration, freq=freq)
+        file_hash = hashlib.md5(f"{prompt}_{mood}".encode("utf-8")).hexdigest()[:10]
+        return MediaPayload(
+            data=data,
+            mime_type="audio/wav",
+            filename=f"mock_audio_{file_hash}.wav",
+            metadata={
+                "mood": mood,
+                "duration_sec": duration,
+                "provider": "MockAudioProvider",
+                "mock": True,
+                "prompt": prompt,
+            },
+        )
+
+
+class MockMediaProvider(MediaProvider):
+    """Composite coordinator bundling all four deterministic mock media providers."""
+
+    def __init__(
+        self,
+        image_provider: Optional[ImageProvider] = None,
+        voice_provider: Optional[VoiceProvider] = None,
+        video_provider: Optional[VideoProvider] = None,
+        audio_provider: Optional[AudioProvider] = None,
+    ) -> None:
+        self.image = image_provider or MockImageProvider()
+        self.voice = voice_provider or MockVoiceProvider()
+        self.video = video_provider or MockVideoProvider()
+        self.audio = audio_provider or MockAudioProvider()
+
+    @property
+    def name(self) -> str:
+        return "mock"
+
+    async def health_check(self) -> Dict[str, Any]:
+        return {
+            "status": "healthy",
+            "provider": "MockMediaProvider",
+            "modalities": {
+                "image": type(self.image).__name__,
+                "voice": type(self.voice).__name__,
+                "video": type(self.video).__name__,
+                "audio": type(self.audio).__name__,
+            },
+            "offline_ready": True,
+        }
+

@@ -23,6 +23,7 @@ import { useWorkspaceStore } from '../store/workspaceStore';
 import { RefinementModal } from './RefinementModal';
 import { OriginBadge } from './OriginBadge';
 import { WhyIsThisHereModal, WhyIsThisHereData } from './WhyIsThisHereModal';
+import { EntityMediaSection } from './EntityMediaSection';
 import type { OriginType } from '../types';
 
 export const UniverseCodexCanvas: React.FC = () => {
@@ -802,7 +803,16 @@ export const UniverseCodexCanvas: React.FC = () => {
                             "{char.visual_prompt}"
                           </p>
                         </div>
+
+                        {/* Multimodal Sensory Media */}
+                        <EntityMediaSection
+                          entityType="character"
+                          entityId={char.id}
+                          defaultPrompt={char.visual_prompt || `${char.name}, ${char.role}: ${char.motivation}`}
+                          availableModalities={['image', 'voice']}
+                        />
                       </div>
+
                     );
                   })}
                 </div>
@@ -979,6 +989,14 @@ export const UniverseCodexCanvas: React.FC = () => {
                           )}
                         </button>
                       </div>
+
+                      {/* Multimodal Sensory Media */}
+                      <EntityMediaSection
+                        entityType="scene"
+                        entityId={scene.id}
+                        defaultPrompt={scene.visual_prompt || `${scene.title} in ${scene.location_setting}: ${scene.conflict_narrative}`}
+                        availableModalities={['image', 'audio', 'video']}
+                      />
                     </div>
                   );
                 })}

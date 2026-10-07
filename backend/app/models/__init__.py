@@ -68,6 +68,16 @@ from backend.app.models.potential import (
     BatchPotentialStatusUpdate,
 )
 
+from backend.app.models.media import (
+    MediaType,
+    MediaJobStatus,
+    MediaAssetBase,
+    MediaAssetRecord,
+    MediaGenerationRequest,
+    MediaJobResponse,
+    MediaAssetRead,
+)
+
 __all__ = [
     "Project",
     "ProjectCreate",
@@ -126,6 +136,14 @@ __all__ = [
     "SeedPotentialItemUpdate",
     "SinglePotentialItemStatusUpdate",
     "BatchPotentialStatusUpdate",
+    "MediaType",
+    "MediaJobStatus",
+    "MediaAssetBase",
+    "MediaAssetRecord",
+    "MediaGenerationRequest",
+    "MediaJobResponse",
+    "MediaAssetRead",
 ]
+
 
 

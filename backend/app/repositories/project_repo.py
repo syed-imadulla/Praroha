@@ -1,10 +1,11 @@
 import json
 import uuid
-from typing import AsyncGenerator, List, Optional, Tuple
+from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, delete, select
 from backend.app.config import settings
 from backend.app.models.dna import SeedDNA, SeedDNARecord
+from backend.app.models.media import MediaAssetRecord
 from backend.app.models.project import Asset, AssetCreate, Project, ProjectCreate
 from backend.app.models.selection import WorldSelectionRecord
 from backend.app.models.unfold import (
@@ -170,6 +171,30 @@ def _migrate_columns(connection):
                 connection.execute(text("ALTER TABLE world_selections ADD COLUMN custom_directives TEXT"))
             except Exception:
                 pass
+
+    if "media_assets" not in table_names:
+        try:
+            connection.execute(text("""
+                CREATE TABLE IF NOT EXISTS media_assets (
+                    id VARCHAR PRIMARY KEY,
+                    project_id VARCHAR NOT NULL,
+                    entity_type VARCHAR NOT NULL,
+                    entity_id VARCHAR NOT NULL,
+                    media_type VARCHAR NOT NULL,
+                    status VARCHAR NOT NULL,
+                    asset_url TEXT,
+                    mime_type VARCHAR,
+                    prompt TEXT NOT NULL,
+                    provider_name VARCHAR NOT NULL,
+                    error_message TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    completed_at TIMESTAMP,
+                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+                )
+            """))
+        except Exception:
+            pass
+
 
 
 async def init_db() -> None:
@@ -1221,6 +1246,53 @@ class ProjectRepository:
             for rec in updated:
                 await self.session.refresh(rec)
         return updated
+
+    async def create_media_asset(self, record: MediaAssetRecord) -> MediaAssetRecord:
+        """Persist a new media asset record."""
+        self.session.add(record)
+        await self.session.commit()
+        await self.session.refresh(record)
+        return record
+
+    async def update_media_asset(
+        self, asset_id: str, updates: Dict[str, Any]
+    ) -> Optional[MediaAssetRecord]:
+        """Update an existing media asset."""
+        stmt = select(MediaAssetRecord).where(MediaAssetRecord.id == asset_id)
+        res = await self.session.execute(stmt)
+        rec = res.scalar_one_or_none()
+        if not rec:
+            return None
+        for key, value in updates.items():
+            if hasattr(rec, key):
+                setattr(rec, key, value)
+        self.session.add(rec)
+        await self.session.commit()
+        await self.session.refresh(rec)
+        return rec
+
+    async def get_media_asset(self, asset_id: str) -> Optional[MediaAssetRecord]:
+        """Retrieve media asset by id."""
+        stmt = select(MediaAssetRecord).where(MediaAssetRecord.id == asset_id)
+        res = await self.session.execute(stmt)
+        return res.scalar_one_or_none()
+
+    async def list_media_assets(
+        self,
+        project_id: str,
+        entity_id: Optional[str] = None,
+        media_type: Optional[str] = None,
+    ) -> List[MediaAssetRecord]:
+        """List media assets for a project with optional filters."""
+        stmt = select(MediaAssetRecord).where(MediaAssetRecord.project_id == project_id)
+        if entity_id:
+            stmt = stmt.where(MediaAssetRecord.entity_id == entity_id)
+        if media_type:
+            stmt = stmt.where(MediaAssetRecord.media_type == media_type)
+        stmt = stmt.order_by(MediaAssetRecord.created_at.desc())
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
+
 
 
 
