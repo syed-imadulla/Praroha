@@ -23,9 +23,20 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration voiceovers with voice selection and audio playback.
 - [x] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Cinematic scene video rendering with local fallback.
 - [x] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient soundscapes and background audio composition.
-- [x] **Phase 18: Seed Mutation Lab** — What-if seed variable modification and downstream impact preview.
-- [ ] **Phase 19: Counterfactual Replay** — Delta inspection between selected and rejected worlds.
-- [ ] **Phase 20: Human-Only Zones** — Creator-locked creative constraints protected from AI modification.
+- [x] **Phase 19: Counterfactual Replay** — Delta inspection between selected and rejected worlds.
+- [x] **Phase 20: Human-Only Zones** — Creator-locked creative constraints protected from AI modification.
+- [x] **Phase 21: Design System Foundation** — Global design tokens, Cormorant Garamond / Inter typography, warm parchment background, paper grain, and core utilities.
+- [ ] **Phase 22: Global App Shell** — Warm cream sidebar (265-280px), botanical branding, and corner accents.
+- [ ] **Phase 23: Home Screen** — Editorial hero statement, leaf separator, 72px pill seed input, 5 creation modes, and recent creations row.
+- [ ] **Phase 24: Creation Component System** — Unified reusable CreationCard component supporting Image, Story, Sound, Video, and Chat.
+- [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, and empty states.
+- [ ] **Phase 26: Graveyard Screen** — Calm, poetic cemetery for removed ideas with restore and permanent deletion confirmation.
+- [ ] **Phase 27: Profile Screen** — Botanical identity card, creation statistics, tabs, and account settings panel.
+- [ ] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
+- [ ] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts.
+- [ ] **Phase 30: Motion & Organic Unfolding** — Organic motion system (180ms transitions, seed pulse, unfolding animations).
+- [ ] **Phase 31: Responsive & Accessibility** — Desktop, Tablet, Mobile responsiveness and WCAG contrast/touch target compliance.
+- [ ] **Phase 32: Final Visual Audit & Verification** — Complete verification against design.md checklist and test suite.
 
 ---
 

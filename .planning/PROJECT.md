@@ -35,19 +35,33 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [x] Deterministic demo fallback mode using the canonical underwater city fixtures for 100% demo resilience
 - [x] Full test verification: 53/53 backend tests, 16/16 E2E tests, clean frontend build
 
-### Milestone 2: Semantic Intelligence + Generative Media (Active)
+### Milestone 2: Semantic Intelligence + Generative Media (Completed & Verified)
 - [x] **Phase 9: Seed Potential Map** — Explicit, Inferred, Open possibilities layer between Seed DNA and Worlds.
-- [ ] **Phase 10: Divergence Engine** — Exactly 3 worlds with intentional divergence (Familiar, Radical, Inverse) and exploration profile.
-- [ ] **Phase 11: Decision DNA** — Capture rich human choice rationale, priorities, rejected directions, and propagate downstream.
-- [ ] **Phase 12: Origin Ledger** — Entity origin classification (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) and "Why is this here?" explanation.
-- [ ] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
-- [ ] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual (Primary: Pollinations where usable free/team-provided path available; Fallback: local FLUX.1 schnell; Last resort: MockMediaProvider).
-- [ ] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration (Primary: Edge TTS; Optional local fallback: Kokoro-82M; Fallback: MockMediaProvider).
-- [ ] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation (Primary: Pyramid Flow for cinematic workflow; Practical local fallback: Wan2.1 T2V-1.3B; Experimental: Mochi 1; Last resort: MockMediaProvider).
-- [ ] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient atmosphere, soundscape, background audio composition (Primary: ACE-Step 1.5; Optional alternative: Stable Audio Open; Fallback: MockMediaProvider).
-- [ ] **Phase 18: Seed Mutation Lab** — Modify fundamental seed variable, preview impact (Affected/Conditional/Preserved), fork branch.
-- [ ] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
-- [ ] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
+- [x] **Phase 10: Divergence Engine** — Exactly 3 worlds with intentional divergence (Familiar, Radical, Inverse) and exploration profile.
+- [x] **Phase 11: Decision DNA** — Capture rich human choice rationale, priorities, rejected directions, and propagate downstream.
+- [x] **Phase 12: Origin Ledger** — Entity origin classification (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, etc.) and "Why is this here?" explanation.
+- [x] **Phase 13: Media Provider Architecture** — Clean non-blocking `MediaProvider` abstraction (`ImageProvider`, `VoiceProvider`, `VideoProvider`, `AudioProvider`).
+- [x] **Phase 14: Image Generation (Pollinations / FLUX.1 schnell)** — On-demand generation for World cover, Character portrait, Location concept, Scene visual.
+- [x] **Phase 15: Voice Generation (Edge TTS / Kokoro-82M)** — Narration audio generation, voice selection, playback, regeneration.
+- [x] **Phase 16: Video Generation (Pyramid Flow / Wan2.1)** — Selective cinematic scene generation.
+- [x] **Phase 17: Audio & Atmosphere (ACE-Step 1.5 / Stable Audio Open)** — Ambient atmosphere, soundscape, background audio composition.
+- [x] **Phase 18: Seed Mutation Lab** — Modify fundamental seed variable, preview impact (Affected/Conditional/Preserved), fork branch.
+- [x] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
+- [x] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
+
+### Milestone 3: Complete UI Upgrade (Active)
+- [ ] **Phase 21: Design System Foundation** — Global design tokens, Cormorant Garamond & Inter typography, warm cream parchment, subtle paper texture, button/card/input utility tokens (`design.md`).
+- [ ] **Phase 22: Global App Shell** — Warm cream sidebar (265-280px), botanical leaf branding, navigation (Home, My Creations, Graveyard, Profile), corner botanical accents.
+- [ ] **Phase 23: Home Screen** — Poetic hero statement, leaf separator, 72px pill seed input, 5 creation modes, recent creations row.
+- [ ] **Phase 24: Creation Component System** — Unified reusable `CreationCard` component supporting Image, Story, Sound, Video, Chat.
+- [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, empty states.
+- [ ] **Phase 26: Graveyard Screen** — Reflective & poetic idea cemetery, restore, permanent deletion with confirmation modal.
+- [ ] **Phase 27: Profile Screen** — Botanical identity card, stats, creation tabs, account settings panel, soft danger logout.
+- [ ] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Universe Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
+- [ ] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts in unified botanical journal design.
+- [ ] **Phase 30: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
+- [ ] **Phase 31: Responsive & Accessibility** — Multi-device responsive layout (Desktop, Tablet, Mobile), 44px touch targets, keyboard focus rings.
+- [ ] **Phase 32: Final Visual Audit & Verification** — Complete review against `design.md` checklist and test verification.
 
 ### Out of Scope (Milestone 2)
 - Autonomous multi-agent swarms (preserves human agency and single-creator focus).

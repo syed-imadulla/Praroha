@@ -2,44 +2,191 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --cream-50: #F8F4E8;
+  --cream-100: #F2EBDD;
+  --cream-200: #E8E0D0;
+  --cream-300: #D8CCB7;
+
+  --sage-900: #294B3A;
+  --sage-800: #355A46;
+  --sage-700: #466A55;
+  --sage-500: #718875;
+  --sage-200: #C8D0BE;
+  --sage-100: #DDE2D2;
+
+  --terracotta-700: #A0522D;
+  --terracotta-500: #B8734F;
+  --terracotta-200: #E7C8B5;
+
+  --plum-700: #6A4B67;
+  --plum-200: #DCCDD8;
+
+  --gold-500: #C59A55;
+  --gold-200: #E9DDBF;
+
+  --danger: #B85C46;
+  --danger-soft: #F1DDD5;
+
+  --text-primary: #294B3A;
+  --text-body: #394840;
+  --text-muted: #6D756F;
+}
+
 @layer base {
   * {
-    border-color: #1E293B;
+    border-color: #D8CCB7;
   }
   body {
-    background-color: #090D16;
-    color: #F8FAFC;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F8F4E8;
+    background-image: radial-gradient(rgba(72, 67, 55, 0.025) 0.6px, transparent 0.6px);
+    background-size: 7px 7px;
+    color: #394840;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  h1, h2, h3, h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: #294B3A;
   }
 }
 
-/* Custom sleek dark scrollbar */
+/* Botanical Parchment Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090D16;
+  background: #F2EBDD;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 3px;
+  background: #D8CCB7;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #C8D0BE;
 }
 
-/* Glassmorphism panel styling */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 41, 59, 0.8);
-}
+@layer components {
+  /* PRAROHA Botanical Cards */
+  .card-botanical {
+    background-color: rgba(248, 244, 232, 0.88);
+    border: 1px solid #D8CCB7;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(67, 70, 56, 0.05);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+  .card-botanical:hover {
+    box-shadow: 0 8px 24px rgba(60, 64, 51, 0.07);
+  }
 
-.glass-card {
-  background: rgba(19, 29, 51, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(51, 65, 85, 0.5);
+  /* PRAROHA Primary Button: Sage */
+  .btn-sage-primary {
+    background-color: #355A46;
+    color: #F8F4E8;
+    border-radius: 20px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 180ms ease;
+  }
+  .btn-sage-primary:hover {
+    background-color: #294B3A;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(41, 75, 58, 0.2);
+  }
+  .btn-sage-primary:active {
+    transform: translateY(0);
+  }
+
+  /* PRAROHA Secondary Button: Cream */
+  .btn-cream-secondary {
+    background-color: #F2EBDD;
+    border: 1px solid #D8CCB7;
+    color: #355A46;
+    border-radius: 20px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 180ms ease;
+  }
+  .btn-cream-secondary:hover {
+    background-color: #E8E0D0;
+    border-color: #C8D0BE;
+    transform: translateY(-1px);
+  }
+
+  /* PRAROHA Destructive Button */
+  .btn-danger-soft {
+    background-color: #F1DDD5;
+    color: #B85C46;
+    border-radius: 20px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 180ms ease;
+  }
+  .btn-danger-soft:hover {
+    background-color: #E7C8B5;
+    transform: translateY(-1px);
+  }
+
+  /* PRAROHA Seed Input */
+  .input-seed {
+    height: 72px;
+    border-radius: 36px;
+    background-color: #F8F4E8;
+    border: 1px solid #D8CCB7;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-size: 1.05rem;
+    color: #294B3A;
+    transition: all 180ms ease;
+  }
+  .input-seed:focus {
+    outline: none;
+    border-color: #718875;
+    box-shadow: 0 0 0 2px rgba(53, 90, 70, 0.2);
+  }
+
+  /* PRAROHA Filter Pill */
+  .pill-botanical-active {
+    background-color: #294B3A;
+    color: #F8F4E8;
+    border-radius: 9999px;
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 180ms ease;
+  }
+  .pill-botanical-inactive {
+    background-color: #F8F4E8;
+    color: #394840;
+    border: 1px solid #D8CCB7;
+    border-radius: 9999px;
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 180ms ease;
+  }
+  .pill-botanical-inactive:hover {
+    background-color: #F2EBDD;
+    border-color: #C8D0BE;
+  }
+
+  /* Editorial Serif Headings */
+  .heading-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: #294B3A;
+    letter-spacing: -0.01em;
+  }
 }
