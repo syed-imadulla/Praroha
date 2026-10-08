@@ -33,10 +33,20 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [ ] **Phase 26: Graveyard Screen** — Calm, poetic cemetery for removed ideas with restore and permanent deletion confirmation.
 - [ ] **Phase 27: Profile Screen** — Botanical identity card, creation statistics, tabs, and account settings panel.
 - [x] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
-- [x] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts.
-- [ ] **Phase 30: Motion & Organic Unfolding** — Organic motion system (180ms transitions, seed pulse, unfolding animations).
-- [ ] **Phase 31: Responsive & Accessibility** — Desktop, Tablet, Mobile responsiveness and WCAG contrast/touch target compliance.
-- [ ] **Phase 32: Final Visual Audit & Verification** — Complete verification against design.md checklist and test suite.
+- [x] **Phase 29: Secondary UI** — Standardize typography scale, eliminate text <12px, 44px touch targets, modal and drawer polish.
+- [x] **Phase 30: UI Clutter Reduction & Shell Simplification** — Wave 1 P0 clutter removal, Wave 2 TopBar & StageProgressHeader redesign, and Deep Product Integrity Audit (30.4).
+- [ ] **Phase 31: Real Product Hardening + True Realtime (Milestone 4)**
+  - [ ] **Phase 31.1**: Gemini & AI Provider Repair (Valid model, live API calls, arbitrary seed support, no silent fallback).
+  - [ ] **Phase 31.2**: Server-Backed Generation Job State (Persistent `generation_jobs`, real progress, remove client setTimeout timers).
+  - [ ] **Phase 31.3**: Supabase Realtime Infrastructure (Project-scoped channels, dedicated `frontend/src/realtime/` layer).
+  - [ ] **Phase 31.4**: Realtime Store Synchronization (Live DB updates reflect in Zustand store across multi-tab without refresh).
+  - [ ] **Phase 31.5**: Project Routing & Authoritative Rehydration (`/projects/:projectId`, backend rehydration, Project Library UI).
+  - [ ] **Phase 31.6**: Real My Creations & Graveyard (Live database records, soft delete, real restore, and permanent deletion).
+  - [ ] **Phase 31.7**: Authentication & Project Ownership (User ownership `projects.user_id`, backend authorization guards).
+  - [ ] **Phase 31.8**: Media Realtime Pipeline (Realtime generation events, browser reload resilience).
+  - [ ] **Phase 31.9**: Production Error Semantics & Demo Isolation (Explicit errors, retry states, strict separation of Demo vs Real Mode).
+  - [ ] **Phase 31.10**: Production E2E & Two-Tab Realtime Tests (Non-canonical seed validation, multi-tab real-time sync tests).
+  - [ ] **Phase 31.11**: Final Full-System Audit & Verification (Empirical Seed A vs Seed B proof, live multi-tab proof).
 
 ---
 
@@ -421,3 +431,124 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   5. StageProgressHeader provides clean editorial rail on desktop and non-scrolling carousel on mobile.
   6. 100% pass across all 9 automated test suites with zero horizontal overflow across 6 viewports.
 
+---
+
+## Milestone 4: Real Product Hardening + True Realtime
+
+### Phase 31.1: Gemini & AI Provider Repair
+**Goal**: Repair live AI generation so that arbitrary seeds produce genuine, divergent outputs from Google Gemini without silent mock fallbacks.  
+**Depends on**: Phase 30  
+**Requirements**: REAL-01.1, REAL-01.2, REAL-01.3, REAL-01.4  
+**Success Criteria**:
+  1. Active model is configured as `gemini-2.5-flash` in `backend/app/core/config.py` and instantiated cleanly.
+  2. Live Google AI API calls succeed for Seed DNA, Worlds, and Unfold when `GEMINI_API_KEY` is present.
+  3. Silent fallback to `MockProvider` in production mode is completely removed; real error envelopes are returned if API fails.
+  4. Testing with Seed A (*"A nomadic clockmaker in a desert of glass"*) and Seed B (*"A monastery in space tending a dying dying star"*) produces fundamentally distinct outputs.
+
+---
+
+### Phase 31.2: Server-Backed Generation Job State
+**Goal**: Model and persist asynchronous generation jobs in PostgreSQL to replace client-side `setTimeout` fake progress bars with genuine server job lifecycle states.  
+**Depends on**: Phase 31.1  
+**Requirements**: REAL-04.1, REAL-04.2  
+**Success Criteria**:
+  1. `generation_jobs` SQLModel table created in backend tracking `job_id`, `project_id`, `stage`, `status`, `progress_percent`, `error_message`, and timestamps.
+  2. Long-running AI operations create a job and execute via background tasks or async pipelines.
+  3. Client subscribes to real job progression; fake `setTimeout` ladders in frontend stores are eliminated.
+
+---
+
+### Phase 31.3: Supabase Realtime Infrastructure
+**Goal**: Establish a dedicated, robust Supabase Realtime subscription layer in the frontend scoped strictly by project.  
+**Depends on**: Phase 31.2  
+**Requirements**: REAL-02.1, REAL-02.2, REAL-02.3  
+**Success Criteria**:
+  1. Dedicated module `frontend/src/realtime/` with lifecycle methods: `connect`, `subscribeProject(projectId)`, `unsubscribeProject`, `disconnect`.
+  2. Scoped Postgres change listeners on `projects`, `seed_dna`, `seed_potential_items`, `world_candidates`, `world_selections`, `world_bibles`, `characters`, `character_relationships`, `scenes`, `media_assets`, and `entity_revisions`.
+  3. Connection resilience handles disconnection, network interruptions, and automatic re-subscription without memory leaks.
+
+---
+
+### Phase 31.4: Realtime Store Synchronization
+**Goal**: Wire Supabase Realtime events directly to Zustand workspace store so any database mutation automatically updates the UI across open tabs without refreshing.  
+**Depends on**: Phase 31.3  
+**Requirements**: REAL-03.1, REAL-03.2  
+**Success Criteria**:
+  1. Store state updates deterministically upon receiving Realtime `INSERT`, `UPDATE`, or `DELETE` events.
+  2. Opening the project in two separate browser tabs verifies that an action taken in Tab A (e.g. world selection or entity editing) reflects immediately in Tab B.
+
+---
+
+### Phase 31.5: Project Routing & Authoritative Rehydration
+**Goal**: Implement authoritative URL routing and server rehydration so users can refresh, bookmark, or navigate between real projects via `/projects/:projectId`.  
+**Depends on**: Phase 31.4  
+**Requirements**: REAL-06.1, REAL-06.2  
+**Success Criteria**:
+  1. Application supports deep routes: `/`, `/projects`, `/projects/:projectId`, `/creations`, `/graveyard`.
+  2. Navigating to `/projects/:projectId` fetches authoritative state from backend API and subscribes to project realtime channel.
+  3. Project Library UI allows creating, renaming, opening, switching, and deleting real projects.
+
+---
+
+### Phase 31.6: Real My Creations & Graveyard
+**Goal**: Replace static placeholder arrays in My Creations and Graveyard with live database-driven records supporting soft-delete, restore, and permanent deletion.  
+**Depends on**: Phase 31.5  
+**Requirements**: REAL-07.1, REAL-07.2  
+**Success Criteria**:
+  1. My Creations displays actual projects and media assets queried from backend.
+  2. Moving an entity or project to the Graveyard marks `archived_at` or `deleted_at` in Postgres.
+  3. Graveyard screen allows genuine restoration and permanent deletion with confirmation modal, syncing via Realtime.
+
+---
+
+### Phase 31.7: Authentication & Project Ownership
+**Goal**: Integrate user ownership (`projects.user_id`) and protect backend endpoints against unauthorized access.  
+**Depends on**: Phase 31.6  
+**Requirements**: REAL-08.1, REAL-08.2  
+**Success Criteria**:
+  1. User authentication context (via Supabase Auth or session token) binds to newly created projects.
+  2. Backend endpoints verify that the requesting user owns the target project before reading or mutating.
+  3. Anonymous or unauthorized requests cannot mutate or delete other users' projects.
+
+---
+
+### Phase 31.8: Media Realtime Pipeline
+**Goal**: Convert media generation into a background job pipeline backed by Supabase Realtime events.  
+**Depends on**: Phase 31.4  
+**Requirements**: REAL-05.1, REAL-05.2  
+**Success Criteria**:
+  1. `POST /media/generate` triggers background generation and emits realtime updates as assets complete.
+  2. Browser tab closure during generation does not lose asset; reopening the project immediately renders the newly created asset from Postgres.
+
+---
+
+### Phase 31.9: Error Semantics & Demo Mode Isolation
+**Goal**: Enforce strict error semantics (no 200 OK mask on failures) and isolate Canonical Demo Mode with zero bleed into Real Mode.  
+**Depends on**: Phase 31.1, Phase 31.2  
+**Requirements**: REAL-09.1, REAL-09.2  
+**Success Criteria**:
+  1. Explicit error states with actionable codes and retry actions rendered in UI.
+  2. Canonical demo data (*"A child discovers a forgotten city beneath the ocean"*) is available ONLY when explicitly entering Demo Mode.
+  3. Real Mode uses live Gemini generation and Postgres persistence without mixing demo fixtures.
+
+---
+
+### Phase 31.10: Production E2E & Two-Tab Realtime Tests
+**Goal**: Develop and pass automated Playwright test suites verifying live arbitrary seeds, two-tab realtime synchronization, and recovery.  
+**Depends on**: Phases 31.1–31.9  
+**Requirements**: REAL-10.1  
+**Success Criteria**:
+  1. Playwright test suite launches two browser contexts simultaneously and proves realtime sync without refresh.
+  2. E2E test runs with arbitrary non-demo seeds and verifies live AI outputs.
+  3. Reconnect and error recovery flows pass automated verification.
+
+---
+
+### Phase 31.11: Final Full-System Audit & Verification
+**Goal**: Perform exhaustive end-to-end verification, live Seed A vs Seed B proof, component integrity audit, and produce final milestone sign-off.  
+**Depends on**: Phase 31.10  
+**Requirements**: REAL-10.2  
+**Success Criteria**:
+  1. Empirical proof of Seed A vs Seed B divergent outputs documented.
+  2. 23-item Final Acceptance Criteria verified 100%.
+  3. Production build succeeds and all regression suites pass.

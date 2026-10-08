@@ -133,13 +133,62 @@
 | DDNA-01 – DDNA-03 | Phase 11 | Complete |
 | ORIG-01 – ORIG-03 | Phase 12 | Complete |
 | MED-01 – MED-03 | Phase 13 | Complete |
-| IMG-01 – IMG-03 | Phase 14 | Pending |
-| VOX-01 – VOX-03 | Phase 15 | Pending |
-| VID-01 – VID-03 | Phase 16 | Pending |
-| AUD-01 – AUD-03 | Phase 17 | Pending |
-| MUT-01 – MUT-04 | Phase 18 | Pending |
-| CNTR-01 – CNTR-02 | Phase 19 | Pending |
-| HOZ-01 – HOZ-02 | Phase 20 | Pending |
+| IMG-01 – IMG-03 | Phase 14 | Complete |
+| VOX-01 – VOX-03 | Phase 15 | Complete |
+| VID-01 – VID-03 | Phase 16 | Complete |
+| AUD-01 – AUD-03 | Phase 17 | Complete |
+| MUT-01 – MUT-04 | Phase 18 | Complete |
+| CNTR-01 – CNTR-02 | Phase 19 | Complete |
+| HOZ-01 – HOZ-02 | Phase 20 | Complete |
+| REAL-01 – REAL-20 | Phase 31 | Active |
 
 ---
-*Last updated: 2026-10-07 for Milestone 2*
+
+## Milestone 4: Real Product Hardening + True Realtime Requirements (Active)
+
+### Real AI Generation (REAL-01)
+- [ ] **REAL-01.1**: Use an active, valid Gemini model (`gemini-2.5-flash`) verified against live Google AI API.
+- [ ] **REAL-01.2**: Remove silent fallback to `MockProvider` for production user generation.
+- [ ] **REAL-01.3**: Arbitrary creative seeds produce materially different Seed DNA, World candidates, and Universe codexes (verified with Seed A vs Seed B).
+- [ ] **REAL-01.4**: If the provider fails, return an explicit error with actionable error codes and retry capabilities.
+
+### True Realtime Architecture (REAL-02)
+- [ ] **REAL-02.1**: Implement Supabase Realtime subscriptions in `frontend/src/realtime/` with clear lifecycle (`connect`, `subscribe`, `handleInsert`, `handleUpdate`, `handleDelete`, `disconnect`).
+- [ ] **REAL-02.2**: Subscriptions are strictly scoped to the active project (`project_id`), avoiding global database leaks.
+- [ ] **REAL-02.3**: Realtime subscriptions cover `projects`, `seed_dna`, `seed_potential_items`, `world_candidates`, `world_selections`, `world_bibles`, `characters`, `character_relationships`, `scenes`, `media_assets`, and `entity_revisions`.
+
+### Realtime Store Synchronization (REAL-03)
+- [ ] **REAL-03.1**: Database mutations trigger Supabase Realtime events that dynamically update the Zustand store in other open tabs without a page refresh.
+- [ ] **REAL-03.2**: Multi-tab synchronization verified: mutations in Tab A immediately reflect in Tab B.
+
+### Real Server Generation Status (REAL-04)
+- [ ] **REAL-04.1**: Persist generation job state in Postgres (`generation_jobs` table) with states: `queued`, `processing`, `stage_started`, `stage_completed`, `completed`, `failed`, `cancelled`.
+- [ ] **REAL-04.2**: Remove client `setTimeout` fake progress bars; UI binds to real server job progression via realtime events.
+
+### Media Realtime (REAL-05)
+- [ ] **REAL-05.1**: Media generation (`POST /media/generate`) creates background jobs that emit realtime asset creation/completion events.
+- [ ] **REAL-05.2**: Generation survives browser tab closing; reopening the project retrieves completed assets and resumes realtime subscriptions.
+
+### Real Project Library & Routing (REAL-06)
+- [ ] **REAL-06.1**: Authoritative URL routing (`/projects/:projectId`); loading a project hydrates state from the backend database.
+- [ ] **REAL-06.2**: Functional Project Library UI connected to `GET /api/projects` allowing users to see, open, create, rename, branch, and delete projects.
+
+### Real My Creations & Graveyard (REAL-07)
+- [ ] **REAL-07.1**: Remove hardcoded showcase array; My Creations queries real project and media asset records.
+- [ ] **REAL-07.2**: Real Graveyard displaying soft-deleted/archived entities with functioning restore and permanent deletion via database transactions.
+
+### Real Authentication & Ownership (REAL-08)
+- [ ] **REAL-08.1**: Integrate user ownership (`projects.user_id`) with Supabase Auth or secure session tokens.
+- [ ] **REAL-08.2**: Backend verifies project ownership on every endpoint, preventing unauthorized access across users.
+
+### Real Error Semantics & Demo Mode Isolation (REAL-09)
+- [ ] **REAL-09.1**: Clear API response semantics distinguishing `success`, `error`, and `processing`; no 200 OK responses masking internal fallbacks.
+- [ ] **REAL-09.2**: Explicit Demo Mode clearly isolated from Real Mode; canonical underwater city fixtures are loaded only when Demo Mode is explicitly chosen.
+
+### Production Tests & Acceptance Proof (REAL-10)
+- [ ] **REAL-10.1**: New Playwright E2E tests validating arbitrary creative seeds, dual-tab realtime synchronization without refresh, and server recovery.
+- [ ] **REAL-10.2**: Empirical proof of Seed A vs Seed B output divergence and database-backed realtime synchronization.
+
+---
+*Last updated: 2026-10-08 for Milestone 4: Real Product Hardening + True Realtime*
+

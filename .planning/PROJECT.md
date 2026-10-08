@@ -49,18 +49,28 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [x] **Phase 19: Counterfactual Replay** — Delta comparison between selected world and rejected worlds without full regeneration.
 - [x] **Phase 20: Human-Only Zones** — Creator-locked creative guardrails preserved in Decision DNA and Origin Ledger.
 
-### Milestone 3: Complete UI Upgrade (Active)
+### Milestone 3: Complete UI Upgrade (Completed & Verified)
 - [x] **Phase 21: Design System Foundation** — Global design tokens, Cormorant Garamond & Inter typography, warm cream parchment, subtle paper texture, button/card/input utility tokens (`design.md`).
 - [x] **Phase 22: Global App Shell** — Warm cream sidebar (265-280px), botanical leaf branding, navigation (Home, My Creations, Graveyard, Profile), corner botanical accents.
 - [x] **Phase 23: Home Screen & UI Refinement Pass** — Poetic hero statement, leaf separator, 72px pill seed input, 5 creation modes, recent creations row; unified global `PageContainer` grid, removal of large side journey card, modernization of Stage 2 (Understand) and Stage 3 (Divergent Worlds) to PRAROHA botanical system, and 6-viewport responsive validation.
 - [x] **Phase 24: Creation Component System** — Unified reusable `CreationCard` component supporting Image, Story, Sound, Video, Chat.
-- [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, empty states.
-- [ ] **Phase 26: Graveyard Screen** — Reflective & poetic idea cemetery, restore, permanent deletion with confirmation modal.
-- [ ] **Phase 27: Profile Screen** — Botanical identity card, stats, creation tabs, account settings panel, soft danger logout.
 - [x] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Universe Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
-- [/] **Phase 30: UI Density, Clustering & Composition Polish** — Comprehensive density audit and multi-wave decluttering (Wave 1 P0 Canvas Cleanup completed).
-- [ ] **Phase 31: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
-- [ ] **Phase 32: Final Visual Audit & Verification** — Complete review against `design.md` checklist and test verification.
+- [x] **Phase 29: Secondary UI Polish** — Standardize typography scale (Cormorant 20-36px, Inter 14-16px, metadata 12-13px min), zero instances of `text-[9px]` or `text-[10px]`, high contrast botanical tokens, 44px min touch targets.
+- [x] **Phase 30: Shell Simplification & Clutter Reduction** — Evicted developer telemetry, streamlined header to 3 utility controls, unified Workspace Menu (`•••`), Universe Search (⌘K), non-scrolling mobile carousel.
+- [x] **Phase 30.4: Deep Product Integrity Audit** — Comprehensive 17-part audit documenting real vs mock architecture, AI model naming failure, test false positives, and realtime gaps.
+
+### Milestone 4: Real Product Hardening + True Realtime (Active)
+- [ ] **Phase 31.1: Gemini & AI Provider Repair** — Valid Gemini model (`gemini-2.5-flash`), live generation verification, remove silent mock fallback, support arbitrary creative seeds, real error & retry handling.
+- [ ] **Phase 31.2: Server-Backed Generation Job State** — Persistent `generation_jobs` table, real progress tracking, replace client `setTimeout` fake timers with true job events.
+- [ ] **Phase 31.3: Supabase Realtime Infrastructure** — Scoped Supabase Realtime subscriptions per project, dedicated `frontend/src/realtime/` layer, connect/subscribe/disconnect lifecycle.
+- [ ] **Phase 31.4: Realtime Store Synchronization** — Realtime database events dynamically updating Zustand store without page refresh (verified across multi-tab).
+- [ ] **Phase 31.5: Project Routing & Authoritative Rehydration** — URL-based routing (`/projects/:projectId`), authoritative server rehydration, real Project Library UI (`GET /api/projects`).
+- [ ] **Phase 31.6: Real Creations & Graveyard** — Remove static mock arrays, connect My Creations and Graveyard to live Postgres data with real restore and permanent delete.
+- [ ] **Phase 31.7: Authentication & Project Ownership** — Supabase Auth, `user_id` ownership on projects, backend security verification, zero unauthorized cross-user access.
+- [ ] **Phase 31.8: Media Realtime Pipeline** — Realtime events for image, voice, and audio generation, surviving browser close and reload.
+- [ ] **Phase 31.9: Error Semantics & Demo Isolation** — Explicit error codes, retryable states, strict isolation of Canonical Demo Mode from Real Mode.
+- [ ] **Phase 31.10: Production E2E & Two-Tab Realtime Tests** — Automated Playwright tests with arbitrary non-canonical seeds and dual-browser-context realtime synchronization.
+- [ ] **Phase 31.11: Final Full-System Audit & Live Verification** — Live dual-seed test (Seed A vs Seed B proof), multi-tab realtime proof, and milestone sign-off.
 
 ### Out of Scope (Milestone 2)
 - Autonomous multi-agent swarms (preserves human agency and single-creator focus).
@@ -71,15 +81,17 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - Workspace directory: `Praroha` (Sanskrit for sprout / shoot / unfolding from a seed).
 - Frontend: React + Vite + TypeScript, styled with Tailwind CSS (calm dark theme) and Framer Motion.
 - Backend: Python 3.11+ with FastAPI, SQLModel, Pydantic v2 schemas.
-- AI Provider: Provider abstraction (`AIProvider` with `GeminiProvider` using `gemini-3.5-flash` and `MockProvider` fallback).
+- AI Provider: Provider abstraction (`AIProvider` with `GeminiProvider` using active `gemini-2.5-flash` model, explicit error semantics, and MockProvider reserved strictly for explicit Demo Mode).
 - Storage Provider: `StorageProvider` with `SupabaseStorageProvider` and `LocalStorageProvider` fallback.
-- Database: Supabase PostgreSQL via Session Pooler with local SQLite fallback.
+- Database: Supabase PostgreSQL with Supabase Realtime subscriptions.
 - Traceability: Relational DAG lineage synthesis without external graph database.
 
 ## Constraints & Guardrails
 - **Exact Three Worlds**: Exactly three candidates generated before human selection.
 - **Human Choice Gate**: Generation strictly halts at candidate stage until human commits.
 - **Traceability Integrity**: Every entity records provenance back to Seed DNA and creator decisions.
+- **True Realtime & Persistence**: Supabase Realtime propagates database commits to frontend without fake simulation.
+- **Zero Silent Fallback**: Production failures surface real error states with retry mechanisms.
 - **Non-blocking Media**: External media failure must never crash or block core universe operations.
 - **No Chain-of-Thought Leakage**: Origin explanations use stored metadata, never raw LLM scratchpads.
 - **Secrets & Credentials**: Never hardcode API keys or commit `.env`.
@@ -95,4 +107,4 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - **Provider Transparency**: Clearly distinguish free-tier API, local model, and makeathon-provided services; do not claim unlimited-free unless verified.
 
 ---
-*Updated: 2026-10-07 for Milestone 2: Semantic Intelligence + Generative Media (Finalized Media Strategy)*
+*Updated: 2026-10-08 for Milestone 4: Real Product Hardening + True Realtime*

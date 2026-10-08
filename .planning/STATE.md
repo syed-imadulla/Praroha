@@ -1,13 +1,13 @@
 ---
 gsd_state_version: '1.0'
-milestone: 'Milestone 3: Complete UI Upgrade'
+milestone: 'Milestone 4: Real Product Hardening + True Realtime'
 status: in_progress
 progress:
-  total_phases: 32
-  completed_phases: 27
-  total_plans: 64
-  completed_plans: 48
-  percent: 75.00
+  total_phases: 41
+  completed_phases: 30
+  total_plans: 75
+  completed_plans: 50
+  percent: 73.17
 ---
 
 # Project State: Seed Unfold (Praroha)
@@ -16,12 +16,27 @@ progress:
 
 See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-08)
 
-**Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, and creator-locked human-only zones.  
-**Current focus:** Milestone 3: Complete UI Upgrade (Phase 30.2: Wave 2 — Clean Global Header & Shell Simplification Complete)
+**Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, creator-locked human-only zones, and true Supabase Realtime synchronization.  
+**Current focus:** Milestone 4: Real Product Hardening + True Realtime (Initializing Phase 31: Real Product Hardening)
 
 ## Current Position
 
-Phase: 30.2 Wave 2 Clean Global Header & Shell Simplification — 100% Completed & Verified!
+Phase: 31.1 Gemini & AI Provider Repair (Initializing)
+Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
+Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
+Milestone 3 (Phases 21–30): 100% Completed & Verified (Design system, App Shell, Home, Workspace Botanical Redesign, Typography & Polish, Header & Shell Simplification, Product Integrity Audit).
+Milestone 4 (Phase 31: Real Product Hardening + True Realtime):
+- Sub-phase 31.1: Gemini & AI Provider Repair
+- Sub-phase 31.2: Generation Job State
+- Sub-phase 31.3: Supabase Realtime Infrastructure
+- Sub-phase 31.4: Realtime Store Synchronization
+- Sub-phase 31.5: Project Routing & Library
+- Sub-phase 31.6: Real Creations & Graveyard
+- Sub-phase 31.7: Authentication & Ownership
+- Sub-phase 31.8: Media Realtime
+- Sub-phase 31.9: Error/Loading/Recovery Hardening
+- Sub-phase 31.10: Production E2E & Two-Tab Realtime Tests
+- Sub-phase 31.11: Final Full-System Audit
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
 Milestone 3 UI Refinement & Polish Achievements:
