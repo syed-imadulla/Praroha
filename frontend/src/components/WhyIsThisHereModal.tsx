@@ -74,14 +74,14 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       onClick={onClose}
       data-testid="why-is-this-here-modal"
     >
       <div
-        className="relative w-full max-w-lg bg-zinc-950/95 border border-zinc-800 rounded-2xl shadow-2xl p-6 text-zinc-100 overflow-hidden"
+        className="relative w-full max-w-lg bg-[#F8F4E8] border border-[#D8CCB7] rounded-[24px] shadow-2xl p-6 text-[#294B3A] overflow-hidden"
         style={{
-          boxShadow: `0 0 35px -5px ${config.accentColor}25, 0 10px 25px -5px rgba(0, 0, 0, 0.7)`,
+          boxShadow: `0 20px 40px -15px rgba(41, 75, 58, 0.2), 0 0 25px -5px ${config.accentColor}30`,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -95,27 +95,22 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-2">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center border"
-              style={{
-                backgroundColor: `${config.accentColor}15`,
-                borderColor: `${config.accentColor}40`,
-                color: config.accentColor,
-              }}
+              className="w-8 h-8 rounded-lg flex items-center justify-center border bg-[#E2EBE2] border-[#BACBB8] text-[#355A46]"
             >
               <Compass className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-mono tracking-wider text-zinc-400 uppercase">
+              <div className="text-xs font-mono tracking-wider text-[#718875] uppercase">
                 Provenance Explainer • {data.entityType}
               </div>
-              <h2 className="text-lg font-bold text-zinc-100 truncate max-w-sm" data-testid="why-modal-title">
+              <h2 className="text-lg font-bold font-serif text-[#294B3A] truncate max-w-sm" data-testid="why-modal-title">
                 {data.title}
               </h2>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-zinc-100 rounded-lg hover:bg-zinc-800/60 transition-colors"
+            className="p-1.5 text-[#718875] hover:text-[#294B3A] rounded-lg hover:bg-[#F2EBDD] transition-colors"
             data-testid="close-why-modal-btn"
           >
             <X className="w-5 h-5" />
@@ -123,8 +118,8 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
         </div>
 
         {/* Origin Classification Ribbon */}
-        <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-900/80 border border-zinc-800/80 mb-4">
-          <div className="text-xs font-medium text-zinc-300">
+        <div className="flex items-center justify-between p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] mb-4">
+          <div className="text-xs font-medium text-[#294B3A]">
             Universal Origin Tier
           </div>
           <div data-testid="why-modal-origin-badge">
@@ -139,13 +134,13 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
 
         {/* Exact Citation / Anchor Box */}
         {data.originSource && (
-          <div className="mb-4 p-3 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
-            <div className="text-[11px] font-mono uppercase text-zinc-400 mb-1 flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-amber-400" />
+          <div className="mb-4 p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7]">
+            <div className="text-[11px] font-mono uppercase text-[#718875] mb-1 flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-[#C59A55]" />
               Source Anchor Citation
             </div>
             <div
-              className="text-xs font-mono text-zinc-200 bg-black/40 px-2.5 py-1.5 rounded-lg border border-zinc-800/50"
+              className="text-xs font-mono text-[#294B3A] bg-[#F8F4E8] px-2.5 py-1.5 rounded-lg border border-[#D8CCB7]"
               data-testid="why-modal-citation"
             >
               {data.originSource}
@@ -157,14 +152,14 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
         {sourceLabel.includes('Human-Only Zone') && (
           <div
             id="why-modal-hoz-callout"
-            className="mb-4 p-3 rounded-xl bg-amber-950/40 border border-amber-500/50 flex items-start gap-2.5 text-xs text-amber-200"
+            className="mb-4 p-3 rounded-xl bg-[#F5E6DC] border border-[#E2BFAC] flex items-start gap-2.5 text-xs text-[#B8734F]"
           >
-            <Lock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <Lock className="w-4 h-4 text-[#A0522D] shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <div className="font-mono font-bold text-amber-300 uppercase text-[10px]">
+              <div className="font-mono font-bold text-[#A0522D] uppercase text-[10px]">
                 Inviolable Human-Only Zone Lock
               </div>
-              <p className="text-[11.5px] text-amber-200/90 leading-relaxed">
+              <p className="text-[11.5px] text-[#B8734F] leading-relaxed">
                 Locked by human creator before universe expansion. AI models are strictly prohibited from overriding this constraint.
               </p>
             </div>
@@ -173,12 +168,12 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
 
         {/* Narrative Causal Explanation */}
         <div className="mb-6">
-          <div className="text-[11px] font-mono uppercase text-zinc-400 mb-2 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="text-[11px] font-mono uppercase text-[#718875] mb-2 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#355A46]" />
             Why is this here? (Causal Justification)
           </div>
           <div
-            className="text-sm leading-relaxed text-zinc-300 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/80 font-sans"
+            className="text-sm leading-relaxed text-[#394840] p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] font-sans"
             data-testid="why-modal-explanation"
           >
             {generateExplanation()}
@@ -186,14 +181,14 @@ export const WhyIsThisHereModal: React.FC<WhyIsThisHereModalProps> = ({
         </div>
 
         {/* Action Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-zinc-800/80">
-          <div className="text-[11px] text-zinc-400 flex items-center gap-1 font-mono">
-            <GitCommit className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="flex items-center justify-between pt-3 border-t border-[#D8CCB7]">
+          <div className="text-[11px] text-[#718875] flex items-center gap-1 font-mono">
+            <GitCommit className="w-3.5 h-3.5 text-[#355A46]" />
             Zero-Token Deterministic Proof
           </div>
           <button
             onClick={handleJumpToDAG}
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-md shadow-cyan-950/40 hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
             data-testid="why-modal-jump-dag"
           >
             <span>Inspect in Causal DAG</span>

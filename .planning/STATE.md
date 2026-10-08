@@ -4,10 +4,10 @@ milestone: 'Milestone 3: Complete UI Upgrade'
 status: in_progress
 progress:
   total_phases: 32
-  completed_phases: 24
+  completed_phases: 25
   total_plans: 64
-  completed_plans: 44
-  percent: 68.75
+  completed_plans: 45
+  percent: 70.31
 ---
 
 # Project State: Seed Unfold (Praroha)
@@ -17,22 +17,23 @@ progress:
 See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-08)
 
 **Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, and creator-locked human-only zones.  
-**Current focus:** Milestone 3: Complete UI Upgrade (Phase 24: Creation Component System complete -> Phase 25: My Creations Screen next)
+**Current focus:** Milestone 3: Complete UI Upgrade (Phase 28: Seed → Universe Workspace Complete)
 
 ## Current Position
 
-Phase: 23 UI Refinement Pass — 100% Completed & Verified!
+Phase: 28 Seed → Universe Workspace Botanical Redesign — 100% Completed & Verified!
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
-Milestone 3 UI Refinement:
-- Layout Unification: Global PageContainer (272px sidebar, max-w-[1220px] content, consistent padding).
-- Home Screen: Removed large side journey card; unified single-column vertical rhythm (compact continuity pill → editorial hero → 72px pill seed input → presets → 5 responsive creation modes → recent creations row).
-- Stage 2 (Understand): Modernized to warm cream/sage PRAROHA system; Cormorant Garamond headings in rich sage (#294B3A), 2-column desktop grid, SeedPotentialCanvas 3-lane botanical styling.
-- Stage 3 (Divergent Worlds): Exactly 3 world cards with equal visual weight, matching top alignment, subtle Familiar/Radical/Inverse accent distinction, high-contrast readable typography.
-- Inspector & Engine: Modernized InspectorDrawer and bottom architecture cards to botanical tokens.
-- Responsive Audit: Verified zero horizontal overflow across 6 standard viewports (1440x900, 1280x800, 1024x768, 768x1024, 390x844, 360x800).
-Status: Milestone 3 UI Refinement Pass Complete & Verified.
-Last activity: 2026-10-08 — Completed Senior UI Refinement & Alignment Pass with zero backend changes, zero state machine regressions, and 100% test pass rate across build, backend, and frontend E2E suites.
+Milestone 3 UI Refinement & Botanical Convergence:
+- Stage 4 (Choose): Decision DNA botanical notebook card, Human-Only Zones panel, creative priorities chips, negative guardrails checklist, and warm paper cards.
+- Stage 5 (Unfold): Codex container, World Bible, Characters, Factions, Locations, Timeline, Scenes, and progressive loader reskinned to warm paper & botanical tokens.
+- Stage 6 (Trace): 6-lane DAG reskinned from dark cyber to botanical canvas (`#FAF5EE`), paper nodes, sage curves, and botanical Causal Provenance Inspector.
+- Stage 7 (Refine): Timeline Branching, Refinement Audit Log, Seed Mutation Lab, Mutation Causal Diff DAG, and Counterfactual Replay styled as facing botanical journal pages.
+- Secondary Elements: `OriginBadge`, `EntityMediaSection`, `MediaPreviewCard`, `AtmosphereDeck`, lightboxes, modals, tour, shortcuts, and drawers reskinned to botanical tokens.
+- Residual Dark Cyber: 0 instances across all components.
+- Responsive Audit: Zero horizontal overflow verified across 1440px desktop, 1024px tablet, and 390px mobile viewports.
+Status: Phase 28 Complete & Verified.
+Last activity: 2026-10-08 — Completed Phase 28 Botanical Workspace Redesign with zero backend changes, zero functional compromises, and 100% test pass rate across all test suites.
 
 Progress: [██████████] 100.0%
 

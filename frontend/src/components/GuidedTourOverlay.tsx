@@ -38,8 +38,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: The entire macro-scale universe is latent within this small starting seed.',
     technicalFeat: 'Deterministic canonical presets, freeform seed capture, and instant demo bootstrap.',
-    icon: <Sparkles className="w-5 h-5 text-amber-400" />,
-    accentColor: 'from-amber-500/20 to-amber-900/10 border-amber-500/30 text-amber-400',
+    icon: <Sparkles className="w-5 h-5 text-[#805B20]" />,
+    accentColor: 'border-[#C59A55]/30 text-[#805B20]',
   },
   {
     stageNumber: 2,
@@ -51,8 +51,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: Revealing the inherent rules and latent structure buried within the formless seed.',
     technicalFeat: 'Pydantic v2 strict schema enforcement and negative boundary preservation.',
-    icon: <Cpu className="w-5 h-5 text-cyan-400" />,
-    accentColor: 'from-cyan-500/20 to-cyan-900/10 border-cyan-500/30 text-cyan-400',
+    icon: <Cpu className="w-5 h-5 text-[#294B3A]" />,
+    accentColor: 'border-[#294B3A]/30 text-[#294B3A]',
   },
   {
     stageNumber: 3,
@@ -64,8 +64,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: Demonstrating how one seed can unfold into multiple divergent, coherent forms.',
     technicalFeat: 'High-contrast prompt design preventing archetype convergence or generic overlap.',
-    icon: <Layers className="w-5 h-5 text-indigo-400" />,
-    accentColor: 'from-indigo-500/20 to-indigo-900/10 border-indigo-500/30 text-indigo-400',
+    icon: <Layers className="w-5 h-5 text-[#355A46]" />,
+    accentColor: 'border-[#355A46]/30 text-[#355A46]',
   },
   {
     stageNumber: 4,
@@ -77,8 +77,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: Initial human agency selecting which latent form will be brought into full manifestation.',
     technicalFeat: 'Architectural choice gate rejecting unauthorized downstream expansion attempts.',
-    icon: <Compass className="w-5 h-5 text-purple-400" />,
-    accentColor: 'from-purple-500/20 to-purple-900/10 border-purple-500/30 text-purple-400',
+    icon: <Compass className="w-5 h-5 text-[#B8734F]" />,
+    accentColor: 'border-[#B8734F]/30 text-[#B8734F]',
   },
   {
     stageNumber: 5,
@@ -90,8 +90,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: The compact seed has now unfolded into a rich, visible multi-dimensional universe.',
     technicalFeat: 'Atomic multi-table transaction persistence with strict foreign key integrity.',
-    icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
-    accentColor: 'from-emerald-500/20 to-emerald-900/10 border-emerald-500/30 text-emerald-400',
+    icon: <CheckCircle2 className="w-5 h-5 text-[#294B3A]" />,
+    accentColor: 'border-[#294B3A]/30 text-[#294B3A]',
   },
   {
     stageNumber: 6,
@@ -103,8 +103,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: Proving that every single manifest atom originated directly from the unmanifest seed.',
     technicalFeat: 'Dynamic topological DAG layout with ancestor path glow and zoom/pan controls.',
-    icon: <Activity className="w-5 h-5 text-sky-400" />,
-    accentColor: 'from-sky-500/20 to-sky-900/10 border-sky-500/30 text-sky-400',
+    icon: <Activity className="w-5 h-5 text-[#466A55]" />,
+    accentColor: 'border-[#466A55]/30 text-[#466A55]',
   },
   {
     stageNumber: 7,
@@ -116,8 +116,8 @@ const TOUR_STEPS: TourStepData[] = [
     tattvaConnection:
       'Forms hidden in formless: Continuous evolutionary unfolding while preserving the identity of the original seed.',
     technicalFeat: 'Immutable entity revisions with visual diffs, branch isolation, and object storage snapshots.',
-    icon: <GitBranch className="w-5 h-5 text-rose-400" />,
-    accentColor: 'from-rose-500/20 to-rose-900/10 border-rose-500/30 text-rose-400',
+    icon: <GitBranch className="w-5 h-5 text-[#6A4B67]" />,
+    accentColor: 'border-[#6A4B67]/30 text-[#6A4B67]',
   },
 ];
 
@@ -139,31 +139,31 @@ export const GuidedTourOverlay: React.FC = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.96 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="pointer-events-auto w-full max-w-lg bg-[#0e131f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden"
+          className="pointer-events-auto w-full max-w-lg bg-[#F8F4E8] border border-[#D8CCB7] rounded-2xl shadow-2xl overflow-hidden text-[#294B3A]"
         >
           {/* Header Banner */}
-          <div className="p-4 sm:p-5 border-b border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent flex items-start justify-between gap-4">
+          <div className="p-4 sm:p-5 border-b border-[#D8CCB7] bg-[#F2EBDD] flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7]">
                 {currentStepData.icon}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/40 font-bold">
                     Tattva 2: Forms Hidden in Formless
                   </span>
-                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#FAF6EE] text-[#466A55] border border-[#D8CCB7]">
                     Stage {currentStepData.stageNumber} of 7 • {currentStepData.stageName}
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-white mt-1">
+                <h3 className="text-sm sm:text-base font-serif font-bold text-[#294B3A] mt-1">
                   {currentStepData.tattvaTitle}
                 </h3>
               </div>
             </div>
             <button
               onClick={closeTour}
-              className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-lg text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#FAF6EE] transition-colors"
               title="Close Tour (Escape)"
             >
               <X className="w-4 h-4" />
@@ -173,35 +173,35 @@ export const GuidedTourOverlay: React.FC = () => {
           {/* Body Content */}
           <div className="p-4 sm:p-5 space-y-3">
             <div>
-              <p className="text-xs font-medium text-white/50 uppercase tracking-wider mb-1">
+              <p className="text-xs font-semibold text-[#5A6E5E] uppercase tracking-wider mb-1">
                 {currentStepData.subtitle}
               </p>
-              <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#394840] leading-relaxed font-serif">
                 {currentStepData.description}
               </p>
             </div>
 
             {/* Tattva 2 Connection Pill */}
-            <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/25 flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+            <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7] flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-[#805B20] shrink-0 mt-0.5" />
               <div className="text-xs">
-                <span className="text-cyan-400 font-semibold">Tattva 2 Connection: </span>
-                <span className="text-cyan-100/90">{currentStepData.tattvaConnection}</span>
+                <span className="text-[#805B20] font-semibold">Tattva 2 Connection: </span>
+                <span className="text-[#294B3A]">{currentStepData.tattvaConnection}</span>
               </div>
             </div>
 
             {/* Technical Feat Pill */}
-            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-start gap-2.5">
-              <Shield className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="p-2.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] flex items-start gap-2.5">
+              <Shield className="w-4 h-4 text-[#294B3A] shrink-0 mt-0.5" />
               <div className="text-xs">
-                <span className="text-emerald-400 font-semibold">Technical Feat: </span>
-                <span className="text-white/70">{currentStepData.technicalFeat}</span>
+                <span className="text-[#294B3A] font-semibold">Technical Feat: </span>
+                <span className="text-[#5A6E5E]">{currentStepData.technicalFeat}</span>
               </div>
             </div>
           </div>
 
           {/* Footer Controls */}
-          <div className="p-4 border-t border-white/5 bg-black/30 flex items-center justify-between gap-4">
+          <div className="p-4 border-t border-[#D8CCB7] bg-[#F2EBDD] flex items-center justify-between gap-4">
             {/* Step Dots */}
             <div className="flex items-center gap-1.5">
               {TOUR_STEPS.map((s, idx) => (
@@ -209,10 +209,10 @@ export const GuidedTourOverlay: React.FC = () => {
                   key={s.stageNumber}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     idx === tourStep
-                      ? 'w-6 bg-cyan-400'
+                      ? 'w-6 bg-[#294B3A]'
                       : idx < tourStep
-                      ? 'w-2 bg-cyan-600/50'
-                      : 'w-2 bg-white/20'
+                      ? 'w-2 bg-[#466A55]'
+                      : 'w-2 bg-[#D8CCB7]'
                   }`}
                 />
               ))}
@@ -223,7 +223,7 @@ export const GuidedTourOverlay: React.FC = () => {
               <button
                 onClick={prevTourStep}
                 disabled={isFirst}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-white/70 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#D8CCB7] text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#FAF6EE] disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 Back
@@ -231,7 +231,7 @@ export const GuidedTourOverlay: React.FC = () => {
 
               <button
                 onClick={isLast ? closeTour : nextTourStep}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 transition-all flex items-center gap-1.5"
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#294B3A] hover:bg-[#355A46] text-[#F8F4E8] shadow-sm transition-all flex items-center gap-1.5"
               >
                 {isLast ? 'Finish Tour' : 'Next Stage'}
                 {!isLast && <ChevronRight className="w-3.5 h-3.5" />}

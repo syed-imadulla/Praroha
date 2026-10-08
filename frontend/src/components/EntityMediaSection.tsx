@@ -99,32 +99,32 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
   const getModalityIcon = (type: MediaType) => {
     switch (type) {
       case 'image':
-        return <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />;
+        return <ImageIcon className="w-3.5 h-3.5 text-[#355A46]" />;
       case 'voice':
-        return <Mic className="w-3.5 h-3.5 text-amber-400" />;
+        return <Mic className="w-3.5 h-3.5 text-[#C59A55]" />;
       case 'video':
-        return <Video className="w-3.5 h-3.5 text-purple-400" />;
+        return <Video className="w-3.5 h-3.5 text-[#6A4B67]" />;
       case 'audio':
-        return <Music className="w-3.5 h-3.5 text-cyan-400" />;
+        return <Music className="w-3.5 h-3.5 text-[#466A55]" />;
     }
   };
 
   return (
     <div
       data-testid={`entity-media-section-${entityId}`}
-      className="mt-3 pt-3 border-t border-slate-800/80 space-y-3"
+      className="mt-3 pt-3 border-t border-[#D8CCB7] space-y-3"
     >
       {/* Action Header & Modality Buttons */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#294B3A]">
+          <Sparkles className="w-3.5 h-3.5 text-[#355A46]" />
           <span>Multimodal Sensory Assets</span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           {availableModalities.includes('image') && (
             <div
-              className="flex items-center gap-0.5 bg-slate-950/80 p-0.5 rounded-lg border border-slate-800 text-[10px]"
+              className="flex items-center gap-0.5 bg-[#F2EBDD] p-0.5 rounded-lg border border-[#D8CCB7] text-[10px]"
               title="Select aspect ratio for visual generation"
               data-testid={`aspect-ratio-selector-${entityId}`}
             >
@@ -136,8 +136,8 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                   data-testid={`aspect-ratio-btn-${ratio}-${entityId}`}
                   className={`px-2 py-0.5 rounded font-mono transition-all ${
                     selectedAspectRatio === ratio
-                      ? 'bg-cyan-900/80 text-cyan-200 border border-cyan-700/60 shadow-sm font-semibold'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#355A46] text-[#F8F4E8] font-semibold shadow-xs'
+                      : 'text-[#718875] hover:text-[#294B3A]'
                   }`}
                 >
                   {ratio}
@@ -148,21 +148,21 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
 
           {availableModalities.includes('voice') && (
             <div
-              className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-0.5 rounded-lg border border-slate-800 text-[10px]"
+              className="flex items-center gap-1.5 bg-[#F2EBDD] px-2 py-0.5 rounded-lg border border-[#D8CCB7] text-[10px]"
               title="Select voice persona archetype"
             >
-              <Mic className="w-3 h-3 text-amber-400 shrink-0" />
+              <Mic className="w-3 h-3 text-[#C59A55] shrink-0" />
               <select
                 data-testid={`voice-persona-selector-${entityId}`}
                 value={selectedVoicePersona}
                 onChange={(e) => setSelectedVoicePersona(e.target.value)}
-                className="bg-transparent text-slate-300 font-medium text-[11px] focus:outline-none cursor-pointer pr-1 py-0.5"
+                className="bg-transparent text-[#294B3A] font-medium text-[11px] focus:outline-none cursor-pointer pr-1 py-0.5"
               >
                 {CURATED_VOICE_PERSONAS.map((p) => (
                   <option
                     key={p.id}
                     value={p.id}
-                    className="bg-slate-900 text-slate-200"
+                    className="bg-[#F8F4E8] text-[#294B3A]"
                     data-testid={`voice-persona-option-${p.id}-${entityId}`}
                   >
                     {p.name}
@@ -174,21 +174,21 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
 
           {availableModalities.includes('audio') && (
             <div
-              className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-0.5 rounded-lg border border-slate-800 text-[10px]"
+              className="flex items-center gap-1.5 bg-[#F2EBDD] px-2 py-0.5 rounded-lg border border-[#D8CCB7] text-[10px]"
               title="Select atmosphere soundscape mood preset"
             >
-              <Music className="w-3 h-3 text-cyan-400 shrink-0" />
+              <Music className="w-3 h-3 text-[#355A46] shrink-0" />
               <select
                 data-testid={`audio-mood-selector-${entityId}`}
                 value={selectedAudioMood}
                 onChange={(e) => setSelectedAudioMood(e.target.value)}
-                className="bg-transparent text-slate-300 font-medium text-[11px] focus:outline-none cursor-pointer pr-1 py-0.5"
+                className="bg-transparent text-[#294B3A] font-medium text-[11px] focus:outline-none cursor-pointer pr-1 py-0.5"
               >
                 {CURATED_AUDIO_MOODS.map((m) => (
                   <option
                     key={m.id}
                     value={m.id}
-                    className="bg-slate-900 text-slate-200"
+                    className="bg-[#F8F4E8] text-[#294B3A]"
                     data-testid={`audio-mood-option-${m.id}-${entityId}`}
                   >
                     {m.name}
@@ -197,7 +197,6 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
               </select>
             </div>
           )}
-
 
           {availableModalities.map((modality) => {
             const isGenerating = !!isGeneratingMedia[`${entityId}_${modality}`];
@@ -212,13 +211,13 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                 data-testid={`generate-${modality}-${entityId}`}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
                   isGenerating
-                    ? 'bg-cyan-950/60 border-cyan-800 text-cyan-300 cursor-not-allowed opacity-80'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border-slate-700/80 hover:border-slate-600'
+                    ? 'bg-[#DDE2D2] border-[#C8D0BE] text-[#294B3A] cursor-not-allowed opacity-80'
+                    : 'bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border-[#D8CCB7] hover:border-[#C8D0BE] shadow-2xs'
                 }`}
                 title={`Generate ${modality} asset via configured MediaProvider`}
               >
                 {isGenerating ? (
-                  <RotateCw className="w-3 h-3 animate-spin text-cyan-400" />
+                  <RotateCw className="w-3 h-3 animate-spin text-[#355A46]" />
                 ) : (
                   getModalityIcon(modality)
                 )}

@@ -153,7 +153,7 @@ export const RefineCanvas: React.FC = () => {
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-8 pb-16">
+    <div className="w-full max-w-7xl mx-auto space-y-8 pb-16 text-[#294B3A]">
       {/* Toast Notification */}
       <AnimatePresence>
         {successToast && (
@@ -161,9 +161,9 @@ export const RefineCanvas: React.FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 text-sm font-medium shadow-2xl backdrop-blur-md"
+            className="fixed top-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#294B3A] border border-[#355A46] text-[#F8F4E8] text-sm font-medium shadow-2xl backdrop-blur-md"
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#DDE2D2] shrink-0" />
             <span>{successToast}</span>
           </motion.div>
         )}
@@ -171,19 +171,19 @@ export const RefineCanvas: React.FC = () => {
 
       {/* STAGE HEADER */}
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono uppercase tracking-wider">
-          <History className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono uppercase tracking-wider">
+          <History className="w-3.5 h-3.5 text-[#805B20]" />
           <span>Tattva 2: Forms Hidden in Formless • Stage 7 Refinement & Continuity</span>
         </div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-slate-100 tracking-tight flex items-center gap-3">
+            <h1 className="text-3xl font-serif font-black text-[#294B3A] tracking-tight flex items-center gap-3">
               <span>Refine, Branch & Save</span>
-              <span className="text-xs font-mono font-normal px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+              <span className="text-xs font-mono font-normal px-2.5 py-1 rounded-lg bg-[#F2EBDD] text-[#466A55] border border-[#D8CCB7]">
                 Stage 7
               </span>
             </h1>
-            <p className="text-slate-400 text-sm max-w-2xl mt-1">
+            <p className="text-[#5A6E5E] text-sm max-w-2xl mt-1">
               Explore alternate timeline branches with isolated remapped state, inspect immutable revision logs for characters and scenes, and persist state snapshots.
             </p>
           </div>
@@ -193,10 +193,10 @@ export const RefineCanvas: React.FC = () => {
               id="export-bundle-btn"
               onClick={handleExportBundle}
               disabled={isExporting || !activeProject}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs font-mono font-medium transition hover:border-slate-500 disabled:opacity-50"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE1D0] border border-[#D8CCB7] text-[#294B3A] text-xs font-mono font-medium transition hover:border-[#B5A58D] disabled:opacity-50"
               title="Download portable JSON project bundle with full lineage DAG"
             >
-              <Download className="w-4 h-4 text-cyan-400" />
+              <Download className="w-4 h-4 text-[#466A55]" />
               <span>{isExporting ? 'Exporting...' : 'Export Bundle (.json)'}</span>
             </button>
 
@@ -204,10 +204,10 @@ export const RefineCanvas: React.FC = () => {
               id="save-snapshot-btn"
               onClick={handleSaveSnapshot}
               disabled={isSavingSnapshot || !activeProject}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold transition hover:border-emerald-500/50 disabled:opacity-50"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#294B3A] hover:bg-[#355A46] border border-[#294B3A] text-[#F8F4E8] text-xs font-mono font-bold transition shadow-sm hover:shadow disabled:opacity-50"
               title="Persist snapshot to StorageProvider"
             >
-              <Save className="w-4 h-4 text-emerald-400" />
+              <Save className="w-4 h-4 text-[#DDE2D2]" />
               <span>{isSavingSnapshot ? 'Saving...' : 'Save Storage Snapshot'}</span>
             </button>
           </div>
@@ -218,20 +218,20 @@ export const RefineCanvas: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT: Timeline & Branch Navigator (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="p-6 rounded-2xl bg-canvas-card border border-canvas-border space-y-5">
-            <div className="flex items-center justify-between border-b border-canvas-border pb-3">
+          <div className="p-6 rounded-2xl bg-[#FAF6EE] border border-[#D8CCB7] space-y-5 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#D8CCB7] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <div className="p-2 rounded-lg bg-[#DDE2D2] text-[#294B3A] border border-[#C2CCA8]">
                   <GitBranch className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-100">Timeline Branching</h2>
-                  <p className="text-xs text-slate-400">Fork parallel worlds with remapped state (PERS-02)</p>
+                  <h2 className="text-base font-serif font-bold text-[#294B3A]">Timeline Branching</h2>
+                  <p className="text-xs text-[#5A6E5E]">Fork parallel worlds with remapped state (PERS-02)</p>
                 </div>
               </div>
               <button
                 onClick={() => fetchBranches()}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition"
+                className="p-1.5 rounded-lg text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#F2EBDD] transition"
                 title="Refresh branches"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -239,18 +239,18 @@ export const RefineCanvas: React.FC = () => {
             </div>
 
             {/* Current Timeline Info */}
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-mono">Active Timeline:</span>
-                <span className="px-2 py-0.5 rounded font-mono font-bold text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                <span className="text-[#5A6E5E] font-mono">Active Timeline:</span>
+                <span className="px-2 py-0.5 rounded font-mono font-bold text-xs bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30">
                   {activeProject?.branch_name || 'main'}
                 </span>
               </div>
               {activeProject?.parent_project_id && (
-                <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 pt-1 border-t border-slate-800/80">
-                  <GitFork className="w-3 h-3 text-cyan-400" />
+                <div className="text-[11px] text-[#5A6E5E] font-mono flex items-center gap-1.5 pt-1 border-t border-[#D8CCB7]/60">
+                  <GitFork className="w-3 h-3 text-[#355A46]" />
                   <span>Forked from Parent Project ID:</span>
-                  <span className="text-slate-300 truncate max-w-[140px]">
+                  <span className="text-[#294B3A] truncate max-w-[140px]">
                     {activeProject.parent_project_id}
                   </span>
                 </div>
@@ -259,8 +259,8 @@ export const RefineCanvas: React.FC = () => {
 
             {/* Fork Form */}
             <form onSubmit={handleForkBranch} className="space-y-2.5 pt-1">
-              <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Plus className="w-3.5 h-3.5 text-cyan-400" />
+              <label className="text-xs font-bold text-[#294B3A] flex items-center gap-1.5">
+                <Plus className="w-3.5 h-3.5 text-[#355A46]" />
                 <span>Fork New Timeline Branch</span>
               </label>
               <div className="flex gap-2">
@@ -270,13 +270,13 @@ export const RefineCanvas: React.FC = () => {
                   placeholder="e.g. alternate-solar-rebellion"
                   value={newBranchName}
                   onChange={(e) => setNewBranchName(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-500"
+                  className="flex-1 px-3 py-2 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] text-[#294B3A] placeholder-[#8C9E8F] text-xs font-mono focus:outline-none focus:border-[#294B3A]"
                 />
                 <button
                   id="submit-fork-branch-btn"
                   type="submit"
                   disabled={isBranching || !newBranchName.trim()}
-                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs font-mono transition disabled:opacity-50 flex items-center gap-1.5 shadow-lg shadow-cyan-950/50"
+                  className="px-4 py-2 rounded-xl bg-[#294B3A] hover:bg-[#355A46] text-[#F8F4E8] font-bold text-xs font-mono transition disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
                 >
                   {isBranching ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -287,7 +287,7 @@ export const RefineCanvas: React.FC = () => {
                 </button>
               </div>
               {branchError && (
-                <p className="text-xs text-rose-400 flex items-center gap-1">
+                <p className="text-xs text-[#B8734F] flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" />
                   <span>{branchError}</span>
                 </p>
@@ -296,7 +296,7 @@ export const RefineCanvas: React.FC = () => {
 
             {/* Timeline Branches List */}
             <div className="space-y-2 pt-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-mono uppercase tracking-wider text-[#5A6E5E]">
                 Known Timeline Branches ({projectBranches.length})
               </span>
               <div id="project-branches-list" className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
@@ -307,8 +307,8 @@ export const RefineCanvas: React.FC = () => {
                       key={br.id}
                       className={`p-3.5 rounded-xl border transition flex items-center justify-between gap-3 ${
                         isCurrent
-                          ? 'bg-cyan-950/30 border-cyan-500/50 text-slate-100'
-                          : 'bg-slate-900/40 border-slate-800 text-slate-300 hover:border-slate-700'
+                          ? 'bg-[#EAE1D0] border-[#294B3A] text-[#294B3A] shadow-sm'
+                          : 'bg-[#F2EBDD] border-[#D8CCB7] text-[#394840] hover:border-[#B5A58D]'
                       }`}
                     >
                       <div className="space-y-1 min-w-0">
@@ -317,12 +317,12 @@ export const RefineCanvas: React.FC = () => {
                             {br.branch_name || 'main'}
                           </span>
                           {isCurrent && (
-                            <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#294B3A] text-[#F8F4E8] border border-[#294B3A]">
                               Active
                             </span>
                           )}
                         </div>
-                        <div className="text-[10px] text-slate-400 font-mono flex items-center gap-2">
+                        <div className="text-[10px] text-[#5A6E5E] font-mono flex items-center gap-2">
                           <span>{br.title}</span>
                           <span>•</span>
                           <span>{new Date(br.created_at).toLocaleDateString()}</span>
@@ -332,7 +332,7 @@ export const RefineCanvas: React.FC = () => {
                       {!isCurrent && (
                         <button
                           onClick={() => switchBranch(br.id)}
-                          className="switch-branch-btn px-2.5 py-1.5 rounded-lg text-xs font-mono bg-slate-800 hover:bg-cyan-950 text-cyan-300 hover:text-cyan-200 border border-slate-700 hover:border-cyan-500/40 transition shrink-0"
+                          className="switch-branch-btn px-2.5 py-1.5 rounded-lg text-xs font-mono bg-[#F8F4E8] hover:bg-[#294B3A] text-[#294B3A] hover:text-[#F8F4E8] border border-[#D8CCB7] transition shrink-0"
                         >
                           Switch
                         </button>
@@ -345,54 +345,54 @@ export const RefineCanvas: React.FC = () => {
           </div>
 
           {/* Quick Refine Launchers */}
-          <div className="p-6 rounded-2xl bg-canvas-card border border-canvas-border space-y-4">
-            <div className="flex items-center gap-2.5 border-b border-canvas-border pb-3">
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <div className="p-6 rounded-2xl bg-[#FAF6EE] border border-[#D8CCB7] space-y-4 shadow-sm">
+            <div className="flex items-center gap-2.5 border-b border-[#D8CCB7] pb-3">
+              <div className="p-2 rounded-lg bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
                 <Edit3 className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-100">Direct Refinement Launchers</h3>
-                <p className="text-xs text-slate-400">Trigger trait or scene refinement dialogs</p>
+                <h3 className="text-sm font-serif font-bold text-[#294B3A]">Direct Refinement Launchers</h3>
+                <p className="text-xs text-[#5A6E5E]">Trigger trait or scene refinement dialogs</p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <span className="text-xs text-slate-400 block mb-1.5">Refine Character:</span>
+                <span className="text-xs text-[#5A6E5E] block mb-1.5 font-medium">Refine Character:</span>
                 <div className="flex flex-wrap gap-2">
                   {unfoldedUniverse?.characters.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => setRefiningEntity({ type: 'character', data: c })}
-                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 transition"
+                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 flex items-center gap-1.5 transition"
                     >
                       <Edit3 className="w-3 h-3" />
                       <span>{c.name}</span>
-                      <span className="opacity-60 text-[10px]">v{c.version || 1}</span>
+                      <span className="opacity-75 text-[10px]">v{c.version || 1}</span>
                     </button>
                   ))}
                   {(!unfoldedUniverse || unfoldedUniverse.characters.length === 0) && (
-                    <span className="text-xs text-slate-400 italic">No characters available</span>
+                    <span className="text-xs text-[#718875] italic">No characters available</span>
                   )}
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1.5">Refine Scene:</span>
+              <div className="pt-2 border-t border-[#D8CCB7]">
+                <span className="text-xs text-[#5A6E5E] block mb-1.5 font-medium">Refine Scene:</span>
                 <div className="flex flex-wrap gap-2">
                   {unfoldedUniverse?.scenes.map((s) => (
                     <button
                       key={s.id}
                       onClick={() => setRefiningEntity({ type: 'scene', data: s })}
-                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1.5 transition"
+                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-[#EFE8EE] hover:bg-[#E4D7E2] text-[#6A4B67] border border-[#B399B0]/40 flex items-center gap-1.5 transition"
                     >
                       <Edit3 className="w-3 h-3" />
                       <span>Scene {s.scene_number}</span>
-                      <span className="opacity-60 text-[10px]">v{s.version || 1}</span>
+                      <span className="opacity-75 text-[10px]">v{s.version || 1}</span>
                     </button>
                   ))}
                   {(!unfoldedUniverse || unfoldedUniverse.scenes.length === 0) && (
-                    <span className="text-xs text-slate-400 italic">No scenes available</span>
+                    <span className="text-xs text-[#718875] italic">No scenes available</span>
                   )}
                 </div>
               </div>
@@ -402,28 +402,28 @@ export const RefineCanvas: React.FC = () => {
 
         {/* RIGHT: Universe Refinement Audit Log (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="p-6 rounded-2xl bg-canvas-card border border-canvas-border space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-border pb-3">
+          <div className="p-6 rounded-2xl bg-[#FAF6EE] border border-[#D8CCB7] space-y-5 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D8CCB7] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div className="p-2 rounded-lg bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
                   <History className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-100">Refinement Audit Log</h2>
-                  <p className="text-xs text-slate-400">Immutable version history & diff tracking (PERS-01)</p>
+                  <h2 className="text-base font-serif font-bold text-[#294B3A]">Refinement Audit Log</h2>
+                  <p className="text-xs text-[#5A6E5E]">Immutable version history & diff tracking (PERS-01)</p>
                 </div>
               </div>
 
               {/* Filters */}
-              <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-1 bg-[#F2EBDD] p-1 rounded-xl border border-[#D8CCB7]">
                 {(['all', 'character', 'scene'] as const).map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setSelectedEntityFilter(filter)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono capitalize transition ${
                       selectedEntityFilter === filter
-                        ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-[#294B3A] text-[#F8F4E8] font-bold shadow-sm'
+                        : 'text-[#5A6E5E] hover:text-[#294B3A]'
                     }`}
                   >
                     {filter}
@@ -435,10 +435,10 @@ export const RefineCanvas: React.FC = () => {
             {/* Audit Log Content */}
             <div id="refinement-audit-log" className="space-y-3">
               {filteredRevisions.length === 0 ? (
-                <div className="p-8 rounded-xl bg-slate-900/30 border border-slate-800 text-center space-y-2">
-                  <History className="w-8 h-8 text-slate-400 mx-auto" />
-                  <p className="text-sm font-medium text-slate-300">No Refinements Recorded Yet</p>
-                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                <div className="p-8 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-center space-y-2">
+                  <History className="w-8 h-8 text-[#718875] mx-auto" />
+                  <p className="text-sm font-medium text-[#294B3A]">No Refinements Recorded Yet</p>
+                  <p className="text-xs text-[#5A6E5E] max-w-md mx-auto">
                     Use the "Refine" button on character cards or scene cards in Stage 5 Codex or the launchers on the left to evolve entities and produce immutable audit snapshots.
                   </p>
                 </div>
@@ -456,37 +456,37 @@ export const RefineCanvas: React.FC = () => {
                     return (
                       <div
                         key={rev.id}
-                        className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition space-y-3"
+                        className="p-4 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] hover:border-[#B5A58D] transition space-y-3 shadow-sm"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D8CCB7]/60 pb-2">
                           <div className="flex items-center gap-2">
                             <span
                               className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
                                 isCharacter
-                                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                                  : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                                  ? 'bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30'
+                                  : 'bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/30'
                               }`}
                             >
                               {rev.entity_type}
                             </span>
-                            <span className="font-bold text-slate-200 text-sm">
+                            <span className="font-bold text-[#294B3A] text-sm">
                               {snapshotObj.name || snapshotObj.title || rev.entity_id}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#F2EBDD] text-[#466A55] border border-[#D8CCB7]">
                               v{rev.version}
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-[#5A6E5E] font-mono">
                             {new Date(rev.created_at).toLocaleString()}
                           </span>
                         </div>
 
                         {/* Revision Notes */}
-                        <div className="text-xs bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 space-y-1">
-                          <span className="text-[10px] font-mono uppercase font-bold text-slate-400">
+                        <div className="text-xs bg-[#F2EBDD] p-2.5 rounded-lg border border-[#D8CCB7] space-y-1">
+                          <span className="text-[10px] font-mono uppercase font-bold text-[#5A6E5E]">
                             Creator Rationale / Diff Notes:
                           </span>
-                          <p className="text-slate-200 italic font-mono text-xs">
+                          <p className="text-[#294B3A] italic font-serif text-xs">
                             "{rev.revision_notes || 'Initial revision baseline'}"
                           </p>
                         </div>
@@ -495,38 +495,38 @@ export const RefineCanvas: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                           {isCharacter ? (
                             <>
-                              <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
-                                <span className="text-[10px] text-slate-400 uppercase font-mono block">
+                              <div className="p-2 rounded bg-[#FAF6EE] border border-[#D8CCB7]">
+                                <span className="text-[10px] text-[#5A6E5E] uppercase font-mono block">
                                   Motivation:
                                 </span>
-                                <span className="text-slate-300 line-clamp-2">
+                                <span className="text-[#294B3A] line-clamp-2">
                                   {snapshotObj.motivation || 'N/A'}
                                 </span>
                               </div>
-                              <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
-                                <span className="text-[10px] text-slate-400 uppercase font-mono block">
+                              <div className="p-2 rounded bg-[#FAF6EE] border border-[#D8CCB7]">
+                                <span className="text-[10px] text-[#5A6E5E] uppercase font-mono block">
                                   Core Conflict:
                                 </span>
-                                <span className="text-slate-300 line-clamp-2">
+                                <span className="text-[#294B3A] line-clamp-2">
                                   {snapshotObj.core_conflict || 'N/A'}
                                 </span>
                               </div>
                             </>
                           ) : (
                             <>
-                              <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
-                                <span className="text-[10px] text-slate-400 uppercase font-mono block">
+                              <div className="p-2 rounded bg-[#FAF6EE] border border-[#D8CCB7]">
+                                <span className="text-[10px] text-[#5A6E5E] uppercase font-mono block">
                                   Dramatic Question:
                                 </span>
-                                <span className="text-slate-300 line-clamp-2">
+                                <span className="text-[#294B3A] line-clamp-2">
                                   {snapshotObj.dramatic_question || 'N/A'}
                                 </span>
                               </div>
-                              <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
-                                <span className="text-[10px] text-slate-400 uppercase font-mono block">
+                              <div className="p-2 rounded bg-[#FAF6EE] border border-[#D8CCB7]">
+                                <span className="text-[10px] text-[#5A6E5E] uppercase font-mono block">
                                   Pivotal Outcome:
                                 </span>
-                                <span className="text-slate-300 line-clamp-2">
+                                <span className="text-[#294B3A] line-clamp-2">
                                   {snapshotObj.pivotal_outcome || 'N/A'}
                                 </span>
                               </div>
@@ -544,15 +544,15 @@ export const RefineCanvas: React.FC = () => {
       </div>
 
       {/* SECTION 3: Project Snapshot & State Portability Station (PERS-03) */}
-      <div className="p-6 rounded-2xl bg-canvas-card border border-canvas-border space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-border pb-4">
+      <div className="p-6 rounded-2xl bg-[#FAF6EE] border border-[#D8CCB7] space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D8CCB7] pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <div className="p-2 rounded-lg bg-[#DDE2D2] text-[#294B3A] border border-[#C2CCA8]">
               <HardDrive className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100">Project Snapshot & State Portability</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-lg font-serif font-bold text-[#294B3A]">Project Snapshot & State Portability</h2>
+              <p className="text-xs text-[#5A6E5E]">
                 Full-fidelity bundle import/export (.json) with Lineage DAG and cloud storage persistence (PERS-03)
               </p>
             </div>
@@ -571,18 +571,18 @@ export const RefineCanvas: React.FC = () => {
               id="import-bundle-btn"
               onClick={() => fileInputRef.current?.click()}
               disabled={isImporting}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-medium border border-slate-700 transition"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE1D0] text-[#294B3A] text-xs font-mono font-medium border border-[#D8CCB7] transition hover:border-[#B5A58D]"
               title="Import a previously exported ProjectBundle JSON file"
             >
-              <Upload className="w-4 h-4 text-cyan-400" />
+              <Upload className="w-4 h-4 text-[#355A46]" />
               <span>{isImporting ? 'Importing...' : 'Import Project Bundle'}</span>
             </button>
           </div>
         </div>
 
         {importError && (
-          <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <div className="p-3.5 rounded-xl bg-[#F5E6DC] border border-[#B8734F]/40 text-[#B8734F] text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#B8734F] shrink-0" />
             <span>Import failed: {importError}</span>
           </div>
         )}
@@ -590,13 +590,13 @@ export const RefineCanvas: React.FC = () => {
         {/* Snapshots Grid */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-xs font-mono uppercase tracking-wider text-[#5A6E5E] flex items-center gap-2">
+              <Database className="w-3.5 h-3.5 text-[#355A46]" />
               <span>Stored Backend Snapshots ({snapshots.length})</span>
             </span>
             <button
               onClick={() => fetchSnapshots()}
-              className="p-1 rounded text-slate-400 hover:text-slate-200 transition"
+              className="p-1 rounded text-[#5A6E5E] hover:text-[#294B3A] transition"
               title="Refresh snapshots"
             >
               <RefreshCw className="w-3 h-3" />
@@ -604,7 +604,7 @@ export const RefineCanvas: React.FC = () => {
           </div>
 
           {snapshots.length === 0 ? (
-            <div className="p-6 rounded-xl bg-slate-900/30 border border-slate-800 text-center text-xs text-slate-400">
+            <div className="p-6 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-center text-xs text-[#5A6E5E]">
               No storage snapshots saved yet. Click "Save Storage Snapshot" above to commit the current universe state to the storage layer.
             </div>
           ) : (
@@ -612,21 +612,21 @@ export const RefineCanvas: React.FC = () => {
               {snapshots.map((snap) => (
                 <div
                   key={snap.id}
-                  className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition space-y-2"
+                  className="p-4 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] hover:border-[#294B3A] transition space-y-2 shadow-sm"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30 font-bold">
                       {(snap.size_bytes / 1024).toFixed(1)} KB
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[10px] text-[#5A6E5E] font-mono">
                       {new Date(snap.created_at).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="space-y-0.5">
-                    <span className="text-[11px] font-mono text-slate-300 truncate block" title={snap.storage_key}>
+                    <span className="text-[11px] font-mono text-[#294B3A] truncate block" title={snap.storage_key}>
                       {snap.storage_key}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400 block">
+                    <span className="text-[10px] font-mono text-[#5A6E5E] block">
                       Version: v{snap.version}
                     </span>
                   </div>

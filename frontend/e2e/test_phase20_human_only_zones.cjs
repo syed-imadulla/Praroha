@@ -279,6 +279,7 @@ async function runPhase20E2E() {
     const demoSummaryBanner = page.locator('#human-only-zones-summary-banner');
     await demoSummaryBanner.waitFor({ timeout: 15000 });
     assert(await demoSummaryBanner.isVisible(), 'Canonical demo must display Human-Only Zones summary banner');
+    await demoSummaryBanner.locator('text=Coexistence between synthetic human biology and ancient abyssal intelligence').waitFor({ timeout: 15000 });
 
     const demoBannerText = await demoSummaryBanner.innerText();
     assert(

@@ -30,28 +30,28 @@ export const KeyboardShortcutsModal: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="w-full max-w-xl bg-[#0f1422] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+          className="w-full max-w-xl bg-[#F8F4E8] border border-[#D8CCB7] rounded-2xl shadow-2xl overflow-hidden text-[#294B3A]"
         >
           {/* Header */}
-          <div className="p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+          <div className="p-5 border-b border-[#D8CCB7] flex items-center justify-between bg-[#F2EBDD]">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+              <div className="p-2 rounded-lg bg-[#DDE2D2] border border-[#294B3A]/30 text-[#294B3A]">
                 <Keyboard className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Keyboard Shortcuts</h2>
-                <p className="text-xs text-white/50">Rapid navigation and workspace controls</p>
+                <h2 className="text-base font-serif font-bold text-[#294B3A]">Keyboard Shortcuts</h2>
+                <p className="text-xs text-[#5A6E5E]">Rapid navigation and workspace controls</p>
               </div>
             </div>
             <button
               onClick={toggleShortcutsModal}
-              className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-lg text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#FAF6EE] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -64,21 +64,21 @@ export const KeyboardShortcutsModal: React.FC = () => {
               const group = SHORTCUTS.filter((s) => s.category === cat);
               return (
                 <div key={cat} className="space-y-2">
-                  <h4 className="text-[11px] font-mono font-medium text-white/40 uppercase tracking-wider">
+                  <h4 className="text-[11px] font-mono font-medium text-[#5A6E5E] uppercase tracking-wider">
                     {cat}
                   </h4>
                   <div className="space-y-1.5">
                     {group.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between p-2 rounded-lg bg-white/[0.03] border border-white/5 hover:border-white/10 transition-colors"
+                        className="flex items-center justify-between p-2 rounded-lg bg-[#FAF6EE] border border-[#D8CCB7] hover:border-[#B5A58D] transition-colors"
                       >
-                        <span className="text-xs text-white/80">{item.action}</span>
+                        <span className="text-xs text-[#294B3A]">{item.action}</span>
                         <div className="flex items-center gap-1">
                           {item.keys.map((k, kIdx) => (
                             <kbd
                               key={kIdx}
-                              className="px-2 py-0.5 rounded bg-white/10 border border-white/20 text-[11px] font-mono font-semibold text-cyan-300 shadow-sm min-w-[24px] text-center"
+                              className="px-2 py-0.5 rounded bg-[#F2EBDD] border border-[#D8CCB7] text-[11px] font-mono font-semibold text-[#294B3A] shadow-xs min-w-[24px] text-center"
                             >
                               {k}
                             </kbd>
@@ -93,12 +93,12 @@ export const KeyboardShortcutsModal: React.FC = () => {
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-white/5 bg-black/20 flex items-center justify-between text-xs text-white/40">
+          <div className="p-4 border-t border-[#D8CCB7] bg-[#F2EBDD] flex items-center justify-between text-xs text-[#5A6E5E]">
             <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 text-[#805B20]" />
               Shortcuts active outside input fields
             </span>
-            <span>Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white/70 font-mono">Esc</kbd> to dismiss</span>
+            <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[#FAF6EE] text-[#294B3A] border border-[#D8CCB7] font-mono">Esc</kbd> to dismiss</span>
           </div>
         </motion.div>
       </div>

@@ -262,19 +262,19 @@ export const InspectorDrawer: React.FC = () => {
                       return (
                         <div className="space-y-2">
                           <div>
-                            <div className="text-slate-100 font-bold text-sm">
+                            <div className="text-[#294B3A] font-serif font-bold text-sm">
                               {selWorld?.title || 'Selected World'}
                             </div>
-                            <div className="text-[10px] text-amber-300 font-mono">
+                            <div className="text-[10px] text-[#805B20] font-mono">
                               {selWorld?.archetype}
                             </div>
                           </div>
                           {selectedWorldRationale && (
-                            <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800/80 space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-slate-400">
+                            <div className="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#D8CCB7] space-y-1">
+                              <span className="text-[10px] uppercase font-bold text-[#5A6E5E]">
                                 Creator Rationale:
                               </span>
-                              <p className="text-[11px] text-slate-300 italic leading-relaxed">
+                              <p className="text-[11px] text-[#294B3A] italic leading-relaxed font-serif">
                                 "{selectedWorldRationale}"
                               </p>
                             </div>
@@ -282,17 +282,17 @@ export const InspectorDrawer: React.FC = () => {
 
                           {/* Decision DNA Details */}
                           {activeSelection?.decision_dna && (
-                            <div className="space-y-2 pt-1 border-t border-slate-800/60">
+                            <div className="space-y-2 pt-1 border-t border-[#D8CCB7]">
                               {activeSelection.decision_dna.creative_priorities.length > 0 && (
                                 <div className="space-y-1">
-                                  <span className="text-[9.5px] uppercase font-mono font-bold text-cyan-400">
+                                  <span className="text-[9.5px] uppercase font-mono font-bold text-[#294B3A]">
                                     Creative Priorities:
                                   </span>
                                   <div className="flex flex-wrap gap-1">
                                     {activeSelection.decision_dna.creative_priorities.map((p) => (
                                       <span
                                         key={p}
-                                        className="px-2 py-0.5 rounded-md bg-cyan-950/80 text-cyan-300 border border-cyan-800 text-[10px]"
+                                        className="px-2 py-0.5 rounded-md bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30 text-[10px]"
                                       >
                                         ★ {p}
                                       </span>
@@ -303,14 +303,14 @@ export const InspectorDrawer: React.FC = () => {
 
                               {activeSelection.decision_dna.rejected_directions.length > 0 && (
                                 <div className="space-y-1">
-                                  <span className="text-[9.5px] uppercase font-mono font-bold text-rose-400">
+                                  <span className="text-[9.5px] uppercase font-mono font-bold text-[#B8734F]">
                                     Negative Guardrails:
                                   </span>
                                   <div className="flex flex-wrap gap-1">
                                     {activeSelection.decision_dna.rejected_directions.map((r) => (
                                       <span
                                         key={r}
-                                        className="px-2 py-0.5 rounded-md bg-rose-950/80 text-rose-300 border border-rose-800 text-[10px]"
+                                        className="px-2 py-0.5 rounded-md bg-[#F5E6DC] text-[#B8734F] border border-[#B8734F]/30 text-[10px]"
                                       >
                                         ⊘ {r}
                                       </span>
@@ -320,8 +320,8 @@ export const InspectorDrawer: React.FC = () => {
                               )}
 
                               {activeSelection.decision_dna.custom_directives && (
-                                <div className="p-2 rounded bg-slate-950 border border-slate-800 text-[10.5px] text-slate-400">
-                                  <span className="font-semibold text-amber-300">Directive:</span>{' '}
+                                <div className="p-2 rounded bg-[#FAF6EE] border border-[#D8CCB7] text-[10.5px] text-[#5A6E5E]">
+                                  <span className="font-semibold text-[#805B20]">Directive:</span>{' '}
                                   {activeSelection.decision_dna.custom_directives}
                                 </div>
                               )}
@@ -331,7 +331,7 @@ export const InspectorDrawer: React.FC = () => {
                       );
                     })()
                   ) : (
-                    <p className="text-slate-500 italic text-[11px]">
+                    <p className="text-[#718875] italic text-[11px]">
                       Awaiting human world choice in Stage 4
                     </p>
                   )}
@@ -341,7 +341,7 @@ export const InspectorDrawer: React.FC = () => {
                 {unfoldedUniverse && (
                   <>
                     <div className="flex justify-center -my-2">
-                      <div className="w-0.5 h-5 bg-gradient-to-b from-amber-500/40 to-cyan-500/40" />
+                      <div className="w-0.5 h-5 bg-[#D8CCB7]" />
                     </div>
 
                     {/* Step 4: Unfolded Universe Codex Node */}

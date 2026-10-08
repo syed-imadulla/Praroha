@@ -68,47 +68,47 @@ export const CounterfactualReplayCanvas: React.FC = () => {
   const getDivergenceBadgeColor = (level: string) => {
     switch (level.toLowerCase()) {
       case 'radical':
-        return 'bg-purple-950/80 text-purple-300 border-purple-500/50';
+        return 'bg-[#EFE8EE] text-[#6A4B67] border-[#B399B0]/50';
       case 'inverse':
-        return 'bg-rose-950/80 text-rose-300 border-rose-500/50';
+        return 'bg-[#F5E6DC] text-[#B8734F] border-[#B8734F]/50';
       case 'moderate':
-        return 'bg-amber-950/80 text-amber-300 border-amber-500/50';
+        return 'bg-[#E9DDBF] text-[#805B20] border-[#C59A55]/50';
       default:
-        return 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50';
+        return 'bg-[#DDE2D2] text-[#294B3A] border-[#294B3A]/40';
     }
   };
 
   const getDimensionIcon = (dim: string) => {
     switch (dim) {
       case 'protagonist':
-        return <User className="w-4 h-4 text-cyan-400" />;
+        return <User className="w-4 h-4 text-[#355A46]" />;
       case 'tone_atmosphere':
-        return <Sparkles className="w-4 h-4 text-purple-400" />;
+        return <Sparkles className="w-4 h-4 text-[#6A4B67]" />;
       case 'central_conflict':
-        return <Flame className="w-4 h-4 text-amber-400" />;
+        return <Flame className="w-4 h-4 text-[#B8734F]" />;
       case 'world_rules':
-        return <BookOpen className="w-4 h-4 text-emerald-400" />;
+        return <BookOpen className="w-4 h-4 text-[#805B20]" />;
       default:
-        return <Scale className="w-4 h-4 text-blue-400" />;
+        return <Scale className="w-4 h-4 text-[#294B3A]" />;
     }
   };
 
   return (
-    <div className="space-y-8" data-testid="counterfactual-replay-canvas">
+    <div className="space-y-8 text-[#294B3A]" data-testid="counterfactual-replay-canvas">
       {/* Top Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-violet-950/40 via-slate-900/90 to-slate-950 border border-violet-500/30 shadow-2xl relative overflow-hidden">
+      <div className="p-6 rounded-3xl bg-[#F2EBDD] border border-[#D8CCB7] shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-          <Split className="w-48 h-48 text-violet-400" />
+          <Split className="w-48 h-48 text-[#294B3A]" />
         </div>
         <div className="max-w-3xl space-y-2 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/80 border border-violet-500/40 text-violet-300 text-xs font-mono font-semibold tracking-wide">
-            <GitFork className="w-3.5 h-3.5 text-violet-400" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFE8EE] border border-[#B399B0]/40 text-[#6A4B67] text-xs font-mono font-semibold tracking-wide">
+            <GitFork className="w-3.5 h-3.5 text-[#6A4B67]" />
             <span>STAGE 5 COMPLEMENT: COUNTERFACTUAL REPLAY</span>
           </div>
-          <h2 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-serif font-black text-[#294B3A] tracking-tight flex items-center gap-2">
             <span>What If I Chose Another World?</span>
           </h2>
-          <p className="text-xs md:text-sm text-slate-300/90 leading-relaxed">
+          <p className="text-xs md:text-sm text-[#5A6E5E] leading-relaxed">
             Inspect the structural divergence deltas between your active canon universe and the alternative candidate worlds rejected during Stage 4. 
             Evaluate lead character shifts, sensory mood contrasts, and foundational rule changes without re-running full universe synthesis.
           </p>
@@ -118,11 +118,11 @@ export const CounterfactualReplayCanvas: React.FC = () => {
       {/* Candidate Selector Strip */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5 text-violet-400" />
+          <span className="text-xs font-mono uppercase tracking-wider text-[#5A6E5E] flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5 text-[#6A4B67]" />
             <span>Select Alternative Candidate to Compare:</span>
           </span>
-          <span className="text-[11px] font-mono text-slate-500">
+          <span className="text-[11px] font-mono text-[#718875]">
             {counterfactualCandidates.length} Rejected Worlds Available
           </span>
         </div>
@@ -138,39 +138,39 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                 onClick={() => selectCounterfactualCandidate(candidate.id)}
                 className={`p-4 rounded-2xl border text-left transition-all relative overflow-hidden group ${
                   isSelected
-                    ? 'bg-violet-950/50 border-violet-500/70 shadow-[0_0_20px_rgba(139,92,246,0.18)]'
-                    : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/80'
+                    ? 'bg-[#EAE1D0] border-[#294B3A] shadow-sm'
+                    : 'bg-[#FAF6EE] border-[#D8CCB7] hover:border-[#B5A58D] hover:bg-[#F2EBDD]'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7]">
                       WORLD #{candidate.index}
                     </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-violet-950/70 text-violet-300 border border-violet-700/60">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/40">
                       {candidate.divergence_archetype}
                     </span>
                   </div>
                   {isSelected && (
-                    <span className="flex items-center gap-1 text-[11px] font-mono font-bold text-violet-300">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-violet-400" />
+                    <span className="flex items-center gap-1 text-[11px] font-mono font-bold text-[#294B3A]">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#294B3A]" />
                       <span>Comparing</span>
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-bold text-sm text-slate-100 group-hover:text-violet-200 transition">
+                <h3 className="font-serif font-bold text-base text-[#294B3A] transition">
                   {candidate.title}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-[#5A6E5E] mt-1 line-clamp-2 leading-relaxed">
                   {candidate.concept}
                 </p>
 
-                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-mono">
-                    Archetype: <span className="text-slate-300 font-medium">{candidate.archetype}</span>
+                <div className="mt-3 pt-3 border-t border-[#D8CCB7] flex items-center justify-between text-[11px]">
+                  <span className="text-[#718875] font-mono">
+                    Archetype: <span className="text-[#294B3A] font-medium">{candidate.archetype}</span>
                   </span>
-                  <span className="text-rose-400/90 font-mono text-[10.5px]">
+                  <span className="text-[#B8734F] font-mono text-[10.5px]">
                     Avoided: {candidate.inferred_exclusion}
                   </span>
                 </div>
@@ -182,9 +182,9 @@ export const CounterfactualReplayCanvas: React.FC = () => {
 
       {/* Loading State Indicator */}
       {isLoadingCounterfactual && (
-        <div className="p-12 rounded-3xl bg-slate-900/60 border border-slate-800 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
-          <p className="text-xs font-mono text-slate-300">
+        <div className="p-12 rounded-3xl bg-[#FAF6EE] border border-[#D8CCB7] flex flex-col items-center justify-center space-y-3">
+          <Loader2 className="w-8 h-8 text-[#6A4B67] animate-spin" />
+          <p className="text-xs font-mono text-[#5A6E5E]">
             Synthesizing structural divergence deltas across story dimensions...
           </p>
         </div>
@@ -195,50 +195,50 @@ export const CounterfactualReplayCanvas: React.FC = () => {
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-testid="counterfactual-comparative-matrix">
             {/* Left Column: Current Committed Canon */}
-            <div className="p-6 rounded-3xl bg-slate-900/50 border border-emerald-500/30 shadow-lg space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-emerald-500/20">
+            <div className="p-6 rounded-3xl bg-[#FAF6EE] border-2 border-[#294B3A]/30 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-[#D8CCB7]">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-mono uppercase font-bold text-emerald-300 tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-[#294B3A]" />
+                  <span className="text-xs font-mono uppercase font-bold text-[#294B3A] tracking-wider">
                     Current Committed Canon
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-800">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30">
                   ANCHOR TIMELINE
                 </span>
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-slate-100">
+                <h3 className="text-xl font-serif font-bold text-[#294B3A]">
                   {counterfactualDelta?.canon_title || canonWorld?.title || 'Committed World'}
                 </h3>
-                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                <p className="text-xs text-[#5A6E5E] mt-1.5 leading-relaxed">
                   {canonWorld?.concept || 'Active unfolded story universe anchor.'}
                 </p>
               </div>
 
               {counterfactualDelta?.decision_dna_rationale && (
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                  <span className="text-[10px] font-mono uppercase text-[#5A6E5E] font-bold block">
                     Creator Decision Rationale:
                   </span>
-                  <p className="text-xs text-slate-300 italic">
+                  <p className="text-xs text-[#294B3A] italic font-serif">
                     "{counterfactualDelta.decision_dna_rationale}"
                   </p>
                 </div>
               )}
 
               <div className="space-y-3 pt-2">
-                <span className="text-[11px] font-mono uppercase text-slate-400 font-bold tracking-wider block">
+                <span className="text-[11px] font-mono uppercase text-[#5A6E5E] font-bold tracking-wider block">
                   Active Universe Anchors:
                 </span>
                 {counterfactualDelta?.dimensions.map((dim) => (
-                  <div key={dim.dimension} className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+                  <div key={dim.dimension} className="p-3 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-1 shadow-sm">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#294B3A]">
                       {getDimensionIcon(dim.dimension)}
                       <span>{dim.title}</span>
                     </div>
-                    <p className="text-xs text-slate-400 pl-5 leading-relaxed">
+                    <p className="text-xs text-[#5A6E5E] pl-5 leading-relaxed">
                       {dim.canon_value}
                     </p>
                   </div>
@@ -246,46 +246,46 @@ export const CounterfactualReplayCanvas: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Counterfactual Candidate */}
-            <div className="p-6 rounded-3xl bg-slate-900/50 border border-violet-500/30 shadow-lg space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-violet-500/20">
+            {/* Right Column: Counterfactual Alternative */}
+            <div className="p-6 rounded-3xl bg-[#FAF6EE] border-2 border-[#6A4B67]/30 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-[#D8CCB7]">
                 <div className="flex items-center gap-2">
-                  <GitFork className="w-4 h-4 text-violet-400" />
-                  <span className="text-xs font-mono uppercase font-bold text-violet-300 tracking-wider">
+                  <GitFork className="w-4 h-4 text-[#6A4B67]" />
+                  <span className="text-xs font-mono uppercase font-bold text-[#6A4B67] tracking-wider">
                     Counterfactual Alternative
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-violet-950/80 text-violet-300 border border-violet-800">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/40">
                   REJECTED PATH
                 </span>
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-violet-100">
+                <h3 className="text-xl font-serif font-bold text-[#294B3A]">
                   {activeCandidate.title}
                 </h3>
-                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                <p className="text-xs text-[#5A6E5E] mt-1.5 leading-relaxed">
                   {activeCandidate.concept}
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-violet-950/30 border border-violet-800/40 space-y-1">
-                <span className="text-[10px] font-mono uppercase text-violet-300 font-bold block">
+              <div className="p-3 rounded-xl bg-[#EFE8EE] border border-[#B399B0]/30 space-y-1">
+                <span className="text-[10px] font-mono uppercase text-[#6A4B67] font-bold block">
                   Inferred Exclusion Avoided in Canon:
                 </span>
-                <p className="text-xs text-violet-200">
+                <p className="text-xs text-[#6A4B67]">
                   {activeCandidate.inferred_exclusion}
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-[11px] font-mono uppercase text-violet-400 font-bold tracking-wider block">
+                <span className="text-[11px] font-mono uppercase text-[#6A4B67] font-bold tracking-wider block">
                   Projected Alternative Anchors:
                 </span>
                 {counterfactualDelta?.dimensions.map((dim) => (
-                  <div key={dim.dimension} className="p-3 rounded-xl bg-slate-950/40 border border-violet-900/30 space-y-1">
+                  <div key={dim.dimension} className="p-3 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-1 shadow-sm">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-200">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#294B3A]">
                         {getDimensionIcon(dim.dimension)}
                         <span>{dim.title}</span>
                       </div>
@@ -293,7 +293,7 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                         {dim.divergence_level}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 pl-5 leading-relaxed">
+                    <p className="text-xs text-[#5A6E5E] pl-5 leading-relaxed">
                       {dim.counterfactual_value}
                     </p>
                   </div>
@@ -304,8 +304,8 @@ export const CounterfactualReplayCanvas: React.FC = () => {
 
           {/* 4 Divergence Delta Cards */}
           <div className="space-y-4" data-testid="counterfactual-delta-cards">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-violet-400" />
+            <h3 className="text-sm font-serif font-bold uppercase tracking-wider text-[#294B3A] flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-[#805B20]" />
               <span>Dimension Divergence Analysis (Delta Cards):</span>
             </h3>
 
@@ -313,31 +313,31 @@ export const CounterfactualReplayCanvas: React.FC = () => {
               {counterfactualDelta?.dimensions.map((dim) => (
                 <div
                   key={dim.dimension}
-                  className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition space-y-3"
+                  className="p-5 rounded-2xl bg-[#FAF6EE] border border-[#D8CCB7] hover:border-[#B5A58D] transition space-y-3 shadow-sm"
                   data-testid={`delta-card-${dim.dimension}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {getDimensionIcon(dim.dimension)}
-                      <h4 className="font-bold text-sm text-slate-100">{dim.title}</h4>
+                      <h4 className="font-serif font-bold text-sm text-[#294B3A]">{dim.title}</h4>
                     </div>
                     <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold border ${getDivergenceBadgeColor(dim.divergence_level)}`}>
                       {dim.divergence_level} divergence
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800/60">
+                  <p className="text-xs text-[#394840] leading-relaxed bg-[#F2EBDD] p-3 rounded-xl border border-[#D8CCB7] font-serif">
                     {dim.divergence_analysis}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-800">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-[#D8CCB7]">
                     <div>
-                      <span className="text-slate-500 font-mono block text-[10px]">CANON FOCUS</span>
-                      <span className="text-slate-300 line-clamp-1">{dim.canon_value}</span>
+                      <span className="text-[#5A6E5E] font-mono block text-[10px]">CANON FOCUS</span>
+                      <span className="text-[#294B3A] line-clamp-1">{dim.canon_value}</span>
                     </div>
                     <div>
-                      <span className="text-violet-400 font-mono block text-[10px]">ALTERNATIVE SHIFT</span>
-                      <span className="text-violet-200 line-clamp-1">{dim.counterfactual_value}</span>
+                      <span className="text-[#6A4B67] font-mono block text-[10px]">ALTERNATIVE SHIFT</span>
+                      <span className="text-[#6A4B67] line-clamp-1 font-medium">{dim.counterfactual_value}</span>
                     </div>
                   </div>
                 </div>
@@ -347,13 +347,13 @@ export const CounterfactualReplayCanvas: React.FC = () => {
 
           {/* Exploration Profile Metric Deltas */}
           {counterfactualDelta?.profile_comparison && (
-            <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4" data-testid="exploration-profile-deltas">
+            <div className="p-6 rounded-3xl bg-[#FAF6EE] border border-[#D8CCB7] space-y-4 shadow-sm" data-testid="exploration-profile-deltas">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-cyan-400" />
+                <span className="text-xs font-mono uppercase tracking-wider text-[#5A6E5E] flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-[#294B3A]" />
                   <span>Exploration Profile Divergence Meters</span>
                 </span>
-                <span className="text-xs font-mono text-cyan-300">
+                <span className="text-xs font-mono text-[#466A55] font-semibold">
                   {counterfactualDelta.profile_comparison.summary}
                 </span>
               </div>
@@ -385,26 +385,26 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                     delta: counterfactualDelta.profile_comparison.feasibility_delta,
                   },
                 ].map((metric) => (
-                  <div key={metric.label} className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+                  <div key={metric.label} className="p-4 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-sm">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400 font-medium">{metric.label}</span>
-                      <span className={`font-mono font-bold text-[11px] ${metric.delta > 0 ? 'text-emerald-400' : metric.delta < 0 ? 'text-rose-400' : 'text-slate-400'}`}>
+                      <span className="text-[#5A6E5E] font-medium">{metric.label}</span>
+                      <span className={`font-mono font-bold text-[11px] ${metric.delta > 0 ? 'text-[#294B3A]' : metric.delta < 0 ? 'text-[#B8734F]' : 'text-[#718875]'}`}>
                         {metric.delta > 0 ? `+${metric.delta}%` : `${metric.delta}%`}
                       </span>
                     </div>
 
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                      <div className="flex items-center justify-between text-[10px] text-[#718875] font-mono">
                         <span>Canon: {metric.canon}%</span>
                         <span>Alt: {metric.cf}%</span>
                       </div>
-                      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden relative">
+                      <div className="h-1.5 w-full bg-[#EAE1D0] rounded-full overflow-hidden relative">
                         <div
-                          className="h-full bg-emerald-500/70 rounded-full absolute left-0"
+                          className="h-full bg-[#294B3A] rounded-full absolute left-0"
                           style={{ width: `${metric.canon}%` }}
                         />
                         <div
-                          className="h-full bg-violet-500/90 rounded-full absolute left-0"
+                          className="h-full bg-[#6A4B67] rounded-full absolute left-0"
                           style={{ width: `${metric.cf}%`, opacity: 0.8 }}
                         />
                       </div>
@@ -416,14 +416,14 @@ export const CounterfactualReplayCanvas: React.FC = () => {
           )}
 
           {/* Action Bar: Fork Timeline from Alternative World */}
-          <div className="p-6 rounded-3xl bg-gradient-to-r from-violet-950/60 via-slate-900 to-slate-950 border border-violet-500/40 shadow-xl space-y-4">
+          <div className="p-6 rounded-3xl bg-[#F2EBDD] border border-[#D8CCB7] shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                  <GitFork className="w-4 h-4 text-violet-400" />
+                <h4 className="text-sm font-serif font-bold text-[#294B3A] flex items-center gap-2">
+                  <GitFork className="w-4 h-4 text-[#6A4B67]" />
                   <span>Fork Timeline into This World</span>
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-[#5A6E5E]">
                   Ready to explore this counterfactual universe? Spawns an isolated child timeline branch rooted in '{activeCandidate.title}', preserving current canon immutability.
                 </p>
               </div>
@@ -435,14 +435,14 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                   value={counterfactualBranchName}
                   onChange={(e) => setCounterfactualBranchName(e.target.value)}
                   placeholder="counterfactual/branch-name"
-                  className="px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 font-mono focus:outline-none focus:border-violet-500 w-64"
+                  className="px-3.5 py-2.5 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] text-xs text-[#294B3A] placeholder-[#8C9E8F] font-mono focus:outline-none focus:border-[#294B3A] w-64"
                 />
 
                 <button
                   id="fork-counterfactual-branch-btn"
                   onClick={handleFork}
                   disabled={isForkingCounterfactual}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-violet-900/30 transition disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#6A4B67] hover:bg-[#573D54] text-[#F8F4E8] font-bold text-xs shadow-sm transition disabled:opacity-50"
                 >
                   {isForkingCounterfactual ? (
                     <>
@@ -460,8 +460,8 @@ export const CounterfactualReplayCanvas: React.FC = () => {
             </div>
 
             {forkSuccessBranch && (
-              <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="p-3 rounded-xl bg-[#DDE2D2] border border-[#294B3A]/30 text-[#294B3A] text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#294B3A] shrink-0" />
                 <span>
                   Successfully created and switched to isolated counterfactual branch <strong>{forkSuccessBranch}</strong>!
                 </span>
@@ -469,8 +469,8 @@ export const CounterfactualReplayCanvas: React.FC = () => {
             )}
 
             {forkError && (
-              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              <div className="p-3 rounded-xl bg-[#F5E6DC] border border-[#B8734F]/40 text-[#B8734F] text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-[#B8734F] shrink-0" />
                 <span>{forkError}</span>
               </div>
             )}

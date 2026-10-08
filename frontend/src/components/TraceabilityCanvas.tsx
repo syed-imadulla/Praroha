@@ -115,50 +115,50 @@ export const TraceabilityCanvas: React.FC = () => {
   const getNodeColorClass = (type: TraceNodeType) => {
     switch (type) {
       case 'root_seed':
-        return 'border-cyan-500/50 bg-cyan-950/40 text-cyan-300';
+        return 'border-[#BACBB8] bg-[#F8F4E8] text-[#294B3A]';
       case 'seed_dna':
-        return 'border-sky-500/50 bg-sky-950/40 text-sky-300';
+        return 'border-[#D8CCB7] bg-[#F8F4E8] text-[#294B3A]';
       case 'world_candidate':
-        return 'border-amber-500/40 bg-amber-950/30 text-amber-300';
+        return 'border-[#E9DDBF] bg-[#F8F4E8] text-[#294B3A]';
       case 'human_selection':
-        return 'border-emerald-500/60 bg-emerald-950/50 text-emerald-300';
+        return 'border-[#BACBB8] bg-[#E2EBE2] text-[#294B3A]';
       case 'world_bible':
-        return 'border-emerald-500/50 bg-emerald-950/30 text-emerald-300';
+        return 'border-[#BACBB8] bg-[#F8F4E8] text-[#294B3A]';
       case 'key_location':
-        return 'border-teal-500/40 bg-teal-950/30 text-teal-300';
+        return 'border-[#D8CCB7] bg-[#F8F4E8] text-[#294B3A]';
       case 'character':
-        return 'border-indigo-500/50 bg-indigo-950/40 text-indigo-300';
+        return 'border-[#C59A55]/40 bg-[#F8F4E8] text-[#294B3A]';
       case 'relationship':
-        return 'border-orange-500/50 bg-orange-950/40 text-orange-300';
+        return 'border-[#E2BFAC] bg-[#F8F4E8] text-[#294B3A]';
       case 'scene':
-        return 'border-purple-500/50 bg-purple-950/40 text-purple-300';
+        return 'border-[#DFD1DE] bg-[#F8F4E8] text-[#294B3A]';
       default:
-        return 'border-slate-700 bg-slate-900 text-slate-300';
+        return 'border-[#D8CCB7] bg-[#F8F4E8] text-[#294B3A]';
     }
   };
 
   const getNodeIcon = (type: TraceNodeType) => {
     switch (type) {
       case 'root_seed':
-        return <Sparkles className="w-3.5 h-3.5 text-cyan-400" />;
+        return <Sparkles className="w-3.5 h-3.5 text-[#355A46]" />;
       case 'seed_dna':
-        return <GitFork className="w-3.5 h-3.5 text-sky-400" />;
+        return <GitFork className="w-3.5 h-3.5 text-[#355A46]" />;
       case 'world_candidate':
-        return <Compass className="w-3.5 h-3.5 text-amber-400" />;
+        return <Compass className="w-3.5 h-3.5 text-[#C59A55]" />;
       case 'human_selection':
-        return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />;
+        return <CheckCircle2 className="w-3.5 h-3.5 text-[#355A46]" />;
       case 'world_bible':
-        return <BookOpen className="w-3.5 h-3.5 text-emerald-400" />;
+        return <BookOpen className="w-3.5 h-3.5 text-[#355A46]" />;
       case 'key_location':
-        return <MapPin className="w-3.5 h-3.5 text-teal-400" />;
+        return <MapPin className="w-3.5 h-3.5 text-[#355A46]" />;
       case 'character':
-        return <User className="w-3.5 h-3.5 text-indigo-400" />;
+        return <User className="w-3.5 h-3.5 text-[#805B20]" />;
       case 'relationship':
-        return <Users className="w-3.5 h-3.5 text-orange-400" />;
+        return <Users className="w-3.5 h-3.5 text-[#A0522D]" />;
       case 'scene':
-        return <Film className="w-3.5 h-3.5 text-purple-400" />;
+        return <Film className="w-3.5 h-3.5 text-[#6A4B67]" />;
       default:
-        return <Info className="w-3.5 h-3.5 text-slate-400" />;
+        return <Info className="w-3.5 h-3.5 text-[#718875]" />;
     }
   };
 
@@ -185,20 +185,20 @@ export const TraceabilityCanvas: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-canvas-deep text-slate-100 p-4 md:p-8 space-y-6">
+    <div className="flex-1 flex flex-col h-full bg-[#F8F4E8] text-[#294B3A] p-4 md:p-8 space-y-6">
       {/* Header Banner */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-canvas-border">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#D8CCB7]">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#E2EBE2] text-[#294B3A] border border-[#BACBB8]">
               Tattva 2: Forms Hidden in Formless • Stage 6 Traceability
             </span>
-            <span className="text-xs text-slate-400 font-mono">• Provenance DAG</span>
+            <span className="text-xs text-[#718875] font-mono">• Provenance DAG</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold font-serif text-[#294B3A] tracking-tight">
             Causal Lineage & Provenance DAG
           </h1>
-          <p className="text-xs md:text-sm text-slate-400 max-w-3xl leading-relaxed">
+          <p className="text-xs md:text-sm text-[#5A6E5E] max-w-3xl leading-relaxed">
             Every downstream lore rule, character tension, key location, and dramatic scene is causally
             tethered back to your initial seed. Click any node to illuminate its full provenance trail.
           </p>
@@ -208,7 +208,7 @@ export const TraceabilityCanvas: React.FC = () => {
           {selectedNodeId && (
             <button
               onClick={() => setSelectedNodeId(null)}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700 transition flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-full bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-medium text-[#294B3A] border border-[#D8CCB7] transition flex items-center gap-1.5"
             >
               <span>Reset Highlighting</span>
             </button>
@@ -217,7 +217,7 @@ export const TraceabilityCanvas: React.FC = () => {
           <button
             onClick={() => fetchLineage()}
             disabled={isLoadingLineage}
-            className="px-3 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-700/60 text-xs font-medium flex items-center gap-1.5 transition disabled:opacity-50"
+            className="px-4 py-2 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-50 shadow-xs"
             title="Refresh DAG synthesis"
           >
             <RotateCw className={`w-3.5 h-3.5 ${isLoadingLineage ? 'animate-spin' : ''}`} />
@@ -225,10 +225,10 @@ export const TraceabilityCanvas: React.FC = () => {
           </button>
 
           {/* DAG Zoom Controls */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <div className="flex items-center gap-1 p-1 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] text-xs">
             <button
               onClick={() => setZoomLevel((z) => Math.max(0.7, Number((z - 0.15).toFixed(2))))}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-full text-[#718875] hover:text-[#294B3A] hover:bg-[#EAE0D0] transition"
               title="Zoom Out (-)"
               aria-label="Zoom Out"
             >
@@ -236,7 +236,7 @@ export const TraceabilityCanvas: React.FC = () => {
             </button>
             <button
               onClick={() => setZoomLevel(1.0)}
-              className="px-2 py-0.5 rounded text-[11px] font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition"
+              className="px-2 py-0.5 rounded text-[11px] font-mono text-[#294B3A] hover:bg-[#EAE0D0] transition"
               title="Reset Zoom to 100%"
               aria-label="Reset Zoom"
             >
@@ -244,7 +244,7 @@ export const TraceabilityCanvas: React.FC = () => {
             </button>
             <button
               onClick={() => setZoomLevel((z) => Math.min(1.3, Number((z + 0.15).toFixed(2))))}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-full text-[#718875] hover:text-[#294B3A] hover:bg-[#EAE0D0] transition"
               title="Zoom In (+)"
               aria-label="Zoom In"
             >
@@ -255,10 +255,10 @@ export const TraceabilityCanvas: React.FC = () => {
       </header>
 
       {/* Filter Chips Bar */}
-      <div className="flex items-center justify-between gap-4 flex-wrap pb-2 border-b border-slate-800/80 text-xs">
+      <div className="flex items-center justify-between gap-4 flex-wrap pb-2 border-b border-[#D8CCB7] text-xs">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-slate-400 flex items-center gap-1 font-mono text-[11px]">
-            <Filter className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-[#5A6E5E] flex items-center gap-1 font-mono text-[11px]">
+            <Filter className="w-3.5 h-3.5 text-[#355A46]" />
             Filter Focus:
           </span>
           {(['all', 'characters', 'scenes', 'locations', 'lore'] as const).map((filter) => (
@@ -267,8 +267,8 @@ export const TraceabilityCanvas: React.FC = () => {
               onClick={() => setLineageFilter(filter)}
               className={`px-3 py-1 rounded-lg font-medium capitalize transition ${
                 lineageFilter === filter
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                  : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                  ? 'bg-[#355A46] text-[#F8F4E8] border border-[#294B3A] shadow-xs'
+                  : 'bg-[#F2EBDD] text-[#5A6E5E] hover:text-[#294B3A] border border-[#D8CCB7]'
               }`}
             >
               {filter === 'lore' ? 'Canon & Laws' : filter}
@@ -276,17 +276,17 @@ export const TraceabilityCanvas: React.FC = () => {
           ))}
         </div>
 
-        <div className="text-[11px] font-mono text-slate-400 flex items-center gap-3">
+        <div className="text-[11px] font-mono text-[#718875] flex items-center gap-3">
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#355A46]" />
             Selected Target
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#C59A55]" />
             Causal Ancestor Path
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D8CCB7]" />
             Unrelated Node
           </span>
         </div>
@@ -294,11 +294,11 @@ export const TraceabilityCanvas: React.FC = () => {
 
       {/* Origin Tier Filter Toolbar (ORIG-02) */}
       <div
-        className="flex flex-wrap items-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs"
+        className="flex flex-wrap items-center gap-1.5 py-2 px-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-xs"
         data-testid="dag-origin-filter-toolbar"
       >
-        <span className="text-[11px] font-mono uppercase text-slate-400 mr-2 flex items-center gap-1">
-          <Compass className="w-3.5 h-3.5 text-cyan-400" />
+        <span className="text-[11px] font-mono uppercase text-[#5A6E5E] mr-2 flex items-center gap-1">
+          <Compass className="w-3.5 h-3.5 text-[#355A46]" />
           Origin Tier:
         </span>
         <button
@@ -306,8 +306,8 @@ export const TraceabilityCanvas: React.FC = () => {
           onClick={() => setSelectedOriginFilter('ALL')}
           className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition ${
             selectedOriginFilter === 'ALL'
-              ? 'bg-slate-700 text-slate-100 border border-slate-500 shadow-sm'
-              : 'bg-slate-900/50 text-slate-400 hover:text-slate-200 border border-transparent'
+              ? 'bg-[#355A46] text-[#F8F4E8] border border-[#294B3A] shadow-xs'
+              : 'bg-[#F8F4E8] text-[#5A6E5E] hover:text-[#294B3A] border border-[#D8CCB7]'
           }`}
           data-testid="dag-origin-filter-all"
         >
@@ -330,7 +330,7 @@ export const TraceabilityCanvas: React.FC = () => {
               type="button"
               onClick={() => setSelectedOriginFilter(isSelected ? 'ALL' : type)}
               className={`transition ${
-                isSelected ? 'scale-105 ring-2 ring-white/30 rounded-full' : 'opacity-70 hover:opacity-100'
+                isSelected ? 'scale-105 ring-2 ring-[#355A46]/40 rounded-full' : 'opacity-75 hover:opacity-100'
               }`}
               data-testid={`dag-origin-filter-${type.toLowerCase()}`}
             >
@@ -352,16 +352,16 @@ export const TraceabilityCanvas: React.FC = () => {
           }}
         >
           {isLoadingLineage && !lineageGraph ? (
-            <div className="p-12 text-center rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
-              <RotateCw className="w-6 h-6 text-cyan-400 animate-spin mx-auto" />
-              <p className="text-sm text-slate-300">Synthesizing causal DAG relationships...</p>
+            <div className="p-12 text-center rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-3 shadow-xs">
+              <RotateCw className="w-6 h-6 text-[#355A46] animate-spin mx-auto" />
+              <p className="text-sm text-[#394840]">Synthesizing causal DAG relationships...</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* Lane 1: Root Seed */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-cyan-400">
-                  <span className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800/60">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#355A46]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#E2EBE2] border border-[#BACBB8] text-[#294B3A]">
                     STAGE 01
                   </span>
                   <span>Root Creative Seed</span>
@@ -384,13 +384,13 @@ export const TraceabilityCanvas: React.FC = () => {
 
               {/* Lane Divider Connector */}
               <div className="flex justify-center -my-2">
-                <div className="w-0.5 h-4 bg-gradient-to-b from-cyan-500/40 to-sky-500/40" />
+                <div className="w-0.5 h-4 bg-[#D8CCB7]" />
               </div>
 
               {/* Lane 2: Seed DNA */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-sky-400">
-                  <span className="px-2 py-0.5 rounded bg-sky-950/80 border border-sky-800/60">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#805B20]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/30 text-[#805B20]">
                     STAGE 02
                   </span>
                   <span>Distilled Seed DNA & Constraints</span>
@@ -413,13 +413,13 @@ export const TraceabilityCanvas: React.FC = () => {
 
               {/* Lane Divider Connector */}
               <div className="flex justify-center -my-2">
-                <div className="w-0.5 h-4 bg-gradient-to-b from-sky-500/40 to-amber-500/40" />
+                <div className="w-0.5 h-4 bg-[#D8CCB7]" />
               </div>
 
               {/* Lane 3: World Candidates & Selection */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-400">
-                  <span className="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-800/60">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#805B20]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/30 text-[#805B20]">
                     STAGES 03 & 04
                   </span>
                   <span>Archetype Exploration & Human Selection Gate</span>
@@ -442,14 +442,14 @@ export const TraceabilityCanvas: React.FC = () => {
 
               {/* Lane Divider Connector */}
               <div className="flex justify-center -my-2">
-                <div className="w-0.5 h-4 bg-gradient-to-b from-amber-500/40 to-emerald-500/40" />
+                <div className="w-0.5 h-4 bg-[#D8CCB7]" />
               </div>
 
               {/* Lane 4: World Bible & Key Locations */}
               {(lineageFilter === 'all' || lineageFilter === 'lore' || lineageFilter === 'locations') && (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-400">
-                    <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/60">
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#355A46]">
+                    <span className="px-2 py-0.5 rounded-full bg-[#E2EBE2] border border-[#BACBB8] text-[#294B3A]">
                       STAGE 05A
                     </span>
                     <span>World Bible Canon Laws & Landmark Locations</span>
@@ -479,14 +479,14 @@ export const TraceabilityCanvas: React.FC = () => {
 
               {/* Lane Divider Connector */}
               <div className="flex justify-center -my-2">
-                <div className="w-0.5 h-4 bg-gradient-to-b from-emerald-500/40 to-indigo-500/40" />
+                <div className="w-0.5 h-4 bg-[#D8CCB7]" />
               </div>
 
               {/* Lane 5: Characters & Relationships */}
               {(lineageFilter === 'all' || lineageFilter === 'characters') && (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-indigo-400">
-                    <span className="px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-800/60">
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#6A4B67]">
+                    <span className="px-2 py-0.5 rounded-full bg-[#EFE8EE] border border-[#DFD1DE] text-[#6A4B67]">
                       STAGE 05B
                     </span>
                     <span>Cast of Inhabitants & Interpersonal Dynamics</span>
@@ -510,14 +510,14 @@ export const TraceabilityCanvas: React.FC = () => {
 
               {/* Lane Divider Connector */}
               <div className="flex justify-center -my-2">
-                <div className="w-0.5 h-4 bg-gradient-to-b from-indigo-500/40 to-purple-500/40" />
+                <div className="w-0.5 h-4 bg-[#D8CCB7]" />
               </div>
 
               {/* Lane 6: Story Scenes */}
               {(lineageFilter === 'all' || lineageFilter === 'scenes') && (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-purple-400">
-                    <span className="px-2 py-0.5 rounded bg-purple-950/80 border border-purple-800/60">
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#A0522D]">
+                    <span className="px-2 py-0.5 rounded-full bg-[#F5E6DC] border border-[#E2BFAC] text-[#A0522D]">
                       STAGE 05C
                     </span>
                     <span>Dramatic Story Beats & Scenes</span>
@@ -546,17 +546,17 @@ export const TraceabilityCanvas: React.FC = () => {
         <div className="lg:col-span-4 sticky top-6">
           <div
             id="causal-inspector-card"
-            className="p-6 rounded-2xl bg-canvas-card border border-canvas-border space-y-5 shadow-2xl backdrop-blur-md"
+            className="p-6 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-5 shadow-xs"
           >
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center justify-between border-b border-[#D8CCB7] pb-3">
               <div className="flex items-center gap-2">
-                <GitFork className="w-4 h-4 text-cyan-400" />
-                <h2 className="font-extrabold text-slate-100 text-sm tracking-wide uppercase">
+                <GitFork className="w-4 h-4 text-[#355A46]" />
+                <h2 className="font-bold font-serif text-[#294B3A] text-sm tracking-wide uppercase">
                   Causal Provenance Inspector
                 </h2>
               </div>
               {selectedNode && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 capitalize">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-[#E2EBE2] text-[#294B3A] border border-[#BACBB8] capitalize">
                   Stage {selectedNode.stage}
                 </span>
               )}
@@ -568,23 +568,23 @@ export const TraceabilityCanvas: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     {getNodeIcon(selectedNode.entity_type)}
-                    <span className="text-[11px] font-mono text-slate-400 uppercase">
+                    <span className="text-[11px] font-mono text-[#718875] uppercase">
                       {selectedNode.entity_type.replace('_', ' ')}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-100 leading-snug">
+                  <h3 className="text-lg font-bold font-serif text-[#294B3A] leading-snug">
                     {selectedNode.title || selectedNode.label}
                   </h3>
-                  <p className="text-xs text-slate-400">{selectedNode.summary}</p>
+                  <p className="text-xs text-[#5A6E5E]">{selectedNode.summary}</p>
                 </div>
 
                 {/* Origin Ledger Classification (ORIG-02 / ORIG-03) */}
                 <div
-                  className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-2"
+                  className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between gap-2"
                   data-testid="inspector-origin-box"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold">
+                    <span className="text-[10px] font-mono uppercase text-[#718875] font-semibold">
                       Origin Tier:
                     </span>
                     <OriginBadge
@@ -596,7 +596,7 @@ export const TraceabilityCanvas: React.FC = () => {
                   </div>
                   {selectedNode.origin_source && (
                     <span
-                      className="text-[10px] font-mono text-slate-400 italic truncate max-w-[150px]"
+                      className="text-[10px] font-mono text-[#718875] italic truncate max-w-[150px]"
                       title={selectedNode.origin_source}
                     >
                       {selectedNode.origin_source}
@@ -605,19 +605,19 @@ export const TraceabilityCanvas: React.FC = () => {
                 </div>
 
                 {/* "Why Does This Exist?" Box (TRAC-03) */}
-                <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/40 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                    <Sparkles className="w-4 h-4" />
+                <div className="p-4 rounded-xl bg-[#E2EBE2]/70 border border-[#BACBB8] space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold font-serif text-[#294B3A]">
+                    <Sparkles className="w-4 h-4 text-[#C59A55]" />
                     <span>Why Does This Exist?</span>
                   </div>
-                  <p className="text-xs text-emerald-200 leading-relaxed font-sans">
+                  <p className="text-xs text-[#294B3A] leading-relaxed font-sans">
                     {selectedNode.causal_explanation}
                   </p>
                 </div>
 
                 {/* Ancestor Provenance Trail */}
-                <div className="space-y-2 pt-2 border-t border-slate-800">
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                <div className="space-y-2 pt-2 border-t border-[#D8CCB7]">
+                  <div className="flex items-center justify-between text-[11px] text-[#718875] font-mono">
                     <span>PROVENANCE TRAIL ({ancestorNodesOrdered.length} STEPS)</span>
                   </div>
                   <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
@@ -627,15 +627,15 @@ export const TraceabilityCanvas: React.FC = () => {
                         onClick={() => setSelectedNodeId(anc.id)}
                         className={`w-full text-left p-2 rounded-lg text-xs flex items-center justify-between transition ${
                           anc.id === selectedNode.id
-                            ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40'
-                            : 'bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 border border-slate-800'
+                            ? 'bg-[#355A46] text-[#F8F4E8] border border-[#294B3A]'
+                            : 'bg-[#F2EBDD] hover:bg-[#EAE0D0] text-[#294B3A] border border-[#D8CCB7]'
                         }`}
                       >
                         <div className="flex items-center gap-2 truncate">
-                          <span className="text-[10px] font-mono text-slate-500">#{idx + 1}</span>
+                          <span className={`text-[10px] font-mono ${anc.id === selectedNode.id ? 'text-[#DDE2D2]' : 'text-[#8C9E90]'}`}>#{idx + 1}</span>
                           <span className="font-medium truncate">{anc.title || anc.label}</span>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                        <span className={`text-[10px] font-mono shrink-0 ${anc.id === selectedNode.id ? 'text-[#DDE2D2]' : 'text-[#718875]'}`}>
                           S0{anc.stage}
                         </span>
                       </button>
@@ -645,8 +645,8 @@ export const TraceabilityCanvas: React.FC = () => {
 
                 {/* Metadata Details */}
                 {selectedNode.metadata && Object.keys(selectedNode.metadata).length > 0 && (
-                  <div className="space-y-2 pt-2 border-t border-slate-800">
-                    <span className="text-[11px] text-slate-400 font-mono uppercase">
+                  <div className="space-y-2 pt-2 border-t border-[#D8CCB7]">
+                    <span className="text-[11px] text-[#718875] font-mono uppercase">
                       Entity Attributes
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -655,9 +655,9 @@ export const TraceabilityCanvas: React.FC = () => {
                         return (
                           <span
                             key={key}
-                            className="px-2 py-0.5 rounded text-[10px] bg-slate-900 text-slate-300 border border-slate-800 font-mono"
+                            className="px-2 py-0.5 rounded text-[10px] bg-[#F2EBDD] text-[#294B3A] border border-[#D8CCB7] font-mono"
                           >
-                            <span className="text-slate-500">{key}:</span> {String(val).slice(0, 30)}
+                            <span className="text-[#718875]">{key}:</span> {String(val).slice(0, 30)}
                           </span>
                         );
                       })}
@@ -667,11 +667,11 @@ export const TraceabilityCanvas: React.FC = () => {
               </div>
             ) : (
               <div className="py-10 text-center space-y-3">
-                <div className="w-10 h-10 rounded-full bg-slate-800/80 border border-slate-700 text-slate-400 flex items-center justify-center mx-auto">
-                  <Compass className="w-5 h-5 animate-pulse" />
+                <div className="w-10 h-10 rounded-full bg-[#E2EBE2] border border-[#BACBB8] text-[#355A46] flex items-center justify-center mx-auto shadow-2xs">
+                  <Compass className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-200">Interactive Lineage Ready</h4>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
+                <h4 className="text-sm font-bold font-serif text-[#294B3A]">Interactive Lineage Ready</h4>
+                <p className="text-xs text-[#5A6E5E] max-w-xs mx-auto leading-relaxed">
                   Select any character, relationship, world law, or scene card to reveal its causal
                   provenance back to the root seed.
                 </p>
@@ -687,19 +687,19 @@ export const TraceabilityCanvas: React.FC = () => {
 const getOriginAccentClass = (type?: OriginType) => {
   switch (type) {
     case 'SEED_EXPLICIT':
-      return 'border-l-4 border-l-cyan-400';
+      return 'border-l-4 border-l-[#294B3A]';
     case 'SEED_INFERRED':
-      return 'border-l-4 border-l-indigo-400';
+      return 'border-l-4 border-l-[#466A55]';
     case 'HUMAN_DECISION':
-      return 'border-l-4 border-l-amber-400';
+      return 'border-l-4 border-l-[#C59A55]';
     case 'DERIVED':
-      return 'border-l-4 border-l-sky-400';
+      return 'border-l-4 border-l-[#6A4B67]';
     case 'AI_INTRODUCED':
-      return 'border-l-4 border-l-violet-400';
+      return 'border-l-4 border-l-[#A0522D]';
     case 'USER_ADDED':
-      return 'border-l-4 border-l-emerald-400';
+      return 'border-l-4 border-l-[#355A46]';
     default:
-      return 'border-l-4 border-l-slate-600';
+      return 'border-l-4 border-l-[#D8CCB7]';
   }
 };
 
@@ -729,21 +729,21 @@ const NodeCard: React.FC<NodeCardProps> = ({
       onClick={onClick}
       id={`node-${node.id}`}
       data-node-id={node.id}
-      className={`p-3.5 rounded-xl border cursor-pointer transition-all duration-200 select-none flex flex-col justify-between ${originBorder} ${
+      className={`p-3.5 rounded-[16px] border cursor-pointer transition-all duration-200 select-none flex flex-col justify-between shadow-xs ${originBorder} ${
         isSelected
-          ? 'ring-2 ring-cyan-400 bg-cyan-950/80 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-[1.01]'
+          ? 'ring-2 ring-[#355A46] bg-[#E2EBE2] border-[#355A46] shadow-sm scale-[1.01]'
           : isHighlighted
-          ? 'ring-1 ring-emerald-400 bg-emerald-950/40 border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+          ? 'ring-1 ring-[#C59A55] bg-[#E9DDBF]/40 border-[#C59A55] shadow-2xs'
           : isDimmed
-          ? 'opacity-35 hover:opacity-75 bg-slate-900/60 border-slate-800'
-          : `${colorClass} hover:border-slate-500 hover:shadow-md`
+          ? 'opacity-35 hover:opacity-75 bg-[#F2EBDD]/60 border-[#D8CCB7]'
+          : `${colorClass} hover:border-[#BACBB8] hover:shadow-2xs`
       }`}
     >
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
             {icon}
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#718875] truncate">
               {node.entity_type.replace('_', ' ')}
             </span>
           </div>
@@ -755,26 +755,26 @@ const NodeCard: React.FC<NodeCardProps> = ({
               size="xs"
               showLabel={false}
             />
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-900/80 text-slate-400 border border-slate-800">
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-[#F2EBDD] text-[#718875] border border-[#D8CCB7]">
               S0{node.stage}
             </span>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <h4 className="text-xs font-bold text-slate-100 truncate">{node.title || node.label}</h4>
+          <h4 className="text-xs font-bold font-serif text-[#294B3A] truncate">{node.title || node.label}</h4>
           {node.metadata?.version !== undefined && (
-            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30 shrink-0">
               v{String(node.metadata.version)}
             </span>
           )}
         </div>
-        <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{node.summary}</p>
+        <p className="text-[11px] text-[#5A6E5E] line-clamp-2 leading-relaxed">{node.summary}</p>
       </div>
 
-      <div className="pt-2 mt-2 border-t border-slate-800/60 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+      <div className="pt-2 mt-2 border-t border-[#D8CCB7] flex items-center justify-between text-[10px] text-[#718875] font-mono">
         <span>{node.parent_ids.length > 0 ? `${node.parent_ids.length} parent(s)` : 'Root Origin'}</span>
-        <span className="flex items-center gap-0.5 text-cyan-400 hover:underline">
+        <span className="flex items-center gap-0.5 text-[#355A46] hover:underline font-medium">
           <span>Inspect</span>
           <ChevronRight className="w-3 h-3" />
         </span>

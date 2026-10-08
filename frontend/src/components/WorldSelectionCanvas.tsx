@@ -217,21 +217,21 @@ export const WorldSelectionCanvas: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-canvas-border">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-400">
+            <span className="p-1.5 rounded-lg bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A]">
               <Compass className="w-4 h-4" />
             </span>
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#466A55]">
               Stage 4 / 07 — Choice Gate
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono flex items-center gap-1 font-bold">
-              <ShieldCheck className="w-3 h-3" />
+            <span className="px-2.5 py-0.5 rounded-full bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] text-[10px] font-mono flex items-center gap-1 font-bold">
+              <ShieldCheck className="w-3 h-3 text-[#355A46]" />
               Human-in-the-Loop
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold font-sans text-slate-100 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold font-serif text-[#294B3A] tracking-tight">
             Human World Selection & Creative Commitment
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm max-w-2xl">
+          <p className="text-[#466A55] text-xs sm:text-sm max-w-2xl">
             Choose which of the three contrasting worlds becomes your project's canonical foundation. Define the Decision DNA (priorities, negative guardrails, and rationale) that anchors all Stage 5 unfolding.
           </p>
         </div>
@@ -241,7 +241,7 @@ export const WorldSelectionCanvas: React.FC = () => {
           <button
             type="button"
             onClick={handleBackToStage3}
-            className="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 border border-slate-700 hover:border-cyan-500/50 text-xs font-semibold flex items-center gap-2 transition-all active:scale-95"
+            className="px-4 py-2.5 rounded-full bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
             title="Return to candidate comparison without locking"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -252,11 +252,11 @@ export const WorldSelectionCanvas: React.FC = () => {
 
       {/* Grounding Reminder: Seed DNA Anchor Strip */}
       {seedDNA && (
-        <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-slate-400 font-semibold">
-            <Dna className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span className="text-slate-300 font-medium">Seed DNA Anchor:</span>
-            <span className="text-slate-400 italic line-clamp-1">"{seedDNA.dna.premise}"</span>
+        <div className="p-4 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs shadow-2xs">
+          <div className="flex items-center gap-2 text-[#466A55] font-semibold">
+            <Dna className="w-4 h-4 text-[#355A46] shrink-0" />
+            <span className="text-[#294B3A] font-medium">Seed DNA Anchor:</span>
+            <span className="text-[#466A55] italic line-clamp-1">"{seedDNA.dna.premise}"</span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -266,7 +266,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                 setInspectorTab('dna');
                 toggleInspector(true);
               }}
-              className="text-cyan-400 hover:underline text-[11px] font-medium"
+              className="text-[#355A46] hover:underline text-[11px] font-medium"
             >
               View DNA Full
             </button>
@@ -276,9 +276,9 @@ export const WorldSelectionCanvas: React.FC = () => {
 
       {/* Stage 5 Unfolding Lock Banner */}
       {isStage5Begun && (
-        <div className="p-4 rounded-xl bg-amber-950/50 border border-amber-600/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-200 shadow-[0_0_25px_rgba(245,158,11,0.15)]">
+        <div className="p-4 rounded-xl bg-[#F2EBDD] border border-[#C59A55] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#294B3A] shadow-xs">
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+            <Lock className="w-4 h-4 text-[#C59A55] shrink-0" />
             <span>
               <strong>Direction Frozen:</strong> Stage 5 universe unfolding has already begun. The selected world is locked to preserve narrative consistency. To explore another candidate, branch the project.
             </span>
@@ -286,7 +286,7 @@ export const WorldSelectionCanvas: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveStage('unfold')}
-            className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold whitespace-nowrap self-start sm:self-auto"
+            className="px-3.5 py-1.5 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] text-xs font-semibold whitespace-nowrap self-start sm:self-auto shadow-2xs"
           >
             Go to Stage 5
           </button>
@@ -295,11 +295,11 @@ export const WorldSelectionCanvas: React.FC = () => {
 
       {/* 3-Column Comparative Grid with Glow & Dim Hierarchy */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-          <span className="font-semibold text-slate-300">
+        <div className="flex items-center justify-between text-xs text-[#466A55] px-1">
+          <span className="font-semibold text-[#294B3A]">
             {isStage5Begun ? 'Selected canon world direction:' : 'Select one world direction to activate:'}
           </span>
-          <span className="text-[11px] font-mono text-slate-500">
+          <span className="text-[11px] font-mono text-[#718875]">
             {isStage5Begun
               ? 'Direction locked (Stage 5 active)'
               : selectedWorldId
@@ -337,22 +337,22 @@ export const WorldSelectionCanvas: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 15 }}
-            className="p-6 rounded-2xl glass-card border border-cyan-500/40 bg-gradient-to-b from-slate-900/90 via-slate-950/95 to-slate-950 shadow-[0_0_40px_rgba(6,182,212,0.15)] space-y-6"
+            className="p-6 sm:p-8 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] shadow-xs space-y-6"
           >
             {/* Header: Chosen World Direction + Lock Action */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#D8CCB7]">
               <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 text-cyan-400 text-xs font-mono font-bold uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-2 text-[#355A46] text-xs font-mono font-bold uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-[#355A46]" />
                   <span>Chosen World Direction</span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-100 flex items-center gap-2">
+                <h3 className="text-xl sm:text-2xl font-bold font-serif text-[#294B3A] flex items-center gap-2">
                   <span>{chosenCandidate.title}</span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-800 text-cyan-300 font-normal">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] font-normal font-sans">
                     {chosenCandidate.archetype}
                   </span>
                   {chosenCandidate.divergence_archetype && (
-                    <span className="text-[10.5px] uppercase font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-cyan-300">
+                    <span className="text-[10.5px] uppercase font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] text-[#466A55]">
                       {chosenCandidate.divergence_archetype}
                     </span>
                   )}
@@ -364,7 +364,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                   type="button"
                   onClick={handleConfirmLock}
                   disabled={isSelectingWorld}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-sm flex items-center gap-2.5 shadow-glow-cyan transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                  className="px-6 py-3 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-sm flex items-center gap-2.5 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
                   title="Lock this creative world direction and proceed to Stage 5 Unfolding"
                 >
                   <Lock className={`w-4 h-4 ${isSelectingWorld ? 'animate-spin' : ''}`} />
@@ -377,17 +377,17 @@ export const WorldSelectionCanvas: React.FC = () => {
             {/* Decision DNA Capture Controls */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               {/* Section 1: Creative Priorities */}
-              <div className="space-y-3 p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+              <div className="space-y-3 p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7]">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs uppercase tracking-wider">
-                    <Sliders className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 text-[#294B3A] font-bold text-xs uppercase tracking-wider">
+                    <Sliders className="w-3.5 h-3.5 text-[#355A46]" />
                     <span>1. Creative Priorities (Pillars)</span>
                   </div>
-                  <span className="text-[11px] font-mono text-cyan-400/80">
+                  <span className="text-[11px] font-mono text-[#466A55]">
                     {selectedPriorities.length} selected
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
+                <p className="text-[11px] text-[#466A55] leading-relaxed">
                   Select thematic pillars for Stage 5 generation to prioritize across Bible, characters, and scenes:
                 </p>
 
@@ -402,11 +402,11 @@ export const WorldSelectionCanvas: React.FC = () => {
                         onClick={() => togglePriority(p)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 border ${
                           active
-                            ? 'bg-cyan-500/20 text-cyan-200 border-cyan-400/80 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
-                            : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-300'
+                            ? 'bg-[#355A46] text-[#F8F4E8] border-[#294B3A] shadow-xs'
+                            : 'bg-[#F8F4E8] text-[#466A55] border-[#D8CCB7] hover:border-[#355A46] hover:text-[#294B3A]'
                         }`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-[#F8F4E8]' : 'bg-[#718875]'}`} />
                         <span>{p}</span>
                       </button>
                     );
@@ -416,13 +416,13 @@ export const WorldSelectionCanvas: React.FC = () => {
                     .map((customP) => (
                       <span
                         key={customP}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/30 text-cyan-100 border border-cyan-400 flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE] flex items-center gap-1.5"
                       >
                         <span>{customP}</span>
                         <button
                           type="button"
                           onClick={() => togglePriority(customP)}
-                          className="hover:text-red-400"
+                          className="hover:text-red-600"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -443,12 +443,12 @@ export const WorldSelectionCanvas: React.FC = () => {
                       }
                     }}
                     placeholder="Add custom creative priority..."
-                    className="flex-1 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-[#F8F4E8] border border-[#D8CCB7] text-xs text-[#294B3A] placeholder-[#718875] focus:border-[#355A46] focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => handleAddCustomPriority()}
-                    className="px-3 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-800 text-cyan-300 text-xs font-medium flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-lg bg-[#355A46] hover:bg-[#294B3A] border border-[#294B3A] text-[#F8F4E8] text-xs font-medium flex items-center gap-1"
                   >
                     <Plus className="w-3 h-3" />
                     <span>Add</span>
@@ -457,17 +457,17 @@ export const WorldSelectionCanvas: React.FC = () => {
               </div>
 
               {/* Section 2: Negative Guardrails & Rejected Directions */}
-              <div className="space-y-3 p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+              <div className="space-y-3 p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7]">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-rose-300 font-bold text-xs uppercase tracking-wider">
-                    <Ban className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 text-[#B8734F] font-bold text-xs uppercase tracking-wider">
+                    <Ban className="w-3.5 h-3.5 text-[#B8734F]" />
                     <span>2. Negative Guardrails & Exclusions</span>
                   </div>
-                  <span className="text-[11px] font-mono text-rose-400/80">
+                  <span className="text-[11px] font-mono text-[#B8734F]">
                     {inferredExclusionsList.filter((e) => enabledExclusions[e] !== false).length + customExclusions.length} active
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
+                <p className="text-[11px] text-[#466A55] leading-relaxed">
                   Inferred from the two unselected candidate worlds. Toggle active exclusions or add custom boundaries:
                 </p>
 
@@ -480,15 +480,15 @@ export const WorldSelectionCanvas: React.FC = () => {
                         key={exc}
                         className={`flex items-start gap-2.5 p-2 rounded-lg border text-xs cursor-pointer transition ${
                           isChecked
-                            ? 'bg-rose-950/20 border-rose-900/50 text-rose-200'
-                            : 'bg-slate-900/40 border-slate-800 text-slate-500 line-through'
+                            ? 'bg-[#F5E6DC] border-[#E2BFAC] text-[#B8734F]'
+                            : 'bg-[#F8F4E8] border-[#D8CCB7] text-[#718875] line-through'
                         }`}
                       >
                         <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => toggleExclusion(exc)}
-                          className="mt-0.5 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-0"
+                          className="mt-0.5 rounded border-[#D8CCB7] bg-[#F8F4E8] text-[#B8734F] focus:ring-0"
                         />
                         <span className="leading-snug">Avoid: {exc}</span>
                       </label>
@@ -499,13 +499,13 @@ export const WorldSelectionCanvas: React.FC = () => {
                   {customExclusions.map((customExc) => (
                     <div
                       key={customExc}
-                      className="flex items-center justify-between p-2 rounded-lg bg-rose-950/30 border border-rose-800/80 text-xs text-rose-200"
+                      className="flex items-center justify-between p-2 rounded-lg bg-[#F5E6DC] border border-[#E2BFAC] text-xs text-[#B8734F]"
                     >
                       <span>Avoid: {customExc}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveCustomExclusion(customExc)}
-                        className="text-slate-400 hover:text-rose-300"
+                        className="text-[#718875] hover:text-[#B8734F]"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -526,12 +526,12 @@ export const WorldSelectionCanvas: React.FC = () => {
                       }
                     }}
                     placeholder="Add custom exclusion (e.g. No magical portals)..."
-                    className="flex-1 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:border-rose-400 focus:outline-none"
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-[#F8F4E8] border border-[#D8CCB7] text-xs text-[#294B3A] placeholder-[#718875] focus:border-[#B8734F] focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => handleAddCustomExclusion()}
-                    className="px-3 py-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs font-medium flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-lg bg-[#B8734F] hover:bg-[#A0522D] border border-[#A0522D] text-[#F8F4E8] text-xs font-medium flex items-center gap-1"
                   >
                     <Plus className="w-3 h-3" />
                     <span>Add</span>
@@ -544,9 +544,9 @@ export const WorldSelectionCanvas: React.FC = () => {
             <div className="space-y-2 pt-1">
               <label
                 htmlFor="creator-rationale"
-                className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2"
+                className="text-xs font-bold uppercase tracking-wider text-[#294B3A] flex items-center gap-2"
               >
-                <FileEdit className="w-3.5 h-3.5 text-cyan-400" />
+                <FileEdit className="w-3.5 h-3.5 text-[#355A46]" />
                 <span>3. Creator Rationale & Intent</span>
               </label>
               <textarea
@@ -555,7 +555,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                 value={localRationale}
                 onChange={(e) => setLocalRationale(e.target.value)}
                 placeholder="Explain why you chose this direction over the others..."
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 hover:border-slate-600 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-slate-500 text-xs sm:text-sm font-sans transition-all resize-y"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] hover:border-[#355A46] focus:border-[#355A46] focus:ring-1 focus:ring-[#355A46] text-[#294B3A] placeholder-[#718875] text-xs sm:text-sm font-sans transition-all resize-y"
               />
             </div>
 
@@ -563,9 +563,9 @@ export const WorldSelectionCanvas: React.FC = () => {
             <div className="space-y-2">
               <label
                 htmlFor="custom-directives"
-                className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2"
+                className="text-xs font-bold uppercase tracking-wider text-[#294B3A] flex items-center gap-2"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <Sparkles className="w-3.5 h-3.5 text-[#C59A55]" />
                 <span>4. Custom Directives (Non-Negotiables)</span>
               </label>
               <textarea
@@ -574,7 +574,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                 value={customDirectives}
                 onChange={(e) => setCustomDirectives(e.target.value)}
                 placeholder="Specific non-negotiable guidelines for Stage 5 generation..."
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 hover:border-slate-600 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-slate-200 placeholder-slate-500 text-xs sm:text-sm font-sans transition-all resize-y"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] hover:border-[#355A46] focus:border-[#355A46] focus:ring-1 focus:ring-[#355A46] text-[#294B3A] placeholder-[#718875] text-xs sm:text-sm font-sans transition-all resize-y"
               />
             </div>
 
@@ -583,30 +583,30 @@ export const WorldSelectionCanvas: React.FC = () => {
               id="human-only-zones-panel"
               className={`p-5 rounded-xl border transition-all ${
                 humanOnlyZones?.is_locked
-                  ? 'border-amber-500/70 bg-amber-950/25 shadow-[0_0_30px_rgba(245,158,11,0.2)]'
-                  : 'border-amber-500/40 bg-amber-950/15'
+                  ? 'border-[#355A46] bg-[#DDE2D2]/50 shadow-xs'
+                  : 'border-[#D8CCB7] bg-[#F2EBDD]'
               } space-y-4`}
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-900/40">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#D8CCB7]">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="p-1 rounded bg-amber-500/20 text-amber-400">
+                    <span className="p-1 rounded bg-[#DDE2D2] text-[#294B3A]">
                       {humanOnlyZones?.is_locked ? (
-                        <Lock className="w-3.5 h-3.5 text-amber-400" />
+                        <Lock className="w-3.5 h-3.5 text-[#355A46]" />
                       ) : (
-                        <Unlock className="w-3.5 h-3.5 text-amber-400/80" />
+                        <Unlock className="w-3.5 h-3.5 text-[#C59A55]" />
                       )}
                     </span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-300 font-mono">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#294B3A] font-mono">
                       5. Human-Only Zones: Inviolable Creative Axioms
                     </span>
                     {humanOnlyZones?.is_locked && (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1 shadow-sm">
+                      <span className="px-2 py-0.5 rounded-full bg-[#355A46] text-[#F8F4E8] text-[10px] font-mono font-bold flex items-center gap-1 shadow-2xs">
                         <Lock className="w-2.5 h-2.5" /> LOCKED
                       </span>
                     )}
                   </div>
-                  <p className="text-[11.5px] text-amber-200/70 max-w-2xl leading-relaxed">
+                  <p className="text-[11.5px] text-[#466A55] max-w-2xl leading-relaxed">
                     Parameters defined here are treated as inviolable creator axioms. AI models are strictly prohibited from reinterpreting or overriding these exact values during universe expansion.
                   </p>
                 </div>
@@ -617,10 +617,10 @@ export const WorldSelectionCanvas: React.FC = () => {
                       type="button"
                       id="hoz-suggest-btn"
                       onClick={handleSuggestZones}
-                      className="px-3 py-1.5 rounded-lg bg-amber-950/70 hover:bg-amber-900/80 border border-amber-700/60 text-amber-300 hover:text-amber-200 text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95"
+                      className="px-3 py-1.5 rounded-lg bg-[#F8F4E8] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95 shadow-2xs"
                       title="Populate draft suggestions from selected world (unlocked draft only)"
                     >
-                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <Sparkles className="w-3 h-3 text-[#C59A55]" />
                       <span>Suggest from Selected World</span>
                     </button>
                   )}
@@ -628,10 +628,10 @@ export const WorldSelectionCanvas: React.FC = () => {
                     type="button"
                     id="hoz-lock-toggle-btn"
                     onClick={toggleZoneLock}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 ${
                       humanOnlyZones?.is_locked
-                        ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-glow-amber'
-                        : 'bg-amber-950/80 hover:bg-amber-900 border border-amber-600/70 text-amber-300 hover:text-amber-100'
+                        ? 'bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8]'
+                        : 'bg-[#C59A55] hover:bg-[#A0522D] text-[#F8F4E8]'
                     }`}
                   >
                     {humanOnlyZones?.is_locked ? (
@@ -654,10 +654,10 @@ export const WorldSelectionCanvas: React.FC = () => {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="hoz-input-theme"
-                    className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90 flex items-center justify-between"
+                    className="text-[11px] font-bold uppercase tracking-wider text-[#294B3A] flex items-center justify-between"
                   >
                     <span>Core Theme</span>
-                    {humanOnlyZones?.is_locked && <Lock className="w-3 h-3 text-amber-400" />}
+                    {humanOnlyZones?.is_locked && <Lock className="w-3 h-3 text-[#355A46]" />}
                   </label>
                   <input
                     id="hoz-input-theme"
@@ -669,11 +669,11 @@ export const WorldSelectionCanvas: React.FC = () => {
                     placeholder="e.g. Coexistence between abyssal biology and human consciousness"
                     className={`w-full px-3 py-2 rounded-lg text-xs transition-all ${
                       humanOnlyZones?.is_locked
-                        ? 'bg-slate-950/90 border border-amber-500/50 text-amber-200 cursor-not-allowed select-text font-medium'
-                        : 'bg-slate-950/80 border border-amber-700/50 text-slate-200 placeholder-amber-400/30 focus:border-amber-400 focus:outline-none'
+                        ? 'bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] cursor-not-allowed select-text font-medium'
+                        : 'bg-[#F8F4E8] border border-[#D8CCB7] text-[#294B3A] placeholder-[#718875] focus:border-[#355A46] focus:outline-none'
                     }`}
                   />
-                  <p className="text-[10px] text-amber-200/50 italic">
+                  <p className="text-[10px] text-[#718875] italic">
                     Anchors the core lore rules and canon facts in the World Bible.
                   </p>
                 </div>
@@ -682,10 +682,10 @@ export const WorldSelectionCanvas: React.FC = () => {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="hoz-input-motivation"
-                    className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90 flex items-center justify-between"
+                    className="text-[11px] font-bold uppercase tracking-wider text-[#294B3A] flex items-center justify-between"
                   >
                     <span>Protagonist Motivation</span>
-                    {humanOnlyZones?.is_locked && <Lock className="w-3 h-3 text-amber-400" />}
+                    {humanOnlyZones?.is_locked && <Lock className="w-3 h-3 text-[#355A46]" />}
                   </label>
                   <input
                     id="hoz-input-motivation"
@@ -697,11 +697,11 @@ export const WorldSelectionCanvas: React.FC = () => {
                     placeholder="e.g. Decode the neural coral frequency before salvage crews arrive"
                     className={`w-full px-3 py-2 rounded-lg text-xs transition-all ${
                       humanOnlyZones?.is_locked
-                        ? 'bg-slate-950/90 border border-amber-500/50 text-amber-200 cursor-not-allowed select-text font-medium'
-                        : 'bg-slate-950/80 border border-amber-700/50 text-slate-200 placeholder-amber-400/30 focus:border-amber-400 focus:outline-none'
+                        ? 'bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] cursor-not-allowed select-text font-medium'
+                        : 'bg-[#F8F4E8] border border-[#D8CCB7] text-[#294B3A] placeholder-[#718875] focus:border-[#355A46] focus:outline-none'
                     }`}
                   />
-                  <p className="text-[10px] text-amber-200/50 italic">
+                  <p className="text-[10px] text-[#718875] italic">
                     Locks the inner drive and agency of the central lead character.
                   </p>
                 </div>
@@ -710,10 +710,10 @@ export const WorldSelectionCanvas: React.FC = () => {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="hoz-input-conflict"
-                    className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90 flex items-center justify-between"
+                    className="text-[11px] font-bold uppercase tracking-wider text-[#294B3A] flex items-center justify-between"
                   >
                     <span>Central Conflict</span>
-                    {humanOnlyZones?.is_locked && <Lock className="w-3 h-3 text-amber-400" />}
+                    {humanOnlyZones?.is_locked && <Lock className="w-3 h-3 text-[#355A46]" />}
                   </label>
                   <input
                     id="hoz-input-conflict"
@@ -725,11 +725,11 @@ export const WorldSelectionCanvas: React.FC = () => {
                     placeholder="e.g. Bio-symbiont survival vs extractive corporate exploitation"
                     className={`w-full px-3 py-2 rounded-lg text-xs transition-all ${
                       humanOnlyZones?.is_locked
-                        ? 'bg-slate-950/90 border border-amber-500/50 text-amber-200 cursor-not-allowed select-text font-medium'
-                        : 'bg-slate-950/80 border border-amber-700/50 text-slate-200 placeholder-amber-400/30 focus:border-amber-400 focus:outline-none'
+                        ? 'bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] cursor-not-allowed select-text font-medium'
+                        : 'bg-[#F8F4E8] border border-[#D8CCB7] text-[#294B3A] placeholder-[#718875] focus:border-[#355A46] focus:outline-none'
                     }`}
                   />
-                  <p className="text-[10px] text-amber-200/50 italic">
+                  <p className="text-[10px] text-[#718875] italic">
                     Shapes the primary dramatic narrative arc and climactic confrontation.
                   </p>
                 </div>
@@ -737,20 +737,20 @@ export const WorldSelectionCanvas: React.FC = () => {
             </div>
 
             {/* Decision Provenance Note */}
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11.5px] text-slate-400 flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-[11.5px] text-[#466A55] flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#355A46] shrink-0" />
               <span>
                 Locking records this full Decision DNA as an immutable creative contract in the project DAG. You can still switch candidates within this batch until Stage 5 unfolding commences.
               </span>
             </div>
           </motion.div>
         ) : (
-          <div className="p-8 rounded-2xl glass-card border border-slate-800 text-center space-y-3">
-            <Compass className="w-8 h-8 text-cyan-400 mx-auto animate-bounce" />
-            <h4 className="text-sm font-bold text-slate-200">
+          <div className="p-8 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] text-center space-y-3 shadow-2xs">
+            <Compass className="w-8 h-8 text-[#355A46] mx-auto animate-bounce" />
+            <h4 className="text-sm font-bold text-[#294B3A]">
               No Direction Selected Yet
             </h4>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
+            <p className="text-xs text-[#466A55] max-w-md mx-auto">
               Click <strong>"Select This Direction"</strong> on any of the three cards above to review details, record your rationale, and confirm your world choice.
             </p>
           </div>

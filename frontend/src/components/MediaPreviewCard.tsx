@@ -114,7 +114,7 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
     effectiveDuration > 0 ? Math.min(100, Math.max(0, (currentTime / effectiveDuration) * 100)) : 0;
 
   return (
-    <div className="w-full p-2.5 flex flex-col gap-2 bg-slate-950/80 rounded-lg border border-amber-900/30">
+    <div className="w-full p-2.5 flex flex-col gap-2 bg-[#F8F4E8] rounded-xl border border-[#D8CCB7]">
       {/* Audio element (hidden, with data-testid for compatibility) */}
       <audio
         ref={audioRef}
@@ -147,9 +147,9 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
       />
 
       {/* Script snippet banner with 1-click copy */}
-      <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-amber-950/40 border border-amber-800/40 text-[10px] text-amber-200/90">
+      <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-[#F2EBDD] border border-[#D8CCB7] text-[10px] text-[#294B3A]">
         <div className="flex items-center gap-1.5 overflow-hidden">
-          <Mic className="w-3 h-3 text-amber-400 shrink-0" />
+          <Mic className="w-3 h-3 text-[#C59A55] shrink-0" />
           <span className="truncate italic">
             "{prompt || asset?.prompt || 'Narration snippet'}"
           </span>
@@ -159,12 +159,12 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
           onClick={handleCopySnippet}
           data-testid="media-voice-copy-btn"
           title="Copy spoken script to clipboard"
-          className="shrink-0 p-1 rounded hover:bg-amber-900/50 text-amber-300 transition-colors"
+          className="shrink-0 p-1 rounded hover:bg-[#EAE4D4] text-[#A0522D] transition-colors"
         >
           {isCopied ? (
-            <Check className="w-3 h-3 text-emerald-400" />
+            <Check className="w-3 h-3 text-[#355A46]" />
           ) : (
-            <Copy className="w-3 h-3 text-amber-400/80 hover:text-amber-300" />
+            <Copy className="w-3 h-3 text-[#A0522D] hover:text-[#294B3A]" />
           )}
         </button>
       </div>
@@ -173,14 +173,14 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
       <div className="flex items-center justify-between gap-1 text-[9px]">
         <div
           data-testid="media-voice-persona-badge"
-          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-900 border border-amber-800/50 text-amber-300 font-mono"
+          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] text-[#294B3A] font-mono"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C59A55] animate-pulse" />
           <span className="font-semibold">{personaDisplayName}</span>
-          <span className="text-slate-500">•</span>
-          <span className="text-slate-400">{resolvedProvider}</span>
-          <span className="text-slate-500">•</span>
-          <span className="text-amber-400/70 truncate max-w-[110px]">{voiceId}</span>
+          <span className="text-[#D8CCB7]">•</span>
+          <span className="text-[#466A55]">{resolvedProvider}</span>
+          <span className="text-[#D8CCB7]">•</span>
+          <span className="text-[#A0522D] truncate max-w-[110px]">{voiceId}</span>
         </div>
 
         {/* Download Action */}
@@ -191,7 +191,7 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
           rel="noopener noreferrer"
           data-testid="media-voice-download-btn"
           title="Download narration audio"
-          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium text-slate-400 hover:text-amber-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-amber-700/50 transition-colors"
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium text-[#466A55] hover:text-[#294B3A] bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] transition-colors"
         >
           <Download className="w-2.5 h-2.5" />
           <span>Download</span>
@@ -204,7 +204,7 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
           type="button"
           onClick={togglePlayPause}
           data-testid="media-voice-play-pause-btn"
-          className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-amber-950/50 transition-transform active:scale-95"
+          className="w-7 h-7 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] flex items-center justify-center shrink-0 shadow-xs transition-transform active:scale-95"
           title={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? (
@@ -226,9 +226,9 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
             onInput={handleSeek}
             data-testid="media-voice-progress"
             aria-label="Audio progress slider"
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400 hover:h-2 transition-all"
+            className="w-full h-1.5 bg-[#E4DBCB] rounded-lg appearance-none cursor-pointer accent-[#355A46] hover:h-2 transition-all"
             style={{
-              background: `linear-gradient(to right, rgb(245 158 11) ${progressPercent}%, rgb(30 41 59) ${progressPercent}%)`,
+              background: `linear-gradient(to right, rgb(53 90 70) ${progressPercent}%, rgb(228 219 203) ${progressPercent}%)`,
             }}
           />
         </div>
@@ -236,7 +236,7 @@ const NarrativeAudioPlayer: React.FC<NarrativeAudioPlayerProps> = ({
         {/* Time Tracker */}
         <div
           data-testid="media-voice-time"
-          className="text-[10px] font-mono text-slate-400 shrink-0 tabular-nums"
+          className="text-[10px] font-mono text-[#718875] shrink-0 tabular-nums"
         >
           {formatTime(currentTime)} / {formatTime(effectiveDuration)}
         </div>
@@ -316,16 +316,16 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
   const effectivePrompt = prompt || asset?.prompt;
 
   return (
-    <div className="w-full p-2 flex flex-col gap-2 bg-slate-950/80 rounded-lg border border-purple-900/30">
+    <div className="w-full p-2 flex flex-col gap-2 bg-[#F8F4E8] rounded-xl border border-[#D8CCB7]">
       {/* Motion prompt snippet */}
       {effectivePrompt && (
-        <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-purple-950/30 border border-purple-800/30 text-[9px] text-purple-200/90 overflow-hidden">
-          <Video className="w-2.5 h-2.5 text-purple-400 shrink-0" />
+        <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-[#F2EBDD] border border-[#D8CCB7] text-[9px] text-[#294B3A] overflow-hidden">
+          <Video className="w-2.5 h-2.5 text-[#6A4B67] shrink-0" />
           <span className="truncate italic">"{effectivePrompt}"</span>
         </div>
       )}
       {/* Video element and overlay trigger */}
-      <div className="relative group w-full bg-black rounded overflow-hidden aspect-video flex items-center justify-center">
+      <div className="relative group w-full bg-[#EAE4D4] rounded overflow-hidden aspect-video flex items-center justify-center">
         <video
           ref={videoRef}
           src={assetUrl}
@@ -363,7 +363,7 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
           onClick={onOpenLightbox}
           data-testid="media-video-lightbox-trigger"
           title="Open Theater Lightbox"
-          className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white/80 hover:text-white transition-opacity opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+          className="absolute top-2 right-2 p-1.5 rounded-lg bg-[#294B3A]/70 hover:bg-[#294B3A]/90 text-[#F8F4E8] transition-opacity opacity-0 group-hover:opacity-100 backdrop-blur-xs"
         >
           <Maximize2 className="w-3.5 h-3.5" />
         </button>
@@ -373,14 +373,14 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
       <div className="flex items-center justify-between gap-1 text-[9px]">
         <div
           data-testid="media-video-provider-badge"
-          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-900 border border-purple-800/50 text-purple-300 font-mono"
+          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] text-[#6A4B67] font-mono"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#6A4B67] animate-pulse" />
           <span className="font-semibold">{resolvedProvider}</span>
-          <span className="text-slate-500">•</span>
-          <span className="text-slate-400">{aspectRatio}</span>
-          <span className="text-slate-500">•</span>
-          <span className="text-purple-400/80">{effectiveDuration}s</span>
+          <span className="text-[#D8CCB7]">•</span>
+          <span className="text-[#466A55]">{aspectRatio}</span>
+          <span className="text-[#D8CCB7]">•</span>
+          <span className="text-[#6A4B67]">{effectiveDuration}s</span>
         </div>
 
         {/* Download MP4 */}
@@ -391,7 +391,7 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
           rel="noopener noreferrer"
           data-testid="media-video-download-btn"
           title="Download MP4 video"
-          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium text-slate-400 hover:text-purple-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-purple-700/50 transition-colors"
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium text-[#466A55] hover:text-[#294B3A] bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] transition-colors"
         >
           <Download className="w-2.5 h-2.5" />
           <span>Download MP4</span>
@@ -404,7 +404,7 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
           type="button"
           onClick={togglePlayPause}
           data-testid="media-video-play-pause-btn"
-          className="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-950/50 transition-transform active:scale-95"
+          className="w-7 h-7 rounded-full bg-[#6A4B67] hover:bg-[#52374F] text-[#F8F4E8] flex items-center justify-center shrink-0 shadow-xs transition-transform active:scale-95"
           title={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? (
@@ -426,9 +426,9 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
             onInput={handleSeek}
             data-testid="media-video-progress"
             aria-label="Video progress slider"
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400 hover:h-2 transition-all"
+            className="w-full h-1.5 bg-[#E4DBCB] rounded-lg appearance-none cursor-pointer accent-[#6A4B67] hover:h-2 transition-all"
             style={{
-              background: `linear-gradient(to right, rgb(168 85 247) ${progressPercent}%, rgb(30 41 59) ${progressPercent}%)`,
+              background: `linear-gradient(to right, rgb(106 75 103) ${progressPercent}%, rgb(228 219 203) ${progressPercent}%)`,
             }}
           />
         </div>
@@ -436,7 +436,7 @@ const NarrativeVideoPlayer: React.FC<NarrativeVideoPlayerProps> = ({
         {/* Time Tracker */}
         <div
           data-testid="media-video-time"
-          className="text-[10px] font-mono text-slate-400 shrink-0 tabular-nums"
+          className="text-[10px] font-mono text-[#718875] shrink-0 tabular-nums"
         >
           {formatTime(currentTime)} / {formatTime(effectiveDuration)}
         </div>
@@ -526,7 +526,7 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
   const effectivePrompt = prompt || asset?.prompt || 'Ambient Soundscape';
 
   return (
-    <div className="w-full p-2.5 flex flex-col gap-2 bg-slate-950/80 rounded-lg border border-cyan-900/40">
+    <div className="w-full p-2.5 flex flex-col gap-2 bg-[#F8F4E8] rounded-xl border border-[#D8CCB7]">
       <audio
         ref={audioRef}
         src={assetUrl}
@@ -552,9 +552,9 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
       />
 
       {/* Track Snippet Header with Send-To-Deck */}
-      <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-cyan-950/40 border border-cyan-800/40 text-[10px] text-cyan-200/90">
+      <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-[#F2EBDD] border border-[#D8CCB7] text-[10px] text-[#294B3A]">
         <div className="flex items-center gap-1.5 overflow-hidden">
-          <Music className="w-3 h-3 text-cyan-400 shrink-0" />
+          <Music className="w-3 h-3 text-[#355A46] shrink-0" />
           <span className="truncate italic">"{effectivePrompt}"</span>
         </div>
 
@@ -564,7 +564,7 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
           onClick={handleSendToDeck}
           data-testid="media-audio-send-to-deck-btn"
           title="Send soundscape to persistent Atmosphere Deck"
-          className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 transition-colors text-[9px] font-medium"
+          className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#DDE2D2] hover:bg-[#C8D0BE] text-[#294B3A] border border-[#C8D0BE] transition-colors text-[9px] font-medium"
         >
           <Radio className="w-2.5 h-2.5" />
           <span>Send to Deck</span>
@@ -576,15 +576,15 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
         <div className="flex items-center gap-1.5">
           <span
             data-testid="media-audio-mood-badge"
-            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900 border border-cyan-800/50 text-cyan-300 font-mono capitalize"
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] text-[#294B3A] font-mono capitalize"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#355A46] animate-pulse" />
             {mood}
           </span>
 
           <div
             data-testid="media-audio-provider-badge"
-            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 font-mono"
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] text-[#466A55] font-mono"
           >
             <span>{resolvedProvider}</span>
             <span>•</span>
@@ -602,7 +602,7 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
           rel="noopener noreferrer"
           data-testid="media-audio-download-btn"
           title={`Download ${isMp3 ? 'MP3' : 'WAV'} audio`}
-          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium text-slate-400 hover:text-cyan-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-cyan-700/50 transition-colors"
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium text-[#466A55] hover:text-[#294B3A] bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] transition-colors"
         >
           <Download className="w-2.5 h-2.5" />
           <span>Download {isMp3 ? 'MP3' : 'WAV'}</span>
@@ -615,7 +615,7 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
           type="button"
           onClick={togglePlayPause}
           data-testid="media-audio-play-pause-btn"
-          className="w-7 h-7 rounded-full bg-gradient-to-tr from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-cyan-950/50 transition-transform active:scale-95"
+          className="w-7 h-7 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] flex items-center justify-center shrink-0 shadow-xs transition-transform active:scale-95"
           title={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? (
@@ -637,16 +637,16 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
             onInput={handleSeek}
             data-testid="media-audio-progress"
             aria-label="Audio progress slider"
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400 hover:h-2 transition-all"
+            className="w-full h-1.5 bg-[#E4DBCB] rounded-lg appearance-none cursor-pointer accent-[#355A46] hover:h-2 transition-all"
             style={{
-              background: `linear-gradient(to right, rgb(6 182 212) ${progressPercent}%, rgb(30 41 59) ${progressPercent}%)`,
+              background: `linear-gradient(to right, rgb(53 90 70) ${progressPercent}%, rgb(228 219 203) ${progressPercent}%)`,
             }}
           />
         </div>
 
         {/* In-Card Volume Slider */}
         <div className="flex items-center gap-1 shrink-0" title={`Volume: ${Math.round(inCardVolume * 100)}%`}>
-          <Volume2 className="w-3 h-3 text-slate-400" />
+          <Volume2 className="w-3 h-3 text-[#466A55]" />
           <input
             type="range"
             min="0"
@@ -656,14 +656,14 @@ const NarrativeAudioAtmospherePlayer: React.FC<NarrativeAudioAtmospherePlayerPro
             onChange={handleVolumeChange}
             data-testid="media-audio-volume"
             aria-label="In-card audio volume slider"
-            className="w-12 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+            className="w-12 h-1 bg-[#E4DBCB] rounded-lg appearance-none cursor-pointer accent-[#355A46]"
           />
         </div>
 
         {/* Time Tracker */}
         <div
           data-testid="media-audio-time"
-          className="text-[10px] font-mono text-slate-400 shrink-0 tabular-nums"
+          className="text-[10px] font-mono text-[#718875] shrink-0 tabular-nums"
         >
           {formatTime(currentTime)} / {formatTime(effectiveDuration)}
         </div>
@@ -717,13 +717,13 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
   const renderIcon = () => {
     switch (mediaType) {
       case 'image':
-        return <ImageIcon className="w-4 h-4 text-cyan-400" />;
+        return <ImageIcon className="w-4 h-4 text-[#355A46]" />;
       case 'voice':
-        return <Mic className="w-4 h-4 text-amber-400" />;
+        return <Mic className="w-4 h-4 text-[#C59A55]" />;
       case 'video':
-        return <Video className="w-4 h-4 text-purple-400" />;
+        return <Video className="w-4 h-4 text-[#6A4B67]" />;
       case 'audio':
-        return <Music className="w-4 h-4 text-emerald-400" />;
+        return <Music className="w-4 h-4 text-[#466A55]" />;
     }
   };
 
@@ -745,11 +745,11 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       data-testid={`media-card-${mediaType}`}
-      className={`rounded-xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm overflow-hidden flex flex-col p-3 transition-all duration-200 hover:border-slate-700 ${className}`}
+      className={`rounded-xl border border-[#D8CCB7] bg-[#F8F4E8] overflow-hidden flex flex-col p-3 transition-all duration-200 hover:border-[#355A46] shadow-2xs ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-2">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-300">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#294B3A]">
           {renderIcon()}
           <span>{getMediaTitle()}</span>
         </div>
@@ -759,7 +759,7 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
           {status === 'processing' || status === 'queued' ? (
             <span
               data-testid="media-status-processing"
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 animate-pulse"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE] animate-pulse"
             >
               <RotateCw className="w-2.5 h-2.5 animate-spin" />
               <span>{status === 'queued' ? 'Queued' : 'Synthesizing'}</span>
@@ -767,21 +767,21 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
           ) : status === 'completed' ? (
             <span
               data-testid="media-status-completed"
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-800/60"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]"
             >
-              <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+              <CheckCircle2 className="w-2.5 h-2.5 text-[#355A46]" />
               <span>Ready</span>
             </span>
           ) : status === 'failed' ? (
             <span
               data-testid="media-status-failed"
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-950/80 text-rose-300 border border-rose-800/60"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC]"
             >
-              <AlertCircle className="w-2.5 h-2.5 text-rose-400" />
+              <AlertCircle className="w-2.5 h-2.5 text-[#B8734F]" />
               <span>Failed</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#F2EBDD] text-[#718875] border border-[#D8CCB7]">
               <Clock className="w-2.5 h-2.5" />
               <span>Not synthesized</span>
             </span>
@@ -790,21 +790,21 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
       </div>
 
       {/* Body / Content */}
-      <div className="relative min-h-[110px] flex items-center justify-center bg-slate-950/70 rounded-lg border border-slate-800/40 overflow-hidden">
+      <div className="relative min-h-[110px] flex items-center justify-center bg-[#F2EBDD] rounded-lg border border-[#D8CCB7] overflow-hidden">
         {status === 'processing' || status === 'queued' ? (
           <div className="flex flex-col items-center justify-center p-4 text-center">
             <div className="relative w-8 h-8 mb-2">
-              <div className="absolute inset-0 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
-              <Sparkles className="w-4 h-4 text-cyan-400 absolute inset-0 m-auto animate-pulse" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#355A46]/20 border-t-[#355A46] animate-spin" />
+              <Sparkles className="w-4 h-4 text-[#355A46] absolute inset-0 m-auto animate-pulse" />
             </div>
-            <p className="text-[11px] text-cyan-300 font-medium">Generating multimodal asset</p>
-            <p className="text-[9px] text-slate-500 mt-0.5">Non-blocking background synthesis</p>
+            <p className="text-[11px] text-[#294B3A] font-medium">Generating multimodal asset</p>
+            <p className="text-[9px] text-[#718875] mt-0.5">Non-blocking background synthesis</p>
           </div>
         ) : status === 'failed' ? (
           <div className="flex flex-col items-center justify-center p-3 text-center w-full">
-            <AlertCircle className="w-6 h-6 text-rose-400 mb-1" />
-            <p className="text-[11px] text-rose-300 font-medium">Synthesis Encountered Error</p>
-            <p className="text-[9px] text-rose-400/80 mt-0.5 max-w-[200px] truncate" title={errorMessage || 'Provider generation failed'}>
+            <AlertCircle className="w-6 h-6 text-[#B8734F] mb-1" />
+            <p className="text-[11px] text-[#B8734F] font-medium">Synthesis Encountered Error</p>
+            <p className="text-[9px] text-[#B8734F]/80 mt-0.5 max-w-[200px] truncate" title={errorMessage || 'Provider generation failed'}>
               {errorMessage || 'Generation error'}
             </p>
             {onRetry && (
@@ -812,7 +812,7 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
                 type="button"
                 onClick={onRetry}
                 data-testid="media-retry-btn"
-                className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-medium bg-rose-900/50 hover:bg-rose-900 text-rose-200 border border-rose-700/60 transition-colors"
+                className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#F5E6DC] hover:bg-[#EAE4D4] text-[#B8734F] border border-[#E2BFAC] transition-colors"
               >
                 <RotateCw className="w-3 h-3" />
                 Retry
@@ -834,8 +834,8 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
                   data-testid="media-image-preview"
                   className="w-full h-auto max-h-[160px] object-contain rounded transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-xs text-white font-medium backdrop-blur-[2px] pointer-events-none">
-                  <Maximize2 className="w-4 h-4 text-cyan-400" />
+                <div className="absolute inset-0 bg-[#294B3A]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-xs text-[#F8F4E8] font-medium backdrop-blur-2xs pointer-events-none">
+                  <Maximize2 className="w-4 h-4 text-[#F8F4E8]" />
                   <span>Click to Expand</span>
                 </div>
               </div>
@@ -872,14 +872,14 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
         ) : (
           <div className="flex flex-col items-center justify-center p-3 text-center">
             {renderIcon()}
-            <p className="text-[10px] text-slate-500 mt-1">Ready to synthesize</p>
+            <p className="text-[10px] text-[#718875] mt-1">Ready to synthesize</p>
           </div>
         )}
       </div>
 
       {/* Footer info if completed */}
       {asset && asset.provider_name && (
-        <div className="mt-2 flex items-center justify-between text-[9px] text-slate-500 border-t border-slate-800/60 pt-1.5">
+        <div className="mt-2 flex items-center justify-between text-[9px] text-[#718875] border-t border-[#D8CCB7] pt-1.5">
           <span className="capitalize">{asset.provider_name} Provider</span>
           {asset.mime_type && <span>{asset.mime_type.split('/')[1]?.toUpperCase()}</span>}
         </div>
