@@ -16,13 +16,11 @@ Phase 30.2 completed the senior UX/UI redesign of the global header, stage progr
 ## 2. Key Architecture & Visual Polish Deliverables
 
 ### A. Redesigned TopBar (`frontend/src/components/TopBar.tsx`)
-1. **Brand Identity & Project Thumbnails:**
-   - Left-aligned botanical mark with leaf emblem in soft sage container (`#DDE2D2`).
-   - Editorial brand wordmark: **PRAROHA** in Cormorant Garamond font-serif bold (`#294B3A`).
-   - Subtitle: `Seed → Universe` in clean Inter sans (`#718875`).
-   - Subtle vertical divider separating brand from active project.
-   - Project thumbnail container (36x36px) with active project title dropdown (`#branch-switcher-btn`) and timeline branch details (`Branch: main • TATTVA 2`).
-   - Project thumbnail & branch trigger cleanly shown on tablet & desktop (`sm:block`) and accessible via the Workspace Menu on mobile, eliminating narrow-screen text collision.
+1. **Brand Identity & Project-First Header Composition:**
+   - **Sidebar Brand Ownership:** Desktop permanent sidebar is the sole authoritative home for the PRAROHA brand (`✦ 🌱 PRAROHA: Seed → Universe`), completely eliminating redundant duplicate branding from the workspace header.
+   - **Project-First Workspace Header:** The top navbar opens immediately with the **Active Project Thumbnail & Branch Switcher** (`#branch-switcher-btn`) displaying the globe icon, active universe title, and branch metadata (`Branch: main • TATTVA 2`).
+   - **Expanded Project Width:** Title truncation limits expanded up to `max-w-[420px]`, giving long universe titles breathing room.
+   - **Mobile Drawer Access:** On mobile (`lg:hidden`), the hamburger drawer toggle (`[ ☰ ]`) is cleanly positioned at the left edge next to the project identity, triggering the slide-out drawer containing the full PRAROHA logo and navigation.
 2. **Maximum 3 Visible Utility Controls:**
    - Control 1: `Search` (Desktop pill button with ⌘K hotkey, collapsed to compact icon on tablet, accessible via `⌘K` or overflow menu on mobile).
    - Control 2: `Inspect` (`#inspect-drawer-toggle-btn`) toggle with book icon and active deep green pill styling.

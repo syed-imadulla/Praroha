@@ -35,13 +35,14 @@ Milestone 3 UI Refinement & Polish Achievements:
   - Consolidated Mutation Lab and Counterfactual Replay into Stage 7 Refine sub-views.
   - Removed duplicate `Continue to Stage 4` button from Stage 3 lower banner, leaving single dominant header CTA.
 - Phase 30.2 (Wave 2 Clean Global Header & Shell Simplification):
-  - Redesigned TopBar into a quiet, editorial brand identity with left botanical mark, Cormorant Garamond wordmark, `Seed → Universe` tagline, vertical divider, and project thumbnail + branch selector.
+  - Redesigned TopBar into a quiet, project-first workspace header: desktop sidebar retains authoritative PRAROHA brand mark (`✦ 🌱 PRAROHA: Seed → Universe`), while TopBar leads cleanly with active project identity and branch switcher (`#branch-switcher-btn`) with expanded title width.
   - Evicted developer badges (AI status, Supabase, Demo Universe, Tour, Shortcuts, New Seed) into a unified, calm Workspace Menu (`•••`) popover with diagnostics.
   - Reduced visible header controls to maximum 3: Search (with ⌘K hotkey), Inspect toggle, and Workspace Menu (`•••`).
   - Added Universe Search Modal (`SearchModal.tsx`) with instant cross-universe entity indexing and ⌘K hotkey.
   - Redesigned StageProgressHeader into a calm editorial rail on desktop with thin 1px connectors, green checkmarks, and active underline indicator.
   - Recomposed mobile StageProgressHeader into a non-scrolling compact carousel with Prev/Next buttons, centered stage metadata, and 7 interactive indicator dots.
   - Deduplicated mobile top bar in AppShell and wired `open-mobile-nav` event for seamless sidebar drawer access.
+  - Completed conversational UAT & verification (`30-02-UAT.md` & `30-02-VERIFICATION.md`).
 Status: Phase 30.2 Complete & Verified (154 backend tests passing, `test_phase30_02_shell_simplification.cjs` passing 100%, 8 regression suites passing 100%, clean production build, 0 horizontal scroll across all 6 viewports).
 Last activity: 2026-10-08 — Completed Phase 30.2 Wave 2 Clean Global Header & Shell Simplification.
 
