@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seed Unfold (Praroha) — Visual Flow & Stage Gallery</title>
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(15, 23, 42, 0.7);
+      --card-border: rgba(30, 41, 59, 0.8);
+      --accent-cyan: #06b6d4;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-indigo: #6366f1;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0d172e 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--accent-cyan);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 750px;
+      margin: 0 auto 1.75rem;
+      line-height: 1.6;
+    }
+    .actions-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      color: #020617;
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(6, 182, 212, 0.4);
+    }
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+    }
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.9);
+      color: #fff;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #f1f5f9;
+    }
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 1.25rem;
+      background: var(--accent-cyan);
+      border-radius: 2px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 1.75rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(12px);
+      transition: all 0.25s ease;
+    }
+    .card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+    .card-img-wrap {
+      position: relative;
+      background: #020617;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      transition: transform 0.3s ease;
+    }
+    .card:hover .card-img-wrap img {
+      transform: scale(1.03);
+    }
+    .card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .stage-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      white-space: nowrap;
+    }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.4);
+      padding-top: 1rem;
+    }
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .download-btn:hover {
+      background: var(--accent-cyan);
+      color: #020617;
+    }
+    .view-link {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .view-link:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .lightbox.active {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 95%;
+      max-height: 90vh;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      color: #fff;
+      font-size: 2.5rem;
+      font-weight: 300;
+      cursor: pointer;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge-pill">Seed Unfold • Complete Platform UI Spec</div>
+      <h1>Visual Flow & Stage Gallery</h1>
+      <p class="subtitle">
+        Direct, high-resolution downloadable screenshots covering all 7 stages of universe synthesis, human decision gates, provenance DAGs, and counterfactual simulation engines.
+      </p>
+      <div class="actions-bar">
+        <a href="seed_unfold_gallery.zip" download="seed_unfold_gallery.zip" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download All Images (.ZIP — 16 Files)
+        </a>
+        <a href="http://localhost:5173" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Open Live App (localhost:5173)
+        </a>
+      </div>
+    </header>
+
+    <!-- SECTION 1: Core Synthesis Pipeline -->
+    <h2 class="section-title">Linear Universe Synthesis (Stages 1–7)</h2>
+    <div class="grid">
+
+      <!-- Stage 1 -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_01_stage1_seed_input.png')">
+          <img src="gallery_01_stage1_seed_input.png" alt="Stage 1: Seed Input Canvas">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 1: Seed Input Canvas</div>
+            <span class="stage-tag">Stage 1</span>
+          </div>
+          <div class="card-desc">Formless creative potential entry, preset exploration cards (Ocean City, Orbital Ark, etc.), and seed complexity meters.</div>
+          <div class="card-footer">
+            <a href="gallery_01_stage1_seed_input.png" download="01_stage1_seed_input.png" class="download-btn">Download PNG</a>
+            <a href="gallery_01_stage1_seed_input.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 2 -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_02_stage2_seed_dna.png')">
+          <img src="gallery_02_stage2_seed_dna.png" alt="Stage 2: Distilled Seed DNA">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 2: Distilled Seed DNA</div>
+            <span class="stage-tag">Stage 2</span>
+          </div>
+          <div class="card-desc">Extracted narrative blueprint with 4 core thematic pillars, premise statement, emotional tone, and constraint boundaries.</div>
+          <div class="card-footer">
+            <a href="gallery_02_stage2_seed_dna.png" download="02_stage2_seed_dna.png" class="download-btn">Download PNG</a>
+            <a href="gallery_02_stage2_seed_dna.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 2.5 -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_03_stage2_seed_potential_map.png')">
+          <img src="gallery_03_stage2_seed_potential_map.png" alt="Stage 2.5: Seed Potential Map">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 2.5: Seed Potential Map</div>
+            <span class="stage-tag">Stage 2.5</span>
+          </div>
+          <div class="card-desc">Semantic intelligence categorizing explicit facts, AI-inferred possibilities with accept/reject toggles, and catalytic mysteries.</div>
+          <div class="card-footer">
+            <a href="gallery_03_stage2_seed_potential_map.png" download="03_stage2_seed_potential_map.png" class="download-btn">Download PNG</a>
+            <a href="gallery_03_stage2_seed_potential_map.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 3 -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_04_stage3_divergent_worlds.png')">
+          <img src="gallery_04_stage3_divergent_worlds.png" alt="Stage 3: 3 Divergent Worlds">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 3: 3 Divergent Worlds</div>
+            <span class="stage-tag">Stage 3</span>
+          </div>
+          <div class="card-desc">Conceptual divergence generating Familiar, Radical, and Inverse world trajectories with 4-metric radar exploration profiles.</div>
+          <div class="card-footer">
+            <a href="gallery_04_stage3_divergent_worlds.png" download="04_stage3_divergent_worlds.png" class="download-btn">Download PNG</a>
+            <a href="gallery_04_stage3_divergent_worlds.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 4 -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_05_stage4_world_selection_hoz.png')">
+          <img src="gallery_05_stage4_world_selection_hoz.png" alt="Stage 4: Selection & Human-Only Zones">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 4: Selection & Human-Only Zones</div>
+            <span class="stage-tag">Stage 4</span>
+          </div>
+          <div class="card-desc">Decision DNA commitment, creative priorities, negative exclusions, and Creator-Locked Human-Only Zones with padlock controls.</div>
+          <div class="card-footer">
+            <a href="gallery_05_stage4_world_selection_hoz.png" download="05_stage4_world_selection_hoz.png" class="download-btn">Download PNG</a>
+            <a href="gallery_05_stage4_world_selection_hoz.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 5: Bible -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_06_stage5_codex_world_bible.png')">
+          <img src="gallery_06_stage5_codex_world_bible.png" alt="Stage 5: World Bible Codex">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 5: World Bible Lore</div>
+            <span class="stage-tag">Stage 5 • Tab 1</span>
+          </div>
+          <div class="card-desc">Physical laws, geography, canon facts with CREATOR LOCKED badge, factions, locations, and ambient soundscape player.</div>
+          <div class="card-footer">
+            <a href="gallery_06_stage5_codex_world_bible.png" download="06_stage5_codex_world_bible.png" class="download-btn">Download PNG</a>
+            <a href="gallery_06_stage5_codex_world_bible.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 5: Characters -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_07_stage5_codex_characters.png')">
+          <img src="gallery_07_stage5_codex_characters.png" alt="Stage 5: Characters & Cast">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 5: Characters & Cast</div>
+            <span class="stage-tag">Stage 5 • Tab 2</span>
+          </div>
+          <div class="card-desc">Dr. Althea Thorne portrait, archetype dynamics, narration speech synthesizer, and CREATOR LOCKED motivation pill badge.</div>
+          <div class="card-footer">
+            <a href="gallery_07_stage5_codex_characters.png" download="07_stage5_codex_characters.png" class="download-btn">Download PNG</a>
+            <a href="gallery_07_stage5_codex_characters.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 5: Story Beats -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_08_stage5_codex_story_beats.png')">
+          <img src="gallery_08_stage5_codex_story_beats.png" alt="Stage 5: Story Beats">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 5: Story Beats & Video</div>
+            <span class="stage-tag">Stage 5 • Tab 3</span>
+          </div>
+          <div class="card-desc">Three-act narrative arc, cinematic video player with scrubbing, scene audio score, and CREATOR LOCKED climax conflict.</div>
+          <div class="card-footer">
+            <a href="gallery_08_stage5_codex_story_beats.png" download="08_stage5_codex_story_beats.png" class="download-btn">Download PNG</a>
+            <a href="gallery_08_stage5_codex_story_beats.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 6: Lineage DAG -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_09_stage6_provenance_dag.png')">
+          <img src="gallery_09_stage6_provenance_dag.png" alt="Stage 6: Causal Lineage DAG">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 6: Causal Lineage DAG</div>
+            <span class="stage-tag">Stage 6</span>
+          </div>
+          <div class="card-desc">Interactive provenance graph linking entities to origins (SEED_EXPLICIT, HUMAN_DECISION, DERIVED) with ancestor highlighting.</div>
+          <div class="card-footer">
+            <a href="gallery_09_stage6_provenance_dag.png" download="09_stage6_provenance_dag.png" class="download-btn">Download PNG</a>
+            <a href="gallery_09_stage6_provenance_dag.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 7: Refine & Branch -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_10_stage7_refine_branch.png')">
+          <img src="gallery_10_stage7_refine_branch.png" alt="Stage 7: Refine & Branch Canvas">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Stage 7: Refine & Branch Canvas</div>
+            <span class="stage-tag">Stage 7</span>
+          </div>
+          <div class="card-desc">Entity refinement diffs, continuity verification, version history audit log, and timeline branch switcher.</div>
+          <div class="card-footer">
+            <a href="gallery_10_stage7_refine_branch.png" download="10_stage7_refine_branch.png" class="download-btn">Download PNG</a>
+            <a href="gallery_10_stage7_refine_branch.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 2: Specialized Feature Flows -->
+    <h2 class="section-title">Specialized Intelligence & Counterfactual Flows</h2>
+    <div class="grid">
+
+      <!-- Why Is This Here Modal -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_11_flow_why_is_this_here_modal.png')">
+          <img src="gallery_11_flow_why_is_this_here_modal.png" alt="Why Is This Here Modal">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">"Why is this here?" Explainer</div>
+            <span class="stage-tag">Origin Ledger</span>
+          </div>
+          <div class="card-desc">Deterministic causal provenance modal with amber Human-Only Zone lock callout, completely free of raw CoT leakage.</div>
+          <div class="card-footer">
+            <a href="gallery_11_flow_why_is_this_here_modal.png" download="11_flow_why_is_this_here_modal.png" class="download-btn">Download PNG</a>
+            <a href="gallery_11_flow_why_is_this_here_modal.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mutation Lab -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_12_flow_seed_mutation_lab.png')">
+          <img src="gallery_12_flow_seed_mutation_lab.png" alt="Seed Mutation Lab">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Seed Mutation Lab ("What If?")</div>
+            <span class="stage-tag">Phase 18</span>
+          </div>
+          <div class="card-desc">Premise variable modification, 3-tier Causal Impact Matrix (Affected/Conditional/Preserved), Causal Diff DAG, and branch forking.</div>
+          <div class="card-footer">
+            <a href="gallery_12_flow_seed_mutation_lab.png" download="12_flow_seed_mutation_lab.png" class="download-btn">Download PNG</a>
+            <a href="gallery_12_flow_seed_mutation_lab.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Counterfactual Replay -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_13_flow_counterfactual_replay.png')">
+          <img src="gallery_13_flow_counterfactual_replay.png" alt="Counterfactual Replay Canvas">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Counterfactual Replay Engine</div>
+            <span class="stage-tag">Phase 19</span>
+          </div>
+          <div class="card-desc">50/50 dual-column matrix comparing against rejected candidate worlds, 4 divergence delta cards, and 1-click timeline branching.</div>
+          <div class="card-footer">
+            <a href="gallery_13_flow_counterfactual_replay.png" download="13_flow_counterfactual_replay.png" class="download-btn">Download PNG</a>
+            <a href="gallery_13_flow_counterfactual_replay.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workspace Inspector -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_16_flow_workspace_inspector.png')">
+          <img src="gallery_16_flow_workspace_inspector.png" alt="Workspace Inspector Drawer">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Workspace Inspector Drawer</div>
+            <span class="stage-tag">Side Drawer</span>
+          </div>
+          <div class="card-desc">Docked inspection side panel providing persistent access to Seed DNA, World candidates, and active Causal Lineage DAG.</div>
+          <div class="card-footer">
+            <a href="gallery_16_flow_workspace_inspector.png" download="16_flow_workspace_inspector.png" class="download-btn">Download PNG</a>
+            <a href="gallery_16_flow_workspace_inspector.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guided Tour -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_14_flow_guided_tour.png')">
+          <img src="gallery_14_flow_guided_tour.png" alt="Guided Demo Tour">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">7-Stage Guided Demo Tour</div>
+            <span class="stage-tag">Onboarding</span>
+          </div>
+          <div class="card-desc">Interactive spotlight tour overlay guiding evaluators through the 7-stage creative pipeline step-by-step.</div>
+          <div class="card-footer">
+            <a href="gallery_14_flow_guided_tour.png" download="14_flow_guided_tour.png" class="download-btn">Download PNG</a>
+            <a href="gallery_14_flow_guided_tour.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Keyboard Shortcuts -->
+      <div class="card">
+        <div class="card-img-wrap" onclick="openLightbox('gallery_15_flow_keyboard_shortcuts.png')">
+          <img src="gallery_15_flow_keyboard_shortcuts.png" alt="Keyboard Shortcuts Modal">
+        </div>
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-title">Power-User Keyboard Shortcuts</div>
+            <span class="stage-tag">Productivity</span>
+          </div>
+          <div class="card-desc">Instant hotkey cheat sheet for quick stage jumping (1–7), inspector toggle (i), tour launch (t), and help (?).</div>
+          <div class="card-footer">
+            <a href="gallery_15_flow_keyboard_shortcuts.png" download="15_flow_keyboard_shortcuts.png" class="download-btn">Download PNG</a>
+            <a href="gallery_15_flow_keyboard_shortcuts.png" target="_blank" class="view-link">View Full Size ↗</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightbox-img" src="" alt="Enlarged screenshot">
+  </div>
+
+  <script>
+    function openLightbox(src) {
+      const box = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      box.classList.add('active');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  </script>
+</body>
+</html>
