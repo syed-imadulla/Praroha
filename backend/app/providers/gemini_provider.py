@@ -5,22 +5,20 @@ import httpx
 from pydantic import ValidationError
 
 from backend.app.config import settings
+from backend.app.core.errors import AIProviderError
 from backend.app.models.dna import SeedDNA
 from backend.app.models.world import WorldCandidate
 from backend.app.providers.base import AIProvider
-from backend.app.providers.mock_provider import MockProvider
+from backend.app.providers.mock_provider import CANONICAL_SEED_POTENTIAL, MockProvider
 
 logger = logging.getLogger(__name__)
-
 
 _UNSET = object()
 
 
 class GeminiProvider(AIProvider):
-    """Google Gemini AI Provider communicating via REST API with strict JSON schema validation.
-
-    Provides automatic, graceful fallback to MockProvider when GEMINI_API_KEY is not configured
-    or when API calls encounter network/validation errors.
+    """Google Gemini AI Provider communicating via REST API with strict JSON schema validation,
+    dynamic multi-model failover, and strict production error handling (no silent mock masking).
     """
 
     FALLBACK_WARNING_MESSAGE = (
@@ -31,9 +29,29 @@ class GeminiProvider(AIProvider):
         self,
         api_key: Any = _UNSET,
         model: Optional[str] = None,
+        fallback_models: Optional[List[str]] = None,
+        allow_mock_fallback: bool = False,
+        is_demo: bool = False,
     ):
         self.api_key = settings.GEMINI_API_KEY if api_key is _UNSET else api_key
         self.model = model if model is not None else settings.GEMINI_MODEL
+        self.fallback_models = (
+            list(fallback_models)
+            if fallback_models is not None
+            else list(
+                getattr(
+                    settings,
+                    "GEMINI_FALLBACK_MODELS",
+                    ["gemini-3.1-flash-lite"],
+                )
+            )
+        )
+        self.allow_mock_fallback = (
+            allow_mock_fallback
+            or is_demo
+            or ("demo" in str(self.api_key or "").lower())
+        )
+        self.is_demo = is_demo or ("demo" in str(self.api_key or "").lower())
         self._mock_provider = MockProvider()
         self.last_fallback_warning: Optional[str] = None
 
@@ -41,41 +59,119 @@ class GeminiProvider(AIProvider):
         """Perform a liveness and authentication status check."""
         if not self.api_key:
             return {
-                "status": "fallback",
+                "status": "degraded" if not self.allow_mock_fallback else "fallback",
                 "provider": "gemini",
-                "model": f"{self.model} (mock-fallback)",
-                "message": "GEMINI_API_KEY is not configured; running in mock fallback mode.",
+                "model": f"{self.model} (no-key)",
+                "message": "GEMINI_API_KEY is not configured.",
             }
         return {
             "status": "healthy",
             "provider": "gemini",
             "model": self.model,
+            "fallback_models": self.fallback_models,
             "message": "Gemini API key configured.",
         }
 
+    async def _call_gemini_with_failover(
+        self,
+        payload: Dict[str, Any],
+        timeout_primary: float = 16.0,
+        timeout_fallback: float = 25.0,
+    ) -> Dict[str, Any]:
+        """Call Gemini generateContent with resilient failover across primary and fallback models.
+
+        Returns dict: {"data": parsed_json, "model_used": model_name, "fallback_used": bool}
+        or dict: {"use_mock": True} if allow_mock_fallback is True.
+        Raises AIProviderError on unrecoverable failures when allow_mock_fallback is False.
+        """
+        if not self.api_key:
+            if self.allow_mock_fallback:
+                return {"use_mock": True, "model_used": f"{self.model}-mock-fallback"}
+            raise AIProviderError(
+                message="GEMINI_API_KEY is not configured.",
+                error_code="AI_API_KEY_MISSING",
+                status_code=503,
+                retryable=False,
+            )
+
+        models_to_try = [self.model] + [m for m in self.fallback_models if m != self.model]
+        last_error: Optional[Exception] = None
+
+        for idx, model_name in enumerate(models_to_try):
+            timeout = timeout_primary if idx == 0 else timeout_fallback
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
+            headers = {
+                "x-goog-api-key": str(self.api_key),
+                "Content-Type": "application/json",
+            }
+            try:
+                async with httpx.AsyncClient(timeout=timeout) as client:
+                    response = await client.post(url, headers=headers, json=payload)
+
+                    if response.status_code in (401, 403):
+                        logger.error("Gemini API authentication failed (HTTP %s): %s", response.status_code, response.text)
+                        if self.allow_mock_fallback:
+                            return {"use_mock": True, "model_used": f"{model_name}-mock-fallback"}
+                        raise AIProviderError(
+                            message=f"Gemini API authentication failed (HTTP {response.status_code}). Invalid or unauthorized key.",
+                            error_code="AI_AUTH_FAILED",
+                            status_code=502,
+                            retryable=False,
+                            details={"status_code": response.status_code, "response": response.text[:200]},
+                        )
+
+                    if response.status_code == 400:
+                        err_text = response.text
+                        logger.warning("Gemini model %s returned 400 Bad Request: %s", model_name, err_text)
+                        if "not found" in err_text.lower() or "unsupported" in err_text.lower():
+                            last_error = ValueError(f"Model {model_name} unsupported")
+                            continue
+                        if self.allow_mock_fallback:
+                            return {"use_mock": True, "model_used": f"{model_name}-mock-fallback"}
+                        raise AIProviderError(
+                            message=f"Gemini API Bad Request (HTTP 400): {err_text[:200]}",
+                            error_code="AI_BAD_REQUEST",
+                            status_code=400,
+                            retryable=False,
+                        )
+
+                    response.raise_for_status()
+                    data = response.json()
+                    return {
+                        "data": data,
+                        "model_used": model_name,
+                        "fallback_used": idx > 0,
+                    }
+
+            except AIProviderError:
+                raise
+            except Exception as exc:
+                last_error = exc
+                logger.warning(
+                    "Gemini model '%s' failed (%s: %s). Attempting next failover model...",
+                    model_name,
+                    type(exc).__name__,
+                    exc,
+                )
+
+        if self.allow_mock_fallback:
+            logger.warning(
+                "All Gemini models exhausted (%s: %s). Falling back gracefully to MockProvider.",
+                models_to_try,
+                last_error,
+            )
+            return {"use_mock": True, "model_used": f"{self.model}-mock-fallback"}
+
+        raise AIProviderError(
+            message=f"Gemini AI generation failed across all models ({models_to_try}): {last_error}",
+            error_code="AI_GENERATION_FAILED",
+            status_code=503,
+            retryable=True,
+            details={"models_attempted": models_to_try, "last_error": str(last_error)},
+        )
+
     async def extract_dna(self, seed: str) -> Dict[str, Any]:
         """Extract structured Seed DNA from raw user seed text using Gemini REST API."""
-        if not self.api_key:
-            logger.info("No Gemini API key configured. Using MockProvider fallback.")
-            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
-            mock_res = await self._mock_provider.extract_dna(seed)
-            return {
-                "raw_seed": seed,
-                "seed_dna": mock_res["seed_dna"],
-                "model_used": f"{self.model}-mock-fallback",
-                "fallback_used": True,
-                "warning": self.FALLBACK_WARNING_MESSAGE,
-            }
-
-        endpoint_url = (
-            f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self.model}:generateContent"
-        )
-        headers = {
-            "x-goog-api-key": self.api_key,
-            "Content-Type": "application/json",
-        }
-
         payload = {
             "systemInstruction": {
                 "parts": [
@@ -136,13 +232,20 @@ class GeminiProvider(AIProvider):
             },
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(endpoint_url, headers=headers, json=payload)
-                response.raise_for_status()
-                data = response.json()
+        call_res = await self._call_gemini_with_failover(payload)
+        if call_res.get("use_mock"):
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+            mock_res = await self._mock_provider.extract_dna(seed)
+            return {
+                "raw_seed": seed,
+                "seed_dna": mock_res["seed_dna"],
+                "model_used": call_res.get("model_used", f"{self.model}-mock-fallback"),
+                "fallback_used": True,
+                "warning": self.FALLBACK_WARNING_MESSAGE,
+            }
 
-            candidates = data.get("candidates", [])
+        try:
+            candidates = call_res["data"].get("candidates", [])
             if not candidates:
                 raise ValueError("No candidates returned from Gemini API")
 
@@ -156,38 +259,38 @@ class GeminiProvider(AIProvider):
             return {
                 "raw_seed": seed,
                 "seed_dna": validated_dna.model_dump(),
-                "model_used": self.model,
-                "fallback_used": False,
+                "model_used": call_res.get("model_used", self.model),
+                "fallback_used": call_res.get("fallback_used", False),
             }
-
-        except (httpx.HTTPError, json.JSONDecodeError, ValidationError, ValueError, Exception) as exc:
-            logger.warning(
-                "Gemini API call failed (%s: %s). Falling back gracefully to MockProvider.",
-                type(exc).__name__,
-                exc,
+        except Exception as exc:
+            if self.allow_mock_fallback:
+                self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+                mock_res = await self._mock_provider.extract_dna(seed)
+                return {
+                    "raw_seed": seed,
+                    "seed_dna": mock_res["seed_dna"],
+                    "model_used": f"{self.model}-mock-fallback",
+                    "fallback_used": True,
+                    "warning": self.FALLBACK_WARNING_MESSAGE,
+                }
+            raise AIProviderError(
+                message=f"Gemini DNA extraction output parsing failed: {exc}",
+                error_code="AI_PARSE_FAILED",
+                status_code=502,
+                retryable=True,
             )
-            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
-            mock_res = await self._mock_provider.extract_dna(seed)
-            return {
-                "raw_seed": seed,
-                "seed_dna": mock_res["seed_dna"],
-                "model_used": f"{self.model}-mock-fallback",
-                "fallback_used": True,
-                "warning": self.FALLBACK_WARNING_MESSAGE,
-            }
 
     async def extract_potential(
         self, seed: str, dna: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """Extract explicit, inferred, and open possibilities from seed and DNA using Gemini REST API."""
-        if not self.api_key:
-            logger.info("No Gemini API key configured. Using MockProvider potential fallback.")
-            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
-            return await self._mock_provider.extract_potential(seed, dna)
+        # Canonical Demo Fixture Determinism
+        normalized = seed.strip().lower().rstrip(".")
+        if normalized == "a child discovers a forgotten city beneath the ocean" and self.is_demo:
+            return [dict(item) for item in CANONICAL_SEED_POTENTIAL]
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
         payload = {
-            "system_instruction": {
+            "systemInstruction": {
                 "parts": [
                     {
                         "text": (
@@ -230,13 +333,13 @@ class GeminiProvider(AIProvider):
             },
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.post(url, json=payload)
-                resp.raise_for_status()
-                data = resp.json()
+        call_res = await self._call_gemini_with_failover(payload)
+        if call_res.get("use_mock"):
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+            return await self._mock_provider.extract_potential(seed, dna)
 
-            candidates = data.get("candidates", [])
+        try:
+            candidates = call_res["data"].get("candidates", [])
             if not candidates:
                 raise ValueError("No candidates returned from Gemini API")
 
@@ -262,14 +365,16 @@ class GeminiProvider(AIProvider):
                 })
             return results
 
-        except (httpx.HTTPError, json.JSONDecodeError, ValidationError, ValueError, Exception) as exc:
-            logger.warning(
-                "Gemini extract_potential API call failed (%s: %s). Falling back gracefully to MockProvider.",
-                type(exc).__name__,
-                exc,
+        except Exception as exc:
+            if self.allow_mock_fallback:
+                self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+                return await self._mock_provider.extract_potential(seed, dna)
+            raise AIProviderError(
+                message=f"Gemini potential extraction parsing failed: {exc}",
+                error_code="AI_PARSE_FAILED",
+                status_code=502,
+                retryable=True,
             )
-            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
-            return await self._mock_provider.extract_potential(seed, dna)
 
     async def generate_worlds(
         self, dna: Dict[str, Any], potential_items: Optional[List[Dict[str, Any]]] = None
@@ -277,23 +382,9 @@ class GeminiProvider(AIProvider):
         """Generate exactly three high-contrast candidate worlds based on Seed DNA and Seed Potential items."""
         # 1. Canonical Demo Fixture Determinism (strictly evaluate against immutable raw_seed)
         raw_seed = (dna.get("raw_seed") or "").strip().lower().rstrip(".")
-        if raw_seed == "a child discovers a forgotten city beneath the ocean":
+        if raw_seed == "a child discovers a forgotten city beneath the ocean" and self.is_demo:
             logger.info("Canonical ocean seed detected; deterministically returning canonical demo fixtures.")
             return await self._mock_provider.generate_worlds(dna, potential_items=potential_items)
-
-        # 2. Check API key
-        if not self.api_key:
-            logger.info("No Gemini API key configured. Using MockProvider fallback for world generation.")
-            return await self._mock_provider.generate_worlds(dna, potential_items=potential_items)
-
-        endpoint_url = (
-            f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self.model}:generateContent"
-        )
-        headers = {
-            "x-goog-api-key": self.api_key,
-            "Content-Type": "application/json",
-        }
 
         # Filter potential items
         accepted = [item["label"] for item in (potential_items or []) if item.get("user_status") == "accepted"]
@@ -304,11 +395,11 @@ class GeminiProvider(AIProvider):
             f"Seed DNA Specification:\n{json.dumps(dna, indent=2, default=str)}\n\n"
         )
         if accepted:
-            guidance_text += f"MANDATORY CREATIVE PILLARS (Creator-Accepted Possibilities - MUST incorporate and highlight):\n" + "\n".join(f"- {a}" for a in accepted) + "\n\n"
+            guidance_text += "MANDATORY CREATIVE PILLARS (Creator-Accepted Possibilities - MUST incorporate and highlight):\n" + "\n".join(f"- {a}" for a in accepted) + "\n\n"
         if rejected:
-            guidance_text += f"STRICT NEGATIVE CONSTRAINTS (Creator-Rejected Concepts - DO NOT include or evoke):\n" + "\n".join(f"- {r}" for r in rejected) + "\n\n"
+            guidance_text += "STRICT NEGATIVE CONSTRAINTS (Creator-Rejected Concepts - DO NOT include or evoke):\n" + "\n".join(f"- {r}" for r in rejected) + "\n\n"
         if open_dilemmas:
-            guidance_text += f"CATALYTIC DILEMMAS (Open Mysteries - use to inspire candidate dramatic tensions):\n" + "\n".join(f"- {o}" for o in open_dilemmas) + "\n\n"
+            guidance_text += "CATALYTIC DILEMMAS (Open Mysteries - use to inspire candidate dramatic tensions):\n" + "\n".join(f"- {o}" for o in open_dilemmas) + "\n\n"
 
         payload = {
             "systemInstruction": {
@@ -374,7 +465,7 @@ class GeminiProvider(AIProvider):
                                     "conceptual_distance": {"type": "INTEGER"},
                                     "feasibility": {"type": "INTEGER"},
                                     "summary": {"type": "STRING"},
-                                },
+                                    },
                                 "required": ["seed_fidelity", "novelty", "conceptual_distance", "feasibility", "summary"],
                             },
                             "emphasized_potential_labels": {
@@ -401,13 +492,13 @@ class GeminiProvider(AIProvider):
             },
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=35.0) as client:
-                response = await client.post(endpoint_url, headers=headers, json=payload)
-                response.raise_for_status()
-                data = response.json()
+        call_res = await self._call_gemini_with_failover(payload, timeout_primary=20.0, timeout_fallback=28.0)
+        if call_res.get("use_mock"):
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+            return await self._mock_provider.generate_worlds(dna, potential_items=potential_items)
 
-            candidates = data.get("candidates", [])
+        try:
+            candidates = call_res["data"].get("candidates", [])
             if not candidates:
                 raise ValueError("No candidates returned from Gemini API")
 
@@ -427,14 +518,16 @@ class GeminiProvider(AIProvider):
 
             return validated_candidates
 
-        except (httpx.HTTPError, json.JSONDecodeError, ValidationError, ValueError, Exception) as exc:
-            logger.warning(
-                "Gemini generate_worlds call failed (%s: %s). Falling back gracefully to MockProvider.",
-                type(exc).__name__,
-                exc,
+        except Exception as exc:
+            if self.allow_mock_fallback:
+                self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+                return await self._mock_provider.generate_worlds(dna, potential_items=potential_items)
+            raise AIProviderError(
+                message=f"Gemini world generation parsing failed: {exc}",
+                error_code="AI_PARSE_FAILED",
+                status_code=502,
+                retryable=True,
             )
-            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
-            return await self._mock_provider.generate_worlds(dna, potential_items=potential_items)
 
     async def unfold_stage(
         self, stage: str, context: Dict[str, Any]
@@ -446,72 +539,60 @@ class GeminiProvider(AIProvider):
         """Unfold the entire universe (World Bible, Characters, Relationships, Scenes) for the selected world."""
         # 1. Canonical Demo Fixture Determinism (strictly evaluate against immutable raw_seed)
         raw_seed = (context.get("raw_seed") or context.get("seed") or "").strip().lower().rstrip(".")
-        if raw_seed == "a child discovers a forgotten city beneath the ocean":
+        if raw_seed == "a child discovers a forgotten city beneath the ocean" and self.is_demo:
             logger.info("Canonical ocean seed detected; deterministically returning canonical demo fixtures for selected world.")
             return await self._mock_provider.unfold_universe(context)
 
-        # 2. Check API key
-        if not self.api_key:
-            logger.info("No Gemini API key configured. Using MockProvider fallback for universe unfolding.")
-            return await self._mock_provider.unfold_universe(context)
+        system_instruction = (
+            "You are an expert world-builder and narrative architect in the Seed Unfold creative engine.\n"
+            "Given a Seed DNA, a chosen World Candidate, and creator rationale, expand the world into a 4-layer mini-universe:\n"
+            "1. World Bible (geography, physics_rules, history_timeline, factions, canon_facts, key_locations with visual_prompts, visual_style_prompt).\n"
+            "2. Characters (2 to 4 core cast members grounded in World Bible rules, with archetypes, motivations, conflicts, visual_prompts).\n"
+            "3. Relationships (socio-emotional dynamics, tension/alliance types between characters).\n"
+            "4. Scenes (2 to 3 pivotal narrative scenes with dramatic questions, conflicts, outcomes, and visual_prompts).\n"
+            "Strictly adhere to the DECISION DNA CREATIVE CONTRACT if present:\n"
+            "- Emphasize mandatory creative priorities across all 4 layers.\n"
+            "- Strictly avoid negative guardrails and rejected directions.\n"
+            "- Ground all character motivations, lore rules, and scene conflicts in the creator rationale.\n"
+            "Output strictly a valid JSON object matching the required schema with keys: 'world_bible', 'characters', 'relationships', 'scenes'."
+        )
 
-        # 3. Call Gemini if configured, with graceful fallback to MockProvider
+        contract_text = self.format_decision_dna_contract(context)
+        user_prompt = (
+            f"SEED: {context.get('seed')}\n"
+            f"SEED DNA: {json.dumps(context.get('seed_dna', {}), default=str)}\n"
+            f"SELECTED WORLD: {json.dumps(context.get('selected_world', {}), default=str)}\n"
+            f"CREATOR RATIONALE: {context.get('creator_rationale') or 'Focus on world depth and dynamic tension'}\n"
+        )
+        if contract_text:
+            user_prompt += f"\n{contract_text}\n"
+
+        payload = {
+            "systemInstruction": {"parts": [{"text": system_instruction}]},
+            "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
+            "generationConfig": {
+                "temperature": 0.7,
+                "responseMimeType": "application/json",
+            },
+        }
+
+        call_res = await self._call_gemini_with_failover(payload, timeout_primary=22.0, timeout_fallback=30.0)
+        if call_res.get("use_mock"):
+            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+            res = await self._mock_provider.unfold_universe(context)
+            if isinstance(res, dict):
+                res["_warning"] = self.FALLBACK_WARNING_MESSAGE
+            return res
+
         try:
-            endpoint_url = (
-                f"https://generativelanguage.googleapis.com/v1beta/models/"
-                f"{self.model}:generateContent"
-            )
-            headers = {
-                "x-goog-api-key": self.api_key,
-                "Content-Type": "application/json",
-            }
+            candidates = call_res["data"].get("candidates", [])
+            if not candidates:
+                raise ValueError("No candidates returned from Gemini API")
 
-            system_instruction = (
-                "You are an expert world-builder and narrative architect in the Seed Unfold creative engine.\n"
-                "Given a Seed DNA, a chosen World Candidate, and creator rationale, expand the world into a 4-layer mini-universe:\n"
-                "1. World Bible (geography, physics rules, history timeline, factions, canon facts, key locations with visual prompts, visual style prompt).\n"
-                "2. Characters (2 to 4 core cast members grounded in World Bible rules, with archetypes, motivations, conflicts, visual prompts).\n"
-                "3. Relationships (socio-emotional dynamics, tension/alliance types between characters).\n"
-                "4. Scenes (2 to 3 pivotal narrative scenes with dramatic questions, conflicts, outcomes, and visual prompts).\n"
-                "Strictly adhere to the DECISION DNA CREATIVE CONTRACT if present:\n"
-                "- Emphasize mandatory creative priorities across all 4 layers.\n"
-                "- Strictly avoid negative guardrails and rejected directions.\n"
-                "- Ground all character motivations, lore rules, and scene conflicts in the creator rationale.\n"
-                "Output strictly a valid JSON object matching the required schema."
-            )
+            part_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            if not part_text:
+                raise ValueError("Empty content text in Gemini candidate part")
 
-            # Assemble Decision DNA contract if available
-            contract_text = self.format_decision_dna_contract(context)
-
-            user_prompt = (
-                f"SEED: {context.get('seed')}\n"
-                f"SEED DNA: {json.dumps(context.get('seed_dna', {}), default=str)}\n"
-                f"SELECTED WORLD: {json.dumps(context.get('selected_world', {}), default=str)}\n"
-                f"CREATOR RATIONALE: {context.get('creator_rationale') or 'Focus on world depth and dynamic tension'}\n"
-            )
-            if contract_text:
-                user_prompt += f"\n{contract_text}\n"
-
-            payload = {
-                "systemInstruction": {"parts": [{"text": system_instruction}]},
-                "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
-                "generationConfig": {
-                    "temperature": 0.7,
-                    "responseMimeType": "application/json",
-                },
-            }
-
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(endpoint_url, headers=headers, json=payload)
-                response.raise_for_status()
-                data = response.json()
-
-            part_text = (
-                data.get("candidates", [{}])[0]
-                .get("content", {})
-                .get("parts", [{}])[0]
-                .get("text", "")
-            )
             parsed = json.loads(part_text)
             if not isinstance(parsed, dict) or "world_bible" not in parsed:
                 raise ValueError("Incomplete or malformed universe JSON from Gemini")
@@ -519,16 +600,36 @@ class GeminiProvider(AIProvider):
             return parsed
 
         except Exception as exc:
-            logger.warning(
-                "Gemini unfold_universe call failed (%s: %s). Falling back gracefully to MockProvider.",
-                type(exc).__name__,
-                exc,
+            if self.allow_mock_fallback:
+                self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
+                res = await self._mock_provider.unfold_universe(context)
+                if isinstance(res, dict):
+                    res["_warning"] = self.FALLBACK_WARNING_MESSAGE
+                return res
+            raise AIProviderError(
+                message=f"Gemini universe unfolding parsing failed: {exc}",
+                error_code="AI_PARSE_FAILED",
+                status_code=502,
+                retryable=True,
             )
-            self.last_fallback_warning = self.FALLBACK_WARNING_MESSAGE
-            res = await self._mock_provider.unfold_universe(context)
-            if isinstance(res, dict):
-                res["_warning"] = self.FALLBACK_WARNING_MESSAGE
-            return res
+
+    async def generate_json(self, system_instruction: str, user_prompt: str) -> Optional[Dict[str, Any]]:
+        """Generic JSON generation helper for semantic analysis."""
+        payload = {
+            "systemInstruction": {"parts": [{"text": system_instruction}]},
+            "contents": [{"parts": [{"text": user_prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json"},
+        }
+        try:
+            call_res = await self._call_gemini_with_failover(payload)
+            if call_res.get("use_mock"):
+                return None
+            part_text = call_res["data"].get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            if part_text:
+                return json.loads(part_text)
+        except Exception as exc:
+            logger.warning("generate_json helper failed: %s", exc)
+        return None
 
     @staticmethod
     def format_decision_dna_contract(context: Dict[str, Any]) -> str:
@@ -588,5 +689,3 @@ class GeminiProvider(AIProvider):
 
         contract_lines.append("=======================================")
         return "\n".join(contract_lines)
-
-

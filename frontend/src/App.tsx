@@ -8,81 +8,9 @@ import { useWorkspaceStore } from './store/workspaceStore';
 import { AppShell } from './components/shell/AppShell';
 import { CreationCard, CreationItem } from './components/creation';
 
-const CANONICAL_CREATIONS_SHOWCASE: CreationItem[] = [
-  {
-    id: 'demo-img',
-    title: 'Mountain Sunset',
-    type: 'Image',
-    timestamp: '2 min ago',
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80',
-    isFavorite: false,
-  },
-  {
-    id: 'demo-story',
-    title: 'The Whispering Grove',
-    type: 'Story',
-    timestamp: '45 min ago',
-    imageUrl: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600&auto=format&fit=crop&q=80',
-    isFavorite: true,
-  },
-  {
-    id: 'demo-sound',
-    title: 'Dreamscape Reverie',
-    type: 'Sound',
-    timestamp: '1 hr ago',
-    imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
-    isFavorite: false,
-  },
-  {
-    id: 'demo-vid',
-    title: 'Forest Canopy Dawn',
-    type: 'Video',
-    timestamp: '3 hrs ago',
-    imageUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&auto=format&fit=crop&q=80',
-    isFavorite: false,
-  },
-  {
-    id: 'demo-chat',
-    title: 'Philosopher of the Glade',
-    type: 'Chat',
-    timestamp: 'Yesterday',
-    imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
-    isFavorite: true,
-  },
-  {
-    id: 'demo-fallback',
-    title: 'Awaiting Flora Vision',
-    type: 'Image',
-    timestamp: 'Just now',
-    isFavorite: false,
-  },
-];
-
-const CANONICAL_GRAVEYARD_SHOWCASE: CreationItem[] = [
-  {
-    id: 'grave-1',
-    title: 'Floating Islands',
-    type: 'Image',
-    timestamp: '2 days ago',
-    deletedAt: '2 days ago',
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80',
-    isDeleted: true,
-  },
-  {
-    id: 'grave-2',
-    title: 'Forgotten Chronicle',
-    type: 'Story',
-    timestamp: '4 days ago',
-    deletedAt: '4 days ago',
-    imageUrl: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600&auto=format&fit=crop&q=80',
-    isDeleted: true,
-  },
-];
-
 export const App: React.FC = () => {
-  const [creationsGallery, setCreationsGallery] = useState<CreationItem[]>(CANONICAL_CREATIONS_SHOWCASE);
-  const [graveyardGallery, setGraveyardGallery] = useState<CreationItem[]>(CANONICAL_GRAVEYARD_SHOWCASE);
   const [selectedCreationToast, setSelectedCreationToast] = useState<string | null>(null);
+  const [confirmPermanentDeleteId, setConfirmPermanentDeleteId] = useState<string | null>(null);
 
   const {
     setHealth,
@@ -93,7 +21,86 @@ export const App: React.FC = () => {
     selectedWorldId,
     activeNav,
     setActiveNav,
+    hydrateProject,
+    resetWorkspace,
+    creations,
+    isLoadingCreations,
+    creationsError,
+    fetchCreations,
+    graveyard,
+    isLoadingGraveyard,
+    graveyardError,
+    fetchGraveyard,
+    deleteProjectAction,
+    restoreProjectAction,
+    permanentlyDeleteProjectAction,
   } = useWorkspaceStore();
+
+  useEffect(() => {
+    if (activeNav === 'creations') {
+      fetchCreations();
+    } else if (activeNav === 'graveyard') {
+      fetchGraveyard();
+    }
+  }, [activeNav, fetchCreations, fetchGraveyard]);
+
+
+  const [isHydrating, setIsHydrating] = useState(true);
+  const [hydrationError, setHydrationError] = useState<string | null>(null);
+
+  // Deep routing & authoritative hydration from PostgreSQL
+  useEffect(() => {
+    const handleRoute = async () => {
+      const match = window.location.pathname.match(/^\/projects\/([a-zA-Z0-9-]+)$/);
+      if (match) {
+        const projectId = match[1];
+        if (activeProject?.id !== projectId) {
+          setIsHydrating(true);
+          try {
+            const res = await apiClient.getProjectBundle(projectId);
+            if (res.success && res.data) {
+              hydrateProject(res.data);
+            } else {
+              setHydrationError("Project not found.");
+            }
+          } catch (err) {
+            setHydrationError("Failed to load project.");
+          } finally {
+            setIsHydrating(false);
+          }
+          return;
+        }
+      } else if (window.location.pathname === '/' && activeProject) {
+        // If user navigated back to root but store has active project, clear it
+        resetWorkspace();
+      }
+      setIsHydrating(false);
+    };
+
+    handleRoute();
+
+    const handlePopState = () => {
+      handleRoute();
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []); // Run on mount and popstate
+
+  // Sync URL to active project changes
+  useEffect(() => {
+    if (!isHydrating) {
+      if (activeProject) {
+        const newPath = `/projects/${activeProject.id}`;
+        if (window.location.pathname !== newPath) {
+          window.history.pushState(null, '', newPath);
+        }
+      } else {
+        if (window.location.pathname !== '/') {
+          window.history.pushState(null, '', '/');
+        }
+      }
+    }
+  }, [activeProject, isHydrating]);
 
   useEffect(() => {
     // Initial health check against backend API
@@ -125,6 +132,37 @@ export const App: React.FC = () => {
     }
   }, [activeProject, unfoldedUniverse, selectedWorldId, fetchUnfoldedUniverse, fetchActiveSelection]);
 
+  if (isHydrating) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#F8F4E8]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#294B3A] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#294B3A] font-serif text-lg">Unearthing project...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hydrationError) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#F8F4E8]">
+        <div className="max-w-md p-8 bg-white border border-[#D5CDB4] rounded-2xl shadow-sm text-center">
+          <h2 className="text-2xl font-serif text-[#294B3A] mb-4">Cannot Open Project</h2>
+          <p className="text-[#394840] mb-6">{hydrationError}</p>
+          <button 
+            onClick={() => {
+              window.history.pushState(null, '', '/');
+              window.location.reload();
+            }}
+            className="btn-sage-primary"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AppShell activeNav={activeNav} onNavChange={setActiveNav}>
       {activeNav === 'home' ? (
@@ -151,24 +189,81 @@ export const App: React.FC = () => {
               </p>
             </div>
 
-            {/* 3-column gallery using canonical CreationCard */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
-              {creationsGallery.map((item) => (
-                <CreationCard
-                  key={item.id}
-                  creation={item}
-                  onOpen={(c) => setSelectedCreationToast(`Opened: ${c.title}`)}
-                  onToggleFavorite={(c) => {
-                    setCreationsGallery((prev) =>
-                      prev.map((x) => (x.id === c.id ? { ...x, isFavorite: !x.isFavorite } : x))
-                    );
+            {/* My Creations dynamic content */}
+            {isLoadingCreations ? (
+              <div className="flex flex-col items-center justify-center p-16 text-center text-[#718875]">
+                <div className="animate-spin w-8 h-8 border-2 border-[#294B3A] border-t-transparent rounded-full mb-3" />
+                <p className="text-sm font-medium">Loading your creations...</p>
+              </div>
+            ) : creationsError ? (
+              <div className="p-12 text-center text-[#B85C46] flex flex-col items-center gap-3">
+                <p className="text-sm">Could not load your creations.</p>
+                <button
+                  type="button"
+                  onClick={() => fetchCreations()}
+                  className="btn-sage-primary text-xs"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : creations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-16 text-center space-y-4">
+                <p className="text-base text-[#718875] font-serif">No creations yet.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.history.pushState({}, '', '/');
+                    resetWorkspace();
+                    setActiveNav('home');
                   }}
-                  onAction={(actionKey, c) => {
-                    setSelectedCreationToast(`Action "${actionKey}" on: ${c.title}`);
-                  }}
-                />
-              ))}
-            </div>
+                  className="btn-sage-primary text-sm"
+                >
+                  Create your first world
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
+                {creations.map((proj) => {
+                  const creationItem: CreationItem = {
+                    id: proj.id,
+                    title: proj.title,
+                    type: 'story',
+                    timestamp: new Date(proj.updated_at || proj.created_at).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }),
+                    description: proj.seed_text || 'An unfolding world.',
+                  };
+                  return (
+                    <CreationCard
+                      key={proj.id}
+                      creation={creationItem}
+                      onOpen={(c) => {
+                        window.history.pushState({}, '', `/projects/${c.id}`);
+                        setActiveNav('home');
+                        window.dispatchEvent(new PopStateEvent('popstate'));
+                      }}
+                      onAction={async (actionKey, c) => {
+                        if (actionKey === 'delete') {
+                          const ok = await deleteProjectAction(c.id);
+                          if (ok) {
+                            setSelectedCreationToast(`Moved to Graveyard: ${c.title}`);
+                          }
+                        } else if (actionKey === 'open') {
+                          window.history.pushState({}, '', `/projects/${c.id}`);
+                          setActiveNav('home');
+                          window.dispatchEvent(new PopStateEvent('popstate'));
+                        } else {
+                          setSelectedCreationToast(`Action "${actionKey}" on: ${c.title}`);
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            )}
 
             {selectedCreationToast && (
               <div
@@ -190,29 +285,73 @@ export const App: React.FC = () => {
               </p>
             </div>
 
-            {/* Graveyard cards using canonical CreationCard variant="graveyard" */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
-              {graveyardGallery.map((item) => (
-                <CreationCard
-                  key={item.id}
-                  creation={item}
-                  variant="graveyard"
-                  onOpen={(c) => setSelectedCreationToast(`Inspect deleted: ${c.title}`)}
-                  onAction={(actionKey, c) => {
-                    if (actionKey === 'restore') {
-                      setGraveyardGallery((prev) => prev.filter((x) => x.id !== c.id));
-                      setCreationsGallery((prev) => [...prev, { ...c, isDeleted: false }]);
-                      setSelectedCreationToast(`Restored seed: ${c.title}`);
-                    } else if (actionKey === 'delete_permanently') {
-                      setGraveyardGallery((prev) => prev.filter((x) => x.id !== c.id));
-                      setSelectedCreationToast(`Permanently released: ${c.title}`);
-                    } else {
-                      setSelectedCreationToast(`Action "${actionKey}" on: ${c.title}`);
-                    }
-                  }}
-                />
-              ))}
-            </div>
+            {/* Graveyard dynamic content */}
+            {isLoadingGraveyard ? (
+              <div className="flex flex-col items-center justify-center p-16 text-center text-[#718875]">
+                <div className="animate-spin w-8 h-8 border-2 border-[#294B3A] border-t-transparent rounded-full mb-3" />
+                <p className="text-sm font-medium">Loading your graveyard...</p>
+              </div>
+            ) : graveyardError ? (
+              <div className="p-12 text-center text-[#B85C46] flex flex-col items-center gap-3">
+                <p className="text-sm">Could not load your graveyard.</p>
+                <button
+                  type="button"
+                  onClick={() => fetchGraveyard()}
+                  className="btn-sage-primary text-xs"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : graveyard.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-16 text-center space-y-2">
+                <p className="text-base text-[#718875] font-serif">Your graveyard is empty.</p>
+                <p className="text-xs text-[#718875]/80 italic">Your creation is safe here.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
+                {graveyard.map((proj) => {
+                  const creationItem: CreationItem = {
+                    id: proj.id,
+                    title: proj.title,
+                    type: 'story',
+                    timestamp: proj.deleted_at
+                      ? new Date(proj.deleted_at).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })
+                      : 'Recently',
+                    deletedAt: proj.deleted_at
+                      ? new Date(proj.deleted_at).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })
+                      : undefined,
+                    description: proj.seed_text || 'An archived seed.',
+                    isDeleted: true,
+                  };
+                  return (
+                    <CreationCard
+                      key={proj.id}
+                      creation={creationItem}
+                      variant="graveyard"
+                      onOpen={(c) => setSelectedCreationToast(`Archived seed: ${c.title}`)}
+                      onAction={async (actionKey, c) => {
+                        if (actionKey === 'restore') {
+                          const ok = await restoreProjectAction(c.id);
+                          if (ok) {
+                            setSelectedCreationToast(`Restored seed: ${c.title}`);
+                          }
+                        } else if (actionKey === 'delete_permanently') {
+                          setConfirmPermanentDeleteId(c.id);
+                        } else {
+                          setSelectedCreationToast(`Action "${actionKey}" on: ${c.title}`);
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            )}
 
             {selectedCreationToast && (
               <div
@@ -241,6 +380,50 @@ export const App: React.FC = () => {
             >
               Return to Seed Workspace
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation modal for permanent deletion */}
+      {confirmPermanentDeleteId && (
+        <div
+          data-testid="permanent-delete-modal"
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in"
+        >
+          <div className="bg-[#F8F4E8] border border-[#D8CCB7] rounded-[20px] p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h3 className="font-serif text-lg font-bold text-[#294B3A]">
+              Delete this project permanently?
+            </h3>
+            <p className="text-xs text-[#718875]">
+              This action cannot be undone. All worlds and characters within this seed will be permanently removed.
+            </p>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                data-testid="cancel-permanent-delete-btn"
+                onClick={() => setConfirmPermanentDeleteId(null)}
+                className="px-4 py-2 rounded-[12px] bg-[#E8E0D0] text-[#294B3A] text-xs font-medium hover:bg-[#D8CCB7] transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                data-testid="confirm-permanent-delete-btn"
+                onClick={async () => {
+                  const id = confirmPermanentDeleteId;
+                  setConfirmPermanentDeleteId(null);
+                  if (id) {
+                    const ok = await permanentlyDeleteProjectAction(id);
+                    if (ok) {
+                      setSelectedCreationToast('Project deleted permanently');
+                    }
+                  }
+                }}
+                className="px-4 py-2 rounded-[12px] bg-[#B85C46] text-white text-xs font-medium hover:bg-[#9B4834] transition-all"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

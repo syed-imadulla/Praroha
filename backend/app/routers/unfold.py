@@ -1,13 +1,17 @@
+import json
 import logging
 from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.errors import AIProviderError
 from backend.app.core.response import APIResponse, api_success
-from backend.app.models.selection import HumanOnlyZones
+from backend.app.models.selection import HumanOnlyZones, WorldSelectionRecord
 from backend.app.models.unfold import UnfoldedUniverseRead
+from backend.app.models.job import GenerationJob, GenerationJobRead
 from backend.app.providers.factory import get_ai_provider
-from backend.app.repositories.project_repo import ProjectRepository, get_session
+from backend.app.repositories.project_repo import ProjectRepository, get_session, async_session
+from backend.app.services.job_service import update_job_status
 
 logger = logging.getLogger("seed_unfold.router.unfold")
 
@@ -79,11 +83,68 @@ def enforce_human_only_zones_guard(
     return unfolded_data
 
 
-@router.post("/unfold", response_model=APIResponse[UnfoldedUniverseRead])
+async def generate_unfold_task(job_id: str, project_id: str, context: dict, active_selection_id: Optional[str], candidate_id: str):
+    await update_job_status(job_id, "processing")
+    try:
+        async with async_session() as session:
+            repo = ProjectRepository(session)
+            provider = get_ai_provider()
+            unfolded_data = await provider.unfold_universe(context)
+            
+            
+
+            if active_selection_id:
+                # Need to fetch selection using repo 
+                sel_rec = await session.get(WorldSelectionRecord, active_selection_id)
+                if sel_rec:
+                    hoz = sel_rec.get_human_only_zones()
+                    if hoz and hoz.is_locked:
+                        unfolded_data = enforce_human_only_zones_guard(unfolded_data, hoz)
+
+            unfolded_universe = await repo.save_unfolded_universe(
+                project_id=project_id,
+                world_candidate_id=candidate_id,
+                data=unfolded_data,
+            )
+            
+            result_json = json.dumps(unfolded_universe.model_dump(mode="json"))
+            await update_job_status(job_id, "completed", 100, result_json=result_json)
+
+    except AIProviderError as e:
+        await update_job_status(job_id, "failed", error_code=e.error_code, error_message=e.message)
+        async with async_session() as session:
+            repo = ProjectRepository(session)
+            p = await repo.get_project(project_id)
+            if p:
+                p.status = "world_selected"
+                session.add(p)
+                await session.commit()
+    except Exception as exc:
+        logger.error(
+            "Universe unfolding failed for project '%s': %s",
+            project_id,
+            exc,
+            exc_info=True,
+        )
+        await update_job_status(job_id, "failed", error_code="INTERNAL_ERROR", error_message=str(exc))
+        try:
+            async with async_session() as session:
+                repo = ProjectRepository(session)
+                p = await repo.get_project(project_id)
+                if p:
+                    p.status = "world_selected"
+                    session.add(p)
+                    await session.commit()
+        except Exception as reset_exc:
+            logger.error("Failed to reset project status after error: %s", reset_exc)
+
+
+@router.post("/unfold", response_model=APIResponse[GenerationJobRead])
 async def unfold_universe(
     project_id: str,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_session),
-) -> APIResponse[UnfoldedUniverseRead]:
+) -> APIResponse[GenerationJobRead]:
     """
     Unfold the selected world candidate into a multi-layered universe
     (World Bible with key locations, Characters, Relationship Web, and Scenes).
@@ -115,7 +176,14 @@ async def unfold_universe(
     if project.status == "universe_unfolded":
         existing = await repo.get_unfolded_universe(project_id)
         if existing:
-            return api_success(data=existing)
+            dummy_job = GenerationJob(
+                project_id=project_id,
+                job_type="universe_unfold",
+                status="completed",
+                progress=100,
+                result_json=json.dumps(existing.model_dump(mode="json"))
+            )
+            return api_success(data=dummy_job)
 
     # Must be in world_selected status
     if project.status != "world_selected":
@@ -173,45 +241,27 @@ async def unfold_universe(
         "decision_dna": decision_dna_dict,
     }
 
-    try:
-        provider = get_ai_provider()
-        unfolded_data = await provider.unfold_universe(context)
+    job = GenerationJob(
+        project_id=project_id,
+        job_type="universe_unfold",
+        status="queued"
+    )
+    session.add(job)
+    await session.commit()
+    await session.refresh(job)
 
-        # Apply Human-Only Zones Backend Schema Guard (HOZ-01 & HOZ-02)
-        if active_selection:
-            sel_rec, _ = active_selection
-            hoz = sel_rec.get_human_only_zones()
-            if hoz and hoz.is_locked:
-                unfolded_data = enforce_human_only_zones_guard(unfolded_data, hoz)
+    active_selection_id = sel_rec.id if active_selection else None
+    
+    background_tasks.add_task(
+        generate_unfold_task,
+        job.id,
+        project_id,
+        context,
+        active_selection_id,
+        candidate_record.id
+    )
 
-        unfolded_universe = await repo.save_unfolded_universe(
-            project_id=project_id,
-            world_candidate_id=candidate_record.id,
-            data=unfolded_data,
-        )
-        return api_success(data=unfolded_universe)
-
-    except Exception as exc:
-        logger.error(
-            "Universe unfolding failed for project '%s': %s",
-            project_id,
-            exc,
-            exc_info=True,
-        )
-        # Roll back state transition to world_selected so creator can safely retry
-        try:
-            p = await repo.get_project(project_id)
-            if p:
-                p.status = "world_selected"
-                session.add(p)
-                await session.commit()
-        except Exception as reset_exc:
-            logger.error("Failed to reset project status after error: %s", reset_exc)
-
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Universe unfolding failed: {str(exc)}",
-        )
+    return api_success(data=job)
 
 
 @router.get("/unfolded", response_model=APIResponse[UnfoldedUniverseRead])

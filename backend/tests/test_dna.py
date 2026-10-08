@@ -41,7 +41,7 @@ def test_seed_dna_schema_validation():
 @pytest.mark.asyncio
 async def test_gemini_provider_mock_fallback():
     # When api_key is None, should immediately fallback
-    provider_no_key = GeminiProvider(api_key=None, model="gemini-3.5-flash")
+    provider_no_key = GeminiProvider(api_key=None, model="gemini-3.6-flash", allow_mock_fallback=True)
     result_no_key = await provider_no_key.extract_dna("A deep ocean expedition finds a bio-dome.")
     assert result_no_key["fallback_used"] is True
     assert "mock-fallback" in result_no_key["model_used"]
@@ -49,7 +49,7 @@ async def test_gemini_provider_mock_fallback():
     assert len(result_no_key["seed_dna"]["themes"]) > 0
 
     # When api_key is provided but network call raises exception, fallback gracefully
-    provider_with_key = GeminiProvider(api_key="fake-test-key", model="gemini-3.5-flash")
+    provider_with_key = GeminiProvider(api_key="fake-test-key", model="gemini-3.6-flash", allow_mock_fallback=True)
     with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
         mock_post.side_effect = httpx.ConnectError("Connection refused")
         result_failed_call = await provider_with_key.extract_dna("A lost city underwater.")

@@ -35,6 +35,7 @@ import {
   CounterfactualDeltaResponse,
   ForkCounterfactualRequest,
   HumanOnlyZones,
+  ProjectBundle,
 } from '../types';
 
 interface WorkspaceState {
@@ -166,6 +167,7 @@ interface WorkspaceState {
   toggleInspector: (open?: boolean) => void;
   setInspectorTab: (tab: 'dna' | 'provenance' | 'worlds') => void;
   setHealth: (health: SystemHealthData | null) => void;
+  updateAIProviderAction: (provider: string, model?: string) => Promise<boolean>;
   setSyncing: (syncing: boolean) => void;
   setUnderstandSubTab: (tab: 'dna' | 'potential') => void;
   fetchPotentialItems: () => Promise<void>;
@@ -183,6 +185,19 @@ interface WorkspaceState {
   setProviderFallbackWarning: (warning: string | null) => void;
   loadCanonicalDemoUniverse: () => Promise<boolean>;
   resetWorkspace: () => void;
+  recoverActiveJobs: () => Promise<void>;
+  creations: Project[];
+  isLoadingCreations: boolean;
+  creationsError: string | null;
+  graveyard: Project[];
+  isLoadingGraveyard: boolean;
+  graveyardError: string | null;
+  fetchCreations: () => Promise<void>;
+  fetchGraveyard: () => Promise<void>;
+  deleteProjectAction: (projectId: string) => Promise<boolean>;
+  restoreProjectAction: (projectId: string) => Promise<boolean>;
+  permanentlyDeleteProjectAction: (projectId: string) => Promise<boolean>;
+  hydrateProject: (bundle: ProjectBundle) => void;
 }
 
 
@@ -193,6 +208,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     (set, get) => ({
       activeNav: 'home',
       setActiveNav: (nav) => set({ activeNav: nav }),
+      creations: [],
+      isLoadingCreations: false,
+      creationsError: null,
+      graveyard: [],
+      isLoadingGraveyard: false,
+      graveyardError: null,
       activeStage: 'seed',
       unlockedStages: DEFAULT_STAGES,
       seedText: '',
@@ -490,13 +511,14 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         if (!activeProject) return false;
         set({ isExtractingPotential: true });
         try {
-          const res = await apiClient.extractPotential(activeProject.id);
-          if (res.success && res.data) {
-            set({ potentialItems: res.data, isExtractingPotential: false });
-            return true;
+          const jobRes = await apiClient.extractPotential(activeProject.id);
+          if (!jobRes.success || !jobRes.data) {
+            set({ isExtractingPotential: false });
+            return false;
           }
-          set({ isExtractingPotential: false });
-          return false;
+          const items = await apiClient.pollJob<SeedPotentialItem[]>(jobRes.data.id);
+          set({ potentialItems: items, isExtractingPotential: false });
+          return true;
         } catch (err) {
           console.error('Failed to extract potential items:', err);
           set({ isExtractingPotential: false });
@@ -697,28 +719,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           unfoldingStep: 1,
         });
 
-        // Step progression timers for responsive feedback
-        const timer1 = setTimeout(() => {
-          if (get().isUnfolding) set({ unfoldingStep: 2 });
-        }, 500);
-        const timer2 = setTimeout(() => {
-          if (get().isUnfolding) set({ unfoldingStep: 3 });
-        }, 1000);
-        const timer3 = setTimeout(() => {
-          if (get().isUnfolding) set({ unfoldingStep: 4 });
-        }, 1500);
-
         try {
-          const res = await apiClient.unfoldUniverse(project.id);
-          clearTimeout(timer1);
-          clearTimeout(timer2);
-          clearTimeout(timer3);
-
-          if (!res.success || !res.data) {
-            throw new Error(res.error?.message || 'Failed to unfold universe');
+          const jobRes = await apiClient.unfoldUniverse(project.id);
+          if (!jobRes.success || !jobRes.data) {
+            throw new Error(jobRes.error?.message || 'Failed to start unfolding job');
           }
 
-          const unfoldedData = res.data;
+          // In case the project was already unfolded, the job might be completed and return UnfoldedUniverseRead directly inside result_json.
+          const unfoldedData = await apiClient.pollJob<UnfoldedUniverseRead>(jobRes.data.id, 1500, (job) => {
+            if (job.status === 'queued') set({ unfoldingStep: 1 });
+            else if (job.status === 'processing') set({ unfoldingStep: 2 });
+            else if (job.status === 'completed') set({ unfoldingStep: 4 });
+          });
+
           set((s) => ({
             unfoldedUniverse: unfoldedData,
             isUnfolding: false,
@@ -731,9 +744,6 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           }));
           return true;
         } catch (err: unknown) {
-          clearTimeout(timer1);
-          clearTimeout(timer2);
-          clearTimeout(timer3);
           const errorMsg =
             err instanceof Error ? err.message : 'Universe unfolding failed. Please try again.';
           console.error('Failed to unfold universe:', err);
@@ -1057,36 +1067,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             });
           }
 
-          // Step animation progression timeouts
-          const stepTimer1 = setTimeout(() => {
-            if (get().isExtracting) {
-              set({ extractionStep: 'Distilling implicit themes & core tensions...' });
-            }
-          }, 800);
-
-          const stepTimer2 = setTimeout(() => {
-            if (get().isExtracting) {
-              set({ extractionStep: 'Identifying world entities & boundary constraints...' });
-            }
-          }, 1600);
-
-          const stepTimer3 = setTimeout(() => {
-            if (get().isExtracting) {
-              set({ extractionStep: 'Finalizing Seed DNA contract...' });
-            }
-          }, 2400);
-
-          const dnaRes = await apiClient.extractDNA(project.id, seedToUse);
-          clearTimeout(stepTimer1);
-          clearTimeout(stepTimer2);
-          clearTimeout(stepTimer3);
-
-          if (!dnaRes.success || !dnaRes.data) {
-            throw new Error(dnaRes.error?.message || 'Extraction failed');
+          const jobRes = await apiClient.extractDNA(project.id, seedToUse);
+          if (!jobRes.success || !jobRes.data) {
+            throw new Error(jobRes.error?.message || 'Extraction failed');
           }
 
+          const dnaData = await apiClient.pollJob<SeedDNARead>(jobRes.data.id, 1500, (job) => {
+             if (job.status === 'queued') set({ extractionStep: 'Queued...' });
+             else if (job.status === 'processing') set({ extractionStep: 'Processing Seed DNA...' });
+             else if (job.status === 'completed') set({ extractionStep: 'Completed' });
+          });
+
           set((s) => ({
-            seedDNA: dnaRes.data,
+            seedDNA: dnaData,
             seedText: seedToUse,
             worlds: s.worlds.filter((w) => w.project_id === project!.id),
             unlockedStages: s.unlockedStages.includes('understand')
@@ -1118,28 +1111,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         });
 
         try {
-          const stepTimer1 = setTimeout(() => {
-            if (get().isGeneratingWorlds) {
-              set({ worldBranchingStep: 'Formulating contrasting archetypes (Mythic, Ecological, Technological)...' });
-            }
-          }, 700);
-
-          const stepTimer2 = setTimeout(() => {
-            if (get().isGeneratingWorlds) {
-              set({ worldBranchingStep: 'Synthesizing core tensions, aesthetics & cinematic visuals...' });
-            }
-          }, 1400);
-
-          const res = await apiClient.generateWorlds(project.id);
-          clearTimeout(stepTimer1);
-          clearTimeout(stepTimer2);
-
-          if (!res.success || !res.data) {
-            throw new Error(res.error?.message || 'Failed to generate worlds');
+          const jobRes = await apiClient.generateWorlds(project.id);
+          if (!jobRes.success || !jobRes.data) {
+            throw new Error(jobRes.error?.message || 'Failed to start world generation job');
           }
 
+          const worldsData = await apiClient.pollJob<WorldCandidateRead[]>(jobRes.data.id, 1500, (job) => {
+            if (job.status === 'queued') set({ worldBranchingStep: 'Queued...' });
+            else if (job.status === 'processing') set({ worldBranchingStep: 'Generating Worlds...' });
+            else if (job.status === 'completed') set({ worldBranchingStep: 'Completed' });
+          });
+
           set((s) => ({
-            worlds: res.data || [],
+            worlds: worldsData || [],
             unlockedStages: s.unlockedStages.includes('worlds')
               ? s.unlockedStages
               : [...s.unlockedStages, 'worlds'],
@@ -1159,8 +1143,20 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         set((state) => ({
           inspectorOpen: typeof open === 'boolean' ? open : !state.inspectorOpen,
         })),
-      setInspectorTab: (inspectorTab) => set({ inspectorTab }),
+      setInspectorTab: (tab) => set({ inspectorTab: tab }),
       setHealth: (health) => set({ health }),
+      updateAIProviderAction: async (provider: string, model?: string) => {
+        try {
+          const res = await apiClient.updateAIProvider(provider, model);
+          if (res.success && res.data) {
+            set({ health: res.data });
+            return true;
+          }
+          return false;
+        } catch {
+          return false;
+        }
+      },
       setSyncing: (isSyncing) => set({ isSyncing }),
       startTour: () => {
         const currentUnlocked = get().unlockedStages;
@@ -1362,6 +1358,229 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           isForkingCounterfactual: false,
           counterfactualBranchName: '',
         }),
+
+      recoverActiveJobs: async () => {
+        const { activeProject } = get();
+        if (!activeProject) return;
+        try {
+          // Poll for any job in processing state to recover
+          const processingRes = await apiClient.listJobs(activeProject.id, 'processing');
+          const queuedRes = await apiClient.listJobs(activeProject.id, 'queued');
+          const activeJobs = [...(processingRes.data || []), ...(queuedRes.data || [])];
+          
+          for (const job of activeJobs) {
+            if (job.job_type === 'dna_extraction' && !get().isExtracting) {
+              set({ isExtracting: true, extractionStep: job.status === 'queued' ? 'Queued...' : 'Processing Seed DNA...' });
+              apiClient.pollJob<SeedDNARead>(job.id, 1500, (j) => {
+                 if (j.status === 'queued') set({ extractionStep: 'Queued...' });
+                 else if (j.status === 'processing') set({ extractionStep: 'Processing Seed DNA...' });
+                 else if (j.status === 'completed') set({ extractionStep: 'Completed' });
+              }).then(dnaData => {
+                 set((s) => ({
+                   seedDNA: dnaData,
+                   unlockedStages: s.unlockedStages.includes('understand') ? s.unlockedStages : [...s.unlockedStages, 'understand'],
+                   activeStage: 'understand',
+                   isExtracting: false,
+                   extractionStep: '',
+                 }));
+              }).catch(() => set({ isExtracting: false, extractionStep: '' }));
+            }
+            if (job.job_type === 'world_generation' && !get().isGeneratingWorlds) {
+              set({ isGeneratingWorlds: true, worldBranchingStep: job.status === 'queued' ? 'Queued...' : 'Generating Worlds...' });
+              apiClient.pollJob<WorldCandidateRead[]>(job.id, 1500, (j) => {
+                 if (j.status === 'queued') set({ worldBranchingStep: 'Queued...' });
+                 else if (j.status === 'processing') set({ worldBranchingStep: 'Generating Worlds...' });
+                 else if (j.status === 'completed') set({ worldBranchingStep: 'Completed' });
+              }).then(worldsData => {
+                 set((s) => ({
+                   worlds: worldsData || [],
+                   unlockedStages: s.unlockedStages.includes('worlds') ? s.unlockedStages : [...s.unlockedStages, 'worlds'],
+                   activeStage: 'worlds',
+                   isGeneratingWorlds: false,
+                   worldBranchingStep: '',
+                 }));
+              }).catch(() => set({ isGeneratingWorlds: false, worldBranchingStep: '' }));
+            }
+            if (job.job_type === 'universe_unfold' && !get().isUnfolding) {
+              set({ isUnfolding: true, unfoldingStep: job.status === 'queued' ? 1 : 2, unfoldError: null });
+              apiClient.pollJob<UnfoldedUniverseRead>(job.id, 1500, (j) => {
+                 if (j.status === 'queued') set({ unfoldingStep: 1 });
+                 else if (j.status === 'processing') set({ unfoldingStep: 2 });
+                 else if (j.status === 'completed') set({ unfoldingStep: 4 });
+              }).then(unfoldedData => {
+                 set((s) => ({
+                   unfoldedUniverse: unfoldedData,
+                   isUnfolding: false,
+                   unfoldingStep: 4,
+                   unfoldError: null,
+                   activeProject: s.activeProject ? { ...s.activeProject, status: 'universe_unfolded' } : null,
+                   unlockedStages: Array.from(new Set([...s.unlockedStages, 'unfold', 'trace', 'refine'])),
+                 }));
+              }).catch((err) => set((s) => ({ 
+                 isUnfolding: false, 
+                 unfoldingStep: 0, 
+                 unfoldError: err instanceof Error ? err.message : 'Unfold failed',
+                 activeProject: s.activeProject ? { ...s.activeProject, status: 'world_selected' } : null,
+              })));
+            }
+          }
+        } catch (err) {
+          console.error('Failed to recover active jobs:', err);
+        }
+      },
+
+      hydrateProject: (bundle) => {
+        const {
+          project,
+          seed_dna,
+          seed_potential_items,
+          world_candidates,
+          world_selection,
+          unfolded_universe,
+          media_assets,
+          revisions,
+          lineage
+        } = bundle;
+        
+        let newStage: StageType = 'seed';
+        const unlocked: StageType[] = ['seed'];
+        
+        if (seed_dna) {
+          newStage = 'understand';
+          unlocked.push('understand');
+        }
+        if (world_candidates && world_candidates.length > 0) {
+          newStage = 'worlds';
+          unlocked.push('worlds');
+        }
+        if (world_selection) {
+          newStage = 'unfold';
+          unlocked.push('choose', 'unfold');
+        }
+        if (unfolded_universe) {
+          newStage = 'unfold';
+          unlocked.push('trace', 'refine');
+        }
+        
+        const mediaAssetsMap: Record<string, MediaAsset[]> = {};
+        if (media_assets) {
+          for (const asset of media_assets) {
+            if (!mediaAssetsMap[asset.entity_id]) {
+              mediaAssetsMap[asset.entity_id] = [];
+            }
+            mediaAssetsMap[asset.entity_id].push(asset);
+          }
+        }
+
+        set({
+          activeProject: project,
+          seedText: project.seed_text || '',
+          seedDNA: seed_dna,
+          potentialItems: seed_potential_items || [],
+          worlds: world_candidates || [],
+          activeSelection: world_selection,
+          selectedWorldId: world_selection ? world_selection.world_candidate_id : null,
+          unfoldedUniverse: unfolded_universe,
+          entityRevisions: revisions || [],
+          lineageGraph: lineage || null,
+          mediaAssets: mediaAssetsMap,
+          activeStage: newStage,
+          unlockedStages: Array.from(new Set(unlocked))
+        });
+        
+        get().recoverActiveJobs();
+      },
+
+      fetchCreations: async () => {
+        set({ isLoadingCreations: true, creationsError: null });
+        try {
+          const res = await apiClient.listProjects(false, false);
+          if (res.success && res.data) {
+            set({ creations: res.data, isLoadingCreations: false });
+          } else {
+            set({
+              isLoadingCreations: false,
+              creationsError: res.error?.message || 'Could not load your creations.',
+            });
+          }
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : 'Could not load your creations.';
+          set({ isLoadingCreations: false, creationsError: msg });
+        }
+      },
+
+      fetchGraveyard: async () => {
+        set({ isLoadingGraveyard: true, graveyardError: null });
+        try {
+          const res = await apiClient.listGraveyardProjects();
+          if (res.success && res.data) {
+            set({ graveyard: res.data, isLoadingGraveyard: false });
+          } else {
+            set({
+              isLoadingGraveyard: false,
+              graveyardError: res.error?.message || 'Could not load your graveyard.',
+            });
+          }
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : 'Could not load your graveyard.';
+          set({ isLoadingGraveyard: false, graveyardError: msg });
+        }
+      },
+
+      deleteProjectAction: async (projectId: string) => {
+        try {
+          const res = await apiClient.deleteProject(projectId);
+          if (res.success && res.data) {
+            const deletedProj = res.data;
+            set((s) => ({
+              creations: s.creations.filter((p) => p.id !== projectId),
+              graveyard: [deletedProj, ...s.graveyard.filter((p) => p.id !== projectId)],
+              activeProject: s.activeProject?.id === projectId ? null : s.activeProject,
+            }));
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error('Failed to move project to graveyard:', err);
+          return false;
+        }
+      },
+
+      restoreProjectAction: async (projectId: string) => {
+        try {
+          const res = await apiClient.restoreProject(projectId);
+          if (res.success && res.data) {
+            const restoredProj = res.data;
+            set((s) => ({
+              graveyard: s.graveyard.filter((p) => p.id !== projectId),
+              creations: [restoredProj, ...s.creations.filter((p) => p.id !== projectId)],
+            }));
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error('Failed to restore project:', err);
+          return false;
+        }
+      },
+
+      permanentlyDeleteProjectAction: async (projectId: string) => {
+        try {
+          const res = await apiClient.deleteProjectPermanently(projectId);
+          if (res.success) {
+            set((s) => ({
+              graveyard: s.graveyard.filter((p) => p.id !== projectId),
+              creations: s.creations.filter((p) => p.id !== projectId),
+              activeProject: s.activeProject?.id === projectId ? null : s.activeProject,
+            }));
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error('Failed to permanently delete project:', err);
+          return false;
+        }
+      },
     }),
     {
       name: 'seed-unfold-workspace',
@@ -1389,3 +1608,4 @@ if (typeof window !== 'undefined') {
   (window as any).__workspaceStore = useWorkspaceStore;
 }
 
+if (typeof window !== 'undefined') { (window as any).useWorkspaceStore = useWorkspaceStore; }

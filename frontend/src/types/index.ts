@@ -18,13 +18,32 @@ export interface SystemHealthData {
   ai_provider: {
     configured: string;
     resolved: string;
+    model?: string;
     status: string;
+    available_providers?: string[];
+    available_models?: string[];
+    message?: string;
   };
   storage_provider: {
     configured: string;
     type: string;
     status: string;
   };
+}
+
+export interface GenerationJobRead {
+  id: string;
+  project_id: string;
+  job_type: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed';
+  progress: number;
+  error_code?: string | null;
+  error_message?: string | null;
+  result_json?: string | null;
+  created_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  updated_at: string;
 }
 
 export interface Project {
@@ -39,6 +58,7 @@ export interface Project {
   counterfactual_metadata_json?: string | null;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
 }
 
 export interface AssetMetadata {
@@ -372,15 +392,18 @@ export interface SceneRefineRequest {
 }
 
 export interface ProjectBundle {
-  format_version: string;
-  exported_at: string;
+  format_version?: string;
+  exported_at?: string;
   project: Project;
   seed_dna: SeedDNARead | null;
-  worlds: WorldCandidateRead[];
-  selection: WorldSelectionRead | null;
+  seed_potential_items: SeedPotentialItem[];
+  world_candidates: WorldCandidateRead[];
+  world_selection: WorldSelectionRead | null;
   unfolded_universe: UnfoldedUniverseRead | null;
-  revisions: EntityRevisionRead[];
-  lineage: TraceGraphRead | null;
+  media_assets: MediaAsset[];
+  generation_jobs: GenerationJobRead[];
+  revisions?: EntityRevisionRead[];
+  lineage?: TraceGraphRead | null;
 }
 
 export interface SnapshotRead {

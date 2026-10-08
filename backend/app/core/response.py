@@ -7,6 +7,7 @@ T = TypeVar("T")
 class ErrorDetail(BaseModel):
     code: str
     message: str
+    retryable: bool = False
 
 
 class APIResponse(BaseModel, Generic[T]):
@@ -35,11 +36,12 @@ def api_error(
     code: str,
     message: str,
     warning: Optional[str] = None,
+    retryable: bool = False,
 ) -> APIResponse[None]:
     return APIResponse(
         success=False,
         data=None,
-        error=ErrorDetail(code=code, message=message),
+        error=ErrorDetail(code=code, message=message, retryable=retryable),
         fallback_used=False,
         warning=warning,
     )

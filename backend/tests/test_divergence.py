@@ -101,8 +101,8 @@ async def test_mock_provider_arbitrary_seed_with_potential():
 
 @pytest.mark.asyncio
 async def test_gemini_provider_fallback_divergence():
-    """Verify GeminiProvider falls back gracefully with full divergence metadata when no API key is present."""
-    gemini = GeminiProvider(api_key=None, model="gemini-2.5-flash")
+    """Verify GeminiProvider falls back gracefully with full divergence metadata when mock fallback is allowed."""
+    gemini = GeminiProvider(api_key=None, model="gemini-3.6-flash", allow_mock_fallback=True)
     dna = {
         "raw_seed": "An alchemist converts moonlight into breathable atmosphere.",
         "premise": "Moonlight transmuting into atmospheric air.",
@@ -117,68 +117,66 @@ async def test_gemini_provider_fallback_divergence():
 
 
 @pytest.mark.asyncio
-async def test_divergent_worlds_endpoints_lifecycle():
+async def test_divergent_worlds_endpoints_lifecycle(client: httpx.AsyncClient):
     """Verify full REST lifecycle: project -> DNA -> potential items -> generate worlds -> read worlds."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # 1. Create project
-        p_res = await client.post(
-            "/api/projects",
-            json={"title": "Abyssal Exploration", "seed_text": "A diver encounters sentient bioluminescence in the Mariana Trench."},
-        )
-        assert p_res.status_code == 201
-        project_id = p_res.json()["data"]["id"]
+    # 1. Create project
+    p_res = await client.post(
+        "/api/projects",
+        json={"title": "Abyssal Exploration", "seed_text": "A diver encounters sentient bioluminescence in the Mariana Trench."},
+    )
+    assert p_res.status_code == 201
+    project_id = p_res.json()["data"]["id"]
 
-        # 2. Extract DNA
-        dna_res = await client.post(f"/api/projects/{project_id}/dna/extract")
-        assert dna_res.status_code == 200
+    # 2. Extract DNA
+    dna_res = await client.post(f"/api/projects/{project_id}/dna/extract")
+    assert dna_res.status_code == 200
 
-        # 3. Extract & accept potential items
-        pot_extract = await client.post(f"/api/projects/{project_id}/potential/extract")
-        assert pot_extract.status_code == 200
-        items = pot_extract.json()["data"]
-        assert len(items) > 0
+    # 3. Extract & accept potential items
+    pot_extract = await client.post(f"/api/projects/{project_id}/potential/extract")
+    assert pot_extract.status_code == 200
+    items = pot_extract.json()["data"]
+    assert len(items) > 0
 
-        # Accept the first item, reject the second
-        item_1_id = items[0]["id"]
+    # Accept the first item, reject the second
+    item_1_id = items[0]["id"]
+    await client.patch(
+        f"/api/projects/{project_id}/potential/{item_1_id}",
+        json={"user_status": "accepted"},
+    )
+    if len(items) > 1:
+        item_2_id = items[1]["id"]
         await client.patch(
-            f"/api/projects/{project_id}/potential/{item_1_id}",
-            json={"user_status": "accepted"},
+            f"/api/projects/{project_id}/potential/{item_2_id}",
+            json={"user_status": "rejected"},
         )
-        if len(items) > 1:
-            item_2_id = items[1]["id"]
-            await client.patch(
-                f"/api/projects/{project_id}/potential/{item_2_id}",
-                json={"user_status": "rejected"},
-            )
 
-        # 4. Generate world candidates
-        gen_res = await client.post(f"/api/projects/{project_id}/worlds/generate")
-        assert gen_res.status_code == 200
-        worlds_data = gen_res.json()["data"]
-        assert len(worlds_data) == 3
+    # 4. Generate world candidates
+    gen_res = await client.post(f"/api/projects/{project_id}/worlds/generate")
+    assert gen_res.status_code == 200
+    worlds_data = gen_res.json()["data"]
+    assert len(worlds_data) == 3
 
-        archetypes = [w["divergence_archetype"] for w in worlds_data]
-        assert set(archetypes) == {"familiar", "radical", "inverse"}
+    archetypes = [w["divergence_archetype"] for w in worlds_data]
+    assert set(archetypes) == {"familiar", "radical", "inverse"}
 
-        for w in worlds_data:
-            assert "exploration_profile" in w
-            profile = w["exploration_profile"]
-            assert 0 <= profile["seed_fidelity"] <= 100
-            assert 0 <= profile["novelty"] <= 100
-            assert 0 <= profile["conceptual_distance"] <= 100
-            assert 0 <= profile["feasibility"] <= 100
-            assert isinstance(profile["summary"], str)
-            assert isinstance(w["emphasized_potential_labels"], list)
+    for w in worlds_data:
+        assert "exploration_profile" in w
+        profile = w["exploration_profile"]
+        assert 0 <= profile["seed_fidelity"] <= 100
+        assert 0 <= profile["novelty"] <= 100
+        assert 0 <= profile["conceptual_distance"] <= 100
+        assert 0 <= profile["feasibility"] <= 100
+        assert isinstance(profile["summary"], str)
+        assert isinstance(w["emphasized_potential_labels"], list)
 
-        # 5. Fetch stored candidates
-        get_res = await client.get(f"/api/projects/{project_id}/worlds")
-        assert get_res.status_code == 200
-        stored_worlds = get_res.json()["data"]
-        assert len(stored_worlds) == 3
-        for sw in stored_worlds:
-            assert sw["divergence_archetype"] in ("familiar", "radical", "inverse")
-            assert sw["exploration_profile"]["seed_fidelity"] >= 0
+    # 5. Fetch stored candidates
+    get_res = await client.get(f"/api/projects/{project_id}/worlds")
+    assert get_res.status_code == 200
+    stored_worlds = get_res.json()["data"]
+    assert len(stored_worlds) == 3
+    for sw in stored_worlds:
+        assert sw["divergence_archetype"] in ("familiar", "radical", "inverse")
+        assert sw["exploration_profile"]["seed_fidelity"] >= 0
 
 
 def test_backward_compatibility_empty_profile():

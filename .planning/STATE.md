@@ -21,22 +21,22 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
 
 ## Current Position
 
-Phase: 31.1 Gemini & AI Provider Repair (Initializing)
+Phase: 31.6 Real Creations & Graveyard (Completed & Verified)
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
 Milestone 3 (Phases 21–30): 100% Completed & Verified (Design system, App Shell, Home, Workspace Botanical Redesign, Typography & Polish, Header & Shell Simplification, Product Integrity Audit).
 Milestone 4 (Phase 31: Real Product Hardening + True Realtime):
-- Sub-phase 31.1: Gemini & AI Provider Repair
-- Sub-phase 31.2: Generation Job State
-- Sub-phase 31.3: Supabase Realtime Infrastructure
-- Sub-phase 31.4: Realtime Store Synchronization
-- Sub-phase 31.5: Project Routing & Library
-- Sub-phase 31.6: Real Creations & Graveyard
-- Sub-phase 31.7: Authentication & Ownership
-- Sub-phase 31.8: Media Realtime
-- Sub-phase 31.9: Error/Loading/Recovery Hardening
-- Sub-phase 31.10: Production E2E & Two-Tab Realtime Tests
-- Sub-phase 31.11: Final Full-System Audit
+- Sub-phase 31.1: Gemini & AI Provider Repair (Complete)
+- Sub-phase 31.2: Generation Job State (Complete)
+- Sub-phase 31.3: Supabase Realtime Infrastructure (Complete)
+- Sub-phase 31.4: Realtime Store Synchronization (Complete)
+- Sub-phase 31.5: Project Routing & Library (Complete)
+- Sub-phase 31.6: Real Creations & Graveyard (Complete)
+- Sub-phase 31.7: Authentication & Ownership (Pending)
+- Sub-phase 31.8: Media Realtime (Pending)
+- Sub-phase 31.9: Error/Loading/Recovery Hardening (Pending)
+- Sub-phase 31.10: Production E2E & Two-Tab Realtime Tests (Pending)
+- Sub-phase 31.11: Final Full-System Audit (Pending)
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
 Milestone 3 UI Refinement & Polish Achievements:

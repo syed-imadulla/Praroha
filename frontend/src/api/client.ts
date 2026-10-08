@@ -31,6 +31,7 @@ import {
   CounterfactualCandidate,
   CounterfactualDeltaResponse,
   ForkCounterfactualRequest,
+  GenerationJobRead,
 } from '../types';
 
 class ApiClient {
@@ -86,8 +87,44 @@ class ApiClient {
     return this.request<SystemHealthData>('/health');
   }
 
-  async listProjects(): Promise<APIResponse<Project[]>> {
-    return this.request<Project[]>('/projects');
+  async updateAIProvider(provider: string, model?: string): Promise<APIResponse<SystemHealthData>> {
+    return this.request<SystemHealthData>('/health/ai-provider', {
+      method: 'POST',
+      body: JSON.stringify({
+        provider,
+        ...(model ? { model } : {}),
+      }),
+    });
+  }
+
+  async listProjects(archived = false, includeDeleted = false): Promise<APIResponse<Project[]>> {
+    const params = new URLSearchParams();
+    if (archived) params.set('archived', 'true');
+    if (includeDeleted) params.set('include_deleted', 'true');
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.request<Project[]>(`/projects${query}`);
+  }
+
+  async listGraveyardProjects(): Promise<APIResponse<Project[]>> {
+    return this.request<Project[]>('/projects/graveyard');
+  }
+
+  async deleteProject(projectId: string): Promise<APIResponse<Project>> {
+    return this.request<Project>(`/projects/${projectId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async restoreProject(projectId: string): Promise<APIResponse<Project>> {
+    return this.request<Project>(`/projects/${projectId}/restore`, {
+      method: 'POST',
+    });
+  }
+
+  async deleteProjectPermanently(projectId: string): Promise<APIResponse<{ deleted: boolean; project_id: string }>> {
+    return this.request<{ deleted: boolean; project_id: string }>(`/projects/${projectId}/permanent`, {
+      method: 'DELETE',
+    });
   }
 
   async createProject(title: string, seedText?: string): Promise<APIResponse<Project>> {
@@ -110,8 +147,8 @@ class ApiClient {
     return this.request<Project>(`/projects/${projectId}`);
   }
 
-  async extractDNA(projectId: string, rawSeed?: string): Promise<APIResponse<SeedDNARead>> {
-    return this.request<SeedDNARead>(`/projects/${projectId}/dna/extract`, {
+  async extractDNA(projectId: string, rawSeed?: string): Promise<APIResponse<GenerationJobRead>> {
+    return this.request<GenerationJobRead>(`/projects/${projectId}/dna/extract`, {
       method: 'POST',
       body: JSON.stringify({
         raw_seed: rawSeed,
@@ -123,9 +160,56 @@ class ApiClient {
     return this.request<SeedDNARead>(`/projects/${projectId}/dna`);
   }
 
-  async generateWorlds(projectId: string): Promise<APIResponse<WorldCandidateRead[]>> {
-    return this.request<WorldCandidateRead[]>(`/projects/${projectId}/worlds/generate`, {
+  async generateWorlds(projectId: string): Promise<APIResponse<GenerationJobRead>> {
+    return this.request<GenerationJobRead>(`/projects/${projectId}/worlds/generate`, {
       method: 'POST',
+    });
+  }
+
+  async listJobs(projectId?: string, status?: string): Promise<APIResponse<GenerationJobRead[]>> {
+    const params = new URLSearchParams();
+    if (projectId) params.append('project_id', projectId);
+    if (status) params.append('status', status);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.request<GenerationJobRead[]>(`/jobs${query}`);
+  }
+
+  async getJob(jobId: string): Promise<APIResponse<GenerationJobRead>> {
+    return this.request<GenerationJobRead>(`/jobs/${jobId}`);
+  }
+
+  async pollJob<T>(jobId: string, intervalMs = 1500, onProgress?: (job: GenerationJobRead) => void): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const poll = async () => {
+        try {
+          const res = await this.getJob(jobId);
+          if (!res.success || !res.data) {
+            return reject(new Error(res.error?.message || 'Failed to check job status'));
+          }
+          const job = res.data;
+          
+          if (onProgress) {
+            onProgress(job);
+          }
+
+          if (job.status === 'completed') {
+            try {
+              const parsed = job.result_json ? JSON.parse(job.result_json) : null;
+              resolve(parsed as T);
+            } catch (e) {
+              reject(new Error('Failed to parse job result'));
+            }
+          } else if (job.status === 'failed') {
+            reject(new Error(job.error_message || 'Generation failed'));
+          } else {
+            // Still queued or processing
+            setTimeout(poll, intervalMs);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      };
+      poll();
     });
   }
 
@@ -155,8 +239,8 @@ class ApiClient {
     return this.request<WorldSelectionRead>(`/projects/${projectId}/selection`);
   }
 
-  async unfoldUniverse(projectId: string): Promise<APIResponse<UnfoldedUniverseRead>> {
-    return this.request<UnfoldedUniverseRead>(`/projects/${projectId}/unfold`, {
+  async unfoldUniverse(projectId: string): Promise<APIResponse<GenerationJobRead>> {
+    return this.request<GenerationJobRead>(`/projects/${projectId}/unfold`, {
       method: 'POST',
     });
   }
@@ -246,8 +330,8 @@ class ApiClient {
     return this.request<SnapshotRead[]>(`/projects/${projectId}/snapshots`);
   }
 
-  async extractPotential(projectId: string): Promise<APIResponse<SeedPotentialItem[]>> {
-    return this.request<SeedPotentialItem[]>(`/projects/${projectId}/potential/extract`, {
+  async extractPotential(projectId: string): Promise<APIResponse<GenerationJobRead>> {
+    return this.request<GenerationJobRead>(`/projects/${projectId}/potential/extract`, {
       method: 'POST',
     });
   }

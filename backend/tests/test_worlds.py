@@ -51,7 +51,7 @@ async def test_canonical_demo_fixtures_determinism():
     1. Lost Civilization, 2. Bio-City, 3. Time Capsule.
     Detection is based strictly on raw_seed, not the AI-generated premise.
     """
-    provider = GeminiProvider(api_key="fake-test-key", model="gemini-3.5-flash")
+    provider = GeminiProvider(api_key="fake-demo-key", model="gemini-3.6-flash")
 
     # Even if premise is completely altered by Gemini, raw_seed triggers canonical fixtures
     altered_dna = {
@@ -85,7 +85,7 @@ async def test_canonical_demo_fixtures_determinism():
 @pytest.mark.asyncio
 async def test_generate_worlds_mock_fallback():
     # When api_key is None and raw_seed is NOT canonical, should fallback to mock generation
-    provider_no_key = GeminiProvider(api_key=None, model="gemini-3.5-flash")
+    provider_no_key = GeminiProvider(api_key=None, model="gemini-3.6-flash", allow_mock_fallback=True)
     arbitrary_dna = {
         "raw_seed": "A nomad navigates a whispering glass desert.",
         "premise": "A lone wanderer hears prophecies in singing quartz dunes.",
@@ -103,7 +103,7 @@ async def test_generate_worlds_mock_fallback():
     assert [c.get("index", idx) for idx, c in enumerate(candidates, start=1)] == [1, 2, 3]
 
     # When api_key is provided but network call raises exception, fallback gracefully
-    provider_with_key = GeminiProvider(api_key="fake-test-key", model="gemini-3.5-flash")
+    provider_with_key = GeminiProvider(api_key="fake-test-key", model="gemini-3.6-flash", allow_mock_fallback=True)
     with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
         mock_post.side_effect = httpx.ConnectError("Network unreachable")
         candidates_fallback = await provider_with_key.generate_worlds(arbitrary_dna)

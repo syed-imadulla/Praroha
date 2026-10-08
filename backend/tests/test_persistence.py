@@ -232,8 +232,8 @@ async def test_bundle_export_and_import_with_lineage(client: httpx.AsyncClient):
     assert bundle_data["format_version"] == "1.0"
     assert bundle_data["project"]["id"] == project_id
     assert bundle_data["seed_dna"] is not None
-    assert len(bundle_data["worlds"]) == 3
-    assert bundle_data["selection"] is not None
+    assert len(bundle_data["world_candidates"]) == 3
+    assert bundle_data["world_selection"] is not None
     assert bundle_data["unfolded_universe"] is not None
     # Crucial D-03: Complete ProjectBundle includes synthesized lineage DAG
     assert bundle_data["lineage"] is not None

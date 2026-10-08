@@ -1,24 +1,55 @@
+import json
+import traceback
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 
+from backend.app.core.errors import AIProviderError
 from backend.app.core.response import APIResponse, api_success
+from backend.app.models.job import GenerationJob, GenerationJobRead
 from backend.app.models.potential import (
     BatchPotentialStatusUpdate,
     SeedPotentialItemRead,
     SeedPotentialItemUpdate,
 )
 from backend.app.providers.factory import get_ai_provider
-from backend.app.repositories.project_repo import ProjectRepository, get_session
+from backend.app.repositories.project_repo import ProjectRepository, get_session, async_session
+from backend.app.services.job_service import update_job_status
 
 router = APIRouter(prefix="/projects/{project_id}/potential", tags=["potential"])
 
 
-@router.post("/extract", response_model=APIResponse[List[SeedPotentialItemRead]])
+async def generate_potential_task(job_id: str, project_id: str, seed_text: str, dna_dict: dict):
+    await update_job_status(job_id, "processing")
+    try:
+        async with async_session() as session:
+            repo = ProjectRepository(session)
+            ai_provider = get_ai_provider()
+            extraction_result = await ai_provider.extract_potential(seed_text, dna_dict)
+            
+            
+            if isinstance(extraction_result, list):
+                raw_items = extraction_result
+            else:
+                raw_items = extraction_result.get("potential_items", [])
+                
+            records = await repo.save_potential_items(project_id, raw_items)
+            
+            result_json = json.dumps([r.to_read_schema().model_dump(mode="json") for r in records])
+            await update_job_status(job_id, "completed", 100, result_json=result_json)
+    except AIProviderError as e:
+        await update_job_status(job_id, "failed", error_code=e.error_code, error_message=e.message)
+    except Exception as e:
+        import logging
+        logging.getLogger("backend.app").error(f"Potential generation failed: {e}", exc_info=True)
+        await update_job_status(job_id, "failed", error_code="INTERNAL_ERROR", error_message=str(e))
+
+
+@router.post("/extract", response_model=APIResponse[GenerationJobRead])
 async def extract_potential_map(
     project_id: str,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_session),
-) -> APIResponse[List[SeedPotentialItemRead]]:
+) -> APIResponse[GenerationJobRead]:
     """Extract Seed Potential items (explicit, inferred, open) from seed and DNA."""
     repo = ProjectRepository(session)
     project = await repo.get_project(project_id)
@@ -39,15 +70,18 @@ async def extract_potential_map(
     dna_rec = await repo.get_latest_seed_dna(project_id)
     dna_dict = dna_rec.to_seed_dna().model_dump() if dna_rec else {}
 
-    ai_provider = get_ai_provider()
-    extraction_result = await ai_provider.extract_potential(seed_text, dna_dict)
-    if isinstance(extraction_result, list):
-        raw_items = extraction_result
-    else:
-        raw_items = extraction_result.get("potential_items", [])
+    job = GenerationJob(
+        project_id=project_id,
+        job_type="potential_extraction",
+        status="queued"
+    )
+    session.add(job)
+    await session.commit()
+    await session.refresh(job)
 
-    records = await repo.save_potential_items(project_id, raw_items)
-    return api_success(data=[r.to_read_schema() for r in records])
+    background_tasks.add_task(generate_potential_task, job.id, project_id, seed_text, dna_dict)
+
+    return api_success(data=job)
 
 
 @router.get("", response_model=APIResponse[List[SeedPotentialItemRead]])

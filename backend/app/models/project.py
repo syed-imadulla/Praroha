@@ -17,6 +17,7 @@ class ProjectBase(SQLModel):
     branch_name: str = Field(default="main", index=True)
     mutation_metadata_json: Optional[str] = Field(default=None, nullable=True)
     counterfactual_metadata_json: Optional[str] = Field(default=None, nullable=True)
+    deleted_at: Optional[datetime] = Field(default=None, nullable=True)
 
 
 class Project(ProjectBase, table=True):
@@ -73,3 +74,26 @@ class AssetCreate(AssetBase):
 class AssetRead(AssetBase):
     id: str
     created_at: datetime
+
+from typing import List, Optional, Any
+from pydantic import BaseModel
+from .dna import SeedDNARead
+from .potential import SeedPotentialItemRead
+from .world import WorldCandidateRead
+from .selection import WorldSelectionRead
+from .unfold import UnfoldedUniverseRead
+from .job import GenerationJobRead
+
+class ProjectBundleRead(BaseModel):
+    format_version: str = "1.0"
+    exported_at: str = ""
+    project: ProjectRead
+    seed_dna: Optional[SeedDNARead] = None
+    seed_potential_items: List[SeedPotentialItemRead] = []
+    world_candidates: List[WorldCandidateRead] = []
+    world_selection: Optional[WorldSelectionRead] = None
+    unfolded_universe: Optional[UnfoldedUniverseRead] = None
+    media_assets: List[AssetRead] = []
+    generation_jobs: List[GenerationJobRead] = []
+    revisions: List[Any] = []
+    lineage: Optional[Any] = None

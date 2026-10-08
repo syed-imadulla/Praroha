@@ -98,6 +98,11 @@ from backend.app.models.counterfactual import (
     ForkCounterfactualRequest,
     CounterfactualMetadata,
 )
+from backend.app.models.job import (
+    GenerationJob,
+    GenerationJobBase,
+    GenerationJobRead,
+)
 
 __all__ = [
     "Project",
@@ -181,6 +186,9 @@ __all__ = [
     "CounterfactualMetadata",
     "HumanOnlyZones",
     "DecisionDNA",
+    "GenerationJob",
+    "GenerationJobBase",
+    "GenerationJobRead",
 ]
 
 

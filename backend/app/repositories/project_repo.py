@@ -1,5 +1,6 @@
 import json
 import uuid
+from datetime import datetime, timezone
 from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, delete, select, text
@@ -97,6 +98,11 @@ def _migrate_columns(connection):
         if "counterfactual_metadata_json" not in cols:
             try:
                 connection.execute(text("ALTER TABLE projects ADD COLUMN counterfactual_metadata_json TEXT"))
+            except Exception:
+                pass
+        if "deleted_at" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN deleted_at TIMESTAMP"))
             except Exception:
                 pass
 
@@ -301,10 +307,79 @@ class ProjectRepository:
         result = await self.session.execute(statement)
         return result.scalar_one_or_none()
 
-    async def list_projects(self) -> List[Project]:
-        statement = select(Project).order_by(Project.created_at.desc())
+    async def list_projects(
+        self, include_deleted: bool = False, archived_only: bool = False
+    ) -> List[Project]:
+        statement = select(Project)
+        if archived_only:
+            statement = statement.where(Project.deleted_at.is_not(None))
+        elif not include_deleted:
+            statement = statement.where(Project.deleted_at.is_(None))
+        statement = statement.order_by(Project.updated_at.desc(), Project.created_at.desc())
         result = await self.session.execute(statement)
         return list(result.scalars().all())
+
+    async def soft_delete_project(self, project_id: str) -> Optional[Project]:
+        project = await self.get_project(project_id)
+        if not project:
+            return None
+        project.deleted_at = datetime.now(timezone.utc)
+        project.updated_at = datetime.now(timezone.utc)
+        self.session.add(project)
+        await self.session.commit()
+        await self.session.refresh(project)
+        return project
+
+    async def restore_project(self, project_id: str) -> Optional[Project]:
+        project = await self.get_project(project_id)
+        if not project:
+            return None
+        project.deleted_at = None
+        project.updated_at = datetime.now(timezone.utc)
+        self.session.add(project)
+        await self.session.commit()
+        await self.session.refresh(project)
+        return project
+
+    async def delete_project_permanently(self, project_id: str) -> bool:
+        project = await self.get_project(project_id)
+        if not project:
+            return False
+
+        # 1. Unlink any children referencing this project
+        await self.session.execute(
+            text("UPDATE projects SET parent_project_id = NULL WHERE parent_project_id = :pid"),
+            {"pid": project_id},
+        )
+        # 2. Delete all dependent tables safely
+        dependent_tables = [
+            "generation_jobs",
+            "media_assets",
+            "assets",
+            "character_relationships",
+            "characters",
+            "scenes",
+            "world_bibles",
+            "world_selections",
+            "world_candidates",
+            "seed_potential_items",
+            "seed_dna",
+            "entity_revisions",
+        ]
+        for tbl in dependent_tables:
+            try:
+                async with self.session.begin_nested():
+                    await self.session.execute(
+                        text(f"DELETE FROM {tbl} WHERE project_id = :pid"),
+                        {"pid": project_id},
+                    )
+            except Exception as e:
+                logger.warning(f"Failed deleting from {tbl} for project {project_id}: {e}")
+
+        # 3. Delete the project itself
+        await self.session.delete(project)
+        await self.session.commit()
+        return True
 
     async def create_asset_metadata(self, data: AssetCreate) -> Asset:
         asset = Asset(
@@ -1433,3 +1508,64 @@ class ProjectRepository:
 
 
 
+
+    async def get_project_bundle(self, project_id: str) -> Optional["ProjectBundleRead"]:
+        from backend.app.models.project import ProjectBundleRead
+        from backend.app.models.job import GenerationJob
+        
+        project = await self.get_project(project_id)
+        if not project:
+            return None
+
+        # Seed DNA
+        seed_dna_record = await self.get_seed_dna(project_id)
+        seed_dna_read = seed_dna_record.to_read_schema() if seed_dna_record else None
+
+        # Seed Potential Items
+        from backend.app.models.potential import SeedPotentialItemRecord
+        stmt_pot = select(SeedPotentialItemRecord).where(SeedPotentialItemRecord.project_id == project_id)
+        res_pot = await self.session.execute(stmt_pot)
+        potential_items = [p.to_read_schema() for p in res_pot.scalars().all()]
+
+        # World Candidates (latest batch)
+        candidates_records = await self.get_latest_world_candidates(project_id)
+        candidates_read = [c.to_read_schema() for c in candidates_records]
+
+        # World Selection
+        selection_tuple = await self.get_active_world_selection(project_id)
+        selection_read = selection_tuple[0].to_read_schema(selection_tuple[1].to_read_schema()) if selection_tuple else None
+
+        # Unfolded Universe
+        unfolded_universe = await self.get_unfolded_universe(project_id)
+
+        # Media Assets
+        assets_records = await self.list_assets(project_id)
+        assets_read = [a.to_read_schema() for a in assets_records]
+
+        # Generation Jobs
+        stmt_jobs = select(GenerationJob).where(GenerationJob.project_id == project_id)
+        res_jobs = await self.session.execute(stmt_jobs)
+        # Using model_validate because GenerationJob is SQLModel and GenerationJobRead is Pydantic/SQLModel
+        from backend.app.models.job import GenerationJobRead
+        jobs_read = [GenerationJobRead.model_validate(j) for j in res_jobs.scalars().all()]
+
+        # Lineage
+        from backend.app.services.lineage_service import LineageService
+        lineage_service = LineageService(self)
+        lineage = await lineage_service.build_project_lineage(project_id)
+
+        from datetime import datetime, timezone
+        return ProjectBundleRead(
+            format_version="1.0",
+            exported_at=datetime.now(timezone.utc).isoformat(),
+            project=project.to_read_schema(),
+            seed_dna=seed_dna_read,
+            seed_potential_items=potential_items,
+            world_candidates=candidates_read,
+            world_selection=selection_read,
+            unfolded_universe=unfolded_universe,
+            media_assets=assets_read,
+            generation_jobs=jobs_read,
+            revisions=[],
+            lineage=lineage,
+        )

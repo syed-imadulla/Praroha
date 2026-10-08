@@ -65,12 +65,12 @@ async def test_mock_provider_extract_potential_arbitrary_seed():
 
 @pytest.mark.asyncio
 async def test_gemini_provider_potential_fallback():
-    provider_no_key = GeminiProvider(api_key=None, model="gemini-3.5-flash")
+    provider_no_key = GeminiProvider(api_key=None, model="gemini-3.6-flash", allow_mock_fallback=True)
     res = await provider_no_key.extract_potential(CANONICAL_SEED_TEXT, CANONICAL_SEED_DNA)
     items = res if isinstance(res, list) else res.get("potential_items", [])
     assert len(items) > 0
 
-    provider_with_key = GeminiProvider(api_key="fake-test-key", model="gemini-3.5-flash")
+    provider_with_key = GeminiProvider(api_key="fake-test-key", model="gemini-3.6-flash", allow_mock_fallback=True)
     with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
         mock_post.side_effect = httpx.ConnectError("Network down")
         res_fail = await provider_with_key.extract_potential(CANONICAL_SEED_TEXT, CANONICAL_SEED_DNA)

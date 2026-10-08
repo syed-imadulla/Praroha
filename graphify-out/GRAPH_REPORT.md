@@ -1,23 +1,23 @@
 # Graph Report - Praroha  (2026-10-08)
 
 ## Corpus Check
-- 317 files · ~663,752 words
+- 344 files · ~686,802 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 6 file(s) not represented in the graph (top: .zip 2, .example 1, (none) 1)
+- Unclassified: 7 file(s) not represented in the graph (top: .zip 2, .example 1, (none) 1)
 
 ## Summary
-- 3100 nodes · 6917 edges · 212 communities (194 shown, 18 thin omitted)
-- Extraction: 78% EXTRACTED · 22% INFERRED · 0% AMBIGUOUS · INFERRED: 1547 edges (avg confidence: 0.95)
+- 3384 nodes · 7566 edges · 250 communities (229 shown, 21 thin omitted)
+- Extraction: 78% EXTRACTED · 22% INFERRED · 0% AMBIGUOUS · INFERRED: 1693 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0b4175e7`
+- Built from commit: `c25738ca`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - MockProvider
-- creation/index.ts
+- CreationCard
 - frontend/package.json
 - apiClient
 - Acceptance Test Scenarios & Results
@@ -25,11 +25,11 @@
 - Implementation Decisions
 - Seed Unfold — Product Concepts Glossary
 - compilerOptions
-- Milestone 2: Semantic Intelligence + Generative Media Requirements (Active)
+- Milestone 1: Core MVP Requirements (Completed & Verified)
 - package.json
 - Phase 6 Research: Traceability & Provenance (TRAC-01 to TRAC-03)
 - WorldCandidateRecord
-- api_success
+- extract_seed_dna
 - 2. The Three Demo Worlds
 - Automated Playwright Test Results
 - Phase 1 — Validation Strategy
@@ -44,12 +44,12 @@
 - rules/graphify.md
 - workflows/graphify.md
 - test_selection.py
-- routers/mutation.py
+- providers/factory.py
 - types/index.ts
 - Areas Discussed & Decisions Made
 - 1. Questions & User Decisions
 - Topics Discussed & Decisions Made
-- test_worlds.py
+- What Was Built
 - Discussion Topics & Agreed Decisions
 - Phase 3 — Validation Strategy
 - Phase 4 — Validation Strategy
@@ -57,42 +57,41 @@
 - Phase 2 Research: Seed Understanding + Seed DNA
 - Phase 2 — Validation Strategy
 - Phase 1: Foundation / Project Shell - Discussion Log
-- test_voice_generation.py
+- ProviderUnavailableError
 - 06-01-PLAN.md
 - Proposed Changes
 - PRAROHA — UI Density, Clustering & Composition Audit
 - test_audio_generation.py
 - Phase 10 Context: Divergent Worlds Engine
-- PersistenceService
+- models/__init__.py
 - Phase 4 User Acceptance Testing (UAT) Report
 - 1. Locked Decisions & Implementation Scope
 - MockMediaProvider
 - test_unfold.py
-- ProviderUnavailableError
 - AIProvider
 - Technical Analysis
 - useWorkspaceStore
 - Canonical Demo Fixture for Seed Potential Map
+- 30-04-AUDIT.md: Full Deep Technical & Product Integrity Audit
 - Tasks
-- 4. Frontend Experience & UI Architecture
 - Phase 5 Execution Summary: Progressive World Unfolding (Tattva 4: Srishti)
 - Validation Checklist
-- asyncio
-- models/__init__.py
+- conftest.py
+- models/potential.py
 - WorldSelectionRecord
 - 1. Questions & Locked Decisions
 - design.md
 - 2. Technical Architecture & Component Design
 - Technical Tasks
 - Technical Tasks
-- project_repo.py
+- api_success
 - test_persistence.py
 - test_counterfactual_replay.py
 - Locked Architectural Decisions
 - Phase 6: Traceability & Provenance (Tattva 5: Sambandha) - Summary
-- Phase 9 Context: Seed Potential Map
-- react
-- counterfactual_service.py
+- devDependencies
+- UniverseCodexCanvas.tsx
+- WorldCandidateBase
 - Phase 8: Polish / Reliability / Demo — Research & Technical Spikes
 - 2. Technical Tasks
 - Phase 9: Seed Potential Map — User Acceptance Testing (UAT) Report
@@ -105,31 +104,31 @@
 - 1. Locked Decisions & Implementation Scope
 - Praroha Data & Storage Architecture
 - Praroha 3-Minute Live Judging Demo Script
-- Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback
+- routers/counterfactual.py
 - MediaPayload
 - test_video_generation.py
 - Proposed Changes
-- Phase 20: Human-Only Zones — User Acceptance Testing (UAT) Report
-- world.py
+- 3. Sub-Phase Execution Details
+- project_repo.py
 - Praroha Judge Q&A Cheatsheet
 - MediaService
 - Praroha Master Architecture: Tattva 2 & Idea 1
 - 2. Key Accomplishments & Deliverables
 - Proposed Changes
-- Proposed Changes
+- projectSubscription
 - Phase 7: Refine / Branch / Save (Tattva 6: Parinamana & Dharana) — Summary
 - 14. PROFILE SCREEN
 - Technical Tasks
 - Phase 12 Plan 1 (12-01-PLAN.md): Backend Origin Ledger Engine
 - Locked Architectural Decisions
 - 2. Key Changes Implemented
-- http_exception_handler
+- ai_provider_error_handler
 - MediaPreviewCard.tsx
-- StorageProvider
-- ADR-001: Core Architecture & Stack Selection
-- test_image_generation.py
+- LocalStorageProvider
+- Phase Details
+- MockImageProvider
 - 23. Content-Type Visual Language
-- 2. Locked Decisions (Incorporating Plan Corrections)
+- Milestone 2 Phase Details
 - Architecture & Technology Research
 - Architecture & Technology Research
 - test_phase14_image_generation.cjs
@@ -137,16 +136,16 @@
 - .format_decision_dna_contract
 - Tasks
 - test_gemini_provider_graceful_fallback
-- 1. Locked Decisions & Implementation Scope
-- Phase 11 Plan 1 (11-01-PLAN.md): Backend Decision DNA Engine
+- test_divergence.py
+- 3. Architecture & Code Changes
 - 2. Technical Investigation & Corrected Patterns
-- asyncio
+- Phase 11 Plan 1 (11-01-PLAN.md): Backend Decision DNA Engine
 - Phase 7 User Acceptance Testing (UAT) Report
 - Tasks
 - 2. Locked Implementation Decisions
 - Phase 5 Research: Progressive World Unfolding
 - Phase 29: Secondary UI + Typography + Visibility Polish — Verification Report
-- .generate_worlds
+- Phase 9 Context: Seed Potential Map
 - ref_path
 - Phase 28: Seed → Universe Workspace Botanical Redesign — Verification Report
 - 6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)
@@ -157,26 +156,26 @@
 - test_phase18_mutation_lab.cjs
 - test_phase10_divergence.cjs
 - Seed Unfold (Praroha)
-- test_phase13_media_provider.cjs
+- Milestone 2: Semantic Intelligence + Generative Media Requirements (Active)
 - Implementation Waves
 - test_phase4_selection.cjs
 - test_phase5_unfold.cjs
 - 2. Key Removals & Architectural Shifts
 - test_phase9_potential.cjs
-- CreationItem
+- Milestone 4: Real Product Hardening + True Realtime Requirements (Active)
 - Implementation Waves
 - 2. Technical Design & Architecture
 - 13. GRAVEYARD SCREEN
 - SeedInputCanvas.tsx
-- Milestone 2 Phase Details
+- Milestone 4: Real Product Hardening + True Realtime
 - 20. Motion & Interaction
 - Phase 30.2: Clean Global Header & Shell Simplification — Verification Report
 - Phase 21 Plan: Design System Foundation (UI Upgrade Phase 1)
 - Locked Decisions
-- ADR-003: Cloud Object Storage and Asset Management
+- StorageProvider
 - Status: COMPLETE & VERIFIED
 - test_human_only_zones.py
-- Phase 24: Creation Component System — Execution Plan
+- dependencies
 - Status: COMPLETE & VERIFIED
 - test_phase16_video_generation.cjs
 - 12. MY CREATIONS SCREEN
@@ -186,92 +185,130 @@
 - Phase 30.2 UAT: Clean Global Header & Shell Simplification
 - 4. Typography
 - ProjectRepository
-- test_supabase_storage_provider_fallback_on_network_error
+- Settings
 - Phase 4 Research: Human World Selection
-- Phase 22 Plan: Global App Shell (UI Upgrade Phase 2)
-- CreationCard
+- ADR-001: Core Architecture & Stack Selection
+- Praroha AI Pipeline & Provider Architecture
 - 9. Buttons
-- 2. Acceptance Criteria Checklist
-- Tasks
-- _migrate_columns
+- 1. Existing Architecture Integration Points
+- .generate_origin_explanation
+- 1. Domain & Architecture Investigation
 - 24. Empty States
 - 2.1 Core Palette
 - 3. Background
 - 5. Layout System
 - 6. Sidebar
 - test_phase28_botanical_workspace.cjs
-- 4. Implementation Decisions
-- 2. Key Architecture Decisions & Implementations
-- WorldCandidateBase
+- Phase 11 Context: Decision DNA
+- 30-04-EXECUTIVE-SUMMARY.md: Executive Summary & Technical Integrity Verdict
+- .generate_worlds
 - Phase 23 UAT: Botanical Home Screen UI Upgrade
-- conftest.py
+- Phase 14 Plan 2 (14-02-PLAN.md): Frontend Visual Experience & Lightbox Modal
+- Proposed Changes
+- Seed Unfold — Traceability & Provenance Model
 - test_phase29_ui_polish.cjs
-- App.tsx
+- 2. Technical Architecture & Component Design
 - test_phase3_worlds.cjs
-- Phase 12 Plan 2 (12-02-PLAN.md): Frontend Origin Ledger UI & E2E Suite
-- test_backward_compatibility_empty_profile
+- 3. Phase B: Component Density Maps
+- Phase 8 User Acceptance Testing (UAT) Report
+- GeminiProvider
+- Key Topics & Alignment
 - test_phase19_counterfactual_replay.cjs
-- test_phase20_human_only_zones.cjs
+- Phase 31.5: Project Routing & Authoritative Rehydration
 - ref_assert
-- test_phase12_origin_ledger.cjs
+- test_generation_jobs.py
 - test_phase6_traceability.cjs
+- 4. Frontend Experience & UI Architecture
+- models/unfold.py
+- test_potential.py
+- 30-04-TEST-AUDIT.md: Test Quality, False Positive & Coverage Gap Audit
+- 2. Locked Decisions (Incorporating Plan Corrections)
 - Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report
-- Backend (`backend/`)
-- 02-01-PLAN.md
+- 1. Architectural Inspection & Root Causes
+- test_projects_lifecycle.py
+- Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback
+- 2. API Contract Anomaly Analysis
+- 30-04-CONTENT-AUDIT.md: Terminology, Jargon & Cognitive Friction Audit
+- projectSubscription.ts
+- Phase 22 Plan: Global App Shell (UI Upgrade Phase 2)
 - Phase 30.1: Wave 1 Verification Report
+- 30-04-REALTIME-MATRIX.md: Realtime & Reactivity Audit Matrix
+- test_supabase_storage_provider_fallback_on_network_error
+- Status: COMPLETE & VERIFIED
+- Plan 01-02 Summary: Frontend Workspace Shell & End-to-End Integration
+- Phase 3 Plan 02 Summary: Frontend Candidate Cards, Comparison Canvas & Inspector Integration
+- test_responsive_refinement.cjs
+- Phase 12 Plan 2 (12-02-PLAN.md): Frontend Origin Ledger UI & E2E Suite
+- Phase 15 Plan 1 (15-01-PLAN.md): Backend Voice Provider Engine
+- 1. Locked Decisions & Implementation Scope
+- 16. Phase Q: Issue Priority Matrix
+- run_uat.cjs
+- scripts
+- Phase 31.3 Verification Report: Supabase Realtime Infrastructure
+- 2. Acceptance Criteria Checklist
+- Phase 23 Plan: Home Screen UI Upgrade
+- test_lifecycle_e2e.mjs
+- 2. Key Architecture Decisions & Implementations
+- Phase 8: Polish / Reliability / Demo - Validation Matrix
+- 3. Cinematic Video Prompt Enrichment (`D-03`)
+- 11. Phase J: TopBar De-Cluttering & Structural Redesign
+- 12. Phase K: Stage Progress Rail Composition
+- 6. Phase E: Clustering Test Results
+- 7. Phase F: Nested Card Audit (Anti-Pattern Hunt)
+- 8. Phase G: Spacing & Rhythm Audit
 
 ## God Nodes (most connected - your core abstractions)
-1. `ProjectRepository` - 161 edges
+1. `ProjectRepository` - 178 edges
 2. `MediaPayload` - 83 edges
-3. `ProviderUnavailableError` - 63 edges
-4. `MockProvider` - 58 edges
-5. `PersistenceService` - 57 edges
-6. `APIResponse` - 54 edges
-7. `api_success()` - 54 edges
-8. `MediaService` - 53 edges
-9. `useWorkspaceStore` - 52 edges
-10. `WorldSelectionRecord` - 50 edges
+3. `GeminiProvider` - 67 edges
+4. `MockProvider` - 66 edges
+5. `api_success()` - 65 edges
+6. `ProviderUnavailableError` - 63 edges
+7. `APIResponse` - 61 edges
+8. `PersistenceService` - 58 edges
+9. `MediaService` - 55 edges
+10. `useWorkspaceStore` - 55 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `3.2. `backend/app/providers/gemini_provider.py`` --references--> `AIProviderError`  [INFERRED]
+  .planning/phases/31-real-product-hardening/31-01-PLAN.md → backend/app/core/errors.py
+- `3.3. Router Error Handling (`dna.py`, `worlds.py`, `unfold.py`, `potential.py`)` --references--> `AIProviderError`  [INFERRED]
+  .planning/phases/31-real-product-hardening/31-01-PLAN.md → backend/app/core/errors.py
+- `Sub-Phase 31.1: Gemini & AI Provider Repair` --references--> `AIProviderError`  [INFERRED]
+  .planning/phases/31-real-product-hardening/31-PLAN.md → backend/app/core/errors.py
+- `Anomaly 1: Dual Envelope `fallback_used` Collision` --references--> `api_success()`  [INFERRED]
+  .planning/phases/30-04-product-integrity-audit/30-04-API-MATRIX.md → backend/app/core/response.py
 - `3. Immutability & Persistence` --references--> `SeedDNARecord`  [INFERRED]
   .planning/phases/02-seed-understanding-seed-dna/02-RESEARCH.md → backend/app/models/dna.py
-- `2. Reusable Assets in Workspace` --references--> `SeedDNARecord`  [INFERRED]
-  .planning/phases/03-three-world-generation/03-RESEARCH.md → backend/app/models/dna.py
-- `Existing Architecture Integration Points` --references--> `SeedDNARecord`  [INFERRED]
-  .planning/phases/09-seed-potential-map/09-RESEARCH.md → backend/app/models/dna.py
-- `A. Immutable Revision History (`entity_revisions`) & Audit Diffs` --references--> `EntityRevisionRecord`  [INFERRED]
-  .planning/phases/07-refine-branch-save/07-RESEARCH.md → backend/app/models/persistence.py
-- `1. Test Automation Matrix` --references--> `EntityRevisionRecord`  [INFERRED]
-  .planning/phases/07-refine-branch-save/07-VALIDATION.md → backend/app/models/persistence.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (212 total, 18 thin omitted)
+## Communities (250 total, 21 thin omitted)
 
 ### Community 0 - "MockProvider"
-Cohesion: 0.08
-Nodes (18): GeminiProvider, MockProvider, test_local_storage_provider(), test_mock_provider_extract_dna(), test_mock_provider_generate_worlds(), test_mock_provider_health_check(), test_mock_provider_unfold_stages(), 3. Fallback & Failure Modes (Actual Source Behavior) (+10 more)
+Cohesion: 0.11
+Nodes (15): MockProvider, test_local_storage_provider(), test_mock_provider_extract_dna(), test_mock_provider_generate_worlds(), test_mock_provider_health_check(), test_mock_provider_unfold_stages(), Part 17 — Consolidated Findings & Severity Classification, Stage 5: Unfold (Universe Codex) (+7 more)
 
-### Community 1 - "creation/index.ts"
-Cohesion: 0.38
-Nodes (8): ContentTypeStyle, TYPE_CONFIG, CreationAction, CreationCardProps, CreationCardVariant, CreationType, FlexibleCreationType, normalizeCreationType()
+### Community 1 - "CreationCard"
+Cohesion: 0.12
+Nodes (24): ContentTypeStyle, CreationCard(), TYPE_CONFIG, CreationAction, CreationCardProps, CreationCardVariant, CreationItem, CreationType (+16 more)
 
 ### Community 2 - "frontend/package.json"
-Cohesion: 0.05
-Nodes (40): dependencies, clsx, framer-motion, lucide-react, react, react-dom, tailwind-merge, zustand (+32 more)
+Cohesion: 0.11
+Nodes (17): name, private, type, version, autoprefixer, clsx, postcss, react-dom (+9 more)
 
 ### Community 3 - "apiClient"
-Cohesion: 0.10
-Nodes (13): apiClient, APIResponse, Project, ProjectBundle, SeedPotentialItem, Delivered Features, Plan 01-02 Summary: Frontend Workspace Shell & End-to-End Integration, Verification Evidence (+5 more)
+Cohesion: 0.14
+Nodes (7): apiClient, APIResponse, GenerationJobRead, Project, Delivered Features, What Was Built, 1. Complete API Surface Matrix
 
 ### Community 4 - "Acceptance Test Scenarios & Results"
 Cohesion: 0.18
 Nodes (10): Acceptance Test Scenarios & Results, Phase 3 UAT: Three World Generation, Summary, Test 1: Stage 3 Transition & Candidate Generation, Test 2: Canonical Demo Fixtures Determinism, Test 3: Six Core Dimensions & Visual Contrast, Test 4: Workspace Inspector Drawer (Worlds Tab), Test 5: Re-generation & Append-Only Batch Persistence (+2 more)
 
 ### Community 5 - "Phase 1: Foundation / Project Shell - Research"
-Cohesion: 0.12
-Nodes (15): 1. Monorepo Organization, 2. Standardized Response Envelope, 3. AI Provider ABC Contract, 4. Storage Provider ABC Contract, Architectural Responsibility Map, Architecture Patterns & Implementation Blueprint, Automated Test Commands, Backend Core (+7 more)
+Cohesion: 0.10
+Nodes (20): 1. Monorepo Organization, 2. Standardized Response Envelope, 3. AI Provider ABC Contract, 4. Storage Provider ABC Contract, Architectural Responsibility Map, Architecture Patterns & Implementation Blueprint, Automated Test Commands, Backend Core (+12 more)
 
 ### Community 6 - "Implementation Decisions"
 Cohesion: 0.10
@@ -283,27 +320,27 @@ Nodes (18): 10. Scenes, 11. Assets, 12. Traceability, 13. Refine, 14. Branch, 15
 
 ### Community 8 - "compilerOptions"
 Cohesion: 0.11
-Nodes (17): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleResolution, noEmit (+9 more)
+Nodes (18): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleResolution, noEmit (+10 more)
 
-### Community 9 - "Milestone 2: Semantic Intelligence + Generative Media Requirements (Active)"
-Cohesion: 0.09
-Nodes (21): Audio & Atmosphere via ACE-Step 1.5 (AUD) — Phase 17, Counterfactual Replay (CNTR) — Phase 19, Decision DNA (DDNA) — Phase 11, Divergence Engine (DIV) — Phase 10, Human-Only Zones (HOZ) — Phase 20, Human World Selection (HCHO), Image Generation via Pollinations & FLUX (IMG) — Phase 14, Milestone 1: Core MVP Requirements (Completed & Verified) (+13 more)
+### Community 9 - "Milestone 1: Core MVP Requirements (Completed & Verified)"
+Cohesion: 0.17
+Nodes (11): Human World Selection (HCHO), Milestone 1: Core MVP Requirements (Completed & Verified), Progressive World Unfolding (UNFL), Refine, Branch & Persistence (PERS), Reliability & Demo Resilience (DEMO), Requirements: Seed Unfold (Praroha), Seed Understanding & Seed DNA (DNA), Shell & Foundation (SHEL) (+3 more)
 
 ### Community 10 - "package.json"
 Cohesion: 0.13
 Nodes (14): description, devDependencies, concurrently, name, private, scripts, dev, dev:backend (+6 more)
 
 ### Community 12 - "Phase 6 Research: Traceability & Provenance (TRAC-01 to TRAC-03)"
-Cohesion: 0.15
-Nodes (12): 1.2 Node Schema (`TraceNode`), 1.3 Edge Schema (`TraceEdge`), 1.4 Lineage DAG Response (`TraceGraphRead`), 1. Domain Modeling: Nodes, Edges & Lineage, 2. Causal Explanation Engine (TRAC-03), 3.1 Stage 6 ("Trace") Canvas (`TraceabilityCanvas.tsx`), 3. Frontend Canvas & UX Architecture, 4. Test Strategy (+4 more)
+Cohesion: 0.17
+Nodes (11): 1.2 Node Schema (`TraceNode`), 1.3 Edge Schema (`TraceEdge`), 1.4 Lineage DAG Response (`TraceGraphRead`), 1. Domain Modeling: Nodes, Edges & Lineage, 2. Causal Explanation Engine (TRAC-03), 3.1 Stage 6 ("Trace") Canvas (`TraceabilityCanvas.tsx`), 3. Frontend Canvas & UX Architecture, 4. Test Strategy (+3 more)
 
 ### Community 13 - "WorldCandidateRecord"
-Cohesion: 0.12
-Nodes (24): SeedDNARecord, EntityRevisionRecord, CharacterRecord, CharacterRelationshipRecord, SceneRecord, WorldBibleRecord, WorldCandidateRecord, 2. Source-Accurate Pipeline Table (+16 more)
+Cohesion: 0.15
+Nodes (25): SeedDNARecord, EntityRevisionRecord, CharacterRecord, CharacterRelationshipRecord, SceneRecord, WorldBibleRecord, WorldCandidateRecord, 2. Source-Accurate Pipeline Table (+17 more)
 
-### Community 14 - "api_success"
-Cohesion: 0.05
-Nodes (26): api_error(), api_success(), APIResponse, ErrorDetail, ExtractDNARequest, SeedDNARead, get_counterfactual_candidates(), get_counterfactual_delta() (+18 more)
+### Community 14 - "extract_seed_dna"
+Cohesion: 0.11
+Nodes (6): extract_seed_dna(), get_latest_seed_dna(), generate_world_candidates(), get_latest_world_candidates(), B. Foolproof AI Provider Fallback Resilience (DEMO-02), Repository & DB Migration (`backend/app/repositories/project_repo.py`)
 
 ### Community 15 - "2. The Three Demo Worlds"
 Cohesion: 0.22
@@ -330,8 +367,8 @@ Cohesion: 0.33
 Nodes (5): ADR-002: Three-World Branching and Traceability DAG, Consequences, Context, Decision, Status
 
 ### Community 21 - "LineageService"
-Cohesion: 0.11
-Nodes (12): AncestorPathRead, TraceEdge, TraceGraphRead, TraceNode, LineageService, test_ancestor_path_traversal_preserves_origins(), test_canonical_demo_seeding_origin_diversity(), test_database_schema_migration_backward_compatibility() (+4 more)
+Cohesion: 0.15
+Nodes (9): AncestorPathRead, TraceEdge, TraceGraphRead, TraceNode, get_node_ancestor_path(), get_project_lineage(), get_mutation_service(), LineageService (+1 more)
 
 ### Community 22 - "Seed Unfold — Product Documentation"
 Cohesion: 0.33
@@ -349,13 +386,13 @@ Nodes (4): 1. Product Rules, 2. UX Rules, 3. Architecture Rules, Seed Unfold —
 Cohesion: 0.15
 Nodes (16): test_cannot_select_world_after_stage5_unfolding_begun(), test_get_active_selection_endpoint(), test_select_candidate_from_older_batch_rejected(), test_select_invalid_candidate(), test_select_world_success(), test_select_world_with_rationale(), test_selection_schema(), test_switch_world_selection() (+8 more)
 
-### Community 33 - "routers/mutation.py"
-Cohesion: 0.10
-Nodes (14): EntityImpactItem, ForkMutationRequest, get_utc_now(), MutationMetadata, MutationSimulationResponse, PremiseVariableRead, SeedMutationRequest, fork_mutated_universe() (+6 more)
+### Community 33 - "providers/factory.py"
+Cohesion: 0.11
+Nodes (9): get_storage_provider(), build_engine(), AIProviderUpdateRequest, _get_health_payload(), health_check(), update_ai_provider(), get_media_service(), test_storage_factory_supabase_resolution() (+1 more)
 
 ### Community 34 - "types/index.ts"
 Cohesion: 0.07
-Nodes (63): DagEdge, DagNode, MutationCausalDiffDAG(), MutationCausalDiffDAGProps, ModalContentProps, PRESET_MUTATIONS, SeedMutationLabCanvas(), SeedPotentialCanvasProps (+55 more)
+Nodes (63): DagEdge, DagNode, MutationCausalDiffDAGProps, ModalContentProps, SeedDnaViewerProps, DEFAULT_STAGES, WorkspaceState, AncestorPathRead (+55 more)
 
 ### Community 35 - "Areas Discussed & Decisions Made"
 Cohesion: 0.22
@@ -366,16 +403,16 @@ Cohesion: 0.22
 Nodes (8): 1. Questions & User Decisions, 2. Locked Decisions Summary, Phase 4 Discussion Log: Human World Selection, Q1: Selection Interaction & Confirmation Flow, Q2: Backend Selection Persistence, Q3: Re-Selection / Switching Policy, Q4: Visual Canvas Treatment, Q5: Traceability DAG in Inspector Drawer
 
 ### Community 37 - "Topics Discussed & Decisions Made"
-Cohesion: 0.25
-Nodes (7): 1. Progressive Unfolding UX & Lifecycle State Machine, 3. Database & Relational Persistence Architecture, 4. Non-blocking Visual Prompt Descriptors (UNFL-05) & Key Locations, 5. Lineage & Inspector Integration, Date: 2026-10-04, Phase 5 Discussion Log: Progressive World Unfolding, Topics Discussed & Decisions Made
+Cohesion: 0.22
+Nodes (8): 1. Progressive Unfolding UX & Lifecycle State Machine, 2. Canonical Demo Fixture Support, 3. Database & Relational Persistence Architecture, 4. Non-blocking Visual Prompt Descriptors (UNFL-05) & Key Locations, 5. Lineage & Inspector Integration, Date: 2026-10-04, Phase 5 Discussion Log: Progressive World Unfolding, Topics Discussed & Decisions Made
 
-### Community 38 - "test_worlds.py"
-Cohesion: 0.25
+### Community 38 - "What Was Built"
+Cohesion: 0.23
 Nodes (8): test_canonical_demo_fixtures_determinism(), test_generate_worlds_mock_fallback(), test_world_candidate_schema_validation(), test_worlds_generate_and_get_endpoint(), test_worlds_regenerate_batch_history(), Phase 3 Plan 01 Summary: Backend World Candidate Models, Provider & API, Verification, What Was Built
 
 ### Community 39 - "Discussion Topics & Agreed Decisions"
-Cohesion: 0.22
-Nodes (8): 2. Human Interaction & Editing Boundaries, 3. Seed Presets on Input Canvas, 4. Inspector Drawer Presentation, Discussion Topics & Agreed Decisions, Next Steps, Participants, Phase 2 Discussion Log: Seed Understanding + Seed DNA, Session Date
+Cohesion: 0.20
+Nodes (9): 1. AI Provider & Understanding Pass Integration, 2. Human Interaction & Editing Boundaries, 3. Seed Presets on Input Canvas, 4. Inspector Drawer Presentation, Discussion Topics & Agreed Decisions, Next Steps, Participants, Phase 2 Discussion Log: Seed Understanding + Seed DNA (+1 more)
 
 ### Community 40 - "Phase 3 — Validation Strategy"
 Cohesion: 0.29
@@ -401,9 +438,9 @@ Nodes (6): Manual Probes, Per-Task Verification Map, Phase 2 — Validation Stra
 Cohesion: 0.25
 Nodes (7): AI Provider Abstraction & Stub Provider, Deferred Ideas, Frontend-Backend Communication & Monorepo Structure, Initial State & Persistence Bootstrap, Phase 1: Foundation / Project Shell - Discussion Log, The Agent's Discretion, Workspace Layout & Shell Aesthetics
 
-### Community 46 - "test_voice_generation.py"
-Cohesion: 0.04
-Nodes (50): CompositeVoiceProvider, EdgeTTSProvider, resolve_voice_and_persona(), KokoroVoiceProvider, MockVoiceProvider, test_3_tier_fallback_edgetts_and_kokoro_fail_mock_success(), test_3_tier_fallback_edgetts_fail_kokoro_success(), test_3_tier_fallback_via_context_outage_simulation() (+42 more)
+### Community 46 - "ProviderUnavailableError"
+Cohesion: 0.06
+Nodes (30): ProviderUnavailableError, CompositeVoiceProvider, EdgeTTSProvider, resolve_voice_and_persona(), KokoroVoiceProvider, test_3_tier_fallback_edgetts_and_kokoro_fail_mock_success(), test_3_tier_fallback_edgetts_fail_kokoro_success(), test_3_tier_fallback_via_context_outage_simulation() (+22 more)
 
 ### Community 47 - "06-01-PLAN.md"
 Cohesion: 0.18
@@ -414,20 +451,20 @@ Cohesion: 0.20
 Nodes (9): 1. Types & Client (`frontend/src/types/index.ts` & `frontend/src/api/client.ts`), 2. Workspace Store (`frontend/src/store/workspaceStore.ts`), 3. Canvas Component (`frontend/src/components/SeedPotentialCanvas.tsx`), 4. Workspace Integration (`frontend/src/components/WorkspaceCanvas.tsx` / `StageProgressHeader.tsx`), 5. Automated Verification & E2E (`frontend/e2e/test_phase9_potential.cjs`), Goal, Phase 9 Plan 2 (09-02-PLAN.md): Frontend Seed Potential Canvas & Interactive Controls, Proposed Changes (+1 more)
 
 ### Community 49 - "PRAROHA — UI Density, Clustering & Composition Audit"
-Cohesion: 0.05
-Nodes (43): 10. Phase I: Action Hierarchy Audit, 11. Phase J: TopBar De-Cluttering & Structural Redesign, 12. Phase K: Stage Progress Rail Composition, 13. Phase L: Responsive Composition Audit (6 Viewports), 14. Phase M: Comprehensive Remove / Merge / Move / Collapse Master Table, 15. Phase N & O: PRAROHA Botanical Design Language Alignment, 16. Phase Q: Issue Priority Matrix, 17. Phase R: Recommended Implementation Order for Phase 30+ (+35 more)
+Cohesion: 0.12
+Nodes (15): 10. Phase I: Action Hierarchy Audit, 13. Phase L: Responsive Composition Audit (6 Viewports), 14. Phase M: Comprehensive Remove / Merge / Move / Collapse Master Table, 15. Phase N & O: PRAROHA Botanical Design Language Alignment, 17. Phase R: Recommended Implementation Order for Phase 30+, 18. Audit Completion Declaration, 1. Executive Summary & Core Philosophy, 4. Phase C: Visual Cluster Analysis (+7 more)
 
 ### Community 50 - "test_audio_generation.py"
 Cohesion: 0.07
-Nodes (34): ACEStepAudioProvider, CompositeAudioProvider, _generate_wav_bytes(), MockAudioProvider, StableAudioOpenProvider, test_3_tier_fallback_acestep_and_stableaudio_fail_mock_success(), test_3_tier_fallback_acestep_fail_stableaudio_success(), test_3_tier_fallback_via_context_outage_simulation() (+26 more)
+Nodes (32): ACEStepAudioProvider, detect_audio_mime_type(), CompositeAudioProvider, _generate_wav_bytes(), MockAudioProvider, StableAudioOpenProvider, test_3_tier_fallback_acestep_and_stableaudio_fail_mock_success(), test_3_tier_fallback_acestep_fail_stableaudio_success() (+24 more)
 
 ### Community 51 - "Phase 10 Context: Divergent Worlds Engine"
 Cohesion: 0.15
 Nodes (12): 1. Phase Goal, 2. Divergence Archetypes, 3. Exploration Profile Metrics (0–100%), 4. Seed Potential Map Integration (Phase 9 Bridge), 5. Implementation Decisions, 6. Out of Scope for Phase 10, D-01: Data Model Expansion (`backend/app/models/world.py`), D-02: AI Provider Engine (`backend/app/providers/`) (+4 more)
 
-### Community 52 - "PersistenceService"
+### Community 52 - "models/__init__.py"
 Cohesion: 0.08
-Nodes (22): BranchCreate, BranchRead, CharacterRefineRequest, EntityRevisionBase, EntityRevisionRead, get_utc_now(), ProjectBundle, SceneRefineRequest (+14 more)
+Nodes (23): SeedDNARead, BranchCreate, BranchRead, CharacterRefineRequest, EntityRevisionBase, EntityRevisionRead, get_utc_now(), ProjectBundle (+15 more)
 
 ### Community 53 - "Phase 4 User Acceptance Testing (UAT) Report"
 Cohesion: 0.33
@@ -438,36 +475,36 @@ Cohesion: 0.20
 Nodes (9): 1. Locked Decisions & Implementation Scope, 2. Verification & Acceptance Criteria, 3. Downstream Compatibility, D-01: Concrete `PollinationsProvider` Implementation (`IMG-01`), D-03: Context-Aware Visual Prompt Enrichment, D-04: Storage & Metadata Tracking (`IMG-02`), D-05: Multi-Entity Visual Generation Targets (`IMG-03`), D-06: Frontend Lightbox Modal & Aspect Ratio Controls (`IMG-03`) (+1 more)
 
 ### Community 55 - "MockMediaProvider"
-Cohesion: 0.11
-Nodes (35): AudioProvider, ImageProvider, MediaProvider, VideoProvider, VoiceProvider, ConfiguredMediaProvider, MediaProviderFactory, MockMediaProvider (+27 more)
+Cohesion: 0.09
+Nodes (38): AudioProvider, ImageProvider, MediaProvider, VideoProvider, VoiceProvider, ConfiguredMediaProvider, get_media_provider(), MediaProviderFactory (+30 more)
 
 ### Community 56 - "test_unfold.py"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (15): test_canonical_fixtures_by_raw_seed_and_title(), test_character_relationships_scoped_to_candidate(), test_get_unfolded_endpoint(), test_unfold_concurrency_rejection(), test_unfold_failure_lifecycle_and_rollback(), test_unfold_idempotency_when_already_unfolded(), test_unfold_requires_world_selection(), test_unfold_universe_success() (+7 more)
 
 ### Community 58 - "AIProvider"
-Cohesion: 0.06
-Nodes (18): AIProvider, health_check(), 1. Actual AI Provider Architecture, 4. Canonical Demo vs Live Custom Seed Operation, 5. Multimodal Capabilities Reality Check, Components, Deterministic Canonical Demo (`POST /api/projects/canonical-demo`), Future / Optional Scope (Explicitly NOT Live Now) (+10 more)
+Cohesion: 0.14
+Nodes (4): AIProvider, 1. Actual AI Provider Architecture, Components, 3. Is Gemini actually being used?
 
 ### Community 59 - "Technical Analysis"
 Cohesion: 0.15
 Nodes (12): 1. Architectural Overview & Intent, 3.1 Data Types (`frontend/src/types/index.ts`), 3.2 Workspace Store (`frontend/src/store/workspaceStore.ts`) & API Client (`frontend/src/api/client.ts`), 3.3 Stage 4 UI: Decision DNA Capture (`frontend/src/components/WorldSelectionCanvas.tsx`), 3.4 Stage 5 UI: Codex Anchor Strip (`frontend/src/components/UniverseCodexCanvas.tsx`), 3.5 Inspector Drawer (`frontend/src/components/InspectorDrawer.tsx`), 3. Frontend Architecture Integration, 4. Canonical Demo & Offline Resilience (+4 more)
 
 ### Community 60 - "useWorkspaceStore"
-Cohesion: 0.09
-Nodes (37): AtmosphereDeck(), CounterfactualReplayCanvas(), EntityMediaSection(), GuidedTourOverlay(), TOUR_STEPS, TourStepData, InspectorDrawer(), KeyboardShortcutsModal() (+29 more)
+Cohesion: 0.08
+Nodes (47): App(), CounterfactualReplayCanvas(), GuidedTourOverlay(), TOUR_STEPS, TourStepData, InspectorDrawer(), KeyboardShortcutsModal(), ShortcutRow (+39 more)
 
 ### Community 61 - "Canonical Demo Fixture for Seed Potential Map"
 Cohesion: 0.25
 Nodes (7): AI-Inferred Possibilities, Canonical Demo Fixture for Seed Potential Map, Existing Architecture Integration Points, Explicit Elements, Open Questions, Phase 9 Research: Seed Potential Map, Technical Analysis
 
-### Community 62 - "Tasks"
+### Community 62 - "30-04-AUDIT.md: Full Deep Technical & Product Integrity Audit"
+Cohesion: 0.06
+Nodes (35): 30-04-AUDIT.md: Full Deep Technical & Product Integrity Audit, Enforced Guards:, Execution Results Comparison:, Feature Classification Table:, Key Contract Insights:, Key Findings:, Part 10 — Media Generation & Storage Audit, Part 11 — Secondary Components & Utility Surface Audit (+27 more)
+
+### Community 63 - "Tasks"
 Cohesion: 0.15
 Nodes (12): AudioMoodPreset, 1. Define Audio Mood Presets & Types, 2. Update Workspace Store with Atmosphere Deck & Category Blocker Set, 3. Implement Docked Persistent Atmosphere Deck, 4. Upgrade In-Card Audio Player in MediaPreviewCard & MIME-Aware Download, 6. Integrate Audio Controls in EntityMediaSection & Codex Canvas, 7. Production Build & Automated Playwright E2E Suite, Goal (+4 more)
-
-### Community 63 - "4. Frontend Experience & UI Architecture"
-Cohesion: 0.50
-Nodes (4): 4.1 Dual Placement for "Bring This World to Life" (`D-02`, `VID-03`), 4.2 Rich In-Card Video Player (`MediaPreviewCard.tsx`), 4.3 Interactive Lightbox Modal (`VideoLightboxModal.tsx`), 4. Frontend Experience & UI Architecture
 
 ### Community 64 - "Phase 5 Execution Summary: Progressive World Unfolding (Tattva 4: Srishti)"
 Cohesion: 0.40
@@ -477,17 +514,17 @@ Nodes (4): Captured Artifacts, Execution Overview, Phase 5 Execution Summary: Pr
 Cohesion: 0.33
 Nodes (5): 1. Backend Verification, 2. Frontend Verification, 3. End-to-End Playwright Verification, Phase 6 Validation: Traceability & Provenance (TRAC-01 to TRAC-03), Validation Checklist
 
-### Community 66 - "asyncio"
-Cohesion: 0.22
-Nodes (4): test_canonical_demo_fixtures_divergence_triad(), test_divergent_worlds_endpoints_lifecycle(), test_gemini_provider_fallback_divergence(), test_mock_provider_arbitrary_seed_with_potential()
+### Community 66 - "conftest.py"
+Cohesion: 0.38
+Nodes (3): client(), event_loop(), initialize_test_db()
 
-### Community 67 - "models/__init__.py"
-Cohesion: 0.09
-Nodes (21): BatchPotentialStatusUpdate, get_utc_now(), PotentialItemStatus, SeedPotentialCategory, SeedPotentialItemBase, SeedPotentialItemRead, SeedPotentialItemRecord, SeedPotentialItemUpdate (+13 more)
+### Community 67 - "models/potential.py"
+Cohesion: 0.08
+Nodes (16): BatchPotentialStatusUpdate, get_utc_now(), PotentialItemStatus, SeedPotentialCategory, SeedPotentialItemBase, SeedPotentialItemRead, SeedPotentialItemRecord, SeedPotentialItemUpdate (+8 more)
 
 ### Community 68 - "WorldSelectionRecord"
 Cohesion: 0.08
-Nodes (23): WorldSelectionBase, WorldSelectionRecord, 1. Backend Data Models (`backend/app/models/selection.py`), 2. Database & Repository (`backend/app/repositories/project_repo.py`), 3. API Endpoints (`backend/app/routers/selection.py`), 4. Frontend State & Canvas (`frontend/src/`), Executive Summary, Phase 4 Context: Human World Selection (+15 more)
+Nodes (31): WorldSelectionBase, WorldSelectionRecord, _migrate_columns(), 1. Backend Data Models (`backend/app/models/selection.py`), 2. Database & Repository (`backend/app/repositories/project_repo.py`), 3. API Endpoints (`backend/app/routers/selection.py`), 4. Frontend State & Canvas (`frontend/src/`), Executive Summary (+23 more)
 
 ### Community 69 - "1. Questions & Locked Decisions"
 Cohesion: 0.25
@@ -509,9 +546,9 @@ Nodes (10): 1. Frontend Types (`frontend/src/types/index.ts`), 2. API Client Int
 Cohesion: 0.15
 Nodes (12): VoicePersona, 1. Voice Persona Models & Catalog (`frontend/src/types/index.ts`), 2. Voice Persona Selector Controls (`frontend/src/components/EntityMediaSection.tsx`), 3. Dual-Target Voice Generation Coverage (`frontend/src/components/UniverseCodexCanvas.tsx`), 4. Custom Narrative Audio Player (`frontend/src/components/MediaPreviewCard.tsx`), 5. Frontend Build Validation, 6. Automated Playwright E2E Test Suite (`frontend/e2e/test_phase15_voice_generation.cjs`), Goal (+4 more)
 
-### Community 74 - "project_repo.py"
-Cohesion: 0.13
-Nodes (9): lifespan(), get_ai_provider(), get_storage_provider(), build_engine(), get_session(), init_db(), get_counterfactual_service(), test_storage_factory_supabase_resolution() (+1 more)
+### Community 74 - "api_success"
+Cohesion: 0.06
+Nodes (30): api_error(), api_success(), APIResponse, ErrorDetail, ProjectBundleRead, ProjectRead, get_job(), list_jobs() (+22 more)
 
 ### Community 75 - "test_persistence.py"
 Cohesion: 0.27
@@ -529,17 +566,17 @@ Nodes (7): D-02: Multi-Entity Generation Targets & Modal Controls (`AUD-01`, `AU
 Cohesion: 0.29
 Nodes (6): 1. Executive Summary, 3. Verification & Testing, 4. Artifact Links, Backend Test Suite, Frontend Build & End-to-End Suite, Phase 6: Traceability & Provenance (Tattva 5: Sambandha) - Summary
 
-### Community 79 - "Phase 9 Context: Seed Potential Map"
-Cohesion: 0.22
-Nodes (8): API Endpoints, Frontend Presentation, Implementation Decisions, Item Statuses, Key Concepts & Categories, Out of Scope, Phase 9 Context: Seed Potential Map, Phase Goal
+### Community 79 - "devDependencies"
+Cohesion: 0.18
+Nodes (11): devDependencies, autoprefixer, playwright, postcss, tailwindcss, @types/node, @types/react, @types/react-dom (+3 more)
 
-### Community 80 - "react"
-Cohesion: 0.11
-Nodes (29): ORIGIN_CONFIG, OriginBadge(), OriginBadgeProps, OriginConfig, getOriginAccentClass(), NodeCard(), NodeCardProps, WhyIsThisHereData (+21 more)
+### Community 80 - "UniverseCodexCanvas.tsx"
+Cohesion: 0.08
+Nodes (37): AtmosphereDeck(), EntityMediaSection(), ORIGIN_CONFIG, OriginBadge(), OriginBadgeProps, OriginConfig, getOriginAccentClass(), NodeCard() (+29 more)
 
-### Community 81 - "counterfactual_service.py"
-Cohesion: 0.10
-Nodes (12): CounterfactualCandidateRead, CounterfactualDeltaDimension, CounterfactualDeltaResponse, CounterfactualMetadata, ExplorationProfileComparison, ForkCounterfactualRequest, get_utc_now(), fork_counterfactual_branch() (+4 more)
+### Community 81 - "WorldCandidateBase"
+Cohesion: 0.14
+Nodes (12): WorldCandidateBase, 1. Data Models (`backend/app/models/world.py`), 2. Repository Layer (`backend/app/repositories/project_repo.py`), 3. AI Providers, 4. Router (`backend/app/routers/worlds.py`), 5. Automated Tests (`backend/tests/test_divergence.py`), Goal, Phase 10 Plan 1 (10-01-PLAN.md): Backend Divergent Worlds Engine (+4 more)
 
 ### Community 82 - "Phase 8: Polish / Reliability / Demo — Research & Technical Spikes"
 Cohesion: 0.14
@@ -559,63 +596,67 @@ Nodes (6): 1. Demo Walkthrough & Presentation Aids, 2. Error Communication & Res
 
 ### Community 86 - "Praroha: Comprehensive Judge Explanation"
 Cohesion: 0.10
-Nodes (19): 10. What happens without an API key or during network throttling?, 11. What is the canonical demo mode?, 12. How does the seed become a universe?, 13. Where does human agency enter?, 14. How is the original seed preserved?, 15. How does traceability work?, 16. How is project data stored?, 18. What is currently implemented? (+11 more)
+Nodes (20): 10. What happens without an API key or during network throttling?, 11. What is the canonical demo mode?, 12. How does the seed become a universe?, 13. Where does human agency enter?, 14. How is the original seed preserved?, 15. How does traceability work?, 16. How is project data stored?, 18. What is currently implemented? (+12 more)
 
 ### Community 87 - "Praroha"
 Cohesion: 0.11
-Nodes (17): 1. Problem Statement, 2. The Tattva 2 Connection, 3. Idea 1: Generative AI, 4. The Praroha Solution, 5. System Architecture, 7. Quick Start & Demonstration, 8. Technology Stack, 9. Multimodal Scope: Implemented vs. Future (+9 more)
+Nodes (18): 1. Problem Statement, 2. The Tattva 2 Connection, 3. Idea 1: Generative AI, 4. The Praroha Solution, 5. System Architecture, 6. AI Models, Reliability & Architecture Modes, 7. Quick Start & Demonstration, 8. Technology Stack (+10 more)
 
 ### Community 88 - "Tasks"
 Cohesion: 0.17
 Nodes (11): 2. Extend Workspace Store (Corrections 1, 2, 5, 6), 3. Implement Interactive Causal Diff DAG Component (Correction 3, 4), 4. Implement Seed Mutation Lab Canvas (Split Layout) (Corrections 2, 6), 5. Integrate into Codex Canvas & TopBar, 6. Production Build & Playwright E2E Suite (Correction 5, 7), Goal, Phase 18: Plan 2 (18-02-PLAN.md) — Frontend Seed Mutation Lab & Causal Diff DAG, Scope Boundaries & Non-Goals (Correction 8) (+3 more)
 
 ### Community 89 - "test_mutation_lab.py"
-Cohesion: 0.11
-Nodes (22): _setup_unfolded_project(), test_branch_name_sanitization_and_collision_safety(), test_causal_justifications_no_cot_leakage(), test_child_branch_origin_ledger_mutation_citation(), test_deterministic_classification_offline_resilience(), test_extract_all_four_premise_variables(), test_fork_mutation_isolated_branch_and_id_remapping(), test_fork_mutation_non_premise_variable_tone() (+14 more)
+Cohesion: 0.06
+Nodes (32): EntityImpactItem, ForkMutationRequest, get_utc_now(), MutationMetadata, MutationSimulationResponse, PremiseVariableRead, SeedMutationRequest, simulate_mutation() (+24 more)
 
 ### Community 90 - "playwright"
-Cohesion: 0.29
-Nodes (3): { chromium }, { chromium }, playwright
+Cohesion: 0.17
+Nodes (6): assert, { chromium }, runPhase12E2E(), { chromium }, { chromium }, playwright
 
 ### Community 91 - "1. Locked Decisions & Implementation Scope"
 Cohesion: 0.25
 Nodes (7): 1. Locked Decisions & Implementation Scope, 2. Verification Criteria, D-01: Universal Origin Classification Taxonomy (`ORIG-01`), D-03: Stage 5 Genesis Engine Origin Assignment, D-04: Deterministic "Why is this here?" Explainer (`ORIG-03`), D-06: Visual Styling & Color Palette, Phase 12 Context: Origin Ledger
 
 ### Community 92 - "Praroha Data & Storage Architecture"
-Cohesion: 0.17
-Nodes (9): 1. Structured Relational Data Layer, 3. Current Runtime Configuration Audit, 4. State Portability & Snapshots, Key Takeaway for Judges, Lossless Round-Trip Import (`POST /api/projects/import`), Overview, Praroha Data & Storage Architecture, ProjectBundle (`GET /api/projects/{id}/bundle`) (+1 more)
+Cohesion: 0.20
+Nodes (7): 1. Structured Relational Data Layer, 4. State Portability & Snapshots, Lossless Round-Trip Import (`POST /api/projects/import`), Overview, Praroha Data & Storage Architecture, ProjectBundle (`GET /api/projects/{id}/bundle`), Storage Snapshots (`POST /api/projects/{id}/snapshots`)
 
 ### Community 93 - "Praroha 3-Minute Live Judging Demo Script"
 Cohesion: 0.18
 Nodes (10): [0:00 – 0:20] 1. Introduction: The Philosophical & Technical Challenge, [0:20 – 0:40] 2. The Formless Seed (Stage 1), [0:40 – 1:00] 3. Uncovering Hidden Structure: Seed DNA (Stage 2), [1:00 – 1:20] 4. Three Latent Manifestations (Stage 3), [1:20 – 1:35] 5. Human Choice Gate (Stage 4), [1:35 – 2:05] 6. Progressive Universe Unfolding (Stage 5), [2:05 – 2:25] 7. Refinement, Branching & Continuity (Stage 7), [2:25 – 2:45] 8. Traceability DAG: Proving Origin (Stage 6) (+2 more)
 
-### Community 94 - "Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback"
-Cohesion: 0.29
-Nodes (6): 1. Context & Objectives, 2. Technical Tasks, 3. Verification Criteria, Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback, Task 2: Mount `POST /api/projects/canonical-demo`, Task 3: Resilient Fallback Wrapper in `gemini_provider.py`
+### Community 94 - "routers/counterfactual.py"
+Cohesion: 0.09
+Nodes (16): CounterfactualCandidateRead, CounterfactualDeltaDimension, CounterfactualDeltaResponse, CounterfactualMetadata, ExplorationProfileComparison, ForkCounterfactualRequest, get_utc_now(), ExplorationProfile (+8 more)
+
+### Community 95 - "MediaPayload"
+Cohesion: 0.06
+Nodes (18): MediaPayload, _generate_svg_bytes(), MockVoiceProvider, test_composite_mock_media_provider(), test_media_api_endpoints(), test_media_service_error_containment(), test_mock_audio_provider(), test_mock_image_provider() (+10 more)
 
 ### Community 96 - "test_video_generation.py"
 Cohesion: 0.05
-Nodes (49): CompositeVideoProvider, _generate_minimal_mp4_bytes(), MockVideoProvider, PyramidFlowProvider, WanVideoProvider, test_3_tier_fallback_pyramid_and_wan_fail_mock_success(), test_3_tier_fallback_pyramid_fail_wan_success(), test_3_tier_fallback_via_context_outage_simulation() (+41 more)
+Nodes (47): CompositeVideoProvider, _generate_minimal_mp4_bytes(), MockVideoProvider, PyramidFlowProvider, WanVideoProvider, test_3_tier_fallback_pyramid_and_wan_fail_mock_success(), test_3_tier_fallback_pyramid_fail_wan_success(), test_3_tier_fallback_via_context_outage_simulation() (+39 more)
 
 ### Community 97 - "Proposed Changes"
 Cohesion: 0.17
 Nodes (11): 1. Types (`frontend/src/types/index.ts`), 2. API Client & Workspace Store, 3. Stage 4: World Selection Canvas (`frontend/src/components/WorldSelectionCanvas.tsx`), 4. Stage 5: Universe Codex Canvas (`frontend/src/components/UniverseCodexCanvas.tsx`), 5. Inspector Drawer (`frontend/src/components/InspectorDrawer.tsx`), 6. Automated E2E Verification (`frontend/e2e/test_phase11_decision_dna.cjs`), Goal, Phase 11 Plan 2 (11-02-PLAN.md): Frontend Decision DNA UI & E2E Verification (+3 more)
 
-### Community 98 - "Phase 20: Human-Only Zones — User Acceptance Testing (UAT) Report"
-Cohesion: 0.25
-Nodes (7): 1. Executive Summary, 2.2 Frontend Build & TypeScript Validation, 2.3 End-to-End Browser Automation (Playwright), 2. Test Execution Results, 3. Visual Artifacts Captured, 4. Verification Sign-Off, Phase 20: Human-Only Zones — User Acceptance Testing (UAT) Report
+### Community 98 - "3. Sub-Phase Execution Details"
+Cohesion: 0.17
+Nodes (12): 3. Sub-Phase Execution Details, Sub-Phase 31.10: Production E2E & Two-Tab Realtime Tests, Sub-Phase 31.11: Final Full-System Audit & Live Verification, Sub-Phase 31.1: Gemini & AI Provider Repair, Sub-Phase 31.2: Server-Backed Generation Job State, Sub-Phase 31.3: Supabase Realtime Infrastructure, Sub-Phase 31.4: Realtime Store Synchronization, Sub-Phase 31.5: Project Routing & Authoritative Rehydration (+4 more)
 
-### Community 99 - "world.py"
-Cohesion: 0.10
-Nodes (15): get_utc_now(), SeedDNA, SeedDNABase, DecisionDNA, get_utc_now(), WorldSelectionCreate, WorldSelectionRead, DivergenceArchetype (+7 more)
+### Community 99 - "project_repo.py"
+Cohesion: 0.09
+Nodes (25): lifespan(), ExtractDNARequest, get_utc_now(), SeedDNA, SeedDNABase, GenerationJob, GenerationJobBase, GenerationJobRead (+17 more)
 
 ### Community 100 - "Praroha Judge Q&A Cheatsheet"
-Cohesion: 0.11
-Nodes (17): 10. How is provenance represented?, 11. Why a relational database instead of a dedicated graph database like Neo4j?, 12. What is stored in object storage?, 13. Is Supabase actually being used right now?, 14. Can this generate actual images, audio, or video right now?, 15. Can this architecture scale?, 16. What is the key technical innovation?, 1. Why is this project Tattva 2? (+9 more)
+Cohesion: 0.12
+Nodes (16): 10. How is provenance represented?, 11. Why a relational database instead of a dedicated graph database like Neo4j?, 12. What is stored in object storage?, 13. Is Supabase actually being used right now?, 14. Can this generate actual images, audio, or video right now?, 15. Can this architecture scale?, 16. What is the key technical innovation?, 1. Why is this project Tattva 2? (+8 more)
 
 ### Community 101 - "MediaService"
 Cohesion: 0.07
-Nodes (26): get_utc_now(), MediaAssetBase, MediaAssetRead, MediaAssetRecord, MediaGenerationRequest, MediaJobResponse, ProjectCreate, get_media_provider() (+18 more)
+Nodes (24): get_utc_now(), MediaAssetBase, MediaAssetRead, MediaAssetRecord, MediaGenerationRequest, MediaJobResponse, ProjectCreate, MediaService (+16 more)
 
 ### Community 102 - "Praroha Master Architecture: Tattva 2 & Idea 1"
 Cohesion: 0.33
@@ -629,9 +670,9 @@ Nodes (9): 1. Overview & Conceptual Architecture, 2. Key Accomplishments & Deliv
 Cohesion: 0.18
 Nodes (10): 1. Types (`frontend/src/types/index.ts`), 2. Candidate Card (`frontend/src/components/WorldCandidateCard.tsx`), 3. Stage 3 Canvas (`frontend/src/components/WorldCandidatesCanvas.tsx`), 4. Stage 4 Selection Canvas (`frontend/src/components/WorldSelectionCanvas.tsx`), 5. Automated E2E Verification (`frontend/e2e/test_phase10_divergence.cjs`), Goal, Phase 10 Plan 2 (10-02-PLAN.md): Frontend Divergent Worlds UI & E2E Verification, Proposed Changes (+2 more)
 
-### Community 105 - "Proposed Changes"
-Cohesion: 0.22
-Nodes (8): 2. Repository Layer (`backend/app/repositories/project_repo.py`), 3. AI Providers, 4. Router & Endpoints (`backend/app/routers/potential.py`), 5. Automated Tests (`backend/tests/test_potential.py`), Goal, Phase 9 Plan 1 (09-01-PLAN.md): Backend Seed Potential Map Service, Proposed Changes, Verification Criteria
+### Community 105 - "projectSubscription"
+Cohesion: 0.33
+Nodes (5): projectSubscription, RealtimeEventCallback, 1.3. Missing Supabase Realtime Subscription Layer, True Realtime Architecture (REAL-02), Phase 31.3: Supabase Realtime Infrastructure
 
 ### Community 106 - "Phase 7: Refine / Branch / Save (Tattva 6: Parinamana & Dharana) — Summary"
 Cohesion: 0.25
@@ -646,8 +687,8 @@ Cohesion: 0.14
 Nodes (13): 1. Interactive Video Lightbox Modal (`frontend/src/components/VideoLightboxModal.tsx`), 2. Rich In-Card Video Player (`frontend/src/components/MediaPreviewCard.tsx`), 3. Dual "Bring This World to Life" Entry Points (`frontend/src/components/UniverseCodexCanvas.tsx`), 4. Canonical Motion Prompt Dispatch (`frontend/src/components/EntityMediaSection.tsx`), 5. Frontend Build Validation, 6. Automated Playwright E2E Test Suite (`frontend/e2e/test_phase16_video_generation.cjs`), Acceptance Gates, Execution Suite (+5 more)
 
 ### Community 109 - "Phase 12 Plan 1 (12-01-PLAN.md): Backend Origin Ledger Engine"
-Cohesion: 0.40
-Nodes (4): Goal, Phase 12 Plan 1 (12-01-PLAN.md): Backend Origin Ledger Engine, Requirements Addressed, Verification
+Cohesion: 0.25
+Nodes (7): 3. Causal Explainer & Lineage DAG Synthesis (`backend/app/services/lineage_service.py`), 4. Dedicated Pytest Test Suite (`backend/tests/test_origin_ledger.py`), Goal, Phase 12 Plan 1 (12-01-PLAN.md): Backend Origin Ledger Engine, Requirements Addressed, Technical Tasks, Verification
 
 ### Community 110 - "Locked Architectural Decisions"
 Cohesion: 0.18
@@ -657,29 +698,33 @@ Nodes (10): D-01: UI Entry Point & Codex Integration (`CNTR-01`), D-02: Hybrid D
 Cohesion: 0.12
 Nodes (15): 1. Executive Summary, 2. Key Changes Implemented, 3. What Was Intentionally Preserved, 4. Responsive Verification Matrix, 5. Automated Test Suite Results, 6. Known Limitations, A. Home Screen Alignment & Side Journey Card Removal, B. Global Layout Container (`PageContainer`) (+7 more)
 
+### Community 112 - "ai_provider_error_handler"
+Cohesion: 0.39
+Nodes (3): ai_provider_error_handler(), http_exception_handler(), unhandled_exception_handler()
+
 ### Community 113 - "MediaPreviewCard.tsx"
-Cohesion: 0.16
-Nodes (22): EntityMediaSectionProps, ImageLightboxModalProps, MediaPreviewCard(), MediaPreviewCardProps, NarrativeAudioAtmospherePlayer(), NarrativeAudioAtmospherePlayerProps, NarrativeAudioPlayer(), NarrativeAudioPlayerProps (+14 more)
+Cohesion: 0.12
+Nodes (29): EntityMediaSectionProps, ImageLightboxModal(), ImageLightboxModalProps, MediaPreviewCard(), MediaPreviewCardProps, NarrativeAudioAtmospherePlayer(), NarrativeAudioAtmospherePlayerProps, NarrativeAudioPlayer() (+21 more)
 
-### Community 114 - "StorageProvider"
-Cohesion: 0.06
-Nodes (29): LocalStorageProvider, StorageProvider, SupabaseStorageProvider, 2. Object Storage Layer (`StorageProvider`), Providers Implemented in Source Code, 1. Technical Stack Overview, 2. Architectural Principles & Boundaries, 3. Data Flow Diagram (+21 more)
+### Community 114 - "LocalStorageProvider"
+Cohesion: 0.13
+Nodes (9): LocalStorageProvider, SupabaseStorageProvider, 2. Object Storage Layer (`StorageProvider`), 3. Current Runtime Configuration Audit, Key Takeaway for Judges, Providers Implemented in Source Code, 17. What is cloud storage?, 1.2 Upstream Foundation (Phase 13 & 14) (+1 more)
 
-### Community 115 - "ADR-001: Core Architecture & Stack Selection"
-Cohesion: 0.33
-Nodes (5): ADR-001: Core Architecture & Stack Selection, Consequences, Context, Decision, Status
+### Community 115 - "Phase Details"
+Cohesion: 0.17
+Nodes (12): Overview, Phase 1: Foundation / Project Shell, Phase 2: Seed Understanding + Seed DNA, Phase 3: Three World Generation, Phase 4: Human World Selection, Phase 5: Progressive World Unfolding, Phase 6: Traceability / Provenance, Phase 7: Refine / Branch / Save (+4 more)
 
-### Community 116 - "test_image_generation.py"
-Cohesion: 0.07
-Nodes (24): CompositeImageProvider, FluxSchnellProvider, MockImageProvider, PollinationsImageProvider, test_3_tier_fallback_pollinations_and_flux_fail_mock_success(), test_3_tier_fallback_pollinations_fail_flux_success(), test_image_api_with_aspect_ratios(), test_image_metadata_persistence() (+16 more)
+### Community 116 - "MockImageProvider"
+Cohesion: 0.08
+Nodes (16): CompositeImageProvider, FluxSchnellProvider, MockImageProvider, PollinationsImageProvider, 1. Concrete Pollinations Image Provider with Retry & Backoff (`backend/app/providers/media/pollinations.py`), 2. Local FLUX.1 schnell Provider (`backend/app/providers/media/flux.py`), 3. 3-Tier Composite Image Provider (`backend/app/providers/media/composite.py`), 4. Context-Aware Visual Prompt Enrichment (`backend/app/services/media_service.py`) (+8 more)
 
 ### Community 117 - "23. Content-Type Visual Language"
 Cohesion: 0.33
 Nodes (6): 23. Content-Type Visual Language, Chat, Image, Sound, Story, Video
 
-### Community 118 - "2. Locked Decisions (Incorporating Plan Corrections)"
-Cohesion: 0.29
-Nodes (6): 1. Phase Objective & Tattva Alignment, 2. Locked Decisions (Incorporating Plan Corrections), D-01: Timeline Branching & Strict Child ID Remapping (PERS-02), D-02: Component Refinement & Immutable Revision History (PERS-01), D-04: UI Architecture & Stage 7 Canvas, Phase 7: Refine, Branch & Save (Tattva 6: Parinamana & Dharana) - Context
+### Community 118 - "Milestone 2 Phase Details"
+Cohesion: 0.20
+Nodes (9): Milestone 2 Phase Details, Milestone 2: Semantic Intelligence + Generative Media, Milestone 3: Complete UI Upgrade, Phase 10: Divergence Engine, Phase 11: Decision DNA, Phase 12: Origin Ledger, Phase 19: Counterfactual Replay, Phase 20: Human-Only Zones (+1 more)
 
 ### Community 119 - "Architecture & Technology Research"
 Cohesion: 0.33
@@ -698,8 +743,8 @@ Cohesion: 0.15
 Nodes (12): D-01: Premise Formulation & "What If?" Formulation (`MUT-01`), D-02: Lineage-Driven Downstream Impact Classification (`MUT-02`), D-03: Isolated Timeline Branching Engine (`MUT-03`), D-04: Causal DAG Mutation Diff & Propagation Visualization (`MUT-04`), D-05: Dedicated Mutation Lab Tab & Split-View UX Architecture, D-06: Verification & Non-Regression Standards, Executive Summary, Locked Architectural Decisions (+4 more)
 
 ### Community 123 - ".format_decision_dna_contract"
-Cohesion: 0.13
-Nodes (10): test_gemini_prompt_creative_contract_injection(), 1. Executive Overview & Problem Statement, 2. Key Decisions Locked, 3. Wave Architecture Plan, 4. Success Verification Criteria, D-01: UX Placement & Journey, D-02: Dual-Layer AI Protection & Zero-Override Enforcement, D-03: Data Model & Origin Ledger Persistence (HOZ-02) (+2 more)
+Cohesion: 0.18
+Nodes (9): 1. Executive Overview & Problem Statement, 2. Key Decisions Locked, 3. Wave Architecture Plan, 4. Success Verification Criteria, D-01: UX Placement & Journey, D-02: Dual-Layer AI Protection & Zero-Override Enforcement, D-03: Data Model & Origin Ledger Persistence (HOZ-02), D-04: Canonical Instant Demo Seeding (+1 more)
 
 ### Community 124 - "Tasks"
 Cohesion: 0.20
@@ -709,21 +754,21 @@ Nodes (9): 2. Implement Counterfactual Replay Canvas Component, 3. Integrate int
 Cohesion: 0.22
 Nodes (4): test_canonical_demo_api_endpoint(), test_create_canonical_demo_project_repository(), test_gemini_provider_graceful_fallback(), Task 4: Pytest Suite `backend/tests/test_demo.py`
 
-### Community 126 - "1. Locked Decisions & Implementation Scope"
-Cohesion: 0.40
-Nodes (5): 1. Locked Decisions & Implementation Scope, D-02: Dual Placement for "Bring This World to Life" (`VID-03`), D-03: Cinematic Video Prompt Enrichment (`VID-01`), D-04: Video Asset Persistence & Storage (`VID-02`), D-05: Cinematic Video Player & Lightbox Experience (`VID-03`)
+### Community 126 - "test_divergence.py"
+Cohesion: 0.14
+Nodes (7): DivergenceArchetype, test_backward_compatibility_empty_profile(), test_canonical_demo_fixtures_divergence_triad(), test_divergent_worlds_endpoints_lifecycle(), test_exploration_profile_and_archetype_validation(), test_gemini_provider_fallback_divergence(), test_mock_provider_arbitrary_seed_with_potential()
 
-### Community 127 - "Phase 11 Plan 1 (11-01-PLAN.md): Backend Decision DNA Engine"
-Cohesion: 0.40
-Nodes (4): Goal, Phase 11 Plan 1 (11-01-PLAN.md): Backend Decision DNA Engine, Requirements Addressed, Verification Criteria
+### Community 127 - "3. Architecture & Code Changes"
+Cohesion: 0.20
+Nodes (9): 1. Objective, 2. Requirements Addressed, 3.1. `backend/app/config.py`, 3.2. `backend/app/providers/gemini_provider.py`, 3.3. Router Error Handling (`dna.py`, `worlds.py`, `unfold.py`, `potential.py`), 3.4. Verification Suite (`backend/tests/test_real_ai_provider.py`), 3. Architecture & Code Changes, 4. Verification & Success Criteria (+1 more)
 
 ### Community 128 - "2. Technical Investigation & Corrected Patterns"
 Cohesion: 0.20
 Nodes (9): 1. Domain Overview & Requirements Mapping, 2. Technical Investigation & Corrected Patterns, A. Immutable Revision History (`entity_revisions`) & Audit Diffs, B. Phase 6 Lineage Version Semantics (`refined_from`), C. Strict Branch Cloning ID Remapping (PERS-02), D. Complete ProjectBundle with Lineage DAG, E. StorageProvider Interface Verification, F. Refinement Scope Boundary (+1 more)
 
-### Community 129 - "asyncio"
-Cohesion: 0.33
-Nodes (5): test_canonical_demo_includes_potential_items(), test_gemini_provider_potential_fallback(), test_mock_provider_extract_potential_arbitrary_seed(), test_mock_provider_extract_potential_canonical(), test_potential_endpoints_lifecycle()
+### Community 129 - "Phase 11 Plan 1 (11-01-PLAN.md): Backend Decision DNA Engine"
+Cohesion: 0.40
+Nodes (4): Goal, Phase 11 Plan 1 (11-01-PLAN.md): Backend Decision DNA Engine, Requirements Addressed, Verification Criteria
 
 ### Community 130 - "Phase 7 User Acceptance Testing (UAT) Report"
 Cohesion: 0.33
@@ -745,13 +790,13 @@ Nodes (5): 1. Domain & Architecture Analysis, 2. Reusable Assets & Integration P
 Cohesion: 0.18
 Nodes (10): 1. Frontend Production Build Check, 2. Backend Pytest Regression Check, 3. Multi-Viewport Workspace Regression Suite, 4. Phase 29 UI & Typography Verification Suite, Components Refactored & Polished, Conclusion, Executive Summary, Key Outcomes Achieved (+2 more)
 
-### Community 135 - ".generate_worlds"
-Cohesion: 0.11
-Nodes (15): 1. Data Models (`backend/app/models/world.py`), 2. API Endpoints (`backend/app/routers/worlds.py`), 3. Frontend Experience (Stage 3 `worlds`), Executive Summary, Out of Scope for Phase 3, Phase 3 Context: Three World Generation, Technical Specifications, 1. Domain & Architecture Analysis (+7 more)
+### Community 135 - "Phase 9 Context: Seed Potential Map"
+Cohesion: 0.20
+Nodes (9): AI Provider & Extraction Engine, API Endpoints, Frontend Presentation, Implementation Decisions, Item Statuses, Key Concepts & Categories, Out of Scope, Phase 9 Context: Seed Potential Map (+1 more)
 
 ### Community 136 - "ref_path"
-Cohesion: 0.11
-Nodes (9): { chromium }, path, { chromium }, path, { chromium }, path, { chromium }, path (+1 more)
+Cohesion: 0.12
+Nodes (10): { chromium }, path, { chromium }, path, assert, { chromium }, path, runPhase20E2E() (+2 more)
 
 ### Community 137 - "Phase 28: Seed → Universe Workspace Botanical Redesign — Verification Report"
 Cohesion: 0.18
@@ -759,11 +804,11 @@ Nodes (10): 2.1 Backend Unit & Integration Tests, 2.2 Frontend Production Compil
 
 ### Community 138 - "6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)"
 Cohesion: 0.21
-Nodes (5): test_canonical_demo_decision_dna(), test_decision_dna_snapshot_propagation_to_unfold(), test_select_world_with_decision_dna(), test_world_selection_backward_compatibility(), 6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)
+Nodes (5): test_canonical_demo_decision_dna(), test_decision_dna_snapshot_propagation_to_unfold(), test_gemini_prompt_creative_contract_injection(), test_select_world_with_decision_dna(), 6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)
 
 ### Community 139 - "2. Phase A: Full Application Audit by Screen & Shared UI"
-Cohesion: 0.25
-Nodes (8): 2. Phase A: Full Application Audit by Screen & Shared UI, Screen 2: Stage 2 — Understand (Seed DNA & Potential Map), Screen 3: Stage 3 — Divergent Worlds (Three Candidate Cards), Screen 4: Stage 4 — Choose (Human Selection & Decision DNA), Screen 5: Stage 5 — Unfold (Universe Codex), Screen 6: Stage 6 — Trace (Causal Lineage DAG), Screen 7: Stage 7 — Refine (Timeline Branching & Audit Log), Shared Components Audit
+Cohesion: 0.20
+Nodes (10): 2. Phase A: Full Application Audit by Screen & Shared UI, Screen 1: Home / Seed Input (Stage 1), Screen 2: Stage 2 — Understand (Seed DNA & Potential Map), Screen 3: Stage 3 — Divergent Worlds (Three Candidate Cards), Screen 4: Stage 4 — Choose (Human Selection & Decision DNA), Screen 5: Stage 5 — Unfold (Universe Codex), Screen 6: Stage 6 — Trace (Causal Lineage DAG), Screen 7: Stage 7 — Refine (Timeline Branching & Audit Log) (+2 more)
 
 ### Community 140 - "test_phase11_decision_dna.cjs"
 Cohesion: 0.67
@@ -786,12 +831,12 @@ Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase10E2E()
 
 ### Community 145 - "Seed Unfold (Praroha)"
-Cohesion: 0.20
-Nodes (9): Business & Hackathon Context, Constraints & Guardrails, Core Value, Milestone 1: Core MVP (Completed & Verified), Milestone 3: Complete UI Upgrade (Active), Milestone Status, Out of Scope (Milestone 2), Seed Unfold (Praroha) (+1 more)
+Cohesion: 0.17
+Nodes (11): Business & Hackathon Context, Constraints & Guardrails, Context, Core Value, Milestone 1: Core MVP (Completed & Verified), Milestone 3: Complete UI Upgrade (Completed & Verified), Milestone 4: Real Product Hardening + True Realtime (Active), Milestone Status (+3 more)
 
-### Community 146 - "test_phase13_media_provider.cjs"
-Cohesion: 0.67
-Nodes (3): assert, { chromium }, runPhase13E2E()
+### Community 146 - "Milestone 2: Semantic Intelligence + Generative Media Requirements (Active)"
+Cohesion: 0.20
+Nodes (10): Audio & Atmosphere via ACE-Step 1.5 (AUD) — Phase 17, Counterfactual Replay (CNTR) — Phase 19, Decision DNA (DDNA) — Phase 11, Divergence Engine (DIV) — Phase 10, Human-Only Zones (HOZ) — Phase 20, Image Generation via Pollinations & FLUX (IMG) — Phase 14, Milestone 2: Semantic Intelligence + Generative Media Requirements (Active), Origin Ledger (ORIG) — Phase 12 (+2 more)
 
 ### Community 147 - "Implementation Waves"
 Cohesion: 0.20
@@ -813,17 +858,17 @@ Nodes (9): 1. Executive Summary, 2. Key Removals & Architectural Shifts, 3. Stri
 Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase9E2E()
 
-### Community 152 - "CreationItem"
-Cohesion: 0.33
-Nodes (5): CreationItem, 4. Home Refactoring, 1. Goal & Requirements Verification, 2. Test Execution Summary, Phase 24 Verification: Creation Component System
+### Community 152 - "Milestone 4: Real Product Hardening + True Realtime Requirements (Active)"
+Cohesion: 0.20
+Nodes (10): Media Realtime (REAL-05), Milestone 4: Real Product Hardening + True Realtime Requirements (Active), Production Tests & Acceptance Proof (REAL-10), Real AI Generation (REAL-01), Real Authentication & Ownership (REAL-08), Real Error Semantics & Demo Mode Isolation (REAL-09), Real My Creations & Graveyard (REAL-07), Real Project Library & Routing (REAL-06) (+2 more)
 
 ### Community 153 - "Implementation Waves"
 Cohesion: 0.20
 Nodes (9): Implementation Waves, Non-Negotiables, Objective, Phase 28: Seed → Universe Workspace Botanical Redesign Plan, Wave 1: Stage 4 — Choose & Decision DNA (`WorldSelectionCanvas.tsx`, `EntityMediaSection.tsx`), Wave 2: Stage 5 — Unfold / Universe Codex (`UniverseCodexCanvas.tsx`, `OriginBadge.tsx`), Wave 3: Stage 6 — Trace / Provenance DAG (`TraceabilityCanvas.tsx`), Wave 4: Stage 7 — Refine, Mutation Lab & Counterfactual Replay (`RefineCanvas.tsx`, `SeedMutationLabCanvas.tsx`, `MutationCausalDiffDAG.tsx`, `CounterfactualReplayCanvas.tsx`) (+1 more)
 
 ### Community 154 - "2. Technical Design & Architecture"
-Cohesion: 0.33
-Nodes (6): 2.1 Provider Hierarchy (`backend/app/providers/media/`), 2.2 Deterministic Mock Assets (`mock.py`), 2.3 Database Schema & Persistence (`media_assets`), 2.5 REST API Design (`backend/app/routers/media.py`), 2. Technical Design & Architecture, Base Contracts (`base.py`)
+Cohesion: 0.29
+Nodes (7): 2.1 Provider Hierarchy (`backend/app/providers/media/`), 2.2 Deterministic Mock Assets (`mock.py`), 2.3 Database Schema & Persistence (`media_assets`), 2.4 Asynchronous Job Service (`media_service.py`), 2.5 REST API Design (`backend/app/routers/media.py`), 2. Technical Design & Architecture, Base Contracts (`base.py`)
 
 ### Community 155 - "13. GRAVEYARD SCREEN"
 Cohesion: 0.40
@@ -831,11 +876,11 @@ Nodes (5): 13. GRAVEYARD SCREEN, Controls, Deleted creation cards, Graveyard int
 
 ### Community 156 - "SeedInputCanvas.tsx"
 Cohesion: 0.11
-Nodes (19): CreationMode, CreationModes(), CreationModesProps, ModeConfig, HomeHero(), CANONICAL_RECENT_CREATIONS, RecentCreationItem, RecentCreationsRow() (+11 more)
+Nodes (21): CreationMode, CreationModes(), CreationModesProps, ModeConfig, HomeHero(), CANONICAL_RECENT_CREATIONS, RecentCreationItem, RecentCreationsRow() (+13 more)
 
-### Community 157 - "Milestone 2 Phase Details"
-Cohesion: 0.06
-Nodes (33): ImageLightboxModal(), 1. Interactive Image Lightbox Modal (`frontend/src/components/ImageLightboxModal.tsx`), 2. Aspect Ratio Controls & Lightbox Trigger (`frontend/src/components/EntityMediaSection.tsx` & `MediaPreviewCard.tsx`), 3. Multi-Entity Visual Generation Coverage: World Covers, Characters, Locations, and Scenes, 4. Frontend Build Validation, 5. Automated Playwright E2E Test Suite (`frontend/e2e/test_phase14_image_generation.cjs`), Goal, Phase 14 Plan 2 (14-02-PLAN.md): Frontend Visual Experience & Lightbox Modal (+25 more)
+### Community 157 - "Milestone 4: Real Product Hardening + True Realtime"
+Cohesion: 0.18
+Nodes (11): Milestone 4: Real Product Hardening + True Realtime, Phase 31.10: Production E2E & Two-Tab Realtime Tests, Phase 31.11: Final Full-System Audit & Verification, Phase 31.1: Gemini & AI Provider Repair, Phase 31.2: Server-Backed Generation Job State, Phase 31.4: Realtime Store Synchronization, Phase 31.5: Project Routing & Authoritative Rehydration, Phase 31.6: Real My Creations & Graveyard (+3 more)
 
 ### Community 158 - "20. Motion & Interaction"
 Cohesion: 0.40
@@ -853,21 +898,21 @@ Nodes (4): Context & Requirements, Goal, Phase 21 Plan: Design System Foundation
 Cohesion: 0.25
 Nodes (7): D-02: Deterministic Causal Explanation Engine (TRAC-03), D-03: Stage 6 Hybrid Canvas UX, D-04: Cross-Stage Deep Linking, Locked Decisions, Phase 6 Context: Traceability & Provenance (TRAC-01 to TRAC-03), Phase Purpose, Technical Constraints & Boundaries
 
-### Community 162 - "ADR-003: Cloud Object Storage and Asset Management"
-Cohesion: 0.33
-Nodes (5): ADR-003: Cloud Object Storage and Asset Management, Consequences, Context, Decision, Status
+### Community 162 - "StorageProvider"
+Cohesion: 0.10
+Nodes (13): StorageProvider, 1. Technical Stack Overview, 2. Architectural Principles & Boundaries, 3. Data Flow Diagram, Seed Unfold — System Architecture, ADR-003: Cloud Object Storage and Asset Management, Consequences, Context (+5 more)
 
 ### Community 163 - "Status: COMPLETE & VERIFIED"
 Cohesion: 0.40
 Nodes (4): 1. Artifacts Created & Updated, 2. Verification Results, Phase 21 Verification: Design System Foundation (UI Upgrade Phase 1), Status: COMPLETE & VERIFIED
 
 ### Community 164 - "test_human_only_zones.py"
-Cohesion: 0.15
-Nodes (12): HumanOnlyZones, enforce_human_only_zones_guard(), test_backward_compatibility_legacy_selections(), test_canonical_demo_includes_human_only_zones(), test_full_pipeline_unfold_with_human_only_zones(), test_human_only_zones_model_serialization(), test_origin_ledger_and_causal_dag_attribution(), test_prompt_contract_exact_invariance() (+4 more)
+Cohesion: 0.07
+Nodes (32): HumanOnlyZones, enforce_human_only_zones_guard(), test_backward_compatibility_legacy_selections(), test_canonical_demo_includes_human_only_zones(), test_full_pipeline_unfold_with_human_only_zones(), test_human_only_zones_model_serialization(), test_origin_ledger_and_causal_dag_attribution(), test_prompt_contract_exact_invariance() (+24 more)
 
-### Community 165 - "Phase 24: Creation Component System — Execution Plan"
-Cohesion: 0.33
-Nodes (5): 1. Overview & Objective, 2. Component Architecture, 3. Visual & Aesthetic Specifications (design.md), 5. Verification Plan, Phase 24: Creation Component System — Execution Plan
+### Community 165 - "dependencies"
+Cohesion: 0.22
+Nodes (9): dependencies, clsx, framer-motion, lucide-react, react, react-dom, @supabase/supabase-js, tailwind-merge (+1 more)
 
 ### Community 166 - "Status: COMPLETE & VERIFIED"
 Cohesion: 0.40
@@ -885,6 +930,10 @@ Nodes (4): 12. MY CREATIONS SCREEN, Filter bar, Gallery, Header
 Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase17E2E()
 
+### Community 170 - "test_health.py"
+Cohesion: 0.60
+Nodes (3): test_ai_provider_toggle(), test_health_endpoint(), test_projects_crud()
+
 ### Community 171 - "22. Responsive Behavior"
 Cohesion: 0.50
 Nodes (4): 22. Responsive Behavior, Desktop, Mobile, Tablet
@@ -898,36 +947,36 @@ Cohesion: 0.50
 Nodes (4): 4.1 Headings, 4.2 Body/UI text, 4.3 Logo, 4. Typography
 
 ### Community 174 - "ProjectRepository"
-Cohesion: 0.10
-Nodes (14): Asset, AssetBase, AssetCreate, AssetRead, get_utc_now(), Project, ProjectBase, ProjectRead (+6 more)
+Cohesion: 0.08
+Nodes (14): Asset, AssetBase, AssetCreate, AssetRead, get_utc_now(), Project, ProjectBase, ProjectRepository (+6 more)
 
 ### Community 176 - "Phase 4 Research: Human World Selection"
 Cohesion: 0.29
 Nodes (6): 1. Domain & Architecture Analysis, 2. Reusable Assets & Integration Points, 3. Potential Hazards & Mitigations, Goal, Key Architectural Insights, Phase 4 Research: Human World Selection
 
-### Community 177 - "Phase 22 Plan: Global App Shell (UI Upgrade Phase 2)"
+### Community 177 - "ADR-001: Core Architecture & Stack Selection"
 Cohesion: 0.33
-Nodes (5): Affected Files & Components, Goal, Implementation Steps, Phase 22 Plan: Global App Shell (UI Upgrade Phase 2), Source of Truth
+Nodes (5): ADR-001: Core Architecture & Stack Selection, Consequences, Context, Decision, Status
 
-### Community 178 - "CreationCard"
-Cohesion: 0.29
-Nodes (8): CreationCard(), Screen 1: Home / Seed Input (Stage 1), Screens 8–10: My Creations, Graveyard, Profile, Milestone 3 Phases Overview, Phase 24: Creation Component System, Phase 28: Seed → Universe Workspace Botanical Redesign, Phase 29: Secondary UI + Typography + Visibility Polish, Phase 30: UI Density, Clustering & Composition Polish
+### Community 178 - "Praroha AI Pipeline & Provider Architecture"
+Cohesion: 0.20
+Nodes (9): 3. Fallback & Failure Modes (Actual Source Behavior), 4. Canonical Demo vs Live Custom Seed Operation, 5. Multimodal Capabilities Reality Check, Deterministic Canonical Demo (`POST /api/projects/canonical-demo`), Future / Optional Scope (Explicitly NOT Live Now), Implemented Now, Master Framing, Praroha AI Pipeline & Provider Architecture (+1 more)
 
 ### Community 179 - "9. Buttons"
 Cohesion: 0.50
 Nodes (4): 9. Buttons, Destructive, Primary, Secondary
 
-### Community 180 - "2. Acceptance Criteria Checklist"
-Cohesion: 0.50
-Nodes (3): 1. Test Automation Matrix, 2. Acceptance Criteria Checklist, Phase 7: Refine, Branch & Save - Validation Matrix
-
-### Community 181 - "Tasks"
+### Community 180 - "1. Existing Architecture Integration Points"
 Cohesion: 0.25
-Nodes (7): 2. Implement Dual-Layer AI Defense & Unfold Schema Guard, Goal, Phase 20: Plan 1 (20-01-PLAN.md) — Backend Human-Only Zones & AI Protection Engine, Scope Boundaries & Non-Goals, Tasks, Verification Commands, Wave 1: Backend Human-Only Zones (Data Modeling, DB Migrations, Strict Prompt Invariance Contract, Schema Guard & Pytest Suite)
+Nodes (7): 1. Existing Architecture Integration Points, AI Provider Engine (`backend/app/providers/`), Frontend (`frontend/src/`), Metric Calibrations & Visual Palette, Phase 10 Research: Divergent Worlds Engine, Potential Bridges & Constraint Injection, Technical Analysis
 
-### Community 182 - "_migrate_columns"
-Cohesion: 0.15
-Nodes (12): WorldBibleBase, _migrate_columns(), 2. Repository Layer (`backend/app/repositories/project_repo.py`), Repository & DB Migration (`backend/app/repositories/project_repo.py`), D-02: Data Schema & Non-Destructive Relational Migration, 1.2 The 6-Tier Universal Origin Classification Taxonomy (`ORIG-01`), 1.3 Deterministic "Why is this here?" Explainer (`ORIG-03`), 1.4 Frontend Integration Surfaces (`ORIG-02`, `ORIG-03`) (+4 more)
+### Community 181 - ".generate_origin_explanation"
+Cohesion: 0.17
+Nodes (8): 2. Implement Dual-Layer AI Defense & Unfold Schema Guard, 3. Update Causal Lineage & Origin Ledger Citations, Goal, Phase 20: Plan 1 (20-01-PLAN.md) — Backend Human-Only Zones & AI Protection Engine, Scope Boundaries & Non-Goals, Tasks, Verification Commands, Wave 1: Backend Human-Only Zones (Data Modeling, DB Migrations, Strict Prompt Invariance Contract, Schema Guard & Pytest Suite)
+
+### Community 182 - "1. Domain & Architecture Investigation"
+Cohesion: 0.25
+Nodes (7): 1.2 The 6-Tier Universal Origin Classification Taxonomy (`ORIG-01`), 1.3 Deterministic "Why is this here?" Explainer (`ORIG-03`), 1.4 Frontend Integration Surfaces (`ORIG-02`, `ORIG-03`), 1. Domain & Architecture Investigation, 2. Plan Decomposition, 3. Risk Mitigation & Verification, Phase 12 Research: Origin Ledger
 
 ### Community 183 - "24. Empty States"
 Cohesion: 0.67
@@ -953,97 +1002,225 @@ Nodes (3): 6. Sidebar, Brand area, Navigation item
 Cohesion: 0.29
 Nodes (7): ARTIFACT_DIR, assert, { chromium }, fs, LOCAL_ARTIFACT_DIR, path, runVisualAndResponsiveAudit()
 
-### Community 189 - "4. Implementation Decisions"
-Cohesion: 0.18
-Nodes (10): 1. Phase Goal, 2. Core Elements of Decision DNA, 3. Downstream Propagation & Integration (Stage 5 Bridge), 4. Implementation Decisions, 5. Out of Scope for Phase 11, D-01: Data Model Expansion (`backend/app/models/selection.py`), D-02: Repository & Database Migration (`backend/app/repositories/project_repo.py`), D-04: Stage 4 Selection UI (`frontend/src/components/WorldSelectionCanvas.tsx`) (+2 more)
+### Community 189 - "Phase 11 Context: Decision DNA"
+Cohesion: 0.33
+Nodes (5): 1. Phase Goal, 2. Core Elements of Decision DNA, 3. Downstream Propagation & Integration (Stage 5 Bridge), 5. Out of Scope for Phase 11, Phase 11 Context: Decision DNA
 
-### Community 190 - "2. Key Architecture Decisions & Implementations"
-Cohesion: 0.67
-Nodes (3): 2. Key Architecture Decisions & Implementations, B. User Clarifications & Plan Corrections, C. Frontend Visual Excellence & Interactive DAG
+### Community 190 - "30-04-EXECUTIVE-SUMMARY.md: Executive Summary & Technical Integrity Verdict"
+Cohesion: 0.20
+Nodes (9): 1. Executive Verdict, 2. Core Architecture: What is Real vs. What is Simulated, 30-04-EXECUTIVE-SUMMARY.md: Executive Summary & Technical Integrity Verdict, 3. Top Findings Summary, 4. Master Deliverable Manifest, 5. Recommended Remediation Plan (Phase 31), Critical Findings, High Severity Findings (+1 more)
 
-### Community 191 - "WorldCandidateBase"
-Cohesion: 0.10
-Nodes (17): WorldCandidateBase, 1. Data Models (`backend/app/models/world.py`), 3. AI Providers, 4. Router (`backend/app/routers/worlds.py`), Goal, Phase 10 Plan 1 (10-01-PLAN.md): Backend Divergent Worlds Engine, Proposed Changes, Requirements Addressed (+9 more)
+### Community 191 - ".generate_worlds"
+Cohesion: 0.12
+Nodes (13): 1. Data Models (`backend/app/models/world.py`), 2. API Endpoints (`backend/app/routers/worlds.py`), 3. Frontend Experience (Stage 3 `worlds`), Executive Summary, Out of Scope for Phase 3, Phase 3 Context: Three World Generation, Technical Specifications, 1. Domain & Architecture Analysis (+5 more)
 
 ### Community 192 - "Phase 23 UAT: Botanical Home Screen UI Upgrade"
 Cohesion: 0.40
 Nodes (4): Execution Summary, Phase 23 UAT: Botanical Home Screen UI Upgrade, Test Artifacts, Verification Matrix
 
-### Community 195 - "conftest.py"
-Cohesion: 0.11
-Nodes (11): Settings, client(), event_loop(), initialize_test_db(), test_database_url_formatting_for_supabase(), 1. Lineage Graph Model, 2. Core Provenance Queries, 3. Privacy & Explainability Constraints (+3 more)
+### Community 193 - "Phase 14 Plan 2 (14-02-PLAN.md): Frontend Visual Experience & Lightbox Modal"
+Cohesion: 0.40
+Nodes (4): Goal, Phase 14 Plan 2 (14-02-PLAN.md): Frontend Visual Experience & Lightbox Modal, Requirements Addressed, Verification Criteria
+
+### Community 194 - "Proposed Changes"
+Cohesion: 0.22
+Nodes (8): 2. Repository Layer (`backend/app/repositories/project_repo.py`), 3. AI Providers, 4. Router & Endpoints (`backend/app/routers/potential.py`), 5. Automated Tests (`backend/tests/test_potential.py`), Goal, Phase 9 Plan 1 (09-01-PLAN.md): Backend Seed Potential Map Service, Proposed Changes, Verification Criteria
+
+### Community 195 - "Seed Unfold — Traceability & Provenance Model"
+Cohesion: 0.29
+Nodes (6): 1. Lineage Graph Model, 2. Core Provenance Queries, 3. Privacy & Explainability Constraints, Edge Relationships, Node Types, Seed Unfold — Traceability & Provenance Model
 
 ### Community 196 - "test_phase29_ui_polish.cjs"
 Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase29PolishAudit()
 
-### Community 197 - "App.tsx"
-Cohesion: 0.10
-Nodes (21): App(), CANONICAL_CREATIONS_SHOWCASE, CANONICAL_GRAVEYARD_SHOWCASE, SearchModal(), SearchModalProps, AppShell(), AppShellProps, BotanicalDecorations() (+13 more)
+### Community 197 - "2. Technical Architecture & Component Design"
+Cohesion: 0.22
+Nodes (8): 2.1 Edge TTS Integration Strategy (`VOX-01`), 2.2 Local Kokoro-82M Fallback Strategy (`VOX-01`), 2.3 Guaranteed Safe Tier 3 Fallback (`MockVoiceProvider`), 2.4 3-Tier Fallback Hierarchy Architecture & Consistent Persona Metadata, 2.5 Deterministic Script Derivation & Dual Targets (`VOX-02`), 2.6 Custom Narrative Audio Player Card (`VOX-03`), 2. Technical Architecture & Component Design, Phase 15 Research: Voice Generation (Edge TTS & Kokoro-82M)
 
 ### Community 198 - "test_phase3_worlds.cjs"
 Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase3E2E()
 
-### Community 201 - "Phase 12 Plan 2 (12-02-PLAN.md): Frontend Origin Ledger UI & E2E Suite"
+### Community 199 - "3. Phase B: Component Density Maps"
+Cohesion: 0.22
+Nodes (9): 3. Phase B: Component Density Maps, Classification Criteria:, Density Map: HOME / STAGE 1 (SEED), Density Map: STAGE 2 (UNDERSTAND), Density Map: STAGE 3 (THREE WORLDS), Density Map: STAGE 4 (CHOOSE & DECISION DNA), Density Map: STAGE 5 (UNFOLD / CODEX), Density Map: STAGE 6 (TRACE / DAG) (+1 more)
+
+### Community 200 - "Phase 8 User Acceptance Testing (UAT) Report"
+Cohesion: 0.29
+Nodes (6): Conceptual Framing, Final Verdict, Phase 8 User Acceptance Testing (UAT) Report, Test Environment, Test Scenarios & Results, Visual Artifacts
+
+### Community 201 - "GeminiProvider"
+Cohesion: 0.11
+Nodes (14): AIProviderError, GeminiProvider, test_dna_extract_and_get_endpoint(), test_gemini_provider_mock_fallback(), test_raw_seed_immutability(), test_seed_dna_schema_validation(), test_ai_provider_error_fastapi_response(), test_gemini_provider_raises_aiprovidererror_on_missing_or_invalid_key() (+6 more)
+
+### Community 202 - "Key Topics & Alignment"
 Cohesion: 0.40
-Nodes (4): Goal, Phase 12 Plan 2 (12-02-PLAN.md): Frontend Origin Ledger UI & E2E Suite, Requirements Addressed, Verification
+Nodes (4): Discussion Summary, Key Topics & Alignment, Phase 3 Discussion Log: Three World Generation, Status
 
 ### Community 203 - "test_phase19_counterfactual_replay.cjs"
 Cohesion: 0.50
 Nodes (4): assert, { chromium }, path, runPhase19E2E()
 
-### Community 204 - "test_phase20_human_only_zones.cjs"
-Cohesion: 0.50
-Nodes (4): assert, { chromium }, path, runPhase20E2E()
+### Community 204 - "Phase 31.5: Project Routing & Authoritative Rehydration"
+Cohesion: 0.22
+Nodes (8): 1. Backend: Authoritative Rehydration Endpoint, 2. Frontend: Deep Project Routing, 3. Frontend: Authoritative Project Rehydration, 4. Frontend: Project Library (CRUD), 5. Security & UI State, 6. Testing, Goal, Phase 31.5: Project Routing & Authoritative Rehydration
 
 ### Community 205 - "ref_assert"
 Cohesion: 0.20
-Nodes (7): assert, { chromium }, runUAT(), assert, { chromium }, assert, { chromium }
+Nodes (7): assert, { chromium }, runPhase13E2E(), assert, { chromium }, assert, { chromium }
 
-### Community 206 - "test_phase12_origin_ledger.cjs"
-Cohesion: 0.67
-Nodes (3): assert, { chromium }, runPhase12E2E()
+### Community 206 - "test_generation_jobs.py"
+Cohesion: 0.43
+Nodes (4): clean_client(), test_generation_job_failure(), test_generation_job_invalid_id(), test_generation_job_lifecycle()
 
 ### Community 207 - "test_phase6_traceability.cjs"
 Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase6E2E()
 
-### Community 208 - "Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report"
+### Community 208 - "4. Frontend Experience & UI Architecture"
+Cohesion: 0.50
+Nodes (4): 4.1 Dual Placement for "Bring This World to Life" (`D-02`, `VID-03`), 4.2 Rich In-Card Video Player (`MediaPreviewCard.tsx`), 4.3 Interactive Lightbox Modal (`VideoLightboxModal.tsx`), 4. Frontend Experience & UI Architecture
+
+### Community 209 - "models/unfold.py"
+Cohesion: 0.10
+Nodes (21): CharacterBase, CharacterRead, CharacterRelationshipBase, CharacterRelationshipRead, FactionItem, get_utc_now(), LocationItem, SceneBase (+13 more)
+
+### Community 210 - "test_potential.py"
+Cohesion: 0.43
+Nodes (5): test_canonical_demo_includes_potential_items(), test_gemini_provider_potential_fallback(), test_mock_provider_extract_potential_arbitrary_seed(), test_mock_provider_extract_potential_canonical(), test_potential_endpoints_lifecycle()
+
+### Community 211 - "30-04-TEST-AUDIT.md: Test Quality, False Positive & Coverage Gap Audit"
+Cohesion: 0.29
+Nodes (6): 1. Test Suite Inventory, 2. The Canonical Demo Bypass Discovery (Critical False Positive), 30-04-TEST-AUDIT.md: Test Quality, False Positive & Coverage Gap Audit, 3. Backend Pytest Quality Audit, 4. Test Coverage Gaps (Blind Spots), Finding: 100% of E2E Suites Test ONLY Hardcoded Fixtures
+
+### Community 212 - "2. Locked Decisions (Incorporating Plan Corrections)"
+Cohesion: 0.25
+Nodes (7): 1. Phase Objective & Tattva Alignment, 2. Locked Decisions (Incorporating Plan Corrections), D-01: Timeline Branching & Strict Child ID Remapping (PERS-02), D-02: Component Refinement & Immutable Revision History (PERS-01), D-03: Full Project State Export, Import & Snapshots (PERS-03), D-04: UI Architecture & Stage 7 Canvas, Phase 7: Refine, Branch & Save (Tattva 6: Parinamana & Dharana) - Context
+
+### Community 213 - "Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report"
 Cohesion: 0.25
 Nodes (7): 1. Executive Summary, 2.2 Frontend Build & TypeScript Validation, 2.3 End-to-End Browser Automation (Playwright), 2. Test Execution Results, 3. Requirements Traceability Matrix, 4. Next Phase, Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report
 
-### Community 209 - "Backend (`backend/`)"
-Cohesion: 0.19
-Nodes (10): CharacterBase, SceneBase, TraceNodeType, TraceRelationType, Backend (`backend/`), 1. Data Models (`backend/app/models/unfold.py` & `lineage.py`), 3. Causal Explainer & Lineage DAG Synthesis (`backend/app/services/lineage_service.py`), 4. Dedicated Pytest Test Suite (`backend/tests/test_origin_ledger.py`) (+2 more)
+### Community 214 - "1. Architectural Inspection & Root Causes"
+Cohesion: 0.25
+Nodes (7): 1.2. Client-Side Fake Generation Progress, 1.4. Store Desynchronization & Multi-Tab Isolation, 1.5. URL Ephemerality & Lack of Backend Rehydration, 1.6. Static Mock Data in Creations & Graveyard, 1. Architectural Inspection & Root Causes, 2. Sequenced Phase Breakdown, Master Plan: Milestone 4 Real Product Hardening + True Realtime
 
-### Community 215 - "02-01-PLAN.md"
-Cohesion: 0.47
-Nodes (3): test_dna_extract_and_get_endpoint(), test_gemini_provider_mock_fallback(), test_raw_seed_immutability()
+### Community 216 - "Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback"
+Cohesion: 0.29
+Nodes (6): 1. Context & Objectives, 2. Technical Tasks, 3. Verification Criteria, Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback, Task 2: Mount `POST /api/projects/canonical-demo`, Task 3: Resilient Fallback Wrapper in `gemini_provider.py`
+
+### Community 217 - "2. API Contract Anomaly Analysis"
+Cohesion: 0.33
+Nodes (5): 2. API Contract Anomaly Analysis, 30-04-API-MATRIX.md: Comprehensive Frontend ↔ Backend Contract Audit Matrix, Anomaly 1: Dual Envelope `fallback_used` Collision, Anomaly 2: Orphaned Backend Endpoints, Anomaly 3: Entity Type Validation Mismatch
+
+### Community 218 - "30-04-CONTENT-AUDIT.md: Terminology, Jargon & Cognitive Friction Audit"
+Cohesion: 0.33
+Nodes (5): 1. Executive Content Assessment, 2. Comprehensive Terminology & Jargon Analysis Table, 30-04-CONTENT-AUDIT.md: Terminology, Jargon & Cognitive Friction Audit, 3. Structural Confusion: The "Two DNA" Trap, 4. Misleading Navigation Promises
+
+### Community 219 - "projectSubscription.ts"
+Cohesion: 0.53
+Nodes (3): RealtimeSubscriptionStatus, supabase, @supabase/supabase-js
+
+### Community 220 - "Phase 22 Plan: Global App Shell (UI Upgrade Phase 2)"
+Cohesion: 0.33
+Nodes (5): Affected Files & Components, Goal, Implementation Steps, Phase 22 Plan: Global App Shell (UI Upgrade Phase 2), Source of Truth
 
 ### Community 221 - "Phase 30.1: Wave 1 Verification Report"
 Cohesion: 0.50
 Nodes (3): 1. Automated Verification Results, 2. Assertion Checks in `test_phase30_01_clutter_reduction.cjs`, Phase 30.1: Wave 1 Verification Report
 
+### Community 222 - "30-04-REALTIME-MATRIX.md: Realtime & Reactivity Audit Matrix"
+Cohesion: 0.40
+Nodes (4): 1. System-Wide Transport Protocol Audit, 2. Screen & Component Reactivity Matrix, 30-04-REALTIME-MATRIX.md: Realtime & Reactivity Audit Matrix, 3. Critical Findings on Realtime Claims
+
+### Community 224 - "Status: COMPLETE & VERIFIED"
+Cohesion: 0.50
+Nodes (3): 2. Verification Results, Phase 22 Verification: Global App Shell (UI Upgrade Phase 2), Status: COMPLETE & VERIFIED
+
+### Community 227 - "test_responsive_refinement.cjs"
+Cohesion: 0.40
+Nodes (3): { chromium }, path, VIEWPORTS
+
+### Community 228 - "Phase 12 Plan 2 (12-02-PLAN.md): Frontend Origin Ledger UI & E2E Suite"
+Cohesion: 0.40
+Nodes (4): Goal, Phase 12 Plan 2 (12-02-PLAN.md): Frontend Origin Ledger UI & E2E Suite, Requirements Addressed, Verification
+
+### Community 229 - "Phase 15 Plan 1 (15-01-PLAN.md): Backend Voice Provider Engine"
+Cohesion: 0.40
+Nodes (4): Goal, Phase 15 Plan 1 (15-01-PLAN.md): Backend Voice Provider Engine, Requirements Addressed, Verification Criteria
+
+### Community 230 - "1. Locked Decisions & Implementation Scope"
+Cohesion: 0.40
+Nodes (5): 1. Locked Decisions & Implementation Scope, D-02: Dual Placement for "Bring This World to Life" (`VID-03`), D-03: Cinematic Video Prompt Enrichment (`VID-01`), D-04: Video Asset Persistence & Storage (`VID-02`), D-05: Cinematic Video Player & Lightbox Experience (`VID-03`)
+
+### Community 231 - "16. Phase Q: Issue Priority Matrix"
+Cohesion: 0.40
+Nodes (5): 16. Phase Q: Issue Priority Matrix, P0 — Major Usability & Architectural Problems (Must Fix First):, P1 — Significant Visual & Composition Problems (Core Redesign):, P2 — Noticeable Polish & Rhythm Issues:, P3 — Minor Refinements:
+
+### Community 232 - "run_uat.cjs"
+Cohesion: 0.67
+Nodes (3): assert, { chromium }, runUAT()
+
+### Community 233 - "scripts"
+Cohesion: 0.50
+Nodes (4): scripts, build, dev, preview
+
+### Community 234 - "Phase 31.3 Verification Report: Supabase Realtime Infrastructure"
+Cohesion: 0.50
+Nodes (3): Overview, Phase 31.3 Verification Report: Supabase Realtime Infrastructure, Test Scripts & Outcomes
+
+### Community 235 - "2. Acceptance Criteria Checklist"
+Cohesion: 0.50
+Nodes (3): 1. Test Automation Matrix, 2. Acceptance Criteria Checklist, Phase 7: Refine, Branch & Save - Validation Matrix
+
+### Community 236 - "Phase 23 Plan: Home Screen UI Upgrade"
+Cohesion: 0.50
+Nodes (3): Goal, Phase 23 Plan: Home Screen UI Upgrade, Visual & Functional Requirements
+
+### Community 238 - "2. Key Architecture Decisions & Implementations"
+Cohesion: 0.67
+Nodes (3): 2. Key Architecture Decisions & Implementations, B. User Clarifications & Plan Corrections, C. Frontend Visual Excellence & Interactive DAG
+
+### Community 240 - "3. Cinematic Video Prompt Enrichment (`D-03`)"
+Cohesion: 0.67
+Nodes (3): 3.1 Creator Text Preservation Rule, 3.2 Canonical Derivation with Motion Cues (when prompt is empty), 3. Cinematic Video Prompt Enrichment (`D-03`)
+
+### Community 241 - "11. Phase J: TopBar De-Cluttering & Structural Redesign"
+Cohesion: 0.67
+Nodes (3): 11. Phase J: TopBar De-Cluttering & Structural Redesign, Current State (10 Controls at Same Visual Level):, Proposed Redesign (One Section = One Purpose):
+
+### Community 242 - "12. Phase K: Stage Progress Rail Composition"
+Cohesion: 0.67
+Nodes (3): 12. Phase K: Stage Progress Rail Composition, Responsive Composition Strategy:, The Problem:
+
+### Community 243 - "6. Phase E: Clustering Test Results"
+Cohesion: 0.67
+Nodes (3): 6. Phase E: Clustering Test Results, Bad Clustering (Currently Forced Together Unnaturally):, Good Clustering (Naturally Perceived as One Thing):
+
+### Community 244 - "7. Phase F: Nested Card Audit (Anti-Pattern Hunt)"
+Cohesion: 0.67
+Nodes (3): 7. Phase F: Nested Card Audit (Anti-Pattern Hunt), Audit & Flattening Recommendations:, The "Card Inside Card Inside Card" Problem
+
 ## Knowledge Gaps
-- **878 isolated node(s):** `{ chromium }`, `path`, `{ chromium }`, `path`, `{ chromium }` (+873 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1397 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **970 isolated node(s):** `{ chromium }`, `path`, `{ chromium }`, `path`, `{ chromium }` (+965 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1527 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ProjectRepository` connect `ProjectRepository` to `MockProvider`, `Implementation Decisions`, `.generate_worlds`, `6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)`, `WorldCandidateRecord`, `api_success`, `LineageService`, `Milestone 2 Phase Details`, `test_selection.py`, `routers/mutation.py`, `test_human_only_zones.py`, `Phase 1: Foundation / Project Shell - Discussion Log`, `test_voice_generation.py`, `test_audio_generation.py`, `PersistenceService`, `_migrate_columns`, `test_unfold.py`, `AIProvider`, `.get_character`, `.get_scene`, `models/__init__.py`, `WorldSelectionRecord`, `.get_unfolded_universe`, `.get_world_candidate`, `project_repo.py`, `test_counterfactual_replay.py`, `Backend (`backend/`)`, `counterfactual_service.py`, `test_mutation_lab.py`, `test_video_generation.py`, `world.py`, `MediaService`, `StorageProvider`, `test_image_generation.py`, `test_gemini_provider_graceful_fallback`?**
-  _High betweenness centrality (0.135) - this node is a cross-community bridge._
-- **Why does `playwright` connect `playwright` to `frontend/package.json`, `ref_path`, `test_phase11_decision_dna.cjs`, `test_phase15_voice_generation.cjs`, `test_phase18_mutation_lab.cjs`, `test_phase10_divergence.cjs`, `test_phase13_media_provider.cjs`, `test_phase7_refine.cjs`, `test_phase4_selection.cjs`, `test_phase5_unfold.cjs`, `test_phase9_potential.cjs`, `test_phase16_video_generation.cjs`, `test_phase17_audio_atmosphere.cjs`, `test_phase28_botanical_workspace.cjs`, `test_phase29_ui_polish.cjs`, `test_phase3_worlds.cjs`, `test_phase19_counterfactual_replay.cjs`, `test_phase20_human_only_zones.cjs`, `ref_assert`, `test_phase12_origin_ledger.cjs`, `test_phase6_traceability.cjs`, `test_phase14_image_generation.cjs`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
-- **Why does `MockProvider` connect `MockProvider` to `asyncio`, `2. Locked Implementation Decisions`, `.generate_worlds`, `6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)`, `WorldCandidateRecord`, `test_worlds.py`, `Implementation Decisions`, `ProjectRepository`, `test_unfold.py`, `AIProvider`, `useWorkspaceStore`, `WorldCandidateBase`, `asyncio`, `models/__init__.py`, `project_repo.py`, `Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report`, `Phase 8: Polish / Reliability / Demo — Research & Technical Spikes`, `Praroha: Comprehensive Judge Explanation`, `02-01-PLAN.md`, `Praroha Data & Storage Architecture`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `world.py`, `Praroha Judge Q&A Cheatsheet`, `Proposed Changes`, `StorageProvider`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
-- **Are the 78 inferred relationships involving `ProjectRepository` (e.g. with `SeedDNA` and `SeedDNARecord`) actually correct?**
-  _`ProjectRepository` has 78 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `ProjectRepository` connect `ProjectRepository` to `MockProvider`, `apiClient`, `Phase 1: Foundation / Project Shell - Research`, `Implementation Decisions`, `6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)`, `WorldCandidateRecord`, `extract_seed_dna`, `LineageService`, `test_selection.py`, `providers/factory.py`, `test_human_only_zones.py`, `Phase 1: Foundation / Project Shell - Discussion Log`, `ProviderUnavailableError`, `test_audio_generation.py`, `models/__init__.py`, `MockMediaProvider`, `test_unfold.py`, `models/potential.py`, `WorldSelectionRecord`, `GeminiProvider`, `api_success`, `test_counterfactual_replay.py`, `models/unfold.py`, `test_potential.py`, `test_mutation_lab.py`, `routers/counterfactual.py`, `MediaPayload`, `test_video_generation.py`, `project_repo.py`, `MediaService`, `.get_character`, `.get_scene`, `.get_world_candidate`, `Milestone 2 Phase Details`, `test_gemini_provider_graceful_fallback`?**
+  _High betweenness centrality (0.166) - this node is a cross-community bridge._
+- **Why does `MockProvider` connect `MockProvider` to `2. Locked Implementation Decisions`, `Phase 1: Foundation / Project Shell - Research`, `Phase 9 Context: Seed Potential Map`, `6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)`, `WorldCandidateRecord`, `Milestone 4: Real Product Hardening + True Realtime Requirements (Active)`, `Milestone 4: Real Product Hardening + True Realtime`, `providers/factory.py`, `Topics Discussed & Decisions Made`, `What Was Built`, `Discussion Topics & Agreed Decisions`, `Implementation Decisions`, `ProjectRepository`, `Praroha AI Pipeline & Provider Architecture`, `1. Existing Architecture Integration Points`, `test_unfold.py`, `Any`, `AIProvider`, `useWorkspaceStore`, `30-04-AUDIT.md: Full Deep Technical & Product Integrity Audit`, `.generate_worlds`, `30-04-EXECUTIVE-SUMMARY.md: Executive Summary & Technical Integrity Verdict`, `Proposed Changes`, `WorldSelectionRecord`, `GeminiProvider`, `api_success`, `Key Topics & Alignment`, `WorldCandidateBase`, `test_potential.py`, `Phase 8: Polish / Reliability / Demo — Research & Technical Spikes`, `30-04-TEST-AUDIT.md: Test Quality, False Positive & Coverage Gap Audit`, `Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report`, `Praroha: Comprehensive Judge Explanation`, `Praroha`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `project_repo.py`, `Praroha Judge Q&A Cheatsheet`, `LocalStorageProvider`, `test_divergence.py`, `3. Architecture & Code Changes`?**
+  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+- **Why does `1. Complete API Surface Matrix` connect `apiClient` to `2. API Contract Anomaly Analysis`, `MediaService`, `GeminiProvider`, `ProjectRepository`, `LineageService`, `MockMediaProvider`, `test_mutation_lab.py`, `routers/counterfactual.py`?**
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
+- **Are the 87 inferred relationships involving `ProjectRepository` (e.g. with `SeedDNA` and `SeedDNARecord`) actually correct?**
+  _`ProjectRepository` has 87 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 37 inferred relationships involving `MediaPayload` (e.g. with `ACEStepAudioProvider` and `CompositeAudioProvider`) actually correct?**
   _`MediaPayload` has 37 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 36 inferred relationships involving `ProviderUnavailableError` (e.g. with `ACEStepAudioProvider` and `CompositeAudioProvider`) actually correct?**
-  _`ProviderUnavailableError` has 36 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 38 inferred relationships involving `MockProvider` (e.g. with `GeminiProvider` and `ProjectRepository`) actually correct?**
-  _`MockProvider` has 38 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 40 inferred relationships involving `GeminiProvider` (e.g. with `AIProviderError` and `SeedDNA`) actually correct?**
+  _`GeminiProvider` has 40 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 46 inferred relationships involving `MockProvider` (e.g. with `GeminiProvider` and `ProjectRepository`) actually correct?**
+  _`MockProvider` has 46 INFERRED edges - model-reasoned connections that need verification._

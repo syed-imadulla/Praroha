@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from backend.app.config import settings
+from backend.app.core.errors import AIProviderError
 from backend.app.core.response import api_error
 from backend.app.repositories.project_repo import init_db
 from backend.app.routers.dna import router as dna_router
@@ -20,6 +21,7 @@ from backend.app.routers.projects import router as projects_router
 from backend.app.routers.selection import router as selection_router
 from backend.app.routers.unfold import router as unfold_router
 from backend.app.routers.worlds import router as worlds_router
+from backend.app.routers.jobs import router as jobs_router
 
 
 @asynccontextmanager
@@ -45,6 +47,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Exception handler for AI provider errors to return explicit error envelopes
+@app.exception_handler(AIProviderError)
+async def ai_provider_error_handler(request: Request, exc: AIProviderError) -> JSONResponse:
+    import logging
+    logging.getLogger("backend.app").warning(
+        f"AIProviderError on {request.method} {request.url.path}: [{exc.error_code}] {exc.message}"
+    )
+    error_res = api_error(
+        code=exc.error_code,
+        message=exc.message,
+        retryable=exc.retryable,
+    )
+    content = error_res.model_dump()
+    content["error_code"] = exc.error_code
+    content["message"] = exc.message
+    content["retryable"] = exc.retryable
+    content["status"] = "error"
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=content,
+    )
 
 
 # Exception handler for HTTP exceptions to preserve standardized APIResponse format
@@ -90,6 +115,7 @@ app.include_router(persistence_router, prefix=settings.API_V1_PREFIX)
 app.include_router(mutation_router, prefix=settings.API_V1_PREFIX)
 app.include_router(counterfactual_router, prefix=settings.API_V1_PREFIX)
 app.include_router(media_router, prefix=settings.API_V1_PREFIX)
+app.include_router(jobs_router, prefix=settings.API_V1_PREFIX)
 
 # Ensure upload directory exists and is mounted for static asset retrieval
 uploads_path = Path(settings.UPLOAD_DIR)

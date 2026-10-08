@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Sidebar, NavView } from './Sidebar';
 import { BotanicalDecorations } from './BotanicalDecorations';
+import { useWorkspaceStore } from '../../store/workspaceStore';
+import { projectSubscription } from '../../realtime/projectSubscription';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -16,11 +18,32 @@ export const AppShell: React.FC<AppShellProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const activeProjectId = useWorkspaceStore((s) => s.activeProject?.id);
+  const recoverActiveJobs = useWorkspaceStore((s) => s.recoverActiveJobs);
+
   React.useEffect(() => {
     const handleOpen = () => setMobileMenuOpen(true);
     window.addEventListener('open-mobile-nav', handleOpen);
     return () => window.removeEventListener('open-mobile-nav', handleOpen);
   }, []);
+
+  // Hook up Realtime Project Subscription
+  React.useEffect(() => {
+    if (activeProjectId) {
+      projectSubscription.subscribeProject(activeProjectId);
+      recoverActiveJobs();
+    } else {
+      projectSubscription.disconnect();
+    }
+
+    return () => {
+      // We don't disconnect on every render cycle, only when unmounting the shell 
+      // or changing the project. Actually, if activeProjectId changes, 
+      // the cleanup function runs and disconnects, which is correct.
+      projectSubscription.disconnect();
+    };
+  }, [activeProjectId, recoverActiveJobs]);
+
 
   return (
     <div className="flex h-screen w-screen bg-[#F8F4E8] text-[#394840] overflow-hidden font-sans relative selection:bg-[#C8D0BE] selection:text-[#294B3A]">

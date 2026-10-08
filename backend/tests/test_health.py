@@ -11,9 +11,33 @@ async def test_health_endpoint(client: AsyncClient):
     assert json_data["success"] is True
     assert json_data["data"]["status"] == "healthy"
     assert "ai_provider" in json_data["data"]
-    assert json_data["data"]["ai_provider"]["resolved"] == "mock"
+    assert json_data["data"]["ai_provider"]["resolved"] in ["mock", "gemini"]
+    assert "model" in json_data["data"]["ai_provider"]
     assert "storage_provider" in json_data["data"]
     assert json_data["data"]["storage_provider"]["type"] == "LocalStorageProvider"
+
+
+@pytest.mark.asyncio
+async def test_ai_provider_toggle(client: AsyncClient):
+    # Switch to mock
+    res = await client.post("/api/health/ai-provider", json={"provider": "mock"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["success"] is True
+    assert body["data"]["ai_provider"]["configured"] == "mock"
+
+    # Switch to gemini model
+    res2 = await client.post(
+        "/api/health/ai-provider",
+        json={"provider": "gemini", "model": "gemini-3.6-flash"},
+    )
+    assert res2.status_code == 200
+    body2 = res2.json()
+    assert body2["success"] is True
+    assert body2["data"]["ai_provider"]["configured"] == "gemini"
+
+    # Switch back to mock for subsequent tests
+    await client.post("/api/health/ai-provider", json={"provider": "mock"})
 
 
 @pytest.mark.asyncio

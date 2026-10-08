@@ -167,7 +167,7 @@ export const CreationCard: React.FC<CreationCardProps> = ({
     },
     {
       key: 'delete',
-      label: 'Delete',
+      label: 'Move to Graveyard',
       icon: <Trash2 className="w-4 h-4 stroke-[2]" />,
       isDestructive: true,
       onClick: () => onAction?.('delete', creation),
@@ -400,7 +400,7 @@ export const CreationCard: React.FC<CreationCardProps> = ({
             className="flex-1 py-1.5 px-2.5 rounded-[12px] bg-[#F1DDD5] text-[#B85C46] hover:bg-[#B85C46] hover:text-white text-xs font-medium font-sans flex items-center justify-center gap-1.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B85C46]"
           >
             <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
-            <span>Delete</span>
+            <span>Delete permanently</span>
           </button>
         </div>
       )}
