@@ -84,54 +84,24 @@ export const TopBar: React.FC = () => {
   return (
     <>
       <header className="h-[68px] sm:h-[72px] border-b border-[#D8CCB7] bg-[#F8F4E8] px-2.5 sm:px-6 flex items-center justify-between select-none z-30 shrink-0">
-        {/* Left Side: Brand & Project Identity */}
-        <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">
-          {/* Mobile Navigation Drawer Trigger */}
+        {/* Left Side: Active Project & Branch Identity */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Mobile Navigation Drawer Trigger (opens sidebar containing full PRAROHA logo) */}
           <button
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent('open-mobile-nav'))}
-            className="lg:hidden w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center text-[#294B3A] hover:bg-[#EAE4D4] focus:outline-none focus:ring-2 focus:ring-[#294B3A] shrink-0"
+            className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-[#294B3A] hover:bg-[#EAE4D4] focus:outline-none focus:ring-2 focus:ring-[#294B3A] shrink-0"
             aria-label="Open navigation menu"
           >
-            <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5 stroke-[2]" />
+            <Menu className="w-5 h-5 stroke-[2]" />
           </button>
 
-          {/* Botanical PRAROHA Mark */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-[#DDE2D2] border border-[#C8D0BE] flex items-center justify-center text-[#294B3A] shadow-2xs">
-              <svg
-                className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#294B3A]"
-                viewBox="0 0 36 36"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M18 31 C 18 20, 9 17, 7 8 C 17 8, 20 18, 18 31 Z" />
-                <path d="M18 31 C 18 20, 27 17, 29 8 C 19 8, 16 18, 18 31 Z" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif font-bold text-[#294B3A] tracking-[0.14em] text-base sm:text-xl leading-none">
-                PRAROHA
-              </span>
-              <span className="text-[11px] sm:text-xs text-[#718875] font-sans leading-none mt-1">
-                Seed → Universe
-              </span>
-            </div>
-          </div>
-
-          {/* Subtle Vertical Divider */}
-          <div className="h-7 sm:h-8 w-px bg-[#D8CCB7] mx-1 sm:mx-2.5 hidden sm:block shrink-0" aria-hidden="true" />
-
-          {/* Project Thumbnail & Branch Selector (Visible on tablet & desktop) */}
-          <div className="relative min-w-0 hidden sm:block" ref={branchMenuRef}>
-            <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Project Thumbnail & Branch Selector (Primary Workspace Identity) */}
+          <div className="relative min-w-0" ref={branchMenuRef}>
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Project Thumbnail Icon/Image */}
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg bg-[#EAE4D4] border border-[#D8CCB7] overflow-hidden flex items-center justify-center text-[#355A46] shrink-0 shadow-2xs">
-                <Globe className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#EAE4D4] border border-[#D8CCB7] overflow-hidden flex items-center justify-center text-[#355A46] shrink-0 shadow-2xs">
+                <Globe className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
               </div>
 
               {/* Title & Branch Popover Trigger */}
@@ -142,19 +112,19 @@ export const TopBar: React.FC = () => {
                   setBranchMenuOpen(!branchMenuOpen);
                   fetchBranches();
                 }}
-                className="text-left group flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[#355A46] rounded-md px-1 py-0.5 transition"
+                className="text-left group flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[#355A46] rounded-lg px-1.5 py-0.5 hover:bg-[#F2EBDD] transition"
                 aria-expanded={branchMenuOpen}
                 aria-label="Select project branch"
               >
                 <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1 min-w-0">
-                    <span className="font-serif font-bold text-xs sm:text-base text-[#294B3A] group-hover:text-[#355A46] transition truncate max-w-[85px] sm:max-w-[170px] md:max-w-[220px]">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="font-serif font-bold text-sm sm:text-base md:text-lg text-[#294B3A] group-hover:text-[#355A46] transition truncate max-w-[130px] xs:max-w-[190px] sm:max-w-[300px] md:max-w-[420px]">
                       {projectTitle}
                     </span>
-                    <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#718875] group-hover:text-[#294B3A] transition shrink-0" />
+                    <ChevronDown className="w-3.5 h-3.5 text-[#718875] group-hover:text-[#294B3A] transition shrink-0" />
                   </div>
-                  <div className="text-[10px] sm:text-xs text-[#718875] font-mono leading-none mt-0.5 flex items-center gap-1 truncate">
-                    <span><strong className="text-[#294B3A] font-semibold">{branchName}</strong></span>
+                  <div className="text-[11px] sm:text-xs text-[#718875] font-mono leading-none mt-1 flex items-center gap-1.5 truncate">
+                    <span>Branch: <strong className="text-[#294B3A] font-semibold">{branchName}</strong></span>
                     <span>•</span>
                     <span className="text-[#5F6D63]">TATTVA 2</span>
                   </div>

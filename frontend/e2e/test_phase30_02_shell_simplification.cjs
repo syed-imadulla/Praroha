@@ -24,21 +24,25 @@ const assert = require('assert');
     await page.locator('text=The Sunken City: Bio-City').first().waitFor({ timeout: 15000 });
 
     // =========================================================================
-    // 1. TOPBAR COMPOSITION & INFORMATION HIERARCHY (DESKTOP 1440px)
+    // 1. TOPBAR & SHELL COMPOSITION (DESKTOP 1440px)
     // =========================================================================
-    console.log('--- Check 1: TopBar Information Hierarchy & Clean Brand Composition ---');
+    console.log('--- Check 1: Sidebar Brand & Navbar Project Identity ---');
     const topBar = page.locator('header').first();
     assert(await topBar.isVisible(), 'TopBar header must be visible');
 
-    // Verify Brand Mark & Wordmark
-    const brandMark = page.locator('span:has-text("PRAROHA"):visible').first();
-    assert(await brandMark.isVisible(), 'Brand wordmark PRAROHA must be visible');
-    const brandSubtitle = page.locator('span:has-text("Seed → Universe"):visible').first();
-    assert(await brandSubtitle.isVisible(), 'Brand subtitle "Seed → Universe" must be visible');
+    // Verify Brand Mark & Wordmark is in Sidebar
+    const brandMark = page.locator('[data-testid="desktop-sidebar"] h1:has-text("PRAROHA"):visible, h1:has-text("PRAROHA"):visible').first();
+    assert(await brandMark.isVisible(), 'Brand wordmark PRAROHA must be visible in sidebar');
+    const brandSubtitle = page.locator('[data-testid="desktop-sidebar"] p:has-text("Seed → Universe"):visible, p:has-text("Seed → Universe"):visible').first();
+    assert(await brandSubtitle.isVisible(), 'Brand subtitle "Seed → Universe" must be visible in sidebar');
+
+    // Verify Navbar starts with Active Project Identity (no duplicate PRAROHA in navbar)
+    const navbarBrand = topBar.locator('span:has-text("PRAROHA"):visible');
+    assert((await navbarBrand.count()) === 0, 'Navbar must not duplicate PRAROHA brand mark when sidebar is present');
 
     // Verify Project Identity
-    const projectTitle = page.locator('span:has-text("Bio-City"):visible, span:has-text("Sunken City"):visible').first();
-    assert(await projectTitle.isVisible(), 'Active project title must be visible');
+    const projectTitle = topBar.locator('span:has-text("Bio-City"):visible, span:has-text("Sunken City"):visible').first();
+    assert(await projectTitle.isVisible(), 'Active project title must be visible in navbar');
 
     // Verify Branch Switcher is present
     const branchBtn = page.locator('#branch-switcher-btn');

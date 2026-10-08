@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/TopBar.tsx": {
-    "mtime": 1791450606.0624118,
-    "seen": 1791450949.8067055,
-    "ast_hash": "33595dcbc6aa6dc8f8e2297e415e9c5d",
+    "mtime": 1791454581.300944,
+    "seen": 1791454861.3608363,
+    "ast_hash": "d3e41247b6f95aa42eca4f90d12ca699",
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791445887.3308961,
-    "seen": 1791445953.3643959,
-    "ast_hash": "bd4fc3643b426df613b4cb1228a278b2",
+    "mtime": 1791451063.5954733,
+    "seen": 1791454861.3608902,
+    "ast_hash": "c5d31faad19daa70c914aa6cee465906",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791445914.520658,
-    "seen": 1791445953.364397,
-    "ast_hash": "2dad4361b30cb783ae05a24bd4ac290c",
+    "mtime": 1791451090.0722342,
+    "seen": 1791454861.360891,
+    "ast_hash": "0e532a3aaaa39d5fe489869733ec5acf",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -2190,9 +2190,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase29_ui_polish.cjs": {
-    "mtime": 1791443483.050903,
-    "seen": 1791443788.0274482,
-    "ast_hash": "b0f56b603dff23ae7bbac7dc9d9c0aed",
+    "mtime": 1791454620.924622,
+    "seen": 1791454861.3607898,
+    "ast_hash": "45f65202ec612a1fe5662533407adc17",
     "semantic_hash": ""
   },
   ".planning/phases/29-secondary-ui-polish/29-01-PLAN.md": {
@@ -2262,9 +2262,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase30_02_shell_simplification.cjs": {
-    "mtime": 1791449588.4361677,
-    "seen": 1791450949.806647,
-    "ast_hash": "84a5d14624106523840cd98f9748bede",
+    "mtime": 1791454602.0807753,
+    "seen": 1791454861.3607943,
+    "ast_hash": "0f5c1efba9ee549d7d1d949a042ae2ef",
     "semantic_hash": ""
   },
   "frontend/src/components/SearchModal.tsx": {
@@ -2307,6 +2307,12 @@
     "mtime": 1791450074.2021196,
     "seen": 1791450949.807147,
     "ast_hash": "0d723ef188316e6cb0b26bda83db876e",
+    "semantic_hash": ""
+  },
+  ".planning/phases/30-02-shell-simplification/30-02-VERIFICATION.md": {
+    "mtime": 1791450986.839166,
+    "seen": 1791454861.361037,
+    "ast_hash": "620062318e698abadca90b0ef9108d11",
     "semantic_hash": ""
   }
 }

@@ -32,7 +32,7 @@ async function runPhase29PolishAudit() {
     await topBar.waitFor({ state: 'visible' });
 
     // Brand title should use Cormorant Garamond
-    const brandTitle = page.locator('span:has-text("Praroha"):visible').first();
+    const brandTitle = page.locator('span:has-text("Praroha"):visible, h1:has-text("PRAROHA"):visible').first();
     if (await brandTitle.isVisible()) {
       const fontSize = await brandTitle.evaluate(el => window.getComputedStyle(el).fontSize);
       console.log(`   Brand Title font size: ${fontSize}`);
