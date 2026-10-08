@@ -16,6 +16,12 @@ export const AppShell: React.FC<AppShellProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  React.useEffect(() => {
+    const handleOpen = () => setMobileMenuOpen(true);
+    window.addEventListener('open-mobile-nav', handleOpen);
+    return () => window.removeEventListener('open-mobile-nav', handleOpen);
+  }, []);
+
   return (
     <div className="flex h-screen w-screen bg-[#F8F4E8] text-[#394840] overflow-hidden font-sans relative selection:bg-[#C8D0BE] selection:text-[#294B3A]">
       {/* Background Subtle Botanical Edge Foilage */}
@@ -60,19 +66,20 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       {/* Main Content Layout */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10 min-w-0">
-        {/* Mobile / Tablet Top Bar */}
-        <header className="lg:hidden h-14 bg-[#F4EEDF] border-b border-[#D8CCB7] px-4 flex items-center justify-between shrink-0 z-30">
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(true)}
-            className="w-11 h-11 rounded-xl flex items-center justify-center text-[#294B3A] hover:bg-[#EAE4D4] focus:outline-none focus:ring-2 focus:ring-[#294B3A]"
-            aria-label="Open navigation menu"
-          >
-            <Menu className="w-6 h-6 stroke-[2]" />
-          </button>
+        {/* Mobile / Tablet Top Bar (Only when not on Home, which renders its own unified TopBar) */}
+        {activeNav !== 'home' && (
+          <header className="lg:hidden h-14 bg-[#F4EEDF] border-b border-[#D8CCB7] px-4 flex items-center justify-between shrink-0 z-30">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-[#294B3A] hover:bg-[#EAE4D4] focus:outline-none focus:ring-2 focus:ring-[#294B3A]"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-6 h-6 stroke-[2]" />
+            </button>
 
-          {/* Centered Brand on Mobile */}
-          <div className="flex items-center gap-2">
+            {/* Centered Brand on Mobile */}
+            <div className="flex items-center gap-2">
             <svg
               className="w-5 h-5 text-[#294B3A]"
               viewBox="0 0 36 36"
@@ -93,6 +100,7 @@ export const AppShell: React.FC<AppShellProps> = ({
 
           <div className="w-11" aria-hidden="true" />
         </header>
+        )}
 
         {/* Dynamic Page or Workspace Content */}
         <main className="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">

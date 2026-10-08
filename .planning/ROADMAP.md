@@ -408,15 +408,16 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 ### Phase 30: UI Density, Clustering & Composition Polish
 **Goal**: Systematic elimination of visual clutter, misplaced developer telemetry, and competing actions across primary creative workspaces.  
 **Depends on**: Phase 29  
-**Plans**: 4 Waves (Wave 1 completed)
+**Plans**: 4 Waves (Waves 1 & 2 completed)
 - [x] **30-01-PLAN.md / Wave 1 (P0 Clutter Reduction)**: Removal of canvas architecture/engine status cards across all 7 stages, removal of premature media generation from Stage 3 candidates, removal of duplicate branching launchers/tabs from Stage 5 Codex, removal of competing Stage 3 bottom CTA, and Stage 7 refinement sub-view consolidation (`test_phase30_01_clutter_reduction.cjs`).
-- [ ] **Wave 2 (TopBar & Navigation Density)**: TopBar action consolidation and mobile progress drawer recomposition.
+- [x] **30-02-PLAN.md / Wave 2 (Clean Global Header & Shell Simplification)**: Senior UX redesign of TopBar and StageProgressHeader. Left brand mark and project identity cleanly separated with subtle vertical divider; top-level button cluster evicted into unified Workspace Menu (`•••`) popover; maximum 3 visible utility controls (Search, Inspect, Overflow); Universe Search Modal (`SearchModal.tsx`) with ⌘K hotkey; quiet editorial progress rail on desktop with thin 1px connectors, green checkmarks, and active underline indicator; non-scrolling mobile compact stage carousel with Prev/Next buttons and 7 interactive stage indicator dots; mobile header deduplication in AppShell (`test_phase30_02_shell_simplification.cjs`).
 - [ ] **Wave 3 (Stage 4 & Stage 2 Layout Flattening)**: Stage 4 selection gate consolidation and Stage 2 DNA blueprint flattening.
 - [ ] **Wave 4 (Stage 3 & Stage 6 Progressive Disclosure)**: Stage 3 narrative dimensions progressive disclosure and Stage 6 DAG filter toolbar unification.
-**Success Criteria (Wave 1)**:
+**Success Criteria (Wave 1 & 2)**:
   1. Zero technical architecture cards rendered on creative canvases.
   2. Stage 3 candidate comparison contains zero premature media generation inputs/buttons.
   3. Stage 5 Codex contains zero duplicate Mutation Lab or Counterfactual Replay launchers.
-  4. Stage 3 retains exactly one dominant progression CTA.
-  5. 100% pass across all 8 test suites with zero horizontal overflow across 6 viewports.
+  4. TopBar header reduced to max 3 utility controls with zero competing developer badges.
+  5. StageProgressHeader provides clean editorial rail on desktop and non-scrolling carousel on mobile.
+  6. 100% pass across all 9 automated test suites with zero horizontal overflow across 6 viewports.
 

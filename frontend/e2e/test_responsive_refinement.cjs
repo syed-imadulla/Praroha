@@ -76,6 +76,14 @@ async function runResponsiveSmokeTest() {
     const fullPage = await fullContext.newPage();
     await fullPage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
 
+    // Ensure clean workspace state
+    await fullPage.evaluate(() => {
+      if (window.__workspaceStore) {
+        window.__workspaceStore.getState().resetWorkspace();
+      }
+    });
+    await fullPage.waitForTimeout(500);
+
     // Select preset and extract
     const oceanPreset = fullPage.locator('button:has-text("Sunken Ocean City")');
     await oceanPreset.click();

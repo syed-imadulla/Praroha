@@ -132,15 +132,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/StageProgressHeader.tsx": {
-    "mtime": 1791440710.5232291,
-    "seen": 1791443788.0274956,
-    "ast_hash": "b595e584845fc0c5d9e15368063ebeca",
+    "mtime": 1791449282.9972177,
+    "seen": 1791450949.8067036,
+    "ast_hash": "981239df338a28afa123a199c27708a2",
     "semantic_hash": ""
   },
   "frontend/src/components/TopBar.tsx": {
-    "mtime": 1791441955.7581732,
-    "seen": 1791443788.027497,
-    "ast_hash": "be0d181b955b23fc590642c8f3e8b2e5",
+    "mtime": 1791450606.0624118,
+    "seen": 1791450949.8067055,
+    "ast_hash": "33595dcbc6aa6dc8f8e2297e415e9c5d",
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
@@ -1686,9 +1686,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase20_human_only_zones.cjs": {
-    "mtime": 1791445264.066355,
-    "seen": 1791445953.3642616,
-    "ast_hash": "67746ed3fe5f0aef3807b512f9d0a305",
+    "mtime": 1791449710.96859,
+    "seen": 1791450949.806633,
+    "ast_hash": "350e0b222e4291cca6340fbcdd907005",
     "semantic_hash": ""
   },
   ".planning/phases/20-human-only-zones/20-UAT.md": {
@@ -1740,9 +1740,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/shell/AppShell.tsx": {
-    "mtime": 1791428941.0008903,
-    "seen": 1791432252.3483338,
-    "ast_hash": "906fc478cc3e309b533cb7f354d10650",
+    "mtime": 1791448791.4712377,
+    "seen": 1791450949.8067372,
+    "ast_hash": "7e72934f18ed90434fcfb21cdb9a50bc",
     "semantic_hash": ""
   },
   "frontend/src/components/shell/BotanicalDecorations.tsx": {
@@ -2052,9 +2052,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_responsive_refinement.cjs": {
-    "mtime": 1791436296.2279832,
-    "seen": 1791436575.8371534,
-    "ast_hash": "d69f86996db6a5c3d67d698508f9e43a",
+    "mtime": 1791449889.1304195,
+    "seen": 1791450949.8066623,
+    "ast_hash": "20efda1b9ee4e0145362d9f2f417c541",
     "semantic_hash": ""
   },
   "frontend/src/components/shell/PageContainer.tsx": {
@@ -2076,9 +2076,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/stage3_botanical_worlds.png": {
-    "mtime": 1791445524.334026,
-    "seen": 1791445953.364774,
-    "ast_hash": "97823df02e322855f76734b2949173c2",
+    "mtime": 1791449924.3451722,
+    "seen": 1791450949.8071642,
+    "ast_hash": "40544c2a4412884934aa17fe101d51d4",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase28_botanical_workspace.cjs": {
@@ -2100,21 +2100,21 @@
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_choose_desktop_1440.png": {
-    "mtime": 1791445559.9920337,
-    "seen": 1791445953.3647335,
-    "ast_hash": "40756b4e1574df40ebfd744f5c772d65",
+    "mtime": 1791449409.5332031,
+    "seen": 1791450949.8071053,
+    "ast_hash": "4740fb46f23e5ac73557cb5e815cfbba",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_choose_mobile_390.png": {
-    "mtime": 1791445568.6704144,
-    "seen": 1791445953.364736,
-    "ast_hash": "2adaecef4576970b76718d1368c77b65",
+    "mtime": 1791449418.0939846,
+    "seen": 1791450949.8071072,
+    "ast_hash": "49e6d2c6ad5db479c0dd546aa508f9ed",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_choose_tablet_1024.png": {
-    "mtime": 1791445564.356725,
-    "seen": 1791445953.3647387,
-    "ast_hash": "e92bd81fe932b811526c27280a332c01",
+    "mtime": 1791449413.8429015,
+    "seen": 1791450949.8071096,
+    "ast_hash": "7e985e6b9659ec47aa735c78fe8330d0",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_mutation_desktop_1440.png": {
@@ -2136,57 +2136,57 @@
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_refine_desktop_1440.png": {
-    "mtime": 1791445562.874738,
-    "seen": 1791445953.3647497,
-    "ast_hash": "85efc0944b9c385615a6d6473463e7b9",
+    "mtime": 1791449412.379905,
+    "seen": 1791450949.8071194,
+    "ast_hash": "cbf69f2720153c001e17586d3970f7ea",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_refine_mobile_390.png": {
-    "mtime": 1791445571.4486628,
-    "seen": 1791445953.3647513,
-    "ast_hash": "a231afd87668476d483f70a59dd81593",
+    "mtime": 1791449420.9168844,
+    "seen": 1791450949.8071215,
+    "ast_hash": "2285e176847422da7af86a92cc95a255",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_refine_tablet_1024.png": {
-    "mtime": 1791445567.2187,
-    "seen": 1791445953.364753,
-    "ast_hash": "220dee31e2c56a57447bd704b7f96493",
+    "mtime": 1791449416.6568947,
+    "seen": 1791450949.8071234,
+    "ast_hash": "6c0d4af12807d066e6ab2ed1aef3c326",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_trace_desktop_1440.png": {
-    "mtime": 1791445561.920555,
-    "seen": 1791445953.3647544,
-    "ast_hash": "da0ef131f69f700a8f9856a3f44790c3",
+    "mtime": 1791449411.4266176,
+    "seen": 1791450949.8071258,
+    "ast_hash": "5a8ca08975d61abb0a130121af99f7d2",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_trace_mobile_390.png": {
-    "mtime": 1791445570.5356708,
-    "seen": 1791445953.364757,
-    "ast_hash": "9a2ef2618316012e8a8fae706d76a80a",
+    "mtime": 1791449419.9788866,
+    "seen": 1791450949.807128,
+    "ast_hash": "32383a4533e47ee332867e6c0ee96f44",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_trace_tablet_1024.png": {
-    "mtime": 1791445566.2687082,
-    "seen": 1791445953.364759,
-    "ast_hash": "c9d44744516b9e8264f5369c5498f004",
+    "mtime": 1791449415.727897,
+    "seen": 1791450949.8071303,
+    "ast_hash": "29a8d545f2b4974c0cd92a266d385845",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_unfold_desktop_1440.png": {
-    "mtime": 1791445560.9517248,
-    "seen": 1791445953.3647614,
-    "ast_hash": "ccf26c1c7caeddc3a4155c471079e530",
+    "mtime": 1791449410.4739096,
+    "seen": 1791450949.8071327,
+    "ast_hash": "873afff51653b6589cef017a5825fe7d",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_unfold_mobile_390.png": {
-    "mtime": 1791445569.610679,
-    "seen": 1791445953.3647635,
-    "ast_hash": "1282a28e01b851e8022235f566544648",
+    "mtime": 1791449419.012889,
+    "seen": 1791450949.8071346,
+    "ast_hash": "cd6bed8a2d9f03fc3c50b82828623157",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_unfold_tablet_1024.png": {
-    "mtime": 1791445565.3187165,
-    "seen": 1791445953.3647654,
-    "ast_hash": "d88048d8c23bb033740c3bc31800a35c",
+    "mtime": 1791449414.7778993,
+    "seen": 1791450949.8071368,
+    "ast_hash": "e129ae013ab3cbc90c03eb362809bd2f",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase29_ui_polish.cjs": {
@@ -2259,6 +2259,54 @@
     "mtime": 1791445785.6433516,
     "seen": 1791445953.3647723,
     "ast_hash": "ad34bb350a69d9f852545976b594792c",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase30_02_shell_simplification.cjs": {
+    "mtime": 1791449588.4361677,
+    "seen": 1791450949.806647,
+    "ast_hash": "84a5d14624106523840cd98f9748bede",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/SearchModal.tsx": {
+    "mtime": 1791448936.3648121,
+    "seen": 1791450949.806695,
+    "ast_hash": "1b6030d422a95c4137ac86fe6cb07588",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/screenshots/phase30_02_header_1024x768_tablet_land.png": {
+    "mtime": 1791450049.7292917,
+    "seen": 1791450949.8071392,
+    "ast_hash": "4edde24fae169f36fd9fab9a94fabf9f",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/screenshots/phase30_02_header_1280x800_desktop.png": {
+    "mtime": 1791450007.5955875,
+    "seen": 1791450949.807141,
+    "ast_hash": "0c11f98c7065fd04b4c779c919fd56dc",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/screenshots/phase30_02_header_1440x900_desktop.png": {
+    "mtime": 1791449985.6567416,
+    "seen": 1791450949.807143,
+    "ast_hash": "b1b8439e9a33cde7e62965fcd5b6fa86",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/screenshots/phase30_02_header_360x800_mobile_android.png": {
+    "mtime": 1791450376.6089985,
+    "seen": 1791450949.8071442,
+    "ast_hash": "846ab755c735739dab3bda717d0a613c",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/screenshots/phase30_02_header_390x844_mobile_iphone.png": {
+    "mtime": 1791450642.8721101,
+    "seen": 1791450949.8071454,
+    "ast_hash": "cf7d4d59ea4010e5ae31075b8bbf0687",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/screenshots/phase30_02_header_768x1024_tablet_port.png": {
+    "mtime": 1791450074.2021196,
+    "seen": 1791450949.807147,
+    "ast_hash": "0d723ef188316e6cb0b26bda83db876e",
     "semantic_hash": ""
   }
 }

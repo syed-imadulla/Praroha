@@ -6,8 +6,8 @@ progress:
   total_phases: 32
   completed_phases: 27
   total_plans: 64
-  completed_plans: 47
-  percent: 73.44
+  completed_plans: 48
+  percent: 75.00
 ---
 
 # Project State: Seed Unfold (Praroha)
@@ -17,11 +17,11 @@ progress:
 See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-08)
 
 **Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, and creator-locked human-only zones.  
-**Current focus:** Milestone 3: Complete UI Upgrade (Phase 30.1: Wave 1 — Canvas Cleanup & P0 Clutter Removal Complete)
+**Current focus:** Milestone 3: Complete UI Upgrade (Phase 30.2: Wave 2 — Clean Global Header & Shell Simplification Complete)
 
 ## Current Position
 
-Phase: 30.1 Wave 1 Canvas Cleanup & P0 Clutter Removal — 100% Completed & Verified!
+Phase: 30.2 Wave 2 Clean Global Header & Shell Simplification — 100% Completed & Verified!
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
 Milestone 3 UI Refinement & Polish Achievements:
@@ -31,12 +31,19 @@ Milestone 3 UI Refinement & Polish Achievements:
 - Phase 30.1 (Wave 1 P0 Clutter Removal):
   - Removed canvas architecture cards (`AI Provider Engine`, `Persistence Layer`, `Cloud Object Storage`) across all 7 creative canvases.
   - Removed premature media generation prompt textboxes, aspect ratio selectors, and buttons from Stage 3 candidate cards.
-  - Removed duplicate header branching launchers (`launcher-simulate-what-if-btn`, `launcher-counterfactual-replay-btn`) and tabs (`codex-tab-mutation`, `codex-tab-replay`) from Stage 5 Codex.
-  - Consolidated Mutation Lab and Counterfactual Replay into Stage 7 Refine sub-views (`#refine-tab-timeline`, `#refine-tab-mutation`, `#refine-tab-replay`).
-  - Removed duplicate `Continue to Stage 4` button from Stage 3 lower guidance banner, leaving single dominant header CTA.
-  - Zero empty space backfilling; pure whitespace restoration.
-Status: Phase 30.1 Complete & Verified (154 backend tests passing, `test_phase30_01_clutter_reduction.cjs` passing 100%, 7 existing regression suites passing 100%, clean production build).
-Last activity: 2026-10-08 — Completed Phase 30.1 Wave 1 Canvas Cleanup & P0 Clutter Removal.
+  - Removed duplicate header branching launchers and tabs from Stage 5 Codex.
+  - Consolidated Mutation Lab and Counterfactual Replay into Stage 7 Refine sub-views.
+  - Removed duplicate `Continue to Stage 4` button from Stage 3 lower banner, leaving single dominant header CTA.
+- Phase 30.2 (Wave 2 Clean Global Header & Shell Simplification):
+  - Redesigned TopBar into a quiet, editorial brand identity with left botanical mark, Cormorant Garamond wordmark, `Seed → Universe` tagline, vertical divider, and project thumbnail + branch selector.
+  - Evicted developer badges (AI status, Supabase, Demo Universe, Tour, Shortcuts, New Seed) into a unified, calm Workspace Menu (`•••`) popover with diagnostics.
+  - Reduced visible header controls to maximum 3: Search (with ⌘K hotkey), Inspect toggle, and Workspace Menu (`•••`).
+  - Added Universe Search Modal (`SearchModal.tsx`) with instant cross-universe entity indexing and ⌘K hotkey.
+  - Redesigned StageProgressHeader into a calm editorial rail on desktop with thin 1px connectors, green checkmarks, and active underline indicator.
+  - Recomposed mobile StageProgressHeader into a non-scrolling compact carousel with Prev/Next buttons, centered stage metadata, and 7 interactive indicator dots.
+  - Deduplicated mobile top bar in AppShell and wired `open-mobile-nav` event for seamless sidebar drawer access.
+Status: Phase 30.2 Complete & Verified (154 backend tests passing, `test_phase30_02_shell_simplification.cjs` passing 100%, 8 regression suites passing 100%, clean production build, 0 horizontal scroll across all 6 viewports).
+Last activity: 2026-10-08 — Completed Phase 30.2 Wave 2 Clean Global Header & Shell Simplification.
 
 Progress: [██████████] 100.0%
 

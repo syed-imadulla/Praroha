@@ -262,6 +262,11 @@ async function runPhase20E2E() {
     // Scenario 8: Canonical Demo Human-Only Zones Verification (DEMO-01 + HOZ-01/02)
     // -------------------------------------------------------------
     console.log('\n--- Scenario 8: Canonical Demo Human-Only Zones Verification ---');
+    const overflowMenuBtn = page.locator('#workspace-overflow-menu-btn');
+    if (await overflowMenuBtn.isVisible()) {
+      await overflowMenuBtn.click();
+      await page.waitForTimeout(200);
+    }
     const demoBtn = page.locator('#instant-demo-topbar-btn').first();
     await demoBtn.waitFor({ timeout: 5000 });
 
