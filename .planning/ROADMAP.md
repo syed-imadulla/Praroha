@@ -33,7 +33,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [ ] **Phase 26: Graveyard Screen** — Calm, poetic cemetery for removed ideas with restore and permanent deletion confirmation.
 - [ ] **Phase 27: Profile Screen** — Botanical identity card, creation statistics, tabs, and account settings panel.
 - [x] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
-- [ ] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts.
+- [x] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts.
 - [ ] **Phase 30: Motion & Organic Unfolding** — Organic motion system (180ms transitions, seed pulse, unfolding animations).
 - [ ] **Phase 31: Responsive & Accessibility** — Desktop, Tablet, Mobile responsiveness and WCAG contrast/touch target compliance.
 - [ ] **Phase 32: Final Visual Audit & Verification** — Complete verification against design.md checklist and test suite.

@@ -623,6 +623,13 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           finalPayload.human_only_zones = hoz;
         }
 
+        // Sanity check: Ensure the selected candidate belongs to the active project
+        const candidateInStore = state.worlds.find((w) => w.id === candidateId);
+        if (candidateInStore && candidateInStore.project_id && candidateInStore.project_id !== project.id) {
+          console.warn('Candidate belongs to a different project than activeProject! Aborting stale selection.');
+          return false;
+        }
+
         set({ isSelectingWorld: true });
         try {
           const res = await apiClient.selectWorld(project.id, candidateId, finalPayload);
@@ -843,6 +850,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           const worldsRes = await apiClient.getLatestWorlds(targetProjectId);
           if (worldsRes.success && worldsRes.data && worldsRes.data.length > 0) {
             set({ worlds: worldsRes.data });
+          } else {
+            set({ worlds: [] });
           }
 
           const selRes = await apiClient.getActiveSelection(targetProjectId);
@@ -1027,13 +1036,25 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
         try {
           let project = state.activeProject;
-          if (!project) {
+          // If no project exists or existing project is not a fresh draft or has a different seed text, create a new project
+          if (!project || (project.status !== 'draft' && project.seed_text !== seedToUse)) {
             const createRes = await apiClient.createProject('Seed World Project', seedToUse);
             if (!createRes.success || !createRes.data) {
               throw new Error(createRes.error?.message || 'Failed to initialize project');
             }
             project = createRes.data;
-            set({ activeProject: project });
+            set({
+              activeProject: project,
+              worlds: [],
+              selectedWorldId: null,
+              selectedWorldRationale: '',
+              activeSelection: null,
+              unfoldedUniverse: null,
+              lineageGraph: null,
+              entityRevisions: [],
+              mutationSimulation: null,
+              potentialItems: [],
+            });
           }
 
           // Step animation progression timeouts
@@ -1067,6 +1088,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           set((s) => ({
             seedDNA: dnaRes.data,
             seedText: seedToUse,
+            worlds: s.worlds.filter((w) => w.project_id === project!.id),
             unlockedStages: s.unlockedStages.includes('understand')
               ? s.unlockedStages
               : [...s.unlockedStages, 'understand'],

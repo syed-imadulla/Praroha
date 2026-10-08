@@ -17,6 +17,7 @@ import { WorldCandidateRead } from '../types';
 
 export const WorldCandidatesCanvas: React.FC = () => {
   const {
+    activeProject,
     worlds,
     isGeneratingWorlds,
     worldBranchingStep,
@@ -31,13 +32,15 @@ export const WorldCandidatesCanvas: React.FC = () => {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
   const hasTriggeredRef = React.useRef(false);
 
-  // Auto-generate on first arrival if worlds are empty and DNA exists
+  // Auto-generate on first arrival if worlds are empty (or belong to a different project) and DNA exists
   useEffect(() => {
-    if (worlds.length === 0 && !isGeneratingWorlds && seedDNA && !hasTriggeredRef.current) {
+    const hasCurrentWorlds =
+      worlds.length > 0 && (!activeProject || worlds.every((w) => w.project_id === activeProject.id));
+    if (!hasCurrentWorlds && !isGeneratingWorlds && seedDNA && !hasTriggeredRef.current) {
       hasTriggeredRef.current = true;
       generateWorlds();
     }
-  }, [worlds.length, isGeneratingWorlds, seedDNA, generateWorlds]);
+  }, [worlds, isGeneratingWorlds, seedDNA, activeProject, generateWorlds]);
 
   const handleRegenerate = async () => {
     await generateWorlds();

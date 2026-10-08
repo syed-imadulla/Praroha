@@ -60,6 +60,23 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     )
 
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    import logging
+    logging.getLogger("backend.app").error(
+        f"Unhandled exception on {request.method} {request.url.path}: {exc}",
+        exc_info=True,
+    )
+    error_res = api_error(
+        code="INTERNAL_SERVER_ERROR",
+        message=str(exc) or "Internal server error occurred.",
+    )
+    return JSONResponse(
+        status_code=500,
+        content=error_res.model_dump(),
+    )
+
+
 # Mount routers
 app.include_router(health_router, prefix=settings.API_V1_PREFIX)
 app.include_router(projects_router, prefix=settings.API_V1_PREFIX)

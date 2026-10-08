@@ -47,8 +47,28 @@ class ApiClient {
         ...options,
       });
 
-      const data: APIResponse<T> = await response.json();
-      return data;
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: data?.error?.code || `HTTP_${response.status}`,
+            message:
+              data?.error?.message ||
+              data?.detail ||
+              `Request failed with status ${response.status}`,
+          },
+        };
+      }
+
+      return data as APIResponse<T>;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Unknown network failure';
       return {

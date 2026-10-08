@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1791407161.1522975,
-    "seen": 1791408312.262002,
-    "ast_hash": "ed0787114726e8ad72a0b2f5f4b07c53",
+    "mtime": 1791456906.3597171,
+    "seen": 1791457080.7682621,
+    "ast_hash": "c65d51615375a113725de8b3f76b294d",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791407543.5088356,
-    "seen": 1791408312.2621453,
-    "ast_hash": "73fa7d3f3c7d4a93aad80a2c23e91987",
+    "mtime": 1791456816.631433,
+    "seen": 1791457080.768414,
+    "ast_hash": "24881cd9ea2e16e97df467bace678349",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791428568.0420418,
-    "seen": 1791432252.3483398,
-    "ast_hash": "8958498e352a72533ef53908f4370499",
+    "mtime": 1791456868.5780187,
+    "seen": 1791457080.7684593,
+    "ast_hash": "1398bec905f4da08f58598f2cc4cb857",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791451063.5954733,
-    "seen": 1791454861.3608902,
-    "ast_hash": "c5d31faad19daa70c914aa6cee465906",
+    "mtime": 1791457058.410504,
+    "seen": 1791457080.7684717,
+    "ast_hash": "95db4d2e46352c0a7f5c1e915027aac4",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791451090.0722342,
-    "seen": 1791454861.360891,
-    "ast_hash": "0e532a3aaaa39d5fe489869733ec5acf",
+    "mtime": 1791455182.6960568,
+    "seen": 1791457080.768473,
+    "ast_hash": "1a551fb643726e0476cda1827e8d3949",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorldCandidatesCanvas.tsx": {
-    "mtime": 1791444961.3300116,
-    "seen": 1791445953.3643444,
-    "ast_hash": "1550f63916a590a4f10a800361cbc102",
+    "mtime": 1791456887.5138676,
+    "seen": 1791457080.7684426,
+    "ast_hash": "cd9baf74ccf1334c4c1e2f52736fa7d0",
     "semantic_hash": ""
   },
   ".planning/phases/03-three-world-generation/03-01-SUMMARY.md": {
@@ -2100,21 +2100,21 @@
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_choose_desktop_1440.png": {
-    "mtime": 1791449409.5332031,
-    "seen": 1791450949.8071053,
-    "ast_hash": "4740fb46f23e5ac73557cb5e815cfbba",
+    "mtime": 1791456985.9650822,
+    "seen": 1791457080.7686448,
+    "ast_hash": "cdc3d7f35bfec7416673e3c6038390b7",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_choose_mobile_390.png": {
-    "mtime": 1791449418.0939846,
-    "seen": 1791450949.8071072,
-    "ast_hash": "49e6d2c6ad5db479c0dd546aa508f9ed",
+    "mtime": 1791456994.488951,
+    "seen": 1791457080.7686455,
+    "ast_hash": "61894b2fd16254e89e88e88e79ddf808",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_choose_tablet_1024.png": {
-    "mtime": 1791449413.8429015,
-    "seen": 1791450949.8071096,
-    "ast_hash": "7e985e6b9659ec47aa735c78fe8330d0",
+    "mtime": 1791456990.2610478,
+    "seen": 1791457080.7686465,
+    "ast_hash": "b101026934e79c1cbf20a940d12bfb54",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_mutation_desktop_1440.png": {
@@ -2136,57 +2136,57 @@
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_refine_desktop_1440.png": {
-    "mtime": 1791449412.379905,
-    "seen": 1791450949.8071194,
-    "ast_hash": "cbf69f2720153c001e17586d3970f7ea",
+    "mtime": 1791456988.8100593,
+    "seen": 1791457080.7686505,
+    "ast_hash": "cb0b676bbbaf64ce69caed33cc0cd729",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_refine_mobile_390.png": {
-    "mtime": 1791449420.9168844,
-    "seen": 1791450949.8071215,
-    "ast_hash": "2285e176847422da7af86a92cc95a255",
+    "mtime": 1791456997.2029924,
+    "seen": 1791457080.7686515,
+    "ast_hash": "fe2b17ad9c9cf67a58bde1448455aa5c",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_refine_tablet_1024.png": {
-    "mtime": 1791449416.6568947,
-    "seen": 1791450949.8071234,
-    "ast_hash": "6c0d4af12807d066e6ab2ed1aef3c326",
+    "mtime": 1791456993.0357172,
+    "seen": 1791457080.7686524,
+    "ast_hash": "28316c6c1e8facf61f08a386fa458dcb",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_trace_desktop_1440.png": {
-    "mtime": 1791449411.4266176,
-    "seen": 1791450949.8071258,
-    "ast_hash": "5a8ca08975d61abb0a130121af99f7d2",
+    "mtime": 1791456987.860067,
+    "seen": 1791457080.7686534,
+    "ast_hash": "c6d15571d6d91e148c48598e9a548c90",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_trace_mobile_390.png": {
-    "mtime": 1791449419.9788866,
-    "seen": 1791450949.807128,
-    "ast_hash": "32383a4533e47ee332867e6c0ee96f44",
+    "mtime": 1791456996.3209994,
+    "seen": 1791457080.768654,
+    "ast_hash": "ac986012f418c5030aaf7f02dd496074",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_trace_tablet_1024.png": {
-    "mtime": 1791449415.727897,
-    "seen": 1791450949.8071303,
-    "ast_hash": "29a8d545f2b4974c0cd92a266d385845",
+    "mtime": 1791456992.118033,
+    "seen": 1791457080.7686548,
+    "ast_hash": "9c408931ed0b9360d0c30853e8915c1e",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_unfold_desktop_1440.png": {
-    "mtime": 1791449410.4739096,
-    "seen": 1791450949.8071327,
-    "ast_hash": "873afff51653b6589cef017a5825fe7d",
+    "mtime": 1791456986.8857148,
+    "seen": 1791457080.7686558,
+    "ast_hash": "9e06cbe17931f4279bf8aa823f2af181",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_unfold_mobile_390.png": {
-    "mtime": 1791449419.012889,
-    "seen": 1791450949.8071346,
-    "ast_hash": "cd6bed8a2d9f03fc3c50b82828623157",
+    "mtime": 1791456995.4060068,
+    "seen": 1791457080.768657,
+    "ast_hash": "7be91ef1537fa8ea727257f0de216414",
     "semantic_hash": ""
   },
   "frontend/e2e/screenshots/phase28_unfold_tablet_1024.png": {
-    "mtime": 1791449414.7778993,
-    "seen": 1791450949.8071368,
-    "ast_hash": "e129ae013ab3cbc90c03eb362809bd2f",
+    "mtime": 1791456991.1840403,
+    "seen": 1791457080.7686577,
+    "ast_hash": "5f557fffb0eb7f3db4f6dbffa33d7932",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase29_ui_polish.cjs": {
@@ -2310,9 +2310,15 @@
     "semantic_hash": ""
   },
   ".planning/phases/30-02-shell-simplification/30-02-VERIFICATION.md": {
-    "mtime": 1791450986.839166,
-    "seen": 1791454861.361037,
-    "ast_hash": "620062318e698abadca90b0ef9108d11",
+    "mtime": 1791455142.2733853,
+    "seen": 1791457080.768613,
+    "ast_hash": "2b6e001cb4fca6089fc0bcfc09b5b84c",
+    "semantic_hash": ""
+  },
+  ".planning/phases/30-02-shell-simplification/30-02-UAT.md": {
+    "mtime": 1791455156.3382711,
+    "seen": 1791457080.7686117,
+    "ast_hash": "442e4c40f28314a25948ed9a986f45a6",
     "semantic_hash": ""
   }
 }
