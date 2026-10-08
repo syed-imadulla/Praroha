@@ -11,6 +11,7 @@ import {
   Flame,
   ArrowRight,
   Info,
+  FileText,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { SeedDNARead } from '../types';
@@ -34,6 +35,7 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
     potentialItems,
   } = useWorkspaceStore();
   const [copied, setCopied] = useState(false);
+  const [mdCopied, setMdCopied] = useState(false);
 
   const dnaRecord = propDnaRecord || storeDna;
 
@@ -53,13 +55,107 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
 
   const { dna, raw_seed, model_used, fallback_used } = dnaRecord;
 
-  const handleCopyJson = async () => {
+  const handleExportJson = () => {
     try {
-      await navigator.clipboard.writeText(JSON.stringify(dna, null, 2));
+      const dataToExport = {
+        project_id: dnaRecord.project_id,
+        raw_seed: dnaRecord.raw_seed,
+        dna: dnaRecord.dna,
+        model_used: dnaRecord.model_used,
+        fallback_used: dnaRecord.fallback_used,
+        created_at: dnaRecord.created_at,
+      };
+      const jsonStr = JSON.stringify(dataToExport, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `seed-dna-${dnaRecord.project_id || 'export'}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(jsonStr).catch(() => {});
+      }
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
     } catch (err) {
-      console.error('Failed to copy Seed DNA JSON:', err);
+      console.error('Failed to export Seed DNA JSON:', err);
+    }
+  };
+
+  const handleExportMarkdown = () => {
+    try {
+      const lines: string[] = [
+        `# Seed DNA`,
+        ``,
+        `> Synthesized semantic blueprint from initial creative premise.`,
+        ``,
+        `## Original Seed`,
+        `"${dnaRecord.raw_seed || ''}"`,
+        ``,
+        `## Core Premise`,
+        `${dna.premise || ''}`,
+        ``,
+        `## Emotional / Aesthetic Tone`,
+        `${dna.tone || ''}`,
+        ``,
+      ];
+
+      if (dna.themes && dna.themes.length > 0) {
+        lines.push(`## Thematic Directions`);
+        dna.themes.forEach((t) => lines.push(`- ${t}`));
+        lines.push(``);
+      }
+
+      if (dna.entities && dna.entities.length > 0) {
+        lines.push(`## Core Entities`);
+        dna.entities.forEach((e) => lines.push(`- ${e}`));
+        lines.push(``);
+      }
+
+      if (dna.constraints && dna.constraints.length > 0) {
+        lines.push(`## Strict Boundary Constraints`);
+        dna.constraints.forEach((c) => lines.push(`- ${c}`));
+        lines.push(``);
+      }
+
+      if (dna.domain_keywords && dna.domain_keywords.length > 0) {
+        lines.push(`## Domain Keywords`);
+        lines.push(dna.domain_keywords.map((k) => `#${k}`).join(' '));
+        lines.push(``);
+      }
+
+      if (potentialItems && potentialItems.length > 0) {
+        lines.push(`## Seed Potential Map`);
+        potentialItems.forEach((p: any) => {
+          lines.push(`### ${p.category || 'Potential Path'}`);
+          lines.push(`- **Premise**: ${p.premise || p.text || ''}`);
+          if (p.divergence_vector) lines.push(`- **Vector**: ${p.divergence_vector}`);
+        });
+        lines.push(``);
+      }
+
+      const mdContent = lines.join('\n');
+      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `seed-dna-${dnaRecord.project_id || 'export'}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(mdContent).catch(() => {});
+      }
+      setMdCopied(true);
+      setTimeout(() => setMdCopied(false), 2500);
+    } catch (err) {
+      console.error('Failed to export Seed DNA Markdown:', err);
     }
   };
 
@@ -136,22 +232,43 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={handleCopyJson}
+                data-testid="export-dna-json-btn"
+                onClick={handleExportJson}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] text-xs font-medium transition shadow-2xs"
-                title="Copy structured DNA JSON"
+                title="Download structured Seed DNA JSON file"
               >
                 {copied ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-[#294B3A]" />
-                    <span className="text-[#294B3A] font-semibold">Copied JSON</span>
+                    <span className="text-[#294B3A] font-semibold">Exported JSON</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5 text-[#466A55]" />
                     <span>Export JSON</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                data-testid="export-dna-md-btn"
+                onClick={handleExportMarkdown}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] text-xs font-medium transition shadow-2xs"
+                title="Download human-readable Seed DNA Markdown file (.md)"
+              >
+                {mdCopied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-[#294B3A]" />
+                    <span className="text-[#294B3A] font-semibold">Exported Markdown</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-3.5 h-3.5 text-[#466A55]" />
+                    <span>Export Markdown</span>
                   </>
                 )}
               </button>

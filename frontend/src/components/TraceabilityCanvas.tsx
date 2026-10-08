@@ -5,6 +5,7 @@ import {
   RotateCw,
   Filter,
   CheckCircle2,
+  Check,
   Info,
   ChevronRight,
   BookOpen,
@@ -34,6 +35,13 @@ export const TraceabilityCanvas: React.FC = () => {
 
   const [zoomLevel, setZoomLevel] = React.useState<number>(1.0);
   const [selectedOriginFilter, setSelectedOriginFilter] = React.useState<OriginType | 'ALL'>('ALL');
+  const [syncSuccess, setSyncSuccess] = React.useState(false);
+
+  const handleSyncGraph = async () => {
+    await fetchLineage();
+    setSyncSuccess(true);
+    setTimeout(() => setSyncSuccess(false), 2200);
+  };
 
   useEffect(() => {
     if (activeProject) {
@@ -191,16 +199,17 @@ export const TraceabilityCanvas: React.FC = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#E2EBE2] text-[#294B3A] border border-[#BACBB8]">
-              Tattva 2: Forms Hidden in Formless • Stage 6 Traceability
+              Stage 6 · See Where It Came From
             </span>
-            <span className="text-xs text-[#718875] font-mono font-semibold">• Provenance DAG</span>
+            <span className="text-xs text-[#718875] font-mono font-semibold">• Origin Trail</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold font-serif text-[#294B3A] tracking-tight">
-            Causal Lineage & Provenance DAG
+            Origin Trail & Creative Journey
           </h1>
           <p className="text-xs md:text-sm text-[#5A6E5E] max-w-3xl leading-relaxed">
-            Every downstream lore rule, character tension, key location, and dramatic scene is causally
-            tethered back to your initial seed. Click any node to illuminate its full provenance trail.
+            Understand where every element of your universe originated. Follow the direct creative journey:
+            <span className="font-semibold text-[#294B3A]"> Original Seed → Seed DNA → 3 Worlds → Your Choice → World Details (Bible, Characters & Scenes)</span>.
+            Click any node below to answer "Where did this element come from?".
           </p>
         </div>
 
@@ -215,13 +224,23 @@ export const TraceabilityCanvas: React.FC = () => {
           )}
 
           <button
-            onClick={() => fetchLineage()}
+            onClick={handleSyncGraph}
             disabled={isLoadingLineage}
+            data-testid="sync-graph-btn"
             className="px-4 py-2 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-50 shadow-xs"
-            title="Refresh DAG synthesis"
+            title="Fetch latest lineage nodes and connections from database"
           >
-            <RotateCw className={`w-3.5 h-3.5 ${isLoadingLineage ? 'animate-spin' : ''}`} />
-            <span>Sync Graph</span>
+            {syncSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-[#F8F4E8]" />
+                <span>Graph Synced</span>
+              </>
+            ) : (
+              <>
+                <RotateCw className={`w-3.5 h-3.5 ${isLoadingLineage ? 'animate-spin' : ''}`} />
+                <span>{isLoadingLineage ? 'Syncing...' : 'Sync Graph'}</span>
+              </>
+            )}
           </button>
 
           {/* DAG Zoom Controls */}

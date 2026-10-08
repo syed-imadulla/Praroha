@@ -38,6 +38,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def get_utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 def build_engine(database_url: str):
     """Build async SQLAlchemy engine optimized for SQLite or PostgreSQL/Supabase."""
     url_str = str(database_url).strip()
@@ -290,6 +294,22 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+def derive_project_title(seed_text: Optional[str], fallback_title: Optional[str] = None) -> str:
+    cleaned = (seed_text or "").strip()
+    if not cleaned:
+        return fallback_title or "New Seed"
+    first_sentence = cleaned.split(".")[0].strip()
+    words = [w for w in first_sentence.split() if w]
+    if len(words) <= 6:
+        candidate = " ".join(words)
+    else:
+        candidate = " ".join(words[:6])
+    candidate = candidate.strip(" ,;:—-\"'\n\r\t")
+    if len(candidate) > 40:
+        candidate = candidate[:40].rstrip()
+    return candidate.title() if candidate else (fallback_title or "New Seed")
+
+
 class ProjectRepository:
     """Repository abstracting database interactions from FastAPI routes."""
 
@@ -297,8 +317,12 @@ class ProjectRepository:
         self.session = session
 
     async def create_project(self, data: ProjectCreate, owner_id: Optional[str] = None) -> Project:
+        title = (data.title or "").strip()
+        if not title or title.lower() in ("seed world project", "untitled", "the sunken city", "new project"):
+            title = derive_project_title(data.seed_text, fallback_title="New Seed")
+
         project = Project(
-            title=data.title,
+            title=title,
             seed_text=data.seed_text or "",
             status="draft",
             owner_id=owner_id,
@@ -660,7 +684,28 @@ class ProjectRepository:
 
             # 2. Persist World Bible
             bible_data = data.get("world_bible", {})
-            timeline_items = bible_data.get("history_timeline", [])
+            raw_timeline = bible_data.get("history_timeline", [])
+            if isinstance(raw_timeline, str):
+                raw_timeline = [raw_timeline]
+            timeline_items = []
+            if isinstance(raw_timeline, list):
+                for t in raw_timeline:
+                    if isinstance(t, dict):
+                        era = str(t.get("era") or t.get("title") or t.get("period") or t.get("year") or "Era")
+                        event = str(t.get("event") or t.get("description") or t.get("summary") or "")
+                        timeline_items.append({"era": era, "event": event})
+                    elif isinstance(t, str):
+                        s = t.strip()
+                        if not s:
+                            continue
+                        if ":" in s:
+                            e_part, ev_part = s.split(":", 1)
+                            timeline_items.append({"era": e_part.strip(), "event": ev_part.strip()})
+                        elif " - " in s:
+                            e_part, ev_part = s.split(" - ", 1)
+                            timeline_items.append({"era": e_part.strip(), "event": ev_part.strip()})
+                        else:
+                            timeline_items.append({"era": "Era", "event": s})
             factions_items = bible_data.get("factions", [])
             canon_facts = bible_data.get("canon_facts", [])
             locations_items = bible_data.get("key_locations", [])
@@ -765,7 +810,7 @@ class ProjectRepository:
                     project_id=project_id,
                     world_candidate_id=world_candidate_id,
                     scene_number=s.get("scene_number", 1),
-                    title=s.get("title", "Untitled Scene"),
+                    title=s.get("title") or s.get("name") or f"Scene {s.get('scene_number', 1)}",
                     location_setting=s.get("location_setting") or s.get("setting", ""),
                     characters_involved_json=json.dumps(characters_involved if isinstance(characters_involved, list) else []),
                     dramatic_question=s.get("dramatic_question", ""),
@@ -1535,14 +1580,43 @@ class ProjectRepository:
         res = await self.session.execute(stmt)
         return list(res.scalars().all())
 
+    async def create_generation_job(self, record: "GenerationJob") -> "GenerationJob":
+        """Persist a new generation job record."""
+        self.session.add(record)
+        await self.session.commit()
+        await self.session.refresh(record)
+        return record
 
+    async def update_generation_job(
+        self, job_id: str, updates: Dict[str, Any]
+    ) -> Optional["GenerationJob"]:
+        """Update an existing generation job."""
+        from backend.app.models.job import GenerationJob
+        stmt = select(GenerationJob).where(GenerationJob.id == job_id)
+        res = await self.session.execute(stmt)
+        rec = res.scalar_one_or_none()
+        if not rec:
+            return None
+        for key, value in updates.items():
+            if hasattr(rec, key):
+                setattr(rec, key, value)
+        rec.updated_at = get_utc_now()
+        self.session.add(rec)
+        await self.session.commit()
+        await self.session.refresh(rec)
+        return rec
 
-
-
+    async def get_generation_job(self, job_id: str) -> Optional["GenerationJob"]:
+        """Retrieve generation job by id."""
+        from backend.app.models.job import GenerationJob
+        stmt = select(GenerationJob).where(GenerationJob.id == job_id)
+        res = await self.session.execute(stmt)
+        return res.scalar_one_or_none()
 
     async def get_project_bundle(self, project_id: str) -> Optional["ProjectBundleRead"]:
         from backend.app.models.project import ProjectBundleRead
         from backend.app.models.job import GenerationJob
+        from backend.app.models.media import MediaAssetRead
         
         project = await self.get_project(project_id)
         if not project:
@@ -1570,8 +1644,11 @@ class ProjectRepository:
         unfolded_universe = await self.get_unfolded_universe(project_id)
 
         # Media Assets
-        assets_records = await self.list_assets(project_id)
-        assets_read = [a.to_read_schema() for a in assets_records]
+        media_assets_records = await self.list_media_assets(project_id)
+        assets_read = [
+            a.to_read_schema() if hasattr(a, "to_read_schema") else MediaAssetRead.model_validate(a)
+            for a in media_assets_records
+        ]
 
         # Generation Jobs
         stmt_jobs = select(GenerationJob).where(GenerationJob.project_id == project_id)

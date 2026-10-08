@@ -23,6 +23,7 @@ export const InspectorDrawer: React.FC = () => {
     <AnimatePresence>
       {inspectorOpen && (
         <motion.aside
+          data-testid="workspace-inspector-drawer"
           initial={{ x: '100%', opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}

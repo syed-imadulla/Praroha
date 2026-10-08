@@ -162,6 +162,23 @@ class PollinationsImageProvider(ImageProvider):
                     current_backoff *= self.backoff_multiplier
                     continue
                 break
+            except httpx.HTTPStatusError as http_err:
+                if http_err.response.status_code == 402:
+                    logger.error("Pollinations returned 402 Payment Required. Halting retries.")
+                    raise ProviderUnavailableError("Client error '402 Payment Required'") from http_err
+                
+                last_exception = http_err
+                logger.warning(
+                    "HTTP error on attempt %d: %s. Backoff %.1fs.",
+                    attempt + 1,
+                    http_err,
+                    current_backoff,
+                )
+                if attempt < self.max_retries:
+                    await asyncio.sleep(current_backoff)
+                    current_backoff *= self.backoff_multiplier
+                    continue
+                break
             except ProviderUnavailableError:
                 raise
             except Exception as unhandled:

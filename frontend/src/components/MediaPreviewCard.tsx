@@ -679,6 +679,8 @@ interface MediaPreviewCardProps {
   isGenerating?: boolean;
   onRetry?: () => void;
   className?: string;
+  entityType?: 'world' | 'character' | 'location' | 'scene';
+  entityTitle?: string;
 }
 
 export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
@@ -688,14 +690,23 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
   isGenerating = false,
   onRetry,
   className = '',
+  entityType,
+  entityTitle,
 }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isVideoLightboxOpen, setIsVideoLightboxOpen] = useState(false);
-  const status = isGenerating
-    ? 'processing'
-    : job?.status || asset?.status || 'idle';
   const assetUrl = job?.asset_url || asset?.asset_url;
-  const errorMessage = job?.error_message || asset?.error_message;
+  
+  const isCurrentlyFailed = job?.status === 'failed' || asset?.status === 'failed';
+  const hasRealAsset = Boolean(!isCurrentlyFailed && assetUrl && (asset?.status === 'completed' || job?.status === 'completed'));
+  
+  const status = isCurrentlyFailed
+    ? 'failed'
+    : hasRealAsset
+    ? 'completed'
+    : (isGenerating || job?.status === 'processing' || job?.status === 'queued')
+    ? (job?.status || 'processing')
+    : 'idle';
 
   const activeAsset: MediaAsset | undefined =
     asset ||
@@ -730,13 +741,22 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
   const getMediaTitle = () => {
     switch (mediaType) {
       case 'image':
+        if (entityType === 'scene') {
+          return entityTitle ? `Scene Visual: ${entityTitle}` : 'Scene Visual';
+        }
+        if (entityType === 'character') {
+          return entityTitle ? `Portrait: ${entityTitle}` : 'Character Portrait';
+        }
+        if (entityType === 'location') {
+          return entityTitle ? `Location Art: ${entityTitle}` : 'Location Art';
+        }
         return 'Visual Concept Art';
       case 'voice':
-        return 'Vocal Narration';
+        return entityTitle ? `Voice: ${entityTitle}` : 'Vocal Narration';
       case 'video':
-        return 'Cinematic Clip';
+        return entityTitle ? `Video Clip: ${entityTitle}` : 'Cinematic Clip';
       case 'audio':
-        return 'Ambient Soundscape';
+        return entityTitle ? `Atmosphere: ${entityTitle}` : 'Ambient Soundscape';
     }
   };
 
@@ -747,6 +767,29 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
       data-testid={`media-card-${mediaType}`}
       className={`rounded-xl border border-[#D8CCB7] bg-[#F8F4E8] overflow-hidden flex flex-col p-3 transition-all duration-200 hover:border-[#355A46] shadow-2xs ${className}`}
     >
+      {/* Entity Affiliation Badge */}
+      {entityType === 'scene' && mediaType === 'image' && (
+        <div
+          data-testid="scene-visual-badge"
+          className="flex items-center gap-1.5 px-2.5 py-1 mb-2 rounded-lg bg-[#EFE8EE] border border-[#DFD1DE] text-xs text-[#6A4B67] font-medium"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#6A4B67] shrink-0" />
+          <span className="font-semibold">Scene Visual:</span>
+          <span className="truncate">{entityTitle || 'Attached Scene'}</span>
+        </div>
+      )}
+
+      {entityType === 'character' && mediaType === 'image' && (
+        <div
+          data-testid="character-portrait-badge"
+          className="flex items-center gap-1.5 px-2.5 py-1 mb-2 rounded-lg bg-[#E9DDBF] border border-[#C59A55]/30 text-xs text-[#805B20] font-medium"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#805B20] shrink-0" />
+          <span className="font-semibold">Character Portrait:</span>
+          <span className="truncate">{entityTitle || 'Character'}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-2.5">
         <div className="flex items-center gap-2 text-[13px] font-bold text-[#294B3A]">
@@ -797,15 +840,26 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
               <div className="absolute inset-0 rounded-full border-2 border-[#355A46]/20 border-t-[#355A46] animate-spin" />
               <Sparkles className="w-4 h-4 text-[#355A46] absolute inset-0 m-auto animate-pulse" />
             </div>
-            <p className="text-xs text-[#294B3A] font-bold">Generating multimodal asset</p>
+            <p className="text-xs text-[#294B3A] font-bold">
+              {mediaType === 'image'
+                ? 'Creating your image...'
+                : mediaType === 'voice' || mediaType === 'audio'
+                ? 'Creating your audio...'
+                : 'Creating your video...'}
+            </p>
             <p className="text-xs text-[#5F6D63] mt-0.5">Non-blocking background synthesis</p>
           </div>
         ) : status === 'failed' ? (
           <div className="flex flex-col items-center justify-center p-4 text-center w-full">
-            <AlertCircle className="w-7 h-7 text-[#B8734F] mb-1.5" />
-            <p className="text-xs text-[#B8734F] font-bold">Synthesis Encountered Error</p>
-            <p className="text-xs text-[#B8734F] mt-0.5 max-w-[240px] truncate" title={errorMessage || 'Provider generation failed'}>
-              {errorMessage || 'Generation error'}
+            <p className="text-xs text-[#B8734F] font-bold">
+              {mediaType === 'image'
+                ? 'Could not create this image.'
+                : mediaType === 'voice' || mediaType === 'audio'
+                ? 'Could not create this audio.'
+                : 'Could not create this yet.'}
+            </p>
+            <p className="text-xs text-[#B8734F] mt-0.5 max-w-[240px]">
+              {job?.error_message || asset?.error_message || 'Something went wrong. Please try again.'}
             </p>
             {onRetry && (
               <button
@@ -815,7 +869,7 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
                 className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F5E6DC] hover:bg-[#EAE4D4] text-[#B8734F] border border-[#E2BFAC] transition-colors min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#B8734F]"
               >
                 <RotateCw className="w-3.5 h-3.5" />
-                Retry
+                Try Again
               </button>
             )}
           </div>

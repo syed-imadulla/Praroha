@@ -89,6 +89,11 @@ class CompositeAudioProvider(AudioProvider):
             )
 
         # --- Tier 3: Guaranteed Safe Mock Fallback ---
+        import os
+        if os.getenv("ENVIRONMENT") != "demo" and os.getenv("PRAROHA_ENV") != "demo":
+            logger.error("Real mode: Providers failed. Refusing to fallback to MockProvider.")
+            raise ProviderUnavailableError("Real providers failed and mock fallback is disabled in real mode.")
+
         logger.info("Delivering Tier 3 (MockAudioProvider) deterministic fallback audio soundscape.")
         try:
             payload = await self.mock.generate_audio(

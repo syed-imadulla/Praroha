@@ -4,13 +4,13 @@ import { useWorkspaceStore } from '../store/workspaceStore';
 import { StageDefinition, StageType } from '../types';
 
 const STAGES: StageDefinition[] = [
-  { id: 'seed', number: 1, label: 'Seed', description: 'Raw Idea' },
-  { id: 'understand', number: 2, label: 'Understand', description: 'Seed DNA' },
-  { id: 'worlds', number: 3, label: '3 Worlds', description: 'Latent Directions' },
-  { id: 'choose', number: 4, label: 'Choose', description: 'Human Gate' },
-  { id: 'unfold', number: 5, label: 'Unfold', description: 'Universe Expansion' },
-  { id: 'trace', number: 6, label: 'Trace', description: 'Causal Lineage' },
-  { id: 'refine', number: 7, label: 'Refine', description: 'Branch & Save' },
+  { id: 'seed', number: 1, label: 'Seed', description: 'Your Idea' },
+  { id: 'understand', number: 2, label: 'Understand', description: 'Understand It' },
+  { id: 'worlds', number: 3, label: '3 Worlds', description: 'Possible Worlds' },
+  { id: 'choose', number: 4, label: 'Choose', description: 'Your Choice' },
+  { id: 'unfold', number: 5, label: 'Unfold', description: 'Build Your World' },
+  { id: 'trace', number: 6, label: 'Trace', description: 'See Where It Came From' },
+  { id: 'refine', number: 7, label: 'Refine', description: 'Edit & Branch' },
 ];
 
 export const StageProgressHeader: React.FC = () => {

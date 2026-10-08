@@ -78,6 +78,11 @@ class CompositeImageProvider(ImageProvider):
             )
 
         # --- Tier 3: Guaranteed Mock Fallback ---
+        import os
+        if os.getenv("ENVIRONMENT") != "demo" and os.getenv("PRAROHA_ENV") != "demo":
+            logger.error("Real mode: Providers failed. Refusing to fallback to MockProvider.")
+            raise ProviderUnavailableError("Real providers failed and mock fallback is disabled in real mode.")
+
         logger.info("Delivering Tier 3 (MockImageProvider) deterministic fallback asset.")
         try:
             payload = await self.mock.generate_image(

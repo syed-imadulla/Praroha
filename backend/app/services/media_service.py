@@ -4,6 +4,7 @@ import logging
 from typing import Any, Dict, List, Optional
 from fastapi import HTTPException
 
+from backend.app.models.job import GenerationJob
 from backend.app.models.media import (
     MediaAssetRecord,
     MediaGenerationRequest,
@@ -73,6 +74,19 @@ class MediaService:
         )
         created_asset = await self.repo.create_media_asset(asset_record)
 
+        # Create corresponding GenerationJob in generation_jobs table (shared ID for lockstep tracking)
+        job_record = GenerationJob(
+            id=created_asset.id,
+            project_id=project_id,
+            job_type=f"media_{request.media_type}",
+            status="queued",
+            progress=0,
+            error_code=None,
+            error_message=None,
+            result_json=None,
+        )
+        await self.repo.create_generation_job(job_record)
+
         # Launch background task with its own independent session
         asyncio.create_task(
             self._execute_job_in_background(
@@ -127,6 +141,14 @@ class MediaService:
         await repo.update_media_asset(
             asset_id=asset_id,
             updates={"status": "processing"},
+        )
+        await repo.update_generation_job(
+            job_id=asset_id,
+            updates={
+                "status": "processing",
+                "started_at": get_utc_now(),
+                "progress": 25,
+            },
         )
 
         try:
@@ -189,7 +211,16 @@ class MediaService:
                     spoken_text = request.prompt.strip()
                 else:
                     if request.entity_type == "character" and request.entity_id:
-                        char = await repo.get_character(request.entity_id)
+                        clean_char_id = request.entity_id.replace("char-", "").strip()
+                        char = await repo.get_character(request.entity_id) or await repo.get_character(clean_char_id)
+                        if not char and project_id:
+                            chars = await repo.list_characters(project_id)
+                            for c in chars:
+                                if str(c.id) == request.entity_id or str(c.id) == clean_char_id:
+                                    char = c
+                                    break
+                            if not char and chars:
+                                char = chars[0]
                         if char:
                             name = char.name
                             role = char.role
@@ -199,7 +230,16 @@ class MediaService:
                         else:
                             spoken_text = "I am a character in this world."
                     elif request.entity_type == "scene" and request.entity_id:
-                        scene = await repo.get_scene(request.entity_id)
+                        clean_scene_id = request.entity_id.replace("scene-", "").strip()
+                        scene = await repo.get_scene(request.entity_id) or await repo.get_scene(clean_scene_id)
+                        if not scene and project_id:
+                            scenes = await repo.list_scenes(project_id)
+                            for s in scenes:
+                                if str(s.id) == request.entity_id or str(s.id) == clean_scene_id or str(s.scene_number) == clean_scene_id:
+                                    scene = s
+                                    break
+                            if not scene and scenes:
+                                scene = scenes[0]
                         if scene:
                             scene_number = scene.scene_number
                             title = scene.title
@@ -281,7 +321,16 @@ class MediaService:
                         else:
                             generation_prompt = f"Ambient soundscape for world {request.entity_id}."
                     elif request.entity_type == "scene" and request.entity_id:
-                        scene = await repo.get_scene(request.entity_id)
+                        clean_scene_id = request.entity_id.replace("scene-", "").strip()
+                        scene = await repo.get_scene(request.entity_id) or await repo.get_scene(clean_scene_id)
+                        if not scene and project_id:
+                            scenes = await repo.list_scenes(project_id)
+                            for s in scenes:
+                                if str(s.id) == request.entity_id or str(s.id) == clean_scene_id or str(s.scene_number) == clean_scene_id:
+                                    scene = s
+                                    break
+                            if not scene and scenes:
+                                scene = scenes[0]
                         if scene:
                             title = scene.title
                             location_setting = (scene.location_setting or "").rstrip(".")
@@ -306,7 +355,7 @@ class MediaService:
 
             # Store synthesized asset
             ext = _resolve_extension(payload.mime_type)
-            storage_key = f"media/{request.media_type}/{asset_id}.{ext}"
+            storage_key = f"projects/{project_id}/media/{request.media_type}/{asset_id}.{ext}"
             uploaded_url = await self.storage.upload(
                 file_data=payload.data,
                 key=storage_key,
@@ -334,7 +383,6 @@ class MediaService:
                 **(payload.metadata or {}),
             })
 
-
             updated = await repo.update_media_asset(
                 asset_id=asset_id,
                 updates={
@@ -351,6 +399,15 @@ class MediaService:
                     "error_message": None,
                 },
             )
+            await repo.update_generation_job(
+                job_id=asset_id,
+                updates={
+                    "status": "completed",
+                    "progress": 100,
+                    "completed_at": get_utc_now(),
+                    "result_json": json.dumps({"asset_id": asset_id, "asset_url": uploaded_url}),
+                },
+            )
             return updated or await repo.get_media_asset(asset_id)
 
         except Exception as exc:
@@ -362,6 +419,14 @@ class MediaService:
             )
             updated = await repo.update_media_asset(
                 asset_id=asset_id,
+                updates={
+                    "status": "failed",
+                    "error_message": str(exc),
+                    "completed_at": get_utc_now(),
+                },
+            )
+            await repo.update_generation_job(
+                job_id=asset_id,
                 updates={
                     "status": "failed",
                     "error_message": str(exc),

@@ -176,7 +176,7 @@ export const RefineCanvas: React.FC = () => {
       <div className="space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono uppercase tracking-wider">
           <History className="w-3.5 h-3.5 text-[#805B20]" />
-          <span>Tattva 2: Forms Hidden in Formless • Stage 7 Refinement & Continuity</span>
+          <span>Stage 7 · Edit & Branch • Refinement & Continuity</span>
         </div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

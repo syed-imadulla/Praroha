@@ -40,12 +40,15 @@ class MediaAssetRecord(MediaAssetBase, table=True):
     created_at: datetime = Field(default_factory=get_utc_now)
     completed_at: Optional[datetime] = Field(default=None, nullable=True)
 
+    def to_read_schema(self) -> "MediaAssetRead":
+        return MediaAssetRead.model_validate(self)
+
 
 class MediaGenerationRequest(SQLModel):
     entity_type: Literal["world", "character", "location", "scene"]
     entity_id: str
     media_type: MediaType
-    prompt: str
+    prompt: Optional[str] = ""
     aspect_ratio: Optional[str] = "1:1"
     voice_id: Optional[str] = "default"
     duration_sec: Optional[int] = 5

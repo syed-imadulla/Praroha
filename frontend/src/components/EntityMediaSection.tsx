@@ -18,6 +18,7 @@ interface EntityMediaSectionProps {
   availableModalities?: MediaType[];
   compact?: boolean;
   roleHint?: string;
+  entityTitle?: string;
 }
 
 export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
@@ -27,6 +28,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
   availableModalities = ['image', 'voice'],
   compact = false,
   roleHint,
+  entityTitle,
 }) => {
   const {
     mediaAssets,
@@ -199,6 +201,20 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
           )}
 
           {availableModalities.map((modality) => {
+            if (modality === 'video') {
+              return (
+                <div
+                  key="video"
+                  data-testid={`generate-video-disabled-${entityId}`}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#EAE4D4] text-[#718875] border border-[#D8CCB7] cursor-not-allowed opacity-75 min-h-[32px]"
+                  title="Video synthesis is currently unavailable"
+                >
+                  <Video className="w-3.5 h-3.5 text-[#718875]" />
+                  <span>Video (Coming Soon)</span>
+                </div>
+              );
+            }
+
             const isGenerating = !!isGeneratingMedia[`${entityId}_${modality}`];
             const existingAsset = assets.find((a) => a.media_type === modality);
 
@@ -225,7 +241,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                   {isGenerating
                     ? `Generating ${getModalityLabel(modality)}...`
                     : existingAsset
-                    ? `Regenerate ${getModalityLabel(modality)}`
+                    ? `Create ${getModalityLabel(modality)} Again`
                     : `Generate ${getModalityLabel(modality)}`}
                 </span>
               </button>
@@ -267,6 +283,8 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                 job={activeJob}
                 isGenerating={isGenerating}
                 onRetry={() => handleGenerate(modality)}
+                entityType={entityType}
+                entityTitle={entityTitle}
               />
             );
           })}

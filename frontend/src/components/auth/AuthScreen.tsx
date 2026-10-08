@@ -196,9 +196,8 @@ export const AuthScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Editorial footer */}
       <div className="mt-8 text-center text-stone-600 text-xs font-serif tracking-widest">
-        SEED → UNIVERSE · TATTVA 2
+        SEED → UNIVERSE · BOTANICAL CREATIVE JOURNAL
       </div>
     </div>
   );

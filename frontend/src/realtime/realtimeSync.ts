@@ -179,15 +179,56 @@ export function initRealtimeSync() {
        const list = [...(assets[assetKey] || [])];
        
        if (eventType === 'INSERT' && newRec) {
-           if (!list.find(a => a.id === newRec.id)) {
-               assets[assetKey] = [...list, newRec];
+           const existingIdx = list.findIndex(a => a.id === newRec.id);
+           if (existingIdx >= 0) {
+               list[existingIdx] = { ...list[existingIdx], ...newRec };
+           } else {
+               list.push(newRec);
            }
+           assets[assetKey] = list;
        } else if (eventType === 'UPDATE' && newRec) {
-           assets[assetKey] = list.map(a => a.id === newRec.id ? { ...a, ...newRec } : a);
+           const existingIdx = list.findIndex(a => a.id === newRec.id);
+           if (existingIdx >= 0) {
+               list[existingIdx] = { ...list[existingIdx], ...newRec };
+           } else {
+               list.push(newRec);
+           }
+           assets[assetKey] = list;
        } else if (eventType === 'DELETE' && oldRec) {
            assets[assetKey] = list.filter(a => a.id !== oldRec.id);
        }
-       useWorkspaceStore.setState({ mediaAssets: assets });
+
+       // Authoritative generation flag update
+       const isGenerating = { ...state.isGeneratingMedia };
+       const mediaType = (newRec as any)?.media_type || (oldRec as any)?.media_type;
+       if (mediaType) {
+           const genKey = `${assetKey}_${mediaType}`;
+           if (newRec && (newRec.status === 'completed' || newRec.status === 'failed')) {
+               isGenerating[genKey] = false;
+           } else if (newRec && (newRec.status === 'processing' || newRec.status === 'queued')) {
+               isGenerating[genKey] = true;
+           }
+       }
+
+       // Keep activeMediaJobs aligned with PostgreSQL state
+       const jobs = { ...state.activeMediaJobs };
+       if (newRec && newRec.id) {
+           jobs[newRec.id] = {
+               job_id: newRec.id,
+               status: newRec.status,
+               media_type: newRec.media_type,
+               entity_type: newRec.entity_type,
+               entity_id: newRec.entity_id,
+               asset_url: newRec.asset_url,
+               error_message: newRec.error_message,
+           };
+       }
+
+       useWorkspaceStore.setState({
+           mediaAssets: assets,
+           isGeneratingMedia: isGenerating,
+           activeMediaJobs: jobs,
+       });
     }
     else if (table === 'generation_jobs') {
        const jobs = { ...state.activeMediaJobs };
@@ -196,6 +237,23 @@ export function initRealtimeSync() {
                jobs[newRec.id] = { ...jobs[newRec.id], ...newRec };
            } else if (eventType === 'INSERT' || eventType === 'UPDATE') {
                jobs[newRec.id] = newRec;
+           }
+
+           if (newRec.job_type && newRec.job_type.startsWith('media_')) {
+               const mediaType = newRec.job_type.replace('media_', '');
+               const isGenerating = { ...state.isGeneratingMedia };
+               for (const [entityId, assetList] of Object.entries(state.mediaAssets)) {
+                   if (assetList.some(a => a.id === newRec.id)) {
+                       const genKey = `${entityId}_${mediaType}`;
+                       if (newRec.status === 'completed' || newRec.status === 'failed') {
+                           isGenerating[genKey] = false;
+                       } else if (newRec.status === 'processing' || newRec.status === 'queued') {
+                           isGenerating[genKey] = true;
+                       }
+                       break;
+                   }
+               }
+               useWorkspaceStore.setState({ isGeneratingMedia: isGenerating });
            }
        }
        if (eventType === 'DELETE' && oldRec && jobs[oldRec.id]) {

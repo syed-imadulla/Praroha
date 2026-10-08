@@ -84,6 +84,7 @@ from .world import WorldCandidateRead
 from .selection import WorldSelectionRead
 from .unfold import UnfoldedUniverseRead
 from .job import GenerationJobRead
+from .media import MediaAssetRead
 
 class ProjectBundleRead(BaseModel):
     format_version: str = "1.0"
@@ -94,7 +95,7 @@ class ProjectBundleRead(BaseModel):
     world_candidates: List[WorldCandidateRead] = []
     world_selection: Optional[WorldSelectionRead] = None
     unfolded_universe: Optional[UnfoldedUniverseRead] = None
-    media_assets: List[AssetRead] = []
+    media_assets: List[MediaAssetRead] = []
     generation_jobs: List[GenerationJobRead] = []
     revisions: List[Any] = []
     lineage: Optional[Any] = None

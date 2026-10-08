@@ -243,17 +243,119 @@ class MockVideoProvider(VideoProvider):
         )
 
 
-class MockAudioProvider(AudioProvider):
-    """Deterministic mock audio provider generating ambient WAV soundscapes."""
+def generate_cinematic_atmosphere(
+    prompt: str = "",
+    mood: str = "ambient",
+    duration_sec: float = 6.0,
+    sample_rate: int = 22050,
+) -> bytes:
+    """Synthesize an authentic, multi-voice harmonic cinematic audio soundscape.
 
-    MOOD_FREQUENCIES = {
-        "serene-ambient": 196.0,   # G3 warm drone
-        "ambient": 196.0,          # G3 warm drone
-        "tense-dramatic": 110.0,   # A2 low tension drone
-        "mystic-ethereal": 329.63, # E4 shimmering resonance
-        "ominous-drone": 73.42,    # D2 sub-bass foundation
-        "epic-orchestral": 220.0,  # A3 brass harmonic
+    Features:
+    - Root sub-bass drone with harmonic chord progression
+    - Detuned chorus & stereo depth modulation
+    - Low-pass filter movement / breathing envelope
+    - Distinct chord intervals and rhythmic pulses per mood
+    - Prompt-based deterministic texture variation
+    """
+    duration = max(2.5, min(15.0, float(duration_sec)))
+    num_samples = int(duration * sample_rate)
+    subchunk2_size = num_samples * 2
+    chunk_size = 36 + subchunk2_size
+
+    header = struct.pack(
+        "<4sI4s4sIHHIIHH4sI",
+        b"RIFF",
+        chunk_size,
+        b"WAVE",
+        b"fmt ",
+        16,
+        1,
+        1,
+        sample_rate,
+        sample_rate * 2,
+        2,
+        16,
+        b"data",
+        subchunk2_size,
+    )
+
+    # Chords / harmonic voices per mood: list of (freq, relative_amp, modulation_rate)
+    mood_profiles = {
+        "tense-dramatic": [
+            (110.0, 0.35, 1.5),     # A2 sub-tension
+            (116.54, 0.25, 2.0),    # Bb2 dissonance (minor 2nd)
+            (155.56, 0.20, 0.8),    # Eb3 tritone
+            (220.0, 0.15, 3.0),     # A3 octavial pulse
+        ],
+        "serene-ambient": [
+            (98.0, 0.35, 0.2),      # G2 warm anchor
+            (146.83, 0.25, 0.15),   # D3 open fifth
+            (196.0, 0.22, 0.25),    # G3 resonance
+            (246.94, 0.18, 0.1),    # B3 major 3rd
+            (293.66, 0.12, 0.3),    # D4 major 9th
+        ],
+        "mystic-ethereal": [
+            (164.81, 0.30, 0.4),    # E3
+            (246.94, 0.25, 0.3),    # B3
+            (329.63, 0.25, 0.5),    # E4
+            (415.30, 0.15, 0.6),    # G#4 mystic aura
+            (493.88, 0.10, 0.2),    # B4 shimmer
+        ],
+        "ominous-drone": [
+            (55.0, 0.45, 0.5),      # A1 deep sub-bass
+            (73.42, 0.30, 0.3),     # D2 drone
+            (82.41, 0.20, 0.7),     # E2 5th
+            (110.0, 0.15, 0.4),     # A2 undertone
+        ],
+        "epic-orchestral": [
+            (110.0, 0.30, 0.8),     # A2 brass root
+            (164.81, 0.25, 0.6),    # E3 fifth
+            (220.0, 0.25, 1.0),     # A3 foundation
+            (277.18, 0.15, 0.5),    # C#4 major 3rd
+            (330.0, 0.12, 1.2),     # E4 fanfare harmonic
+        ],
     }
+
+    voices = mood_profiles.get(mood, mood_profiles["serene-ambient"])
+
+    # Subtle prompt seed hash for organic acoustic texture
+    prompt_seed = int(hashlib.md5(prompt.encode("utf-8")).hexdigest()[:6], 16) % 1000 / 1000.0
+
+    fade_samples = int(0.25 * sample_rate)
+    samples = bytearray()
+
+    for i in range(num_samples):
+        t = i / sample_rate
+        # Breathing envelope: smooth in and out, no pop/click
+        envelope = min(1.0, i / max(1, fade_samples), (num_samples - i) / max(1, fade_samples))
+
+        # Composite multi-voice waveform synthesis
+        sample_sum = 0.0
+        for freq, amp, mod_rate in voices:
+            # LFO amplitude & subtle frequency modulation
+            lfo = 1.0 + 0.12 * math.sin(2 * math.pi * (mod_rate + prompt_seed * 0.1) * t)
+            # Slight detune for analog acoustic chorus
+            detune = 1.0 + 0.003 * math.sin(2 * math.pi * 0.3 * t)
+            wave = math.sin(2 * math.pi * freq * detune * t)
+            # Soft 2nd harmonic
+            harmonic2 = 0.25 * math.sin(4 * math.pi * freq * t)
+            sample_sum += amp * (wave + harmonic2) * lfo
+
+        # Organic textural background layer (filtered resonance)
+        textural_noise = 0.04 * (math.sin(1234.5 * t) * math.sin(789.1 * t))
+        total_signal = (sample_sum + textural_noise) * envelope
+
+        # Normalize and scale to 16-bit PCM (peak ~ 14000 to prevent clipping)
+        val = int(14000 * total_signal)
+        clamped = max(-32768, min(32767, val))
+        samples.extend(struct.pack("<h", clamped))
+
+    return bytes(header + samples)
+
+
+class MockAudioProvider(AudioProvider):
+    """Deterministic mock audio provider generating rich cinematic atmospheric soundscapes."""
 
     async def generate_audio(
         self,
@@ -262,14 +364,13 @@ class MockAudioProvider(AudioProvider):
         duration_sec: int = 15,
         context: Optional[Dict[str, Any]] = None,
     ) -> MediaPayload:
-        freq = self.MOOD_FREQUENCIES.get(mood, 196.0)
-        duration = min(8.0, max(2.0, float(duration_sec)))
-        data = _generate_wav_bytes(duration_sec=duration, freq=freq)
-        file_hash = hashlib.md5(f"{prompt}_{mood}".encode("utf-8")).hexdigest()[:10]
+        duration = min(10.0, max(3.0, float(duration_sec)))
+        data = generate_cinematic_atmosphere(prompt=prompt, mood=mood, duration_sec=duration)
+        file_hash = hashlib.md5(f"{prompt}_{mood}_{duration}".encode("utf-8")).hexdigest()[:10]
         return MediaPayload(
             data=data,
             mime_type="audio/wav",
-            filename=f"mock_audio_{file_hash}.wav",
+            filename=f"atmosphere_{mood}_{file_hash}.wav",
             metadata={
                 "resolved_provider": "mock",
                 "mood": mood,

@@ -70,42 +70,14 @@ export const WorldSelectionCanvas: React.FC = () => {
   // Derive inferred exclusions from the two non-selected candidate worlds
   const unselectedCandidates = worlds.filter((w) => w.id !== selectedWorldId);
   const inferredExclusionsList = unselectedCandidates.map((cand) => {
-    const t = cand.title.toLowerCase();
-    if (t.includes('lost civilization')) {
-      return 'Classical sunken ruins archaeology';
-    }
-    if (t.includes('time capsule')) {
-      return 'Cold War militarized technology';
-    }
     return `Archetype conventions of ${cand.title} (${cand.archetype})`;
   });
 
   // Synchronize defaults whenever a candidate is chosen
   useEffect(() => {
     if (chosenCandidate) {
-      const isBioCity = chosenCandidate.title.toLowerCase().includes('bio-city');
       if (selectedPriorities.length === 0) {
-        if (isBioCity) {
-          setSelectedPriorities([
-            'Ecological / Symbiotic Mystery',
-            'Atmospheric Lore Depth',
-            'Ethical Stakes',
-          ]);
-        } else {
-          setSelectedPriorities(['Atmospheric Lore Depth', 'Character-Driven Conflict']);
-        }
-      }
-
-      if (!localRationale && isBioCity) {
-        setLocalRationale(
-          'Selected Bio-City for deep biopunk exploration and rich ecological tension.'
-        );
-      }
-
-      if (!customDirectives && isBioCity) {
-        setCustomDirectives(
-          'Ensure coral bio-luminescence and symbiotic sentience remain central across all layers.'
-        );
+        setSelectedPriorities(['Atmospheric Lore Depth', 'Character-Driven Conflict']);
       }
 
       // Default all inferred exclusions to active
@@ -165,18 +137,12 @@ export const WorldSelectionCanvas: React.FC = () => {
 
   const handleSuggestZones = () => {
     if (!chosenCandidate) return;
-    const isBioCity = chosenCandidate.title.toLowerCase().includes('bio-city');
-    let theme = `${chosenCandidate.aesthetic} — ${chosenCandidate.core_tension}`;
-    let motivation = `Uncover the secrets of ${chosenCandidate.title} under canon pressure`;
+    let theme = chosenCandidate.aesthetic ? `${chosenCandidate.aesthetic} — ${chosenCandidate.core_tension}` : chosenCandidate.core_tension;
+    let motivation = `Uncover the truth of ${chosenCandidate.title}`;
     let conflict = chosenCandidate.core_tension;
 
-    if (isBioCity) {
-      theme = 'Coexistence between synthetic human biology and ancient abyssal intelligence';
-      motivation = "Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive";
-      conflict = 'Bio-symbiont collective survival vs. extractive corporate exploitation';
-    } else if (seedDNA?.dna.premise) {
-      theme = seedDNA.dna.premise;
-      conflict = chosenCandidate.core_tension;
+    if (seedDNA?.dna.premise) {
+      theme = `${seedDNA.dna.premise} (${chosenCandidate.title})`;
     }
 
     setHumanOnlyZones({
@@ -357,20 +323,6 @@ export const WorldSelectionCanvas: React.FC = () => {
                     </span>
                   )}
                 </h3>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handleConfirmLock}
-                  disabled={isSelectingWorld}
-                  className="px-6 py-3 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-sm flex items-center gap-2.5 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
-                  title="Lock this creative world direction and proceed to Stage 5 Unfolding"
-                >
-                  <Lock className={`w-4 h-4 ${isSelectingWorld ? 'animate-spin' : ''}`} />
-                  <span>{isSelectingWorld ? 'Locking Direction...' : 'Confirm & Lock Direction (Proceed to Stage 5)'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
               </div>
             </div>
 
@@ -666,7 +618,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                     readOnly={humanOnlyZones?.is_locked}
                     value={humanOnlyZones?.core_theme || ''}
                     onChange={(e) => setHumanOnlyZones({ core_theme: e.target.value })}
-                    placeholder="e.g. Coexistence between abyssal biology and human consciousness"
+                    placeholder="e.g. The core philosophical theme of this world"
                     className={`w-full px-3 py-2.5 rounded-xl text-sm transition-all ${
                       humanOnlyZones?.is_locked
                         ? 'bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] cursor-not-allowed select-text font-medium'
@@ -694,7 +646,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                     readOnly={humanOnlyZones?.is_locked}
                     value={humanOnlyZones?.protagonist_motivation || ''}
                     onChange={(e) => setHumanOnlyZones({ protagonist_motivation: e.target.value })}
-                    placeholder="e.g. Decode the neural coral frequency before salvage crews arrive"
+                    placeholder="e.g. The primary driving quest of the central protagonist"
                     className={`w-full px-3 py-2.5 rounded-xl text-sm transition-all ${
                       humanOnlyZones?.is_locked
                         ? 'bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] cursor-not-allowed select-text font-medium'
@@ -722,7 +674,7 @@ export const WorldSelectionCanvas: React.FC = () => {
                     readOnly={humanOnlyZones?.is_locked}
                     value={humanOnlyZones?.central_conflict || ''}
                     onChange={(e) => setHumanOnlyZones({ central_conflict: e.target.value })}
-                    placeholder="e.g. Bio-symbiont survival vs extractive corporate exploitation"
+                    placeholder="e.g. The irreversible crisis or tension facing this civilization"
                     className={`w-full px-3 py-2.5 rounded-xl text-sm transition-all ${
                       humanOnlyZones?.is_locked
                         ? 'bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] cursor-not-allowed select-text font-medium'
@@ -742,6 +694,24 @@ export const WorldSelectionCanvas: React.FC = () => {
               <span className="leading-relaxed">
                 Locking records this full Decision DNA as an immutable creative contract in the project DAG. You can still switch candidates within this batch until Stage 5 unfolding commences.
               </span>
+            </div>
+
+            {/* Bottom Action Area: Consistent Bottom Button Placement */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#D8CCB7]">
+              <div className="text-xs text-[#5F6D63]">
+                Ready to commit to this world? Lock your choice to unfold Stage 5.
+              </div>
+              <button
+                type="button"
+                data-testid="bottom-confirm-lock-btn"
+                onClick={handleConfirmLock}
+                disabled={isSelectingWorld}
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-sm flex items-center justify-center gap-2.5 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <Lock className={`w-4 h-4 ${isSelectingWorld ? 'animate-spin' : ''}`} />
+                <span>{isSelectingWorld ? 'Locking Direction...' : 'Confirm & Lock Direction (Proceed to Stage 5)'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </motion.div>
         ) : (

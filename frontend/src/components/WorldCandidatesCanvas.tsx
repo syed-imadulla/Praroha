@@ -97,17 +97,7 @@ export const WorldCandidatesCanvas: React.FC = () => {
             title="Generate a fresh set of three world candidates"
           >
             <RotateCw className={`w-3.5 h-3.5 ${isGeneratingWorlds ? 'animate-spin text-[#355A46]' : 'text-[#466A55]'}`} />
-            <span>{isGeneratingWorlds ? 'Synthesizing Worlds...' : 'Re-generate'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleProceedToStage4}
-            disabled={isGeneratingWorlds || worlds.length === 0}
-            className="px-5 py-2.5 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
-          >
-            <span>Proceed to Selection (Stage 4)</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>{isGeneratingWorlds ? 'Creating Worlds...' : 'Create Again'}</span>
           </button>
         </div>
       </div>
@@ -201,12 +191,24 @@ export const WorldCandidatesCanvas: React.FC = () => {
               ))}
             </div>
 
-            {/* Bottom Guidance Banner (Informational Only) */}
-            <div className="p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-[#466A55] text-xs flex items-center gap-2 shadow-2xs">
-              <Info className="w-4 h-4 text-[#355A46] shrink-0" />
-              <span>
-                Compare the three archetypes side-by-side. In <strong className="text-[#294B3A]">Stage 4: World Selection</strong>, you will choose one world to progressively unfold into bible, characters, and scenes.
-              </span>
+            {/* Bottom Guidance Banner and Stage Action */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] shadow-2xs">
+              <div className="flex items-center gap-2 text-[#466A55] text-xs">
+                <Info className="w-4 h-4 text-[#355A46] shrink-0" />
+                <span>
+                  Compare the three archetypes side-by-side. In <strong className="text-[#294B3A]">Stage 4: World Selection</strong>, you will choose one world to progressively unfold into bible, characters, and scenes.
+                </span>
+              </div>
+              <button
+                type="button"
+                data-testid="bottom-proceed-to-stage4-btn"
+                onClick={handleProceedToStage4}
+                disabled={isGeneratingWorlds}
+                className="w-full sm:w-auto shrink-0 px-5 py-2.5 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <span>Proceed to Selection (Stage 4)</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </motion.div>
         ) : (

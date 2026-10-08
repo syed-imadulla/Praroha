@@ -68,7 +68,27 @@ class WorldBibleRecord(WorldBibleBase, table=True):
     def to_read_schema(self) -> "WorldBibleRead":
         try:
             timeline_raw = json.loads(self.history_timeline_json or "[]")
-            timeline = [TimelineEvent(**t) if isinstance(t, dict) else TimelineEvent(era="Era", event=str(t)) for t in timeline_raw]
+            if isinstance(timeline_raw, str):
+                timeline_raw = [timeline_raw]
+            timeline = []
+            if isinstance(timeline_raw, list):
+                for t in timeline_raw:
+                    if isinstance(t, dict):
+                        era = str(t.get("era") or t.get("title") or t.get("period") or t.get("year") or t.get("time") or "Era")
+                        event = str(t.get("event") or t.get("description") or t.get("summary") or t.get("text") or "")
+                        timeline.append(TimelineEvent(era=era, event=event))
+                    elif isinstance(t, str):
+                        s = t.strip()
+                        if not s:
+                            continue
+                        if ":" in s:
+                            era_part, event_part = s.split(":", 1)
+                            timeline.append(TimelineEvent(era=era_part.strip(), event=event_part.strip()))
+                        elif " - " in s:
+                            era_part, event_part = s.split(" - ", 1)
+                            timeline.append(TimelineEvent(era=era_part.strip(), event=event_part.strip()))
+                        else:
+                            timeline.append(TimelineEvent(era="Era", event=s))
         except Exception:
             timeline = []
 

@@ -144,7 +144,7 @@ async def test_media_service_lifecycle_and_execution():
         completed_rec = await service.process_job_now(job_res.job_id, req)
         assert completed_rec.status == "completed"
         assert completed_rec.asset_url is not None
-        assert "/uploads/media/image/" in completed_rec.asset_url
+        assert f"/projects/{project.id}/media/image/" in completed_rec.asset_url
         assert completed_rec.mime_type in ("image/svg+xml", "image/jpeg", "image/png")
         assert completed_rec.completed_at is not None
 
@@ -245,3 +245,26 @@ async def test_media_api_endpoints():
         assets = assets_res.json()["data"]
         assert len(assets) >= 1
         assert assets[0]["id"] == job_id
+
+
+@pytest.mark.asyncio
+async def test_real_mode_prevents_mock_fallback(monkeypatch):
+    """Explicit test that forces real provider failure and ensures the job fails without reaching MockProvider."""
+    # We will set PRAROHA_ENV=real to trigger real mode
+    monkeypatch.setenv("PRAROHA_ENV", "real")
+    
+    from backend.app.providers.media.composite import CompositeImageProvider
+    from backend.app.providers.media.base import ProviderUnavailableError
+    
+    class AlwaysFailsImageProvider(MockImageProvider):
+        async def generate_image(self, prompt: str, aspect_ratio: str = "1:1", context=None):
+            raise ProviderUnavailableError("Simulated real provider failure")
+            
+    provider = CompositeImageProvider(
+        pollinations=AlwaysFailsImageProvider(),
+        flux=AlwaysFailsImageProvider(),
+    )
+    
+    with pytest.raises(ProviderUnavailableError, match="disabled in real mode"):
+        await provider.generate_image(prompt="test")
+

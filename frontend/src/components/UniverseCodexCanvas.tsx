@@ -41,12 +41,13 @@ export const UniverseCodexCanvas: React.FC = () => {
     unfoldError,
     activeCodexTab,
     setActiveCodexTab,
+    setActiveStage,
+    unlockStage,
     unfoldUniverse,
     jumpToTraceNode,
     toggleInspector,
     setInspectorTab,
     setRefiningEntity,
-    generateMediaAction,
     humanOnlyZones,
   } = useWorkspaceStore();
 
@@ -110,16 +111,16 @@ export const UniverseCodexCanvas: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
-                Tattva 2: Forms Hidden in Formless • Stage 5 Unfolding
+                Stage 5 · Build Your World
               </span>
-              <span className="text-xs text-[#5F6D63] font-mono">• Universe Codex</span>
+              <span className="text-xs text-[#5F6D63] font-mono">• World Details</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold font-serif text-[#294B3A] tracking-tight">
               {selectedWorld ? selectedWorld.title : 'Progressive World Unfolding'}
             </h1>
             <p className="text-sm md:text-[15px] text-[#394840] max-w-2xl leading-relaxed">
               {selectedWorld?.concept ||
-                'Expanding the committed world candidate into a multi-layered, living story-world codex.'}
+                'Expanding the committed world candidate into a multi-layered, living story-world.'}
             </p>
           </div>
 
@@ -167,7 +168,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 {/* Priorities */}
                 {(decisionDNA?.creative_priorities && decisionDNA.creative_priorities.length > 0
                   ? decisionDNA.creative_priorities
-                  : ['Ecological / Symbiotic Mystery', 'Atmospheric Lore Depth', 'Ethical Stakes']
+                  : []
                 )
                   .slice(0, 4)
                   .map((p) => (
@@ -184,7 +185,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 {/* Exclusions */}
                 {(decisionDNA?.rejected_directions && decisionDNA.rejected_directions.length > 0
                   ? decisionDNA.rejected_directions
-                  : ['Classical sunken ruins archaeology', 'Cold War militarized technology']
+                  : []
                 )
                   .slice(0, 3)
                   .map((r) => (
@@ -558,34 +559,22 @@ export const UniverseCodexCanvas: React.FC = () => {
                       <span>{selectedWorld?.title || 'Active World'} Hero Cover Visual</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const worldId = selectedWorld?.id || unfoldedUniverse?.world_bible.id;
-                          if (!worldId) return;
-                          await generateMediaAction({
-                            entity_type: 'world',
-                            entity_id: worldId,
-                            media_type: 'video',
-                            prompt: '',
-                            duration_sec: 5,
-                          });
-                        }}
-                        data-testid="bring-world-to-life-hero-btn"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6A4B67] hover:bg-[#583D55] text-[#F8F4E8] font-semibold text-xs shadow-xs transition-all transform hover:-translate-y-0.5 active:translate-y-0"
-                        title="Synthesize 5s cinematic opening teaser video"
+                      <span
+                        data-testid="cinematic-video-coming-soon-badge"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EAE4D4] border border-[#D8CCB7] text-[#718875] font-semibold text-xs cursor-not-allowed"
+                        title="Video generation is currently unavailable"
                       >
-                        <Film className="w-3.5 h-3.5" />
-                        <span>Bring This World to Life</span>
-                      </button>
-                      <span className="text-[11px] text-[#718875] font-mono">16:9 Cinematic Video & Cover</span>
+                        <Film className="w-3.5 h-3.5 text-[#718875]" />
+                        <span>Cinematic Video (Coming Soon)</span>
+                      </span>
+                      <span className="text-[11px] text-[#718875] font-mono">16:9 Cover & Visuals</span>
                     </div>
                   </div>
                   <EntityMediaSection
                     entityType="world"
                     entityId={selectedWorld?.id || unfoldedUniverse.world_bible.id}
                     defaultPrompt={`Hero visual cover for ${selectedWorld?.title || 'Unfolded World'}. ${unfoldedUniverse.world_bible.geography}. ${unfoldedUniverse.world_bible.physics_rules}`}
-                    availableModalities={['image', 'video', 'audio']}
+                    availableModalities={['image', 'audio']}
                   />
                 </div>
 
@@ -753,16 +742,22 @@ export const UniverseCodexCanvas: React.FC = () => {
                       <Layers className="w-4 h-4 text-[#355A46]" />
                       <span>Historical Timeline</span>
                     </h3>
-                    <div className="space-y-2.5">
-                      {unfoldedUniverse.world_bible.history_timeline.map((item, idx) => (
-                        <div key={idx} className="border-l-2 border-[#355A46]/60 pl-3 space-y-0.5">
-                          <span className="text-xs font-mono text-[#355A46] font-bold block">
-                            {item.era}
-                          </span>
-                          <p className="text-xs text-[#394840] leading-relaxed">{item.event}</p>
-                        </div>
-                      ))}
-                    </div>
+                    {unfoldedUniverse.world_bible.history_timeline && unfoldedUniverse.world_bible.history_timeline.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {unfoldedUniverse.world_bible.history_timeline.map((item, idx) => (
+                          <div key={idx} className="border-l-2 border-[#355A46]/60 pl-3 space-y-0.5">
+                            <span className="text-xs font-mono text-[#355A46] font-bold block">
+                              {item.era}
+                            </span>
+                            <p className="text-xs text-[#394840] leading-relaxed break-words">{item.event}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-[#5A6E5E] italic" data-testid="empty-history-timeline">
+                        No timeline events recorded yet.
+                      </p>
+                    )}
                   </div>
 
                   {/* Canon Facts */}
@@ -771,47 +766,53 @@ export const UniverseCodexCanvas: React.FC = () => {
                       <BookOpen className="w-4 h-4 text-[#355A46]" />
                       <span>Canon Lore Facts</span>
                     </h3>
-                    <ul className="space-y-2 text-xs text-[#394840]">
-                      {unfoldedUniverse.world_bible.canon_facts.map((fact, idx) => {
-                        const isHozTheme =
-                          Boolean(hoz &&
-                          hoz.is_locked &&
-                          hoz.core_theme &&
-                          (fact === hoz.core_theme || fact.includes(hoz.core_theme) || idx === 0));
-                        return (
-                          <li key={idx} className="flex items-start justify-between gap-2">
-                            <div className="flex flex-wrap items-start gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#355A46] mt-2 shrink-0" />
-                              <span className="leading-relaxed">{fact}</span>
-                              {isHozTheme && (
-                                <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shrink-0 min-h-[24px]">
-                                  <Lock className="w-3 h-3" /> CREATOR LOCKED
-                                </span>
-                              )}
-                            </div>
-                            <OriginBadge
-                              originType={isHozTheme ? 'HUMAN_DECISION' : 'DERIVED'}
-                              originSource={isHozTheme ? 'Human-Only Zone: Core Theme' : 'World Bible: Canon Lore Laws'}
-                              interactive={true}
-                              onClick={() =>
-                                setWhyModalData({
-                                  title: `Canon Lore Law #${idx + 1}`,
-                                  entityType: 'Canon Lore Fact',
-                                  originType: isHozTheme ? 'HUMAN_DECISION' : 'DERIVED',
-                                  originSource: isHozTheme ? 'Human-Only Zone: Core Theme' : 'World Bible: Canon Lore Laws',
-                                  causalExplanation: isHozTheme
-                                    ? `Locked by the human creator as an inviolable Human-Only Zone before universe expansion: "${fact}"`
-                                    : `Established in Stage 5 World Bible to enforce physical, geographical, and ecological consistency: "${fact}"`,
-                                  nodeId: 'node-bible',
-                                })
-                              }
-                              size="xs"
-                              showLabel={false}
-                            />
-                          </li>
-                        );
-                      })}
-                    </ul>
+                    {unfoldedUniverse.world_bible.canon_facts && unfoldedUniverse.world_bible.canon_facts.length > 0 ? (
+                      <ul className="space-y-2 text-xs text-[#394840]">
+                        {unfoldedUniverse.world_bible.canon_facts.map((fact, idx) => {
+                          const isHozTheme =
+                            Boolean(hoz &&
+                            hoz.is_locked &&
+                            hoz.core_theme &&
+                            (fact === hoz.core_theme || fact.includes(hoz.core_theme) || idx === 0));
+                          return (
+                            <li key={idx} className="flex items-start justify-between gap-2">
+                              <div className="flex flex-wrap items-start gap-2 flex-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#355A46] mt-2 shrink-0" />
+                                <span className="leading-relaxed break-words">{fact}</span>
+                                {isHozTheme && (
+                                  <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shrink-0 min-h-[24px]">
+                                    <Lock className="w-3 h-3" /> CREATOR LOCKED
+                                  </span>
+                                )}
+                              </div>
+                              <OriginBadge
+                                originType={isHozTheme ? 'HUMAN_DECISION' : 'DERIVED'}
+                                originSource={isHozTheme ? 'Human-Only Zone: Core Theme' : 'World Bible: Canon Lore Laws'}
+                                interactive={true}
+                                onClick={() =>
+                                  setWhyModalData({
+                                    title: `Canon Lore Law #${idx + 1}`,
+                                    entityType: 'Canon Lore Fact',
+                                    originType: isHozTheme ? 'HUMAN_DECISION' : 'DERIVED',
+                                    originSource: isHozTheme ? 'Human-Only Zone: Core Theme' : 'World Bible: Canon Lore Laws',
+                                    causalExplanation: isHozTheme
+                                      ? `Locked by the human creator as an inviolable Human-Only Zone before universe expansion: "${fact}"`
+                                      : `Established in Stage 5 World Bible to enforce physical, geographical, and ecological consistency: "${fact}"`,
+                                    nodeId: 'node-bible',
+                                  })
+                                }
+                                size="xs"
+                                showLabel={false}
+                              />
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-[#5A6E5E] italic" data-testid="empty-canon-facts">
+                        No lore facts have been generated yet.
+                      </p>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -825,7 +826,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 className="space-y-6"
               >
                 {/* Character Cards */}
-                <div id="codex-characters-grid" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="codex-characters-grid" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                   {unfoldedUniverse.characters
                     .filter(
                       (char) =>
@@ -837,108 +838,115 @@ export const UniverseCodexCanvas: React.FC = () => {
                     return (
                       <div
                         key={idx}
-                        className="p-5 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-4 flex flex-col justify-between shadow-xs"
+                        className="p-6 rounded-[22px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-4 flex flex-col justify-between shadow-xs min-w-0 break-words overflow-hidden"
                       >
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-bold font-serif text-[#294B3A] text-sm md:text-base">
+                        <div className="space-y-3 min-w-0">
+                          {/* Character Card Header */}
+                          <div className="space-y-2 pb-2 border-b border-[#D8CCB7] min-w-0">
+                            <div className="min-w-0 space-y-0.5">
+                              <h3 className="font-bold font-serif text-[#294B3A] text-base md:text-lg break-words">
                                 {char.name}
                               </h3>
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <OriginBadge
-                                  originType={char.origin_type || 'SEED_INFERRED'}
-                                  originSource={char.origin_source || 'Character Roster'}
-                                  interactive={true}
-                                  onClick={() =>
-                                    setWhyModalData({
-                                      title: char.name,
-                                      entityType: 'Character',
-                                      originType: char.origin_type || 'SEED_INFERRED',
-                                      originSource: char.origin_source || 'Character Roster',
-                                      nodeId: `node-char-${char.id}`,
-                                    })
-                                  }
-                                  size="xs"
-                                />
-                                <span className="char-version-badge px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
-                                  v{char.version || 1}
-                                </span>
-                                <button
-                                  onClick={() => setRefiningEntity({ type: 'character', data: char })}
-                                  className="refine-character-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#805B20]"
-                                  title="Refine character traits and motivation (PERS-01)"
-                                >
-                                  <Edit3 className="w-3.5 h-3.5" />
-                                  <span>Refine</span>
-                                </button>
-                                <button
-                                  onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
-                                  className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
-                                  title="Trace causal lineage in DAG"
-                                >
-                                  <GitFork className="w-3.5 h-3.5" />
-                                  <span>Trace Lineage</span>
-                                </button>
-                                <span className="px-2.5 py-1 rounded-lg text-xs font-mono bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7] font-medium">
-                                  {char.archetype}
-                                </span>
+                              <div className="text-xs text-[#718875] font-medium break-words">
+                                {char.role}
                               </div>
                             </div>
-                            <div className="text-xs text-[#718875] font-medium mt-0.5">
-                              {char.role}
+
+                            {/* Origin & Archetype Badges */}
+                            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                              <OriginBadge
+                                originType={char.origin_type || 'SEED_INFERRED'}
+                                originSource={char.origin_source || 'Character Roster'}
+                                interactive={true}
+                                onClick={() =>
+                                  setWhyModalData({
+                                    title: char.name,
+                                    entityType: 'Character',
+                                    originType: char.origin_type || 'SEED_INFERRED',
+                                    originSource: char.origin_source || 'Character Roster',
+                                    nodeId: `node-char-${char.id}`,
+                                  })
+                                }
+                                size="xs"
+                              />
+                              <span className="char-version-badge px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30 shrink-0">
+                                v{char.version || 1}
+                              </span>
+                              <span className="px-2 py-0.5 rounded-lg text-xs font-mono bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7] font-medium shrink-0">
+                                {char.archetype}
+                              </span>
+                            </div>
+
+                            {/* Entity Actions */}
+                            <div className="flex flex-wrap items-center gap-2 pt-1 min-w-0">
+                              <button
+                                onClick={() => setRefiningEntity({ type: 'character', data: char })}
+                                className="refine-character-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#805B20] shrink-0"
+                                title="Refine character traits and motivation (PERS-01)"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Refine</span>
+                              </button>
+                              <button
+                                onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
+                                className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A] shrink-0"
+                                title="Trace origin trail in DAG"
+                              >
+                                <GitFork className="w-3.5 h-3.5" />
+                                <span>See Where It Came From</span>
+                              </button>
                             </div>
                           </div>
 
-                          <div className="space-y-2 text-xs">
-                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
-                              <div className="flex items-center justify-between">
+                          <div className="space-y-2 text-xs min-w-0">
+                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
+                              <div className="flex flex-wrap items-center justify-between gap-1">
                                 <span className="text-xs uppercase font-bold text-[#5F6D63]">
                                   Motivation
                                 </span>
                                 {hoz && hoz.is_locked && hoz.protagonist_motivation && (char.motivation === hoz.protagonist_motivation || (char.origin_source && char.origin_source.includes('Human-Only Zone'))) && (
-                                  <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px]">
+                                  <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px] shrink-0">
                                     <Lock className="w-3 h-3" /> CREATOR LOCKED
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[#394840] leading-relaxed">{char.motivation}</p>
+                              <p className="text-[#394840] leading-relaxed break-words whitespace-normal">{char.motivation}</p>
                             </div>
 
-                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
                               <span className="text-xs uppercase font-bold text-[#5F6D63]">
                                 Core Conflict
                               </span>
-                              <p className="text-[#394840] leading-relaxed">{char.core_conflict}</p>
+                              <p className="text-[#394840] leading-relaxed break-words whitespace-normal">{char.core_conflict}</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Visual Prompt Section */}
-                        <div className="pt-2 border-t border-[#D8CCB7] space-y-2">
-                          <div className="flex items-center justify-between text-xs">
+                        <div className="pt-2 border-t border-[#D8CCB7] space-y-2 min-w-0">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs min-w-0">
                             <span className="text-[#5A6E5E] font-mono flex items-center gap-1 font-semibold">
                               <Sparkles className="w-3.5 h-3.5 text-[#C59A55]" />
-                              Concept Prompt
+                              Image Idea
                             </span>
                             <button
                               onClick={() => handleCopyPrompt(copyKey, char.visual_prompt, char.name)}
-                              className="copy-prompt-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-semibold text-[#355A46] border border-[#D8CCB7] transition"
+                              className="copy-prompt-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-semibold text-[#355A46] border border-[#D8CCB7] transition shrink-0"
                             >
                               {copiedId === copyKey ? (
                                 <>
-                                  <Check className="w-3 h-3 text-[#355A46]" />
+                                  <Check className="w-3.5 h-3.5 text-[#355A46]" />
                                   <span>Copied!</span>
                                 </>
                               ) : (
                                 <>
-                                  <Copy className="w-3 h-3" />
-                                  <span>Copy Prompt</span>
+                                  <Copy className="w-3.5 h-3.5" />
+                                  <span>Copy Image Idea</span>
                                 </>
                               )}
                             </button>
                           </div>
-                          <p className="text-[11px] text-[#5A6E5E] italic bg-[#F2EBDD] p-2.5 rounded-lg border border-[#D8CCB7] line-clamp-3">
+                          <p className="text-[11.5px] text-[#5A6E5E] italic bg-[#F2EBDD] p-2.5 rounded-lg border border-[#D8CCB7] break-words whitespace-normal leading-relaxed">
                             "{char.visual_prompt}"
                           </p>
                         </div>
@@ -947,6 +955,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                         <EntityMediaSection
                           entityType="character"
                           entityId={char.id}
+                          entityTitle={char.name}
                           defaultPrompt={char.visual_prompt || `${char.name}, ${char.role}: ${char.motivation}`}
                           availableModalities={['image', 'voice']}
                           roleHint={`${char.role} ${char.archetype}`}
@@ -963,14 +972,14 @@ export const UniverseCodexCanvas: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-bold font-serif text-[#294B3A] flex items-center gap-2">
                       <Flame className="w-4 h-4 text-[#A0522D]" />
-                      <span>Interpersonal Dynamics & Relationship Web</span>
+                      <span>Character Relationships</span>
                     </h2>
                     <span className="text-[11px] text-[#718875]">
                       Scoped to world direction with dynamic tension descriptions
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                     {unfoldedUniverse.relationships.map((rel, idx) => (
                       <div
                         key={idx}
@@ -992,10 +1001,10 @@ export const UniverseCodexCanvas: React.FC = () => {
                           <button
                             onClick={() => jumpToTraceNode(`node-rel-${rel.id}`)}
                             className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
-                            title="Trace causal lineage in DAG"
+                            title="Trace origin trail in DAG"
                           >
                             <GitFork className="w-3.5 h-3.5" />
-                            <span>Trace Lineage</span>
+                            <span>See Where It Came From</span>
                           </button>
                         </div>
                         <p className="text-[#394840] leading-relaxed text-[11.5px]">
@@ -1027,18 +1036,18 @@ export const UniverseCodexCanvas: React.FC = () => {
                   return (
                     <div
                       key={idx}
-                      className="p-6 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-4 shadow-xs"
+                      className="p-6 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-4 shadow-xs min-w-0 break-words overflow-hidden"
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D8CCB7] pb-3">
-                        <div className="flex items-center gap-2.5">
-                          <span className="px-2.5 py-1 rounded-lg bg-[#EFE8EE] text-[#6A4B67] font-mono font-bold text-xs border border-[#DFD1DE]">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D8CCB7] pb-3 min-w-0">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="px-2.5 py-1 rounded-lg bg-[#EFE8EE] text-[#6A4B67] font-mono font-bold text-xs border border-[#DFD1DE] shrink-0">
                             Scene {scene.scene_number}
                           </span>
-                          <h3 className="font-bold font-serif text-[#294B3A] text-base md:text-lg">
+                          <h3 className="font-bold font-serif text-[#294B3A] text-base md:text-lg break-words">
                             {scene.title}
                           </h3>
                         </div>
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap min-w-0">
                           <OriginBadge
                             originType={scene.origin_type || 'SEED_EXPLICIT'}
                             originSource={scene.origin_source || `Story Beat #${scene.scene_number}`}
@@ -1054,12 +1063,12 @@ export const UniverseCodexCanvas: React.FC = () => {
                             }
                             size="xs"
                           />
-                          <span className="scene-version-badge px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE]">
+                          <span className="scene-version-badge px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE] shrink-0">
                             v{scene.version || 1}
                           </span>
                           <button
                             onClick={() => setRefiningEntity({ type: 'scene', data: scene })}
-                            className="refine-scene-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg text-xs font-mono bg-[#EFE8EE] hover:bg-[#DFD1DE] text-[#6A4B67] border border-[#DFD1DE] transition font-semibold"
+                            className="refine-scene-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg text-xs font-mono bg-[#EFE8EE] hover:bg-[#DFD1DE] text-[#6A4B67] border border-[#DFD1DE] transition font-semibold shrink-0"
                             title="Refine scene beats and outcomes (PERS-01)"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1067,58 +1076,58 @@ export const UniverseCodexCanvas: React.FC = () => {
                           </button>
                           <button
                             onClick={() => jumpToTraceNode(`node-scene-${scene.id}`)}
-                            className="trace-lineage-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold"
-                            title="Trace causal lineage in DAG"
+                            className="trace-lineage-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold shrink-0"
+                            title="Trace origin trail in DAG"
                           >
                             <GitFork className="w-3.5 h-3.5" />
-                            <span>Trace Lineage</span>
+                            <span>See Where It Came From</span>
                           </button>
-                          <span className="text-[11px] text-[#718875] font-medium">Setting:</span>
-                          <span className="px-2 py-0.5 rounded text-[11px] bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7]">
+                          <span className="text-[11px] text-[#718875] font-medium shrink-0">Setting:</span>
+                          <span className="px-2 py-0.5 rounded text-[11px] bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7] break-words">
                             {scene.location_setting}
                           </span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                        <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs min-w-0">
+                        <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
                           <span className="text-xs uppercase font-bold text-[#6A4B67]">
                             Dramatic Question
                           </span>
-                          <p className="text-[#294B3A] font-semibold leading-relaxed">
+                          <p className="text-[#294B3A] font-semibold leading-relaxed break-words whitespace-normal">
                             {scene.dramatic_question}
                           </p>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
-                          <div className="flex items-center justify-between">
+                        <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
+                          <div className="flex flex-wrap items-center justify-between gap-1">
                             <span className="text-xs uppercase font-bold text-[#A0522D]">
                               Conflict Narrative
                             </span>
                             {hoz && hoz.is_locked && hoz.central_conflict && (scene.conflict_narrative === hoz.central_conflict || (scene.origin_source && scene.origin_source.includes('Human-Only Zone'))) && (
-                              <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px]">
+                              <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px] shrink-0">
                                 <Lock className="w-3 h-3" /> CREATOR LOCKED
                               </span>
                             )}
                           </div>
-                          <p className="text-[#394840] leading-relaxed">
+                          <p className="text-[#394840] leading-relaxed break-words whitespace-normal">
                             {scene.conflict_narrative}
                           </p>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                        <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
                           <span className="text-xs uppercase font-bold text-[#355A46]">
                             Pivotal Outcome
                           </span>
-                          <p className="text-[#394840] leading-relaxed">{scene.pivotal_outcome}</p>
+                          <p className="text-[#394840] leading-relaxed break-words whitespace-normal">{scene.pivotal_outcome}</p>
                         </div>
                       </div>
 
                       {/* Visual Prompt Section */}
-                      <div className="pt-2 border-t border-[#D8CCB7] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-xs text-[#5A6E5E] font-mono">
+                      <div className="pt-2 border-t border-[#D8CCB7] flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
+                        <div className="flex items-center gap-2 text-xs text-[#5A6E5E] font-mono min-w-0">
                           <Sparkles className="w-3.5 h-3.5 text-[#6A4B67] shrink-0" />
-                          <span className="italic line-clamp-1">"{scene.visual_prompt}"</span>
+                          <span className="italic break-words whitespace-normal">"{scene.visual_prompt}"</span>
                         </div>
                         <button
                           onClick={() => handleCopyPrompt(copyKey, scene.visual_prompt, scene.title)}
@@ -1132,7 +1141,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                           ) : (
                             <>
                               <Copy className="w-3.5 h-3.5" />
-                              <span>Copy Visual Prompt</span>
+                              <span>Copy Image Idea</span>
                             </>
                           )}
                         </button>
@@ -1142,8 +1151,9 @@ export const UniverseCodexCanvas: React.FC = () => {
                       <EntityMediaSection
                         entityType="scene"
                         entityId={scene.id}
+                        entityTitle={`Scene ${scene.scene_number}${scene.title ? `: ${scene.title}` : ''}`}
                         defaultPrompt={scene.visual_prompt || `${scene.title} in ${scene.location_setting}: ${scene.conflict_narrative}`}
-                        availableModalities={['image', 'voice', 'audio', 'video']}
+                        availableModalities={['image', 'voice', 'audio']}
                       />
 
                     </div>
@@ -1151,6 +1161,26 @@ export const UniverseCodexCanvas: React.FC = () => {
                 })}
               </motion.div>
             )}
+
+            {/* Bottom Action Area: Consistent Bottom Navigation */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#D8CCB7] mt-8 min-w-0">
+              <div className="text-xs text-[#5F6D63]">
+                World built successfully. See where every element came from in Stage 6.
+              </div>
+              <button
+                type="button"
+                data-testid="bottom-view-lineage-btn"
+                onClick={() => {
+                  unlockStage('trace');
+                  setActiveStage('trace');
+                }}
+                className="w-full sm:w-auto shrink-0 px-6 py-3 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-sm flex items-center justify-center gap-2.5 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.98]"
+              >
+                <GitBranch className="w-4 h-4" />
+                <span>See Where It Came From (Stage 6)</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -9,6 +9,7 @@ import { AppShell } from './components/shell/AppShell';
 import { CreationCard, CreationItem } from './components/creation';
 import { useAuthStore } from './store/authStore';
 import { AuthScreen } from './components/auth/AuthScreen';
+import { ProfileSettingsView } from './components/profile/ProfileSettingsView';
 
 export const App: React.FC = () => {
   const [selectedCreationToast, setSelectedCreationToast] = useState<string | null>(null);
@@ -394,24 +395,7 @@ export const App: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[#F8F4E8]">
-          <div className="max-w-md card-botanical p-8 flex flex-col items-center gap-4">
-            <h2 className="text-3xl font-serif font-bold text-[#294B3A]">Profile</h2>
-            <p className="text-sm text-[#718875] italic">
-              "Manage your account, creations and preferences."
-            </p>
-            <p className="text-sm text-[#394840]">
-              Your botanical creator profile and account preferences will unfold in Phase 27.
-            </p>
-            <button
-              type="button"
-              onClick={() => setActiveNav('home')}
-              className="btn-sage-primary text-sm mt-2"
-            >
-              Return to Seed Workspace
-            </button>
-          </div>
-        </div>
+        <ProfileSettingsView onBackToWorkspace={() => setActiveNav('home')} />
       )}
 
       {/* Confirmation modal for permanent deletion */}

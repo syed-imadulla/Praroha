@@ -82,7 +82,7 @@ export const TopBar: React.FC = () => {
     }
   };
 
-  const projectTitle = activeProject?.title || 'The Sunken City';
+  const projectTitle = activeProject?.title || 'New Seed';
   const branchName = activeProject?.branch_name || 'main';
 
   return (
@@ -112,6 +112,7 @@ export const TopBar: React.FC = () => {
               <button
                 type="button"
                 id="branch-switcher-btn"
+                data-testid="topbar-branch-btn"
                 onClick={() => {
                   setBranchMenuOpen(!branchMenuOpen);
                   fetchBranches();
@@ -122,15 +123,16 @@ export const TopBar: React.FC = () => {
               >
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="font-serif font-bold text-sm sm:text-base md:text-lg text-[#294B3A] group-hover:text-[#355A46] transition truncate max-w-[130px] xs:max-w-[190px] sm:max-w-[300px] md:max-w-[420px]">
+                    <span
+                      data-testid="topbar-project-title"
+                      className="font-serif font-bold text-sm sm:text-base md:text-lg text-[#294B3A] group-hover:text-[#355A46] transition truncate max-w-[130px] xs:max-w-[190px] sm:max-w-[300px] md:max-w-[420px]"
+                    >
                       {projectTitle}
                     </span>
                     <ChevronDown className="w-3.5 h-3.5 text-[#718875] group-hover:text-[#294B3A] transition shrink-0" />
                   </div>
                   <div className="text-[11px] sm:text-xs text-[#718875] font-mono leading-none mt-1 flex items-center gap-1.5 truncate">
                     <span>Branch: <strong className="text-[#294B3A] font-semibold">{branchName}</strong></span>
-                    <span>•</span>
-                    <span className="text-[#5F6D63]">TATTVA 2</span>
                   </div>
                 </div>
               </button>
@@ -140,6 +142,7 @@ export const TopBar: React.FC = () => {
             {branchMenuOpen && (
               <div
                 id="branch-switcher-popover"
+                data-testid="branch-popover"
                 className="absolute left-0 mt-2 w-72 sm:w-80 bg-[#F8F4E8] border border-[#D8CCB7] rounded-2xl shadow-xl p-2.5 z-50 animate-fade-in"
               >
                 <div className="flex items-center justify-between px-3 py-2 border-b border-[#D8CCB7]/60 mb-1.5">
@@ -149,6 +152,21 @@ export const TopBar: React.FC = () => {
                   <span className="text-xs text-[#5F6D63] font-medium font-mono">
                     {projectBranches.length} branch(es)
                   </span>
+                </div>
+
+                {/* Branch Lineage Preview */}
+                <div className="px-3 py-2 bg-[#F2EBDD] rounded-xl border border-[#D8CCB7] mb-2 text-[11px] font-mono text-[#466A55] space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#355A46]" />
+                    <span>main (Original Timeline) {(!activeProject || activeProject.branch_name === 'main' || branchName === 'main') && <strong className="text-[#355A46] font-bold">(Active)</strong>}</span>
+                  </div>
+                  {projectBranches.filter((b) => b.branch_name !== 'main').map((b) => (
+                    <div key={b.id} className="flex items-center gap-1.5 pl-3 border-l-2 border-[#355A46]/40">
+                      <span>↳</span>
+                      <span className="font-semibold text-[#294B3A]">{b.branch_name}</span>
+                      {b.id === activeProject?.id && <span className="text-xs text-[#355A46] font-bold">(Active)</span>}
+                    </div>
+                  ))}
                 </div>
 
                 <div className="max-h-48 overflow-y-auto space-y-1">

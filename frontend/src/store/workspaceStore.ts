@@ -38,6 +38,16 @@ import {
   ProjectBundle,
 } from '../types';
 
+export function deriveProjectTitle(seedText: string): string {
+  const cleaned = (seedText || '').trim();
+  if (!cleaned) return 'New Seed';
+  const firstSentence = cleaned.split('.')[0].trim();
+  const words = firstSentence.split(/\s+/).filter(Boolean);
+  const snippet = (words.length <= 6 ? words.join(' ') : words.slice(0, 6).join(' ')).replace(/[,;:—"'\t\n]/g, '').trim();
+  if (snippet.length > 40) return snippet.slice(0, 40).trim();
+  return snippet ? snippet.charAt(0).toUpperCase() + snippet.slice(1) : 'New Seed';
+}
+
 interface WorkspaceState {
   activeNav: 'home' | 'creations' | 'graveyard' | 'profile';
   setActiveNav: (nav: 'home' | 'creations' | 'graveyard' | 'profile') => void;
@@ -677,7 +687,6 @@ export const useWorkspaceStore = create<WorkspaceState>()(
               ? s.unlockedStages
               : [...s.unlockedStages, 'unfold'],
             activeStage: 'unfold',
-            inspectorOpen: true,
             inspectorTab: 'provenance',
           }));
           return true;
@@ -1056,7 +1065,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           let project = state.activeProject;
           // If no project exists or existing project is not a fresh draft or has a different seed text, create a new project
           if (!project || (project.status !== 'draft' && project.seed_text !== seedToUse)) {
-            const createRes = await apiClient.createProject('Seed World Project', seedToUse);
+            const derivedTitle = deriveProjectTitle(seedToUse);
+            const createRes = await apiClient.createProject(derivedTitle, seedToUse);
             if (!createRes.success || !createRes.data) {
               throw new Error(createRes.error?.message || 'Failed to initialize project');
             }
@@ -1094,7 +1104,6 @@ export const useWorkspaceStore = create<WorkspaceState>()(
               ? s.unlockedStages
               : [...s.unlockedStages, 'understand'],
             activeStage: 'understand',
-            inspectorOpen: true,
             inspectorTab: 'dna',
             isExtracting: false,
             extractionStep: '',
@@ -1217,12 +1226,24 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           const res = await apiClient.getMediaAssets(activeProject.id, entityId, mediaType);
           if (res.success && res.data) {
-            set((state) => ({
-              mediaAssets: {
-                ...state.mediaAssets,
-                [entityId]: res.data!,
-              },
-            }));
+            set((state) => {
+              const currentList = state.mediaAssets[entityId] || [];
+              const merged = [...currentList];
+              for (const asset of res.data!) {
+                const idx = merged.findIndex(a => a.id === asset.id);
+                if (idx >= 0) {
+                  merged[idx] = asset;
+                } else {
+                  merged.push(asset);
+                }
+              }
+              return {
+                mediaAssets: {
+                  ...state.mediaAssets,
+                  [entityId]: merged,
+                },
+              };
+            });
           }
         } catch (err) {
           console.error('Failed to fetch entity media:', err);
@@ -1230,7 +1251,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       },
 
       generateMediaAction: async (req: MediaGenerationRequest) => {
-        const { activeProject, fetchEntityMedia } = get();
+        const { activeProject } = get();
         if (!activeProject) return null;
         const key = `${req.entity_id}_${req.media_type}`;
         set((state) => ({
@@ -1244,28 +1265,6 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             set((state) => ({
               activeMediaJobs: { ...state.activeMediaJobs, [job.job_id]: job },
             }));
-
-            // Non-blocking poll loop
-            const poll = async () => {
-              for (let i = 0; i < 40; i++) {
-                await new Promise((r) => setTimeout(r, 600));
-                const statusRes = await apiClient.getMediaJob(activeProject.id, job.job_id);
-                if (statusRes.success && statusRes.data) {
-                  const updatedJob = statusRes.data;
-                  set((state) => ({
-                    activeMediaJobs: { ...state.activeMediaJobs, [job.job_id]: updatedJob },
-                  }));
-                  if (updatedJob.status === 'completed' || updatedJob.status === 'failed') {
-                    await fetchEntityMedia(req.entity_id);
-                    set((state) => ({
-                      isGeneratingMedia: { ...state.isGeneratingMedia, [key]: false },
-                    }));
-                    break;
-                  }
-                }
-              }
-            };
-            poll();
             return job.job_id;
           }
         } catch (err) {
@@ -1482,7 +1481,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             if (!mediaAssetsMap[asset.entity_id]) {
               mediaAssetsMap[asset.entity_id] = [];
             }
-            mediaAssetsMap[asset.entity_id].push(asset);
+            if (!mediaAssetsMap[asset.entity_id].some((a) => a.id === asset.id)) {
+              mediaAssetsMap[asset.entity_id].push(asset);
+            }
           }
         }
 

@@ -11,35 +11,10 @@ interface RecentCreationsRowProps {
   onPlantSeed?: () => void;
 }
 
-export const CANONICAL_RECENT_CREATIONS: RecentCreationItem[] = [
-  {
-    id: 'rc-1',
-    title: 'Mountain Sunset',
-    type: 'Image',
-    timestamp: '2 min ago',
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80',
-    isFavorite: false,
-  },
-  {
-    id: 'rc-2',
-    title: 'Forest Vibes',
-    type: 'Video',
-    timestamp: '12 min ago',
-    imageUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&auto=format&fit=crop&q=80',
-    isFavorite: false,
-  },
-  {
-    id: 'rc-3',
-    title: 'Dreamscape',
-    type: 'Sound',
-    timestamp: '1 hr ago',
-    imageUrl: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600&auto=format&fit=crop&q=80',
-    isFavorite: true,
-  },
-];
+export const CANONICAL_RECENT_CREATIONS: RecentCreationItem[] = [];
 
 export const RecentCreationsRow: React.FC<RecentCreationsRowProps> = ({
-  creations: initialCreations = CANONICAL_RECENT_CREATIONS,
+  creations: initialCreations = [],
   onViewAll,
   onSelectCreation,
   onPlantSeed,
@@ -95,10 +70,10 @@ export const RecentCreationsRow: React.FC<RecentCreationsRowProps> = ({
             </svg>
           </div>
           <h3 className="text-xl font-serif font-bold text-[#294B3A]">
-            Your garden is waiting.
+            No creations yet.
           </h3>
           <p className="text-sm text-[#718875] mt-1 max-w-sm">
-            Plant your first seed and watch an idea become a universe.
+            Plant a new seed to begin.
           </p>
           <button
             type="button"

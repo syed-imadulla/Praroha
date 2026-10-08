@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
@@ -11,8 +11,7 @@ import {
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { SeedPreset } from '../types';
 import { HomeHero } from './home/HomeHero';
-import { CreationModes, CreationMode } from './home/CreationModes';
-import { RecentCreationsRow, CANONICAL_RECENT_CREATIONS } from './home/RecentCreationsRow';
+import { RecentCreationsRow, type RecentCreationItem } from './home/RecentCreationsRow';
 
 export const SEED_PRESETS: SeedPreset[] = [
   {
@@ -20,7 +19,7 @@ export const SEED_PRESETS: SeedPreset[] = [
     title: 'Sunken Ocean City',
     genre: 'Subaquatic Exploration',
     seed: 'A child discovers a forgotten city beneath the ocean.',
-    tagline: 'Canonical judge demo • Lost civilization & bio-luminescence',
+    tagline: 'Subaquatic wonder • Lost civilization & bio-luminescence',
   },
   {
     id: 'orbital-ark',
@@ -46,9 +45,24 @@ export const SeedInputCanvas: React.FC = () => {
     extractionStep,
     extractSeedDNA,
     loadCanonicalDemoUniverse,
+    creations,
+    fetchCreations,
   } = useWorkspaceStore();
 
-  const [activeCreationMode, setActiveCreationMode] = useState<CreationMode | null>('image');
+  useEffect(() => {
+    fetchCreations();
+  }, [fetchCreations]);
+
+  const recentCreationItems: RecentCreationItem[] = (creations || []).slice(0, 3).map((proj) => ({
+    id: proj.id,
+    title: proj.title,
+    type: 'story',
+    timestamp: new Date(proj.updated_at || proj.created_at).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    }),
+    description: proj.seed_text || 'An unfolding world.',
+  }));
 
   const handleSelectPreset = (seed: string) => {
     setSeedText(seed);
@@ -199,15 +213,13 @@ export const SeedInputCanvas: React.FC = () => {
           </button>
         </div>
 
-        {/* 3. Creation Modes (5 Cards) */}
-        <CreationModes
-          activeMode={activeCreationMode}
-          onSelectMode={(mode) => setActiveCreationMode(mode)}
-        />
-
-        {/* 4. Recent Creations Horizontal Row */}
+        {/* 3. Recent Creations Horizontal Row */}
         <RecentCreationsRow
-          creations={CANONICAL_RECENT_CREATIONS}
+          creations={recentCreationItems}
+          onSelectCreation={(item) => {
+            window.history.pushState({}, '', `/projects/${item.id}`);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }}
           onViewAll={() => {
             const navBtn = document.querySelector('button[aria-label="My Creations"]') as HTMLButtonElement | null;
             navBtn?.click();
