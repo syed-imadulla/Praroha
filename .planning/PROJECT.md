@@ -58,7 +58,7 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [ ] **Phase 26: Graveyard Screen** — Reflective & poetic idea cemetery, restore, permanent deletion with confirmation modal.
 - [ ] **Phase 27: Profile Screen** — Botanical identity card, stats, creation tabs, account settings panel, soft danger logout.
 - [x] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Universe Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
-- [ ] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts in unified botanical journal design.
+- [x] **Phase 29: Secondary UI** — Redesign modals, inspector drawer, lightboxes, dropdowns, toasts, guided tour, and keyboard shortcuts in unified botanical journal design, standardizing typography and eliminating <12px text.
 - [ ] **Phase 30: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
 - [ ] **Phase 31: Responsive & Accessibility** — Multi-device responsive layout (Desktop, Tablet, Mobile), 44px touch targets, keyboard focus rings.
 - [ ] **Phase 32: Final Visual Audit & Verification** — Complete review against `design.md` checklist and test verification.

@@ -52,7 +52,7 @@ export const StageProgressHeader: React.FC = () => {
           return (
             <React.Fragment key={stage.id}>
               {idx > 0 && (
-                <ChevronRight className="w-3.5 h-3.5 text-[#D8CCB7] shrink-0 mx-0.5" />
+                <ChevronRight className="w-4 h-4 text-[#C8BAA5] shrink-0 mx-0.5" />
               )}
               <button
                 id={`stage-nav-${stage.id}`}
@@ -62,42 +62,42 @@ export const StageProgressHeader: React.FC = () => {
                   }
                 }}
                 disabled={!unlocked}
-                className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                className={`flex items-center gap-2.5 px-3.5 sm:px-4 py-2 rounded-full min-h-[44px] text-sm font-medium transition-all focus:outline-hidden focus:ring-2 focus:ring-[#355A46] focus:ring-offset-2 ${
                   current
                     ? 'bg-[#355A46] text-[#F8F4E8] border border-[#294B3A] shadow-xs'
                     : completed
                     ? 'bg-[#EAE4D4] hover:bg-[#DDE2D2] text-[#294B3A] border border-[#D8CCB7]'
-                    : 'bg-transparent text-[#718875]/50 border border-transparent cursor-not-allowed opacity-60'
+                    : 'bg-[#F2EBDD]/60 text-[#5F6D63] border border-[#D8CCB7]/50 cursor-not-allowed opacity-75'
                 }`}
                 aria-current={current ? 'step' : undefined}
                 aria-label={`Stage ${stage.number}: ${stage.label}`}
               >
                 {/* Stage status indicator icon */}
                 <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                     current
                       ? 'bg-[#F8F4E8] text-[#294B3A]'
                       : completed
                       ? 'bg-[#DDE2D2] text-[#294B3A]'
-                      : 'bg-[#E8E0D0] text-[#718875]'
+                      : 'bg-[#E8E0D0] text-[#5F6D63]'
                   }`}
                 >
                   {completed ? (
-                    <Check className="w-3 h-3 stroke-[3]" />
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                   ) : !unlocked ? (
-                    <Lock className="w-2.5 h-2.5" />
+                    <Lock className="w-3 h-3" />
                   ) : (
                     stage.number
                   )}
                 </div>
 
                 <div className="text-left">
-                  <div className="leading-tight font-sans font-medium tracking-wide">
+                  <div className="leading-tight font-sans font-semibold tracking-tight text-sm">
                     {stage.label}
                   </div>
                   <div
-                    className={`text-[9.5px] hidden xl:block leading-none ${
-                      current ? 'text-[#C8D0BE]' : 'text-[#718875]'
+                    className={`text-xs hidden xl:block leading-none mt-0.5 ${
+                      current ? 'text-[#DDE2D2]' : 'text-[#5F6D63]'
                     }`}
                   >
                     {stage.description}

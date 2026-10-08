@@ -224,25 +224,25 @@ export const MutationCausalDiffDAG: React.FC<MutationCausalDiffDAGProps> = ({
         <div className="flex items-center gap-1 bg-[#FAF6EE] rounded-lg p-0.5 border border-[#D8CCB7]">
           <button
             onClick={() => setZoomLevel((z) => Math.max(0.6, z - 0.15))}
-            className="p-1 hover:bg-[#F2EBDD] rounded text-[#5A6E5E] hover:text-[#294B3A] transition-colors"
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1 hover:bg-[#F2EBDD] rounded-lg text-[#5F6D63] hover:text-[#294B3A] transition-colors"
             title="Zoom Out"
           >
-            <ZoomOut className="w-3.5 h-3.5" />
+            <ZoomOut className="w-4 h-4" />
           </button>
-          <span className="text-[10px] text-[#294B3A] px-1 font-mono">{Math.round(zoomLevel * 100)}%</span>
+          <span className="text-xs text-[#294B3A] px-1.5 font-mono font-bold tabular-nums">{Math.round(zoomLevel * 100)}%</span>
           <button
             onClick={() => setZoomLevel((z) => Math.min(1.6, z + 0.15))}
-            className="p-1 hover:bg-[#F2EBDD] rounded text-[#5A6E5E] hover:text-[#294B3A] transition-colors"
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1 hover:bg-[#F2EBDD] rounded-lg text-[#5F6D63] hover:text-[#294B3A] transition-colors"
             title="Zoom In"
           >
-            <ZoomIn className="w-3.5 h-3.5" />
+            <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={() => setZoomLevel(1)}
-            className="p-1 hover:bg-[#F2EBDD] rounded text-[#5A6E5E] hover:text-[#294B3A] transition-colors"
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1 hover:bg-[#F2EBDD] rounded-lg text-[#5F6D63] hover:text-[#294B3A] transition-colors"
             title="Reset Zoom"
           >
-            <Maximize2 className="w-3.5 h-3.5" />
+            <Maximize2 className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -318,12 +318,12 @@ export const MutationCausalDiffDAG: React.FC<MutationCausalDiffDAGProps> = ({
             className="z-10"
           >
             <div className="flex flex-col items-center p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#294B3A] shadow-md min-w-[240px] text-center">
-              <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider text-[#805B20] mb-0.5">
-                <Sparkles className="w-3 h-3 text-[#805B20]" />
+              <div className="flex items-center gap-1.5 text-xs uppercase font-bold tracking-wider text-[#805B20] mb-0.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#805B20]" />
                 Mutation Origin
               </div>
-              <span className="text-xs font-serif font-bold text-[#294B3A]">{rootPremiseName}</span>
-              <p className="text-[11px] text-[#5A6E5E] line-clamp-1 italic mt-0.5 font-serif max-w-[220px]">
+              <span className="text-[13px] font-serif font-bold text-[#294B3A]">{rootPremiseName}</span>
+              <p className="text-xs text-[#394840] line-clamp-1 italic mt-0.5 font-serif max-w-[220px]">
                 "{rootHypothesis}"
               </p>
             </div>
@@ -365,21 +365,21 @@ export const MutationCausalDiffDAG: React.FC<MutationCausalDiffDAGProps> = ({
                   top: `${node.y}px`,
                   transform: 'translate(-50%, -50%)',
                 }}
-                className={`cursor-pointer rounded-lg p-2.5 min-w-[170px] max-w-[190px] border transition-all duration-200 z-10 ${borderStyle} ${haloStyle}`}
+                className={`cursor-pointer rounded-xl p-2.5 min-w-[170px] max-w-[200px] border transition-all duration-200 z-10 ${borderStyle} ${haloStyle}`}
               >
                 <div className="flex items-center justify-between gap-1 mb-1">
-                  <span className="flex items-center gap-1 text-[10px] uppercase font-mono text-[#5A6E5E] tracking-wider">
+                  <span className="flex items-center gap-1 text-xs uppercase font-mono font-semibold text-[#5F6D63] tracking-wider">
                     {getEntityIcon(node.item.entity_type)}
                     {node.item.entity_type}
                   </span>
                   {getStatusBadge(node.item.impact_category)}
                 </div>
 
-                <div className="text-xs font-semibold truncate text-[#294B3A]" title={node.item.title}>
+                <div className="text-xs font-bold truncate text-[#294B3A]" title={node.item.title}>
                   {node.item.title}
                 </div>
 
-                <div className="text-[10px] text-[#5A6E5E] line-clamp-2 mt-1 leading-tight font-serif">
+                <div className="text-xs text-[#394840] line-clamp-2 mt-1 leading-tight font-serif">
                   {node.item.causal_justification}
                 </div>
               </div>
@@ -397,38 +397,38 @@ export const MutationCausalDiffDAG: React.FC<MutationCausalDiffDAGProps> = ({
           <div className="flex items-start justify-between gap-3 mb-2">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs uppercase font-mono text-[#5A6E5E] flex items-center gap-1">
+                <span className="text-xs uppercase font-mono text-[#5F6D63] font-semibold flex items-center gap-1">
                   {getEntityIcon(selectedNode.entity_type)}
                   {selectedNode.entity_type}
                 </span>
                 {getStatusBadge(selectedNode.impact_category)}
               </div>
-              <h4 className="text-sm font-serif font-bold text-[#294B3A]">{selectedNode.title}</h4>
+              <h4 className="text-base font-serif font-bold text-[#294B3A]">{selectedNode.title}</h4>
             </div>
 
             <button
               onClick={() => onSelectNode(null)}
-              className="p-1 hover:bg-[#F2EBDD] rounded text-[#5A6E5E] hover:text-[#294B3A] transition-colors"
+              className="min-w-[36px] min-h-[36px] flex items-center justify-center p-1.5 hover:bg-[#F2EBDD] rounded-lg text-[#5F6D63] hover:text-[#294B3A] transition-colors focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mt-2 border-t border-[#D8CCB7] pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mt-2 border-t border-[#D8CCB7] pt-2.5">
             <div>
-              <span className="text-[10px] font-bold text-[#B8734F] uppercase tracking-wider block mb-0.5">
+              <span className="text-xs font-bold text-[#B8734F] uppercase tracking-wider block mb-1">
                 Causal Justification
               </span>
-              <p className="text-[#394840] font-serif leading-relaxed text-[11px]">
+              <p className="text-[#394840] leading-relaxed text-xs">
                 {selectedNode.causal_justification}
               </p>
             </div>
 
             <div>
-              <span className="text-[10px] font-bold text-[#805B20] uppercase tracking-wider block mb-0.5">
+              <span className="text-xs font-bold text-[#805B20] uppercase tracking-wider block mb-1">
                 Projected Adaptation
               </span>
-              <p className="text-[#394840] font-serif leading-relaxed text-[11px]">
+              <p className="text-[#394840] leading-relaxed text-xs">
                 {selectedNode.projected_impact || selectedNode.original_summary}
               </p>
             </div>

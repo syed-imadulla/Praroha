@@ -80,28 +80,29 @@ const RefinementModalContent: React.FC<ModalContentProps> = ({ entity, onClose }
         className="relative w-full max-w-2xl bg-[#F8F4E8] border border-[#D8CCB7] rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D8CCB7] bg-[#F2EBDD]/60">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#E9DDBF] border border-[#C59A55]/30 text-[#805B20]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#D8CCB7] bg-[#F2EBDD]/70">
+          <div className="flex items-center gap-3.5">
+            <div className="p-2.5 rounded-xl bg-[#E9DDBF] border border-[#C59A55]/30 text-[#805B20] shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold font-serif text-[#294B3A]">
+              <div className="flex items-center gap-2.5">
+                <h3 className="text-xl sm:text-2xl font-bold font-serif text-[#294B3A] tracking-tight">
                   Refine {isCharacter ? 'Character' : 'Scene Beat'}
                 </h3>
-                <span className="px-2 py-0.5 text-xs font-mono font-medium rounded-full bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
+                <span className="px-2.5 py-0.5 text-xs font-mono font-bold rounded-full bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
                   v{currentVersion} → v{nextVersion}
                 </span>
               </div>
-              <p className="text-xs text-[#718875]">
+              <p className="text-sm text-[#5F6D63] mt-0.5 font-medium">
                 {isCharacter ? charData?.name : `Scene ${sceneData?.scene_number}: ${sceneData?.title}`}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-[#718875] hover:text-[#294B3A] rounded-lg hover:bg-[#F2EBDD] transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-[#EAE4D4] text-[#5F6D63] hover:text-[#294B3A] transition focus:outline-hidden focus:ring-2 focus:ring-[#355A46]"
+            aria-label="Close refinement dialog"
           >
             <X className="w-5 h-5" />
           </button>
@@ -209,12 +210,12 @@ const RefinementModalContent: React.FC<ModalContentProps> = ({ entity, onClose }
           )}
 
           {/* Revision Notes / Rationale */}
-          <div className="pt-2 border-t border-[#D8CCB7] space-y-1.5">
+          <div className="pt-3 border-t border-[#D8CCB7] space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wider text-[#805B20] flex items-center gap-1.5">
-                <GitCommit className="w-3.5 h-3.5" /> Revision Audit Rationale (Required)
+              <label className="text-xs font-bold uppercase tracking-wider text-[#805B20] flex items-center gap-1.5 font-mono">
+                <GitCommit className="w-4 h-4" /> Revision Audit Rationale (Required)
               </label>
-              <span className="text-[10px] text-[#718875]">Stored in immutable history</span>
+              <span className="text-xs text-[#5F6D63] font-medium">Stored in immutable history</span>
             </div>
             <textarea
               id="refine-notes-input"
@@ -222,17 +223,17 @@ const RefinementModalContent: React.FC<ModalContentProps> = ({ entity, onClose }
               rows={2}
               value={revisionNotes}
               onChange={(e) => setRevisionNotes(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[#F2EBDD] border border-[#C59A55]/40 rounded-xl text-[#294B3A] text-sm focus:border-[#805B20] focus:ring-1 focus:ring-[#805B20] transition-all outline-none resize-none placeholder-[#8C9E90]"
+              className="w-full px-4 py-3 bg-[#F2EBDD] border border-[#C59A55]/40 rounded-xl text-[#294B3A] text-sm sm:text-[15px] focus:border-[#805B20] focus:ring-1 focus:ring-[#805B20] transition-all outline-none resize-none placeholder-[#5F6D63]"
               placeholder="Explain the creative reason for this refinement (e.g., 'Tied stakes directly to solar anomaly')"
             />
           </div>
 
           {/* Modal Actions */}
-          <div className="pt-4 flex items-center justify-end gap-3">
+          <div className="pt-5 flex items-center justify-end gap-3.5 border-t border-[#D8CCB7]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-[#718875] hover:text-[#294B3A] transition-colors"
+              className="px-5 py-2.5 min-h-[44px] text-sm font-semibold text-[#5F6D63] hover:text-[#294B3A] rounded-full hover:bg-[#EAE4D4] transition-colors focus:outline-hidden focus:ring-2 focus:ring-[#355A46]"
             >
               Cancel
             </button>
@@ -240,10 +241,10 @@ const RefinementModalContent: React.FC<ModalContentProps> = ({ entity, onClose }
               id="save-refinement-btn"
               type="submit"
               disabled={isSubmitting || !revisionNotes.trim()}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#355A46] hover:bg-[#294B3A] disabled:opacity-50 text-[#F8F4E8] font-semibold rounded-full text-sm shadow-xs transition-all"
+              className="flex items-center gap-2 px-6 py-2.5 min-h-[44px] bg-[#355A46] hover:bg-[#294B3A] disabled:opacity-50 text-[#F8F4E8] font-semibold rounded-full text-sm shadow-xs transition-all focus:outline-hidden focus:ring-2 focus:ring-[#355A46]"
             >
               <Save className="w-4 h-4" />
-              {isSubmitting ? 'Saving Snapshot...' : `Save Refinement (v${nextVersion})`}
+              <span>{isSubmitting ? 'Saving Snapshot...' : `Save Refinement (v${nextVersion})`}</span>
             </button>
           </div>
         </form>

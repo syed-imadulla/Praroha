@@ -102,15 +102,15 @@ export const OriginBadge: React.FC<OriginBadgeProps> = ({
   const Icon = config.icon;
 
   const sizeClasses = {
-    xs: 'px-1.5 py-0.5 text-[10px] gap-1',
-    sm: 'px-2 py-0.5 text-xs gap-1.5',
-    md: 'px-2.5 py-1 text-xs gap-1.5',
+    xs: 'px-2 py-0.5 text-xs gap-1 min-h-[24px]',
+    sm: 'px-2.5 py-1 text-xs gap-1.5 min-h-[28px]',
+    md: 'px-3.5 py-1.5 text-[13px] gap-2 min-h-[32px]',
   }[size];
 
   const iconSizes = {
-    xs: 'w-2.5 h-2.5',
-    sm: 'w-3 h-3',
-    md: 'w-3.5 h-3.5',
+    xs: 'w-3 h-3',
+    sm: 'w-3.5 h-3.5',
+    md: 'w-4 h-4',
   }[size];
 
   const tooltipText = originSource
@@ -133,25 +133,25 @@ export const OriginBadge: React.FC<OriginBadgeProps> = ({
             }
           : undefined
       }
-      className={`inline-flex items-center font-mono font-medium rounded-full border transition-all duration-150 select-none ${
+      className={`inline-flex items-center font-sans font-medium rounded-full border transition-all duration-150 select-none ${
         config.classes
       } ${sizeClasses} ${
         interactive
-          ? 'cursor-pointer hover:scale-105 active:scale-95 hover:shadow-sm'
+          ? 'cursor-pointer hover:shadow-xs focus:outline-hidden focus:ring-2 focus:ring-[#355A46] focus:ring-offset-2'
           : 'cursor-default'
       } ${className}`}
       data-testid={`origin-badge origin-badge-${normType.toLowerCase()}`}
       data-origin-type={normType}
     >
-      <Icon className={`${iconSizes} flex-shrink-0`} />
+      <Icon className={`${iconSizes} shrink-0`} />
       {showLabel && (
-        <span className="truncate max-w-[140px]">
+        <span className="whitespace-nowrap tracking-tight">
           {config.label}
         </span>
       )}
       {interactive && (
         <span
-          className="text-[10px] opacity-75 hover:opacity-100 ml-0.5"
+          className="text-xs font-semibold ml-0.5 opacity-80 hover:opacity-100"
           title="Why is this here?"
         >
           ?

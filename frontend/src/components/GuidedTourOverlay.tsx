@@ -144,97 +144,98 @@ export const GuidedTourOverlay: React.FC = () => {
           {/* Header Banner */}
           <div className="p-4 sm:p-5 border-b border-[#D8CCB7] bg-[#F2EBDD] flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7]">
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7] shadow-xs">
                 {currentStepData.icon}
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/40 font-bold">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-mono tracking-wider uppercase px-2.5 py-1 rounded-full bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/40 font-bold min-h-[26px] inline-flex items-center">
                     Tattva 2: Forms Hidden in Formless
                   </span>
-                  <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#FAF6EE] text-[#466A55] border border-[#D8CCB7]">
+                  <span className="text-xs font-mono tracking-wider uppercase px-2.5 py-1 rounded-full bg-[#FAF6EE] text-[#394840] border border-[#D8CCB7] font-semibold min-h-[26px] inline-flex items-center">
                     Stage {currentStepData.stageNumber} of 7 • {currentStepData.stageName}
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base font-serif font-bold text-[#294B3A] mt-1">
+                <h3 className="text-lg sm:text-xl font-serif font-bold text-[#294B3A] mt-1.5 leading-snug">
                   {currentStepData.tattvaTitle}
                 </h3>
               </div>
             </div>
             <button
               onClick={closeTour}
-              className="p-1.5 rounded-lg text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#FAF6EE] transition-colors"
+              className="min-w-[44px] min-h-[44px] rounded-lg text-[#5F6D63] hover:text-[#294B3A] hover:bg-[#FAF6EE] transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#294B3A]"
               title="Close Tour (Escape)"
+              aria-label="Close Tour"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Body Content */}
-          <div className="p-4 sm:p-5 space-y-3">
+          <div className="p-5 sm:p-6 space-y-4">
             <div>
-              <p className="text-xs font-semibold text-[#5A6E5E] uppercase tracking-wider mb-1">
+              <p className="text-xs font-bold text-[#5F6D63] uppercase tracking-wider mb-1.5">
                 {currentStepData.subtitle}
               </p>
-              <p className="text-xs sm:text-sm text-[#394840] leading-relaxed font-serif">
+              <p className="text-sm sm:text-[15px] text-[#394840] leading-relaxed">
                 {currentStepData.description}
               </p>
             </div>
 
             {/* Tattva 2 Connection Pill */}
-            <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7] flex items-start gap-2.5">
+            <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7] flex items-start gap-3 shadow-xs">
               <Sparkles className="w-4 h-4 text-[#805B20] shrink-0 mt-0.5" />
-              <div className="text-xs">
-                <span className="text-[#805B20] font-semibold">Tattva 2 Connection: </span>
-                <span className="text-[#294B3A]">{currentStepData.tattvaConnection}</span>
+              <div className="text-[13px] leading-relaxed">
+                <span className="text-[#805B20] font-bold">Tattva 2 Connection: </span>
+                <span className="text-[#294B3A] font-medium">{currentStepData.tattvaConnection}</span>
               </div>
             </div>
 
             {/* Technical Feat Pill */}
-            <div className="p-2.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] flex items-start gap-2.5">
+            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] flex items-start gap-3 shadow-xs">
               <Shield className="w-4 h-4 text-[#294B3A] shrink-0 mt-0.5" />
-              <div className="text-xs">
-                <span className="text-[#294B3A] font-semibold">Technical Feat: </span>
-                <span className="text-[#5A6E5E]">{currentStepData.technicalFeat}</span>
+              <div className="text-[13px] leading-relaxed">
+                <span className="text-[#294B3A] font-bold">Technical Feat: </span>
+                <span className="text-[#394840]">{currentStepData.technicalFeat}</span>
               </div>
             </div>
           </div>
 
           {/* Footer Controls */}
-          <div className="p-4 border-t border-[#D8CCB7] bg-[#F2EBDD] flex items-center justify-between gap-4">
+          <div className="p-4 sm:p-5 border-t border-[#D8CCB7] bg-[#F2EBDD] flex items-center justify-between gap-4">
             {/* Step Dots */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5" aria-label={`Step ${tourStep + 1} of ${TOUR_STEPS.length}`}>
               {TOUR_STEPS.map((s, idx) => (
                 <div
                   key={s.stageNumber}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     idx === tourStep
-                      ? 'w-6 bg-[#294B3A]'
+                      ? 'w-7 bg-[#294B3A]'
                       : idx < tourStep
-                      ? 'w-2 bg-[#466A55]'
-                      : 'w-2 bg-[#D8CCB7]'
+                      ? 'w-2.5 bg-[#466A55]'
+                      : 'w-2.5 bg-[#D8CCB7]'
                   }`}
                 />
               ))}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <button
                 onClick={prevTourStep}
                 disabled={isFirst}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#D8CCB7] text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#FAF6EE] disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1"
+                className="min-h-[44px] px-4 py-2 rounded-xl text-sm font-semibold border border-[#D8CCB7] text-[#394840] hover:text-[#294B3A] hover:bg-[#FAF6EE] disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-[#294B3A]"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4" />
                 Back
               </button>
 
               <button
                 onClick={isLast ? closeTour : nextTourStep}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#294B3A] hover:bg-[#355A46] text-[#F8F4E8] shadow-sm transition-all flex items-center gap-1.5"
+                className="min-h-[44px] px-5 py-2 rounded-xl text-sm font-semibold bg-[#294B3A] hover:bg-[#355A46] text-[#F8F4E8] shadow-sm transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#294B3A]"
               >
                 {isLast ? 'Finish Tour' : 'Next Stage'}
-                {!isLast && <ChevronRight className="w-3.5 h-3.5" />}
+                {!isLast && <ChevronRight className="w-4 h-4" />}
               </button>
             </div>
           </div>

@@ -113,26 +113,26 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
           {/* Divergence Archetype Banner Pill */}
           {archetypeType === 'radical' ? (
             <div
-              className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#EFE8EE] text-[#6A4B67] border border-[#D1BECD] flex items-center gap-1"
+              className="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#EFE8EE] text-[#6A4B67] border border-[#D1BECD] flex items-center gap-1.5"
               title="Radical Archetype: High novelty and transformative paradigm shift"
             >
-              <Zap className="w-3 h-3 text-[#6A4B67]" />
+              <Zap className="w-3.5 h-3.5 text-[#6A4B67]" />
               <span>Radical</span>
             </div>
           ) : archetypeType === 'inverse' ? (
             <div
-              className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC] flex items-center gap-1"
+              className="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC] flex items-center gap-1.5"
               title="Inverse Archetype: Conceptual flip & dramatic subversion of core assumptions"
             >
-              <Orbit className="w-3 h-3 text-[#B8734F]" />
+              <Orbit className="w-3.5 h-3.5 text-[#B8734F]" />
               <span>Inverse</span>
             </div>
           ) : (
             <div
-              className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE] flex items-center gap-1"
+              className="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE] flex items-center gap-1.5"
               title="Familiar Archetype: Grounded realization maximizing seed fidelity"
             >
-              <Compass className="w-3 h-3 text-[#294B3A]" />
+              <Compass className="w-3.5 h-3.5 text-[#294B3A]" />
               <span>Familiar</span>
             </div>
           )}
@@ -153,11 +153,11 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
 
         {/* High-Concept Logline */}
         <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 shadow-2xs">
-          <div className="text-[10px] font-bold text-[#466A55] uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className={`w-3 h-3 ${currentTheme.iconColor}`} />
+          <div className="text-xs font-bold text-[#466A55] uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
             <span>High-Concept Premise</span>
           </div>
-          <p className="text-xs sm:text-sm text-[#294B3A] leading-relaxed font-sans">
+          <p className="text-sm text-[#294B3A] leading-relaxed font-sans">
             "{candidate.concept}"
           </p>
         </div>
@@ -165,17 +165,17 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
         {/* Emphasized Potential Items */}
         {candidate.emphasized_potential_labels && candidate.emphasized_potential_labels.length > 0 && (
           <div className="space-y-1.5 pt-0.5">
-            <span className="text-[10px] font-mono text-[#466A55] uppercase tracking-wider">
+            <span className="text-xs font-mono font-semibold text-[#466A55] uppercase tracking-wider">
               Emphasized Potential Pillars:
             </span>
             <div className="flex flex-wrap items-center gap-1.5">
               {candidate.emphasized_potential_labels.map((lbl, lIdx) => (
                 <span
                   key={lIdx}
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7]"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-sans font-medium bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7]"
                   title={`Accepted potential element incorporated into ${candidate.title}`}
                 >
-                  <Sparkles className="w-2.5 h-2.5 text-[#355A46]" />
+                  <Sparkles className="w-3 h-3 text-[#355A46]" />
                   <span>{lbl}</span>
                 </span>
               ))}
@@ -186,18 +186,18 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
         {/* AI Exploration Profile (4 normalized metrics) */}
         {candidate.exploration_profile && (
           <div className="p-3.5 rounded-xl bg-[#F2EBDD]/70 border border-[#D8CCB7] space-y-2.5 shadow-2xs">
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[#466A55]">
+            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#466A55]">
               <span className="flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5 text-[#355A46]" />
                 <span>Exploration Profile</span>
               </span>
-              <span className="font-mono text-[#718875] font-normal">Divergence Metrics</span>
+              <span className="font-mono text-[#718875] font-semibold">Divergence Metrics</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
               {/* Seed Fidelity */}
               <div className="space-y-1" title="Seed Fidelity: Alignment with explicit seed anchors and tone">
-                <div className="flex justify-between text-[10.5px]">
+                <div className="flex justify-between text-xs">
                   <span className="text-[#466A55]">Fidelity</span>
                   <span className="font-mono font-bold text-[#294B3A]">{candidate.exploration_profile.seed_fidelity}%</span>
                 </div>
@@ -253,7 +253,7 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
             </div>
 
             {candidate.exploration_profile.summary && (
-              <p className="text-[10px] text-[#466A55] italic pt-1 border-t border-[#D8CCB7] leading-relaxed">
+              <p className="text-xs text-[#466A55] italic pt-1 border-t border-[#D8CCB7] leading-relaxed">
                 "{candidate.exploration_profile.summary}"
               </p>
             )}
@@ -264,44 +264,44 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
         <div className="space-y-3 flex-1 text-xs pt-1">
           {/* Aesthetic & Mood */}
           <div className="space-y-0.5">
-            <div className="flex items-center gap-1.5 text-[#466A55] font-semibold text-[11px]">
+            <div className="flex items-center gap-1.5 text-[#466A55] font-semibold text-xs">
               <Palette className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Aesthetic & Atmosphere</span>
             </div>
-            <p className="text-[#294B3A] leading-relaxed pl-5 text-[11.5px]">
+            <p className="text-[#294B3A] leading-relaxed pl-5 text-xs">
               {candidate.aesthetic}
             </p>
           </div>
 
           {/* Core Tension */}
           <div className="space-y-0.5">
-            <div className="flex items-center gap-1.5 text-[#466A55] font-semibold text-[11px]">
+            <div className="flex items-center gap-1.5 text-[#466A55] font-semibold text-xs">
               <Flame className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Core Dramatic Stakes</span>
             </div>
-            <p className="text-[#294B3A] leading-relaxed pl-5 text-[11.5px]">
+            <p className="text-[#294B3A] leading-relaxed pl-5 text-xs">
               {candidate.core_tension}
             </p>
           </div>
 
           {/* Trade-Offs */}
           <div className="space-y-0.5">
-            <div className="flex items-center gap-1.5 text-[#466A55] font-semibold text-[11px]">
+            <div className="flex items-center gap-1.5 text-[#466A55] font-semibold text-xs">
               <Scale className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Narrative Balance & Trade-offs</span>
             </div>
-            <p className="text-[#294B3A] leading-relaxed pl-5 text-[11.5px]">
+            <p className="text-[#294B3A] leading-relaxed pl-5 text-xs">
               {candidate.trade_offs}
             </p>
           </div>
 
           {/* Key Visual Vignette */}
           <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-[#466A55]">
+            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-[#466A55]">
               <Camera className={`w-3.5 h-3.5 ${currentTheme.iconColor}`} />
               <span>Signature Cinematic Visual</span>
             </div>
-            <p className="text-[11.5px] text-[#294B3A] italic leading-relaxed">
+            <p className="text-xs text-[#294B3A] italic leading-relaxed">
               "{candidate.key_visual}"
             </p>
           </div>

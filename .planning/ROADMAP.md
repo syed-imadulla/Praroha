@@ -354,8 +354,8 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, empty states.
 - [ ] **Phase 26: Graveyard Screen** — Reflective & poetic idea cemetery, restore, permanent deletion with confirmation modal.
 - [ ] **Phase 27: Profile Screen** — Botanical identity card, stats, creation tabs, account settings panel, soft danger logout.
-- [ ] **Phase 28: Seed → Universe Workspace** — Botanical redesign of the 7 workspace stages preserving all functional logic.
-- [ ] **Phase 29: Secondary UI** — Botanical modals, drawer, lightboxes, dropdowns, shortcuts.
+- [x] **Phase 28: Seed → Universe Workspace** — Botanical redesign of the 7 workspace stages preserving all functional logic.
+- [x] **Phase 29: Secondary UI** — Botanical modals, drawer, lightboxes, dropdowns, shortcuts, typography standardization, and minimum 12px text polish.
 - [ ] **Phase 30: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
 - [ ] **Phase 31: Responsive & Accessibility** — Multi-device responsive layout, 44px touch targets, focus rings.
 - [ ] **Phase 32: Final Visual Audit & Verification** — Complete review against `design.md` checklist and test verification.
@@ -375,4 +375,31 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   5. Missing/failed media degrades gracefully into calm botanical placeholder.
   6. `RecentCreationsRow` refactored to consume `CreationCard` with zero duplicated styles.
   7. Automated Playwright test suite passes 100% across all 13 criteria.
+
+---
+
+### Phase 28: Seed → Universe Workspace Botanical Redesign
+**Goal**: Perform a complete visual convergence pass across Stages 4, 5, 6, and 7 adhering strictly to the PRAROHA Botanical Design System while preserving 100% of functional logic, APIs, and schemas.  
+**Depends on**: Phase 20, Phase 21, Phase 22  
+**Plans**: 1 plan (completed)
+- [x] **28-01-PLAN.md**: Botanical redesign of Stages 4 (Choose & Decision DNA), 5 (Unfold Codex), 6 (Traceability DAG), and 7 (Refine & Mutation Lab & Counterfactual Replay). Zero residual dark cyber elements, responsive multi-viewport pass, and Playwright E2E suite (`test_phase28_botanical_workspace.cjs`).  
+**Success Criteria**:
+  1. Zero dark cyber panels, neon cyan/blue glows, or dark navy blocks in Stages 4-7.
+  2. All functional logic, Human-Only Zones, Decision DNA, Origin Ledger, and Media Engines remain operational.
+  3. Zero horizontal page overflow across 1440px desktop, 1024px tablet, and 390px mobile viewports.
+  4. 154/154 backend pytest suite and Playwright multi-viewport suite pass 100%.
+
+---
+
+### Phase 29: Secondary UI + Typography + Visibility Polish
+**Goal**: Senior Product Designer & Frontend Engineer polish pass standardizing typography scales, eliminating faint text (<12px and /40 opacities), ensuring 44px touch targets, and refining modals, drawers, and lightboxes.  
+**Depends on**: Phase 28  
+**Plans**: 1 plan (completed)
+- [x] **29-01-PLAN.md**: Typography scale standardization (Cormorant Garamond 20–36px, Inter 14–16px, metadata 12–13px min), zero instances of `text-[9px]` or `text-[10px]` across `frontend/src`, high-contrast palette (#294B3A, #394840, #5F6D63), 44px min touch targets for primary buttons and close targets, and comprehensive E2E suite (`test_phase29_ui_polish.cjs`).  
+**Success Criteria**:
+  1. Complete purge of text under 12px across the entire frontend codebase.
+  2. Elimination of faint `/40` opacity text in favor of solid high-contrast botanical tokens.
+  3. Minimum 44px touch targets on primary actions, modal close triggers, and drawer headers.
+  4. Origin badges, media controls, and stage progress headers styled with comfortable padding and readable font sizes.
+  5. 154/154 pytest tests, clean production build (`npm run build`), and 100% pass rate in `test_phase29_ui_polish.cjs`.
 

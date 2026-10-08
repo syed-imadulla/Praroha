@@ -39,46 +39,47 @@ export const KeyboardShortcutsModal: React.FC = () => {
           className="w-full max-w-xl bg-[#F8F4E8] border border-[#D8CCB7] rounded-2xl shadow-2xl overflow-hidden text-[#294B3A]"
         >
           {/* Header */}
-          <div className="p-5 border-b border-[#D8CCB7] flex items-center justify-between bg-[#F2EBDD]">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#DDE2D2] border border-[#294B3A]/30 text-[#294B3A]">
+          <div className="p-5 sm:p-6 border-b border-[#D8CCB7] flex items-center justify-between bg-[#F2EBDD]">
+            <div className="flex items-center gap-3.5">
+              <div className="p-2.5 rounded-xl bg-[#DDE2D2] border border-[#294B3A]/30 text-[#294B3A] shrink-0">
                 <Keyboard className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-base font-serif font-bold text-[#294B3A]">Keyboard Shortcuts</h2>
-                <p className="text-xs text-[#5A6E5E]">Rapid navigation and workspace controls</p>
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#294B3A]">Keyboard Shortcuts</h2>
+                <p className="text-sm text-[#5F6D63] mt-0.5">Rapid navigation and workspace controls</p>
               </div>
             </div>
             <button
               onClick={toggleShortcutsModal}
-              className="p-1.5 rounded-lg text-[#5A6E5E] hover:text-[#294B3A] hover:bg-[#FAF6EE] transition-colors"
+              className="w-11 h-11 flex items-center justify-center rounded-xl text-[#5F6D63] hover:text-[#294B3A] hover:bg-[#FAF6EE] transition-colors focus:outline-hidden focus:ring-2 focus:ring-[#355A46]"
+              aria-label="Close shortcuts modal"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Shortcuts List */}
-          <div className="p-5 max-h-[70vh] overflow-y-auto space-y-4">
+          <div className="p-5 sm:p-6 max-h-[70vh] overflow-y-auto space-y-5">
             {/* Category Groups */}
             {(['Navigation', 'Tools', 'General'] as const).map((cat) => {
               const group = SHORTCUTS.filter((s) => s.category === cat);
               return (
-                <div key={cat} className="space-y-2">
-                  <h4 className="text-[11px] font-mono font-medium text-[#5A6E5E] uppercase tracking-wider">
+                <div key={cat} className="space-y-2.5">
+                  <h4 className="text-xs font-mono font-bold text-[#5F6D63] uppercase tracking-wider">
                     {cat}
                   </h4>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {group.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between p-2 rounded-lg bg-[#FAF6EE] border border-[#D8CCB7] hover:border-[#B5A58D] transition-colors"
+                        className="flex items-center justify-between p-3 rounded-xl bg-[#FAF6EE] border border-[#D8CCB7] hover:border-[#B5A58D] transition-colors"
                       >
-                        <span className="text-xs text-[#294B3A]">{item.action}</span>
-                        <div className="flex items-center gap-1">
+                        <span className="text-sm text-[#294B3A] font-medium pr-3">{item.action}</span>
+                        <div className="flex items-center gap-1.5 shrink-0">
                           {item.keys.map((k, kIdx) => (
                             <kbd
                               key={kIdx}
-                              className="px-2 py-0.5 rounded bg-[#F2EBDD] border border-[#D8CCB7] text-[11px] font-mono font-semibold text-[#294B3A] shadow-xs min-w-[24px] text-center"
+                              className="px-2.5 py-1 rounded-md bg-[#F2EBDD] border border-[#D8CCB7] text-xs font-mono font-bold text-[#294B3A] shadow-xs min-w-[28px] text-center"
                             >
                               {k}
                             </kbd>
@@ -93,9 +94,9 @@ export const KeyboardShortcutsModal: React.FC = () => {
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-[#D8CCB7] bg-[#F2EBDD] flex items-center justify-between text-xs text-[#5A6E5E]">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#805B20]" />
+          <div className="p-4 sm:p-5 border-t border-[#D8CCB7] bg-[#F2EBDD] flex items-center justify-between text-xs sm:text-sm text-[#5F6D63]">
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#805B20]" />
               Shortcuts active outside input fields
             </span>
             <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[#FAF6EE] text-[#294B3A] border border-[#D8CCB7] font-mono">Esc</kbd> to dismiss</span>

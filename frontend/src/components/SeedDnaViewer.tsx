@@ -104,7 +104,7 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
             <Sparkles className="w-3.5 h-3.5" />
             <span>Seed Potential Map</span>
             {potentialItems.length > 0 && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#DDE2D2] text-[#294B3A]">
+              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
                 {potentialItems.length}
               </span>
             )}

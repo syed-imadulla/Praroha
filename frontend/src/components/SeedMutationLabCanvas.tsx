@@ -175,7 +175,7 @@ export const SeedMutationLabCanvas: React.FC = () => {
                   }`}
                 >
                   <span className="text-xs font-semibold">{v.label}</span>
-                  <span className="text-[10px] text-[#5A6E5E] mt-0.5 line-clamp-1 italic font-serif">
+                  <span className="text-xs text-[#5A6E5E] mt-0.5 line-clamp-1 italic font-serif">
                     {v.original_value}
                   </span>
                 </button>
@@ -187,11 +187,11 @@ export const SeedMutationLabCanvas: React.FC = () => {
           {selectedPremiseVariable && (
             <div
               data-testid="mutation-original-value-card"
-              className="mt-3 p-3 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] text-xs"
+              className="mt-3 p-3.5 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] text-xs"
             >
-              <div className="flex items-center justify-between text-[11px] text-[#5A6E5E] mb-1">
-                <span className="font-medium">Original Seed DNA Value:</span>
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-[#FAF6EE] text-[#466A55] border border-[#D8CCB7]">
+              <div className="flex items-center justify-between text-xs text-[#5A6E5E] mb-1">
+                <span className="font-semibold">Original Seed DNA Value:</span>
+                <span className="text-xs uppercase font-mono font-bold px-2 py-0.5 rounded bg-[#FAF6EE] text-[#466A55] border border-[#D8CCB7]">
                   {selectedPremiseVariable.variable_type}
                 </span>
               </div>
@@ -227,7 +227,7 @@ export const SeedMutationLabCanvas: React.FC = () => {
           {/* Preset Chips */}
           {presets.length > 0 && (
             <div className="mt-2.5">
-              <span className="text-[10px] font-semibold text-[#5A6E5E] uppercase tracking-wider block mb-1.5">
+              <span className="text-xs font-semibold text-[#5A6E5E] uppercase tracking-wider block mb-1.5">
                 Suggested Curated Hypotheses:
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -337,7 +337,7 @@ export const SeedMutationLabCanvas: React.FC = () => {
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-semibold text-[#294B3A]">{item.title}</span>
                       <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase font-mono ${
+                        className={`text-xs font-bold px-2 py-0.5 rounded uppercase font-mono ${
                           isAffected
                             ? 'bg-[#F5E6DC] text-[#B8734F] border border-[#B8734F]/40'
                             : isConditional
@@ -348,7 +348,7 @@ export const SeedMutationLabCanvas: React.FC = () => {
                         {item.impact_category}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#5A6E5E] line-clamp-2 font-serif leading-relaxed">
+                    <p className="text-xs text-[#5A6E5E] line-clamp-2 font-serif leading-relaxed">
                       {item.causal_justification}
                     </p>
                   </div>
@@ -359,7 +359,7 @@ export const SeedMutationLabCanvas: React.FC = () => {
             {/* Fork Mutated Universe Section */}
             <div className="border-t border-[#D8CCB7] pt-3 space-y-3">
               <div>
-                <label className="block text-[11px] font-semibold text-[#5A6E5E] uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-[#5A6E5E] uppercase tracking-wider mb-1">
                   Custom Branch Name (Optional)
                 </label>
                 <input

@@ -115,16 +115,16 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
       className="mt-3 pt-3 border-t border-[#D8CCB7] space-y-3"
     >
       {/* Action Header & Modality Buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#294B3A]">
-          <Sparkles className="w-3.5 h-3.5 text-[#355A46]" />
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2 text-[13px] font-bold text-[#294B3A]">
+          <Sparkles className="w-4 h-4 text-[#355A46]" />
           <span>Multimodal Sensory Assets</span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           {availableModalities.includes('image') && (
             <div
-              className="flex items-center gap-0.5 bg-[#F2EBDD] p-0.5 rounded-lg border border-[#D8CCB7] text-[10px]"
+              className="flex items-center gap-1 bg-[#F2EBDD] p-1 rounded-xl border border-[#D8CCB7] text-xs"
               title="Select aspect ratio for visual generation"
               data-testid={`aspect-ratio-selector-${entityId}`}
             >
@@ -134,10 +134,10 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                   type="button"
                   onClick={() => setSelectedAspectRatio(ratio)}
                   data-testid={`aspect-ratio-btn-${ratio}-${entityId}`}
-                  className={`px-2 py-0.5 rounded font-mono transition-all ${
+                  className={`px-2.5 py-1 rounded-lg font-mono transition-all min-h-[28px] ${
                     selectedAspectRatio === ratio
-                      ? 'bg-[#355A46] text-[#F8F4E8] font-semibold shadow-xs'
-                      : 'text-[#718875] hover:text-[#294B3A]'
+                      ? 'bg-[#355A46] text-[#F8F4E8] font-bold shadow-xs'
+                      : 'text-[#5F6D63] hover:text-[#294B3A]'
                   }`}
                 >
                   {ratio}
@@ -148,15 +148,15 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
 
           {availableModalities.includes('voice') && (
             <div
-              className="flex items-center gap-1.5 bg-[#F2EBDD] px-2 py-0.5 rounded-lg border border-[#D8CCB7] text-[10px]"
+              className="flex items-center gap-2 bg-[#F2EBDD] px-2.5 py-1 rounded-xl border border-[#D8CCB7] text-xs min-h-[32px]"
               title="Select voice persona archetype"
             >
-              <Mic className="w-3 h-3 text-[#C59A55] shrink-0" />
+              <Mic className="w-3.5 h-3.5 text-[#C59A55] shrink-0" />
               <select
                 data-testid={`voice-persona-selector-${entityId}`}
                 value={selectedVoicePersona}
                 onChange={(e) => setSelectedVoicePersona(e.target.value)}
-                className="bg-transparent text-[#294B3A] font-medium text-[11px] focus:outline-none cursor-pointer pr-1 py-0.5"
+                className="bg-transparent text-[#294B3A] font-semibold text-xs focus:outline-none cursor-pointer pr-1 py-0.5"
               >
                 {CURATED_VOICE_PERSONAS.map((p) => (
                   <option
@@ -174,15 +174,15 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
 
           {availableModalities.includes('audio') && (
             <div
-              className="flex items-center gap-1.5 bg-[#F2EBDD] px-2 py-0.5 rounded-lg border border-[#D8CCB7] text-[10px]"
+              className="flex items-center gap-2 bg-[#F2EBDD] px-2.5 py-1 rounded-xl border border-[#D8CCB7] text-xs min-h-[32px]"
               title="Select atmosphere soundscape mood preset"
             >
-              <Music className="w-3 h-3 text-[#355A46] shrink-0" />
+              <Music className="w-3.5 h-3.5 text-[#355A46] shrink-0" />
               <select
                 data-testid={`audio-mood-selector-${entityId}`}
                 value={selectedAudioMood}
                 onChange={(e) => setSelectedAudioMood(e.target.value)}
-                className="bg-transparent text-[#294B3A] font-medium text-[11px] focus:outline-none cursor-pointer pr-1 py-0.5"
+                className="bg-transparent text-[#294B3A] font-semibold text-xs focus:outline-none cursor-pointer pr-1 py-0.5"
               >
                 {CURATED_AUDIO_MOODS.map((m) => (
                   <option
@@ -209,7 +209,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                 onClick={() => handleGenerate(modality)}
                 disabled={isGenerating}
                 data-testid={`generate-${modality}-${entityId}`}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#294B3A] ${
                   isGenerating
                     ? 'bg-[#DDE2D2] border-[#C8D0BE] text-[#294B3A] cursor-not-allowed opacity-80'
                     : 'bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border-[#D8CCB7] hover:border-[#C8D0BE] shadow-2xs'
@@ -217,7 +217,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                 title={`Generate ${modality} asset via configured MediaProvider`}
               >
                 {isGenerating ? (
-                  <RotateCw className="w-3 h-3 animate-spin text-[#355A46]" />
+                  <RotateCw className="w-3.5 h-3.5 animate-spin text-[#355A46]" />
                 ) : (
                   getModalityIcon(modality)
                 )}

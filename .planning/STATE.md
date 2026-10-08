@@ -4,10 +4,10 @@ milestone: 'Milestone 3: Complete UI Upgrade'
 status: in_progress
 progress:
   total_phases: 32
-  completed_phases: 25
+  completed_phases: 26
   total_plans: 64
-  completed_plans: 45
-  percent: 70.31
+  completed_plans: 46
+  percent: 71.88
 ---
 
 # Project State: Seed Unfold (Praroha)
@@ -17,23 +17,25 @@ progress:
 See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-08)
 
 **Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, and creator-locked human-only zones.  
-**Current focus:** Milestone 3: Complete UI Upgrade (Phase 28: Seed → Universe Workspace Complete)
+**Current focus:** Milestone 3: Complete UI Upgrade (Phase 29: Secondary UI + Typography + Visibility Polish Complete)
 
 ## Current Position
 
-Phase: 28 Seed → Universe Workspace Botanical Redesign — 100% Completed & Verified!
+Phase: 29 Secondary UI + Typography + Visibility Polish — 100% Completed & Verified!
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
-Milestone 3 UI Refinement & Botanical Convergence:
-- Stage 4 (Choose): Decision DNA botanical notebook card, Human-Only Zones panel, creative priorities chips, negative guardrails checklist, and warm paper cards.
-- Stage 5 (Unfold): Codex container, World Bible, Characters, Factions, Locations, Timeline, Scenes, and progressive loader reskinned to warm paper & botanical tokens.
-- Stage 6 (Trace): 6-lane DAG reskinned from dark cyber to botanical canvas (`#FAF5EE`), paper nodes, sage curves, and botanical Causal Provenance Inspector.
-- Stage 7 (Refine): Timeline Branching, Refinement Audit Log, Seed Mutation Lab, Mutation Causal Diff DAG, and Counterfactual Replay styled as facing botanical journal pages.
-- Secondary Elements: `OriginBadge`, `EntityMediaSection`, `MediaPreviewCard`, `AtmosphereDeck`, lightboxes, modals, tour, shortcuts, and drawers reskinned to botanical tokens.
-- Residual Dark Cyber: 0 instances across all components.
-- Responsive Audit: Zero horizontal overflow verified across 1440px desktop, 1024px tablet, and 390px mobile viewports.
-Status: Phase 28 Complete & Verified.
-Last activity: 2026-10-08 — Completed Phase 28 Botanical Workspace Redesign with zero backend changes, zero functional compromises, and 100% test pass rate across all test suites.
+Milestone 3 UI Refinement & Polish Achievements:
+- Phase 21–24: Design System Foundation, Global App Shell, Home Screen, and Canonical `CreationCard` component system.
+- Phase 28 (Botanical Workspace): 100% reskinned Stages 4 (Choose & Decision DNA), 5 (Unfold Codex), 6 (Traceability DAG), and 7 (Refine & Mutation Lab & Counterfactual Replay). Zero residual dark cyber elements.
+- Phase 29 (Secondary UI & Typography Polish):
+  - Standardized typography scale: Headings Cormorant Garamond (20–36px), UI controls Inter (14–15px), body Inter (14–16px), metadata Inter/mono (12–13px min).
+  - Absolute elimination of all text under 12px: 0 occurrences of `text-[9px]` or `text-[10px]` across `frontend/src`.
+  - Contrast elevation: Replaced faint `/40` and `/50` opacities with solid botanical tokens (`#294B3A`, `#394840`, `#5F6D63`).
+  - Touch targets: Minimum 44px hit bounds on primary actions and modal close buttons (`w-11 h-11`); minimum 32–38px for inline chips and tools.
+  - Secondary UI components: Upgraded `OriginBadge`, `TopBar`, `StageProgressHeader`, `InspectorDrawer`, `WhyIsThisHereModal`, `RefinementModal`, `KeyboardShortcutsModal`, `GuidedTourOverlay`, `AtmosphereDeck`, and lightboxes.
+  - Multi-viewport stability: Zero horizontal page overflow verified across 1440px desktop, 1024px tablet, and 390px mobile viewports.
+Status: Phase 29 Complete & Verified (154 backend tests passing, `test_phase29_ui_polish.cjs` passing 100%, clean production build).
+Last activity: 2026-10-08 — Completed Phase 29 Secondary UI, Typography & Visibility Polish Pass with zero backend changes and zero functional compromises.
 
 Progress: [██████████] 100.0%
 
@@ -69,6 +71,12 @@ Progress: [██████████] 100.0%
 | Phase 18: Seed Mutation Lab | complete | Milestone 2 |
 | Phase 19: Counterfactual Replay | complete | Milestone 2 |
 | Phase 20: Human-Only Zones | complete | Milestone 2 |
+| Phase 21: Design System Foundation | complete | Milestone 3 |
+| Phase 22: Global App Shell | complete | Milestone 3 |
+| Phase 23: Home Screen | complete | Milestone 3 |
+| Phase 24: Creation Component System | complete | Milestone 3 |
+| Phase 28: Seed → Universe Workspace | complete | Milestone 3 |
+| Phase 29: Secondary UI Polish | complete | Milestone 3 |
 
 ## Accumulated Context
 

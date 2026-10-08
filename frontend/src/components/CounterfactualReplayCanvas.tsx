@@ -144,10 +144,10 @@ export const CounterfactualReplayCanvas: React.FC = () => {
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7]">
+                    <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7]">
                       WORLD #{candidate.index}
                     </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/40">
+                    <span className="px-2.5 py-1 rounded text-xs font-mono font-bold uppercase bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/40">
                       {candidate.divergence_archetype}
                     </span>
                   </div>
@@ -203,7 +203,7 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                     Current Committed Canon
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30">
+                <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30">
                   ANCHOR TIMELINE
                 </span>
               </div>
@@ -218,8 +218,8 @@ export const CounterfactualReplayCanvas: React.FC = () => {
               </div>
 
               {counterfactualDelta?.decision_dna_rationale && (
-                <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-[#5A6E5E] font-bold block">
+                <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                  <span className="text-xs font-mono uppercase text-[#5A6E5E] font-bold block">
                     Creator Decision Rationale:
                   </span>
                   <p className="text-xs text-[#294B3A] italic font-serif">
@@ -229,7 +229,7 @@ export const CounterfactualReplayCanvas: React.FC = () => {
               )}
 
               <div className="space-y-3 pt-2">
-                <span className="text-[11px] font-mono uppercase text-[#5A6E5E] font-bold tracking-wider block">
+                <span className="text-xs font-mono uppercase text-[#5A6E5E] font-bold tracking-wider block">
                   Active Universe Anchors:
                 </span>
                 {counterfactualDelta?.dimensions.map((dim) => (
@@ -255,7 +255,7 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                     Counterfactual Alternative
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/40">
+                <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#B399B0]/40">
                   REJECTED PATH
                 </span>
               </div>
@@ -269,8 +269,8 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#EFE8EE] border border-[#B399B0]/30 space-y-1">
-                <span className="text-[10px] font-mono uppercase text-[#6A4B67] font-bold block">
+              <div className="p-3.5 rounded-xl bg-[#EFE8EE] border border-[#B399B0]/30 space-y-1">
+                <span className="text-xs font-mono uppercase text-[#6A4B67] font-bold block">
                   Inferred Exclusion Avoided in Canon:
                 </span>
                 <p className="text-xs text-[#6A4B67]">
@@ -279,7 +279,7 @@ export const CounterfactualReplayCanvas: React.FC = () => {
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-[11px] font-mono uppercase text-[#6A4B67] font-bold tracking-wider block">
+                <span className="text-xs font-mono uppercase text-[#6A4B67] font-bold tracking-wider block">
                   Projected Alternative Anchors:
                 </span>
                 {counterfactualDelta?.dimensions.map((dim) => (
@@ -321,23 +321,23 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                       {getDimensionIcon(dim.dimension)}
                       <h4 className="font-serif font-bold text-sm text-[#294B3A]">{dim.title}</h4>
                     </div>
-                    <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold border ${getDivergenceBadgeColor(dim.divergence_level)}`}>
+                    <span className={`px-2.5 py-1 rounded text-xs font-mono uppercase font-bold border ${getDivergenceBadgeColor(dim.divergence_level)}`}>
                       {dim.divergence_level} divergence
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#394840] leading-relaxed bg-[#F2EBDD] p-3 rounded-xl border border-[#D8CCB7] font-serif">
+                  <p className="text-xs text-[#394840] leading-relaxed bg-[#F2EBDD] p-3.5 rounded-xl border border-[#D8CCB7] font-serif">
                     {dim.divergence_analysis}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-[#D8CCB7]">
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#D8CCB7]">
                     <div>
-                      <span className="text-[#5A6E5E] font-mono block text-[10px]">CANON FOCUS</span>
+                      <span className="text-[#5A6E5E] font-mono block text-xs font-semibold">CANON FOCUS</span>
                       <span className="text-[#294B3A] line-clamp-1">{dim.canon_value}</span>
                     </div>
                     <div>
-                      <span className="text-[#6A4B67] font-mono block text-[10px]">ALTERNATIVE SHIFT</span>
-                      <span className="text-[#6A4B67] line-clamp-1 font-medium">{dim.counterfactual_value}</span>
+                      <span className="text-[#6A4B67] font-mono block text-xs font-semibold">ALTERNATIVE SHIFT</span>
+                      <span className="text-[#6A4B67] line-clamp-1 font-semibold">{dim.counterfactual_value}</span>
                     </div>
                   </div>
                 </div>
@@ -388,13 +388,13 @@ export const CounterfactualReplayCanvas: React.FC = () => {
                   <div key={metric.label} className="p-4 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-sm">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-[#5A6E5E] font-medium">{metric.label}</span>
-                      <span className={`font-mono font-bold text-[11px] ${metric.delta > 0 ? 'text-[#294B3A]' : metric.delta < 0 ? 'text-[#B8734F]' : 'text-[#718875]'}`}>
+                      <span className={`font-mono font-bold text-xs ${metric.delta > 0 ? 'text-[#294B3A]' : metric.delta < 0 ? 'text-[#B8734F]' : 'text-[#718875]'}`}>
                         {metric.delta > 0 ? `+${metric.delta}%` : `${metric.delta}%`}
                       </span>
                     </div>
 
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[10px] text-[#718875] font-mono">
+                      <div className="flex items-center justify-between text-xs text-[#718875] font-mono">
                         <span>Canon: {metric.canon}%</span>
                         <span>Alt: {metric.cf}%</span>
                       </div>

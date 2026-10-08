@@ -30,19 +30,20 @@ export const InspectorDrawer: React.FC = () => {
           className="fixed top-14 right-0 bottom-0 w-80 md:w-96 bg-[#F4EEDF] border-l border-[#D8CCB7] shadow-xl flex flex-col z-20 select-none"
         >
           {/* Drawer Header */}
-          <div className="p-4 border-b border-[#D8CCB7] bg-[#EAE4D4]/60 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#355A46]" />
-              <h2 className="font-serif font-bold text-[#294B3A] text-sm">
+          <div className="p-4 sm:p-5 border-b border-[#D8CCB7] bg-[#EAE4D4]/70 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4.5 h-4.5 text-[#355A46]" />
+              <h2 className="font-serif font-bold text-[#294B3A] text-lg sm:text-xl tracking-tight">
                 Workspace Inspector
               </h2>
             </div>
             <button
               onClick={() => toggleInspector(false)}
-              className="p-1 rounded-md hover:bg-[#EAE4D4] text-[#466A55] hover:text-[#294B3A] transition"
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-[#DDE2D2] text-[#355A46] hover:text-[#294B3A] transition focus:outline-hidden focus:ring-2 focus:ring-[#355A46]"
               title="Close Inspector"
+              aria-label="Close Inspector"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -50,37 +51,37 @@ export const InspectorDrawer: React.FC = () => {
           <div className="flex border-b border-[#D8CCB7] bg-[#F2EBDD]">
             <button
               onClick={() => setInspectorTab('dna')}
-              className={`flex-1 py-2 px-2 text-[11px] font-medium flex items-center justify-center gap-1 border-b-2 transition ${
+              className={`flex-1 py-3 px-3 text-sm font-semibold flex items-center justify-center gap-1.5 border-b-2 transition min-h-[44px] ${
                 inspectorTab === 'dna'
-                  ? 'border-[#355A46] text-[#294B3A] bg-[#EAE4D4] font-bold'
-                  : 'border-transparent text-[#718875] hover:text-[#294B3A] hover:bg-[#EAE4D4]/60'
+                  ? 'border-[#355A46] text-[#294B3A] bg-[#EAE4D4]'
+                  : 'border-transparent text-[#5F6D63] hover:text-[#294B3A] hover:bg-[#EAE4D4]/60'
               }`}
             >
-              <Dna className="w-3.5 h-3.5" />
+              <Dna className="w-4 h-4" />
               <span>DNA</span>
             </button>
 
             <button
               onClick={() => setInspectorTab('worlds')}
-              className={`flex-1 py-2 px-2 text-[11px] font-medium flex items-center justify-center gap-1 border-b-2 transition ${
+              className={`flex-1 py-3 px-3 text-sm font-semibold flex items-center justify-center gap-1.5 border-b-2 transition min-h-[44px] ${
                 inspectorTab === 'worlds'
-                  ? 'border-[#355A46] text-[#294B3A] bg-[#EAE4D4] font-bold'
-                  : 'border-transparent text-[#718875] hover:text-[#294B3A] hover:bg-[#EAE4D4]/60'
+                  ? 'border-[#355A46] text-[#294B3A] bg-[#EAE4D4]'
+                  : 'border-transparent text-[#5F6D63] hover:text-[#294B3A] hover:bg-[#EAE4D4]/60'
               }`}
             >
-              <Globe className="w-3.5 h-3.5" />
+              <Globe className="w-4 h-4" />
               <span>Worlds ({worlds.length})</span>
             </button>
 
             <button
               onClick={() => setInspectorTab('provenance')}
-              className={`flex-1 py-2 px-2 text-[11px] font-medium flex items-center justify-center gap-1 border-b-2 transition ${
+              className={`flex-1 py-3 px-3 text-sm font-semibold flex items-center justify-center gap-1.5 border-b-2 transition min-h-[44px] ${
                 inspectorTab === 'provenance'
-                  ? 'border-[#355A46] text-[#294B3A] bg-[#EAE4D4] font-bold'
-                  : 'border-transparent text-[#718875] hover:text-[#294B3A] hover:bg-[#EAE4D4]/60'
+                  ? 'border-[#355A46] text-[#294B3A] bg-[#EAE4D4]'
+                  : 'border-transparent text-[#5F6D63] hover:text-[#294B3A] hover:bg-[#EAE4D4]/60'
               }`}
             >
-              <GitCommit className="w-3.5 h-3.5" />
+              <GitCommit className="w-4 h-4" />
               <span>Lineage</span>
             </button>
           </div>
@@ -127,10 +128,10 @@ export const InspectorDrawer: React.FC = () => {
                         className={`p-3.5 rounded-xl bg-[#F8F4E8] border ${currentAccent.border} space-y-2 text-xs shadow-2xs`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${currentAccent.badge}`}>
+                          <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${currentAccent.badge}`}>
                             Candidate 0{w.candidate_index || idx + 1}
                           </span>
-                          <span className="text-[10px] text-[#466A55] truncate max-w-[140px]">
+                          <span className="text-xs text-[#466A55] truncate max-w-[140px]">
                             {w.archetype}
                           </span>
                         </div>
@@ -139,11 +140,11 @@ export const InspectorDrawer: React.FC = () => {
                           {w.title}
                         </div>
 
-                        <p className="text-[#394840] text-[11.5px] italic leading-relaxed">
+                        <p className="text-[#394840] text-xs italic leading-relaxed">
                           "{w.concept}"
                         </p>
 
-                        <div className="pt-2 border-t border-[#D8CCB7] space-y-1.5 text-[11px]">
+                        <div className="pt-2 border-t border-[#D8CCB7] space-y-1.5 text-xs">
                           <div>
                             <span className="text-[#466A55] font-semibold">Tension: </span>
                             <span className="text-[#294B3A]">{w.core_tension}</span>
@@ -163,7 +164,7 @@ export const InspectorDrawer: React.FC = () => {
                   <div className="text-xs font-serif font-bold text-[#294B3A]">
                     No World Candidates Available
                   </div>
-                  <p className="text-[11px] text-[#466A55]">
+                  <p className="text-xs text-[#466A55]">
                     Switch to Stage 3 (Three Worlds) and generate candidates to inspect and compare them here.
                   </p>
                 </div>
@@ -177,7 +178,7 @@ export const InspectorDrawer: React.FC = () => {
                     <GitCommit className="w-3.5 h-3.5" />
                     <span>Active Causal Provenance Trail</span>
                   </div>
-                  <p className="text-[#466A55] leading-relaxed text-[11px]">
+                  <p className="text-[#466A55] leading-relaxed text-xs">
                     Traceable DAG linking root seed, distilled Seed DNA, human world choice, and unfolded universe layers.
                   </p>
                 </div>
@@ -185,15 +186,15 @@ export const InspectorDrawer: React.FC = () => {
                 {/* Step 1: Raw Seed Node */}
                 <div className="p-3.5 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 text-xs shadow-2xs">
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
+                    <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
                       Step 1 • Root Seed
                     </span>
-                    <span className="text-[10px] text-[#355A46] font-mono flex items-center gap-1">
+                    <span className="text-xs text-[#355A46] font-mono flex items-center gap-1.5 font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#355A46]" />
                       Immutable
                     </span>
                   </div>
-                  <p className="text-[#294B3A] text-[11.5px] italic line-clamp-3">
+                  <p className="text-[#294B3A] text-xs italic line-clamp-3">
                     "{seedText || 'No seed text recorded'}"
                   </p>
                 </div>
@@ -206,26 +207,26 @@ export const InspectorDrawer: React.FC = () => {
                 {/* Step 2: Seed DNA Node */}
                 <div className="p-3.5 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 text-xs shadow-2xs">
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
+                    <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
                       Step 2 • Seed DNA
                     </span>
-                    <span className="text-[10px] text-[#466A55] font-mono">
+                    <span className="text-xs text-[#466A55] font-mono font-semibold">
                       {seedDNA ? seedDNA.model_used : 'Pending'}
                     </span>
                   </div>
                   {seedDNA ? (
                     <div className="space-y-1">
-                      <p className="text-[#294B3A] text-[11.5px] font-medium line-clamp-2">
+                      <p className="text-[#294B3A] text-xs font-medium line-clamp-2">
                         {seedDNA.dna.premise}
                       </p>
-                      <div className="flex items-center gap-2 text-[10px] text-[#466A55] pt-1">
+                      <div className="flex items-center gap-2 text-xs text-[#466A55] pt-1">
                         <span>Tone: {seedDNA.dna.tone}</span>
                         <span>•</span>
                         <span>{seedDNA.dna.themes?.length || 0} themes</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-[#718875] italic text-[11px]">DNA extraction pending in Stage 2</p>
+                    <p className="text-[#718875] italic text-xs">DNA extraction pending in Stage 2</p>
                   )}
                 </div>
 
@@ -241,7 +242,7 @@ export const InspectorDrawer: React.FC = () => {
                     : 'bg-[#F8F4E8] border-[#D8CCB7]'
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                    <span className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${
                       selectedWorldId
                         ? 'bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7]'
                         : 'bg-[#F2EBDD] text-[#718875]'
@@ -249,7 +250,7 @@ export const InspectorDrawer: React.FC = () => {
                       Step 3 • Human World Selection
                     </span>
                     {selectedWorldId && (
-                      <span className="text-[10px] text-[#355A46] font-bold flex items-center gap-1">
+                      <span className="text-xs text-[#355A46] font-bold flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#355A46]" />
                         Human Verified
                       </span>
@@ -265,16 +266,16 @@ export const InspectorDrawer: React.FC = () => {
                             <div className="text-[#294B3A] font-serif font-bold text-sm">
                               {selWorld?.title || 'Selected World'}
                             </div>
-                            <div className="text-[10px] text-[#805B20] font-mono">
+                            <div className="text-xs text-[#805B20] font-mono">
                               {selWorld?.archetype}
                             </div>
                           </div>
                           {selectedWorldRationale && (
                             <div className="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#D8CCB7] space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-[#5A6E5E]">
+                              <span className="text-xs uppercase font-bold text-[#5A6E5E]">
                                 Creator Rationale:
                               </span>
-                              <p className="text-[11px] text-[#294B3A] italic leading-relaxed font-serif">
+                              <p className="text-xs text-[#294B3A] italic leading-relaxed font-serif">
                                 "{selectedWorldRationale}"
                               </p>
                             </div>
@@ -282,17 +283,17 @@ export const InspectorDrawer: React.FC = () => {
 
                           {/* Decision DNA Details */}
                           {activeSelection?.decision_dna && (
-                            <div className="space-y-2 pt-1 border-t border-[#D8CCB7]">
+                            <div className="space-y-3 pt-2 border-t border-[#D8CCB7]">
                               {activeSelection.decision_dna.creative_priorities.length > 0 && (
-                                <div className="space-y-1">
-                                  <span className="text-[9.5px] uppercase font-mono font-bold text-[#294B3A]">
+                                <div className="space-y-1.5">
+                                  <span className="text-xs uppercase font-mono font-bold text-[#294B3A]">
                                     Creative Priorities:
                                   </span>
-                                  <div className="flex flex-wrap gap-1">
+                                  <div className="flex flex-wrap gap-1.5">
                                     {activeSelection.decision_dna.creative_priorities.map((p) => (
                                       <span
                                         key={p}
-                                        className="px-2 py-0.5 rounded-md bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30 text-[10px]"
+                                        className="px-2.5 py-1 rounded-md bg-[#DDE2D2] text-[#294B3A] border border-[#294B3A]/30 text-xs font-medium"
                                       >
                                         ★ {p}
                                       </span>
@@ -302,15 +303,15 @@ export const InspectorDrawer: React.FC = () => {
                               )}
 
                               {activeSelection.decision_dna.rejected_directions.length > 0 && (
-                                <div className="space-y-1">
-                                  <span className="text-[9.5px] uppercase font-mono font-bold text-[#B8734F]">
+                                <div className="space-y-1.5">
+                                  <span className="text-xs uppercase font-mono font-bold text-[#B8734F]">
                                     Negative Guardrails:
                                   </span>
-                                  <div className="flex flex-wrap gap-1">
+                                  <div className="flex flex-wrap gap-1.5">
                                     {activeSelection.decision_dna.rejected_directions.map((r) => (
                                       <span
                                         key={r}
-                                        className="px-2 py-0.5 rounded-md bg-[#F5E6DC] text-[#B8734F] border border-[#B8734F]/30 text-[10px]"
+                                        className="px-2.5 py-1 rounded-md bg-[#F5E6DC] text-[#B8734F] border border-[#B8734F]/30 text-xs font-medium"
                                       >
                                         ⊘ {r}
                                       </span>
@@ -320,7 +321,7 @@ export const InspectorDrawer: React.FC = () => {
                               )}
 
                               {activeSelection.decision_dna.custom_directives && (
-                                <div className="p-2 rounded bg-[#FAF6EE] border border-[#D8CCB7] text-[10.5px] text-[#5A6E5E]">
+                                <div className="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#D8CCB7] text-xs text-[#394840]">
                                   <span className="font-semibold text-[#805B20]">Directive:</span>{' '}
                                   {activeSelection.decision_dna.custom_directives}
                                 </div>
@@ -331,7 +332,7 @@ export const InspectorDrawer: React.FC = () => {
                       );
                     })()
                   ) : (
-                    <p className="text-[#718875] italic text-[11px]">
+                    <p className="text-[#5F6D63] italic text-xs">
                       Awaiting human world choice in Stage 4
                     </p>
                   )}
@@ -347,40 +348,40 @@ export const InspectorDrawer: React.FC = () => {
                     {/* Step 4: Unfolded Universe Codex Node */}
                     <div id="lineage-unfolded-codex" className="p-3.5 rounded-xl bg-[#F8F4E8] border border-[#355A46] shadow-xs space-y-3 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
+                        <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
                           Step 4 • Unfolded Codex
                         </span>
-                        <span className="text-[10px] text-[#355A46] font-mono font-bold">
+                        <span className="text-xs text-[#355A46] font-mono font-bold">
                           Universe Unfolded
                         </span>
                       </div>
 
                       {/* 4 Child Branches */}
                       <div className="space-y-2 pt-1 border-t border-[#D8CCB7]">
-                        <div className="p-2 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
-                          <span className="text-[#294B3A] text-[11px] font-medium">World Bible</span>
-                          <span className="text-[10px] text-[#466A55] font-mono">
+                        <div className="p-2.5 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
+                          <span className="text-[#294B3A] text-xs font-medium">World Bible</span>
+                          <span className="text-xs text-[#466A55] font-mono">
                             {unfoldedUniverse.world_bible.key_locations.length} Locations • {unfoldedUniverse.world_bible.factions.length} Factions
                           </span>
                         </div>
 
-                        <div className="p-2 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
-                          <span className="text-[#294B3A] text-[11px] font-medium">Characters</span>
-                          <span className="text-[10px] text-[#B8734F] font-mono">
+                        <div className="p-2.5 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
+                          <span className="text-[#294B3A] text-xs font-medium">Characters</span>
+                          <span className="text-xs text-[#B8734F] font-mono">
                             {unfoldedUniverse.characters.length} Inhabitants
                           </span>
                         </div>
 
-                        <div className="p-2 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
-                          <span className="text-[#294B3A] text-[11px] font-medium">Dynamics Web</span>
-                          <span className="text-[10px] text-[#6A4B67] font-mono">
+                        <div className="p-2.5 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
+                          <span className="text-[#294B3A] text-xs font-medium">Dynamics Web</span>
+                          <span className="text-xs text-[#6A4B67] font-mono">
                             {unfoldedUniverse.relationships.length} Tensions
                           </span>
                         </div>
 
-                        <div className="p-2 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
-                          <span className="text-[#294B3A] text-[11px] font-medium">Story Scenes</span>
-                          <span className="text-[10px] text-[#355A46] font-mono">
+                        <div className="p-2.5 rounded-lg bg-[#F2EBDD] border border-[#D8CCB7] flex items-center justify-between">
+                          <span className="text-[#294B3A] text-xs font-medium">Story Scenes</span>
+                          <span className="text-xs text-[#355A46] font-mono">
                             {unfoldedUniverse.scenes.length} Beats
                           </span>
                         </div>
@@ -426,7 +427,7 @@ export const InspectorDrawer: React.FC = () => {
 
                         return (
                           <div className="pt-2 border-t border-[#D8CCB7] space-y-2" data-testid="origin-ledger-distribution">
-                            <div className="flex items-center justify-between text-[10px] font-mono">
+                            <div className="flex items-center justify-between text-xs font-mono">
                               <span className="text-[#466A55] font-bold uppercase tracking-wider">
                                 Origin Ledger Breakdown
                               </span>
@@ -445,7 +446,7 @@ export const InspectorDrawer: React.FC = () => {
                                   return (
                                     <div
                                       key={key}
-                                      className={`px-2 py-1 rounded-lg border text-[10px] font-mono flex items-center justify-between ${cfg.color} ${cfg.border}`}
+                                      className={`px-2.5 py-1.5 rounded-lg border text-xs font-mono flex items-center justify-between ${cfg.color} ${cfg.border}`}
                                     >
                                       <span className="truncate">{cfg.label}</span>
                                       <span className="font-bold ml-1">{cnt}</span>

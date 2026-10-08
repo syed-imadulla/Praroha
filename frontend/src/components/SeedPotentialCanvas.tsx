@@ -111,7 +111,7 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
             <h2 className={`font-serif font-bold text-[#294B3A] ${compact ? 'text-base' : 'text-xl'}`}>
               Seed Potential Map
             </h2>
-            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] font-mono">
+            <span className="text-xs uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] font-mono font-semibold">
               Semantic Intelligence
             </span>
           </div>
@@ -233,7 +233,7 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
                 <Anchor className="w-4 h-4" />
                 <span>Explicit Anchors</span>
               </div>
-              <span className="text-[10px] font-mono text-[#466A55] px-2 py-0.5 rounded-full bg-[#DDE2D2] border border-[#C8D0BE]">
+              <span className="text-xs font-mono font-bold text-[#466A55] px-2.5 py-1 rounded-full bg-[#DDE2D2] border border-[#C8D0BE]">
                 100% Immutable
               </span>
             </div>
@@ -247,12 +247,12 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
                 >
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <span className="text-xs font-semibold text-[#294B3A]">{item.label}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#DDE2D2] text-[#294B3A] font-mono shrink-0">
+                    <span className="text-xs px-2 py-0.5 rounded bg-[#DDE2D2] text-[#294B3A] font-mono font-semibold shrink-0">
                       Anchor
                     </span>
                   </div>
                   {item.source_evidence && (
-                    <div className="text-[11px] text-[#466A55] flex items-center gap-1 font-mono">
+                    <div className="text-xs text-[#466A55] flex items-center gap-1 font-mono">
                       <span>“</span>
                       <span className="italic">{item.source_evidence}</span>
                       <span>”</span>
@@ -272,7 +272,7 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
                 <Sparkles className="w-4 h-4 text-[#294B3A]" />
                 <span>AI-Inferred Possibilities</span>
               </div>
-              <span className="text-[10px] font-mono text-[#466A55] px-2 py-0.5 rounded-full bg-[#EAE4D4] border border-[#D8CCB7]">
+              <span className="text-xs font-mono font-bold text-[#466A55] px-2.5 py-1 rounded-full bg-[#EAE4D4] border border-[#D8CCB7]">
                 Human Choice
               </span>
             </div>
@@ -306,38 +306,38 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
                             {item.label}
                           </span>
                         </div>
-                        <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-[#F2EBDD] text-[#466A55] border border-[#D8CCB7] font-mono">
+                        <span className="inline-block text-xs px-2 py-0.5 rounded bg-[#F2EBDD] text-[#466A55] border border-[#D8CCB7] font-mono">
                           AI-inferred possibility
                         </span>
                       </div>
 
                       {/* Confidence Score Badge */}
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#EAE4D4] text-[#294B3A] shrink-0 border border-[#D8CCB7]">
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#EAE4D4] text-[#294B3A] shrink-0 border border-[#D8CCB7]">
                         {Math.round(item.confidence * 100)}%
                       </span>
                     </div>
 
                     {item.source_evidence && (
-                      <p className="text-[11px] text-[#466A55] mb-3">
+                      <p className="text-xs text-[#466A55] mb-3">
                         <span className="text-[#718875]">Basis:</span> {item.source_evidence}
                       </p>
                     )}
 
                     {/* Interactive Accept / Reject Decision Buttons */}
                     <div className="flex items-center justify-between pt-2 border-t border-[#D8CCB7]/60">
-                      <div className="text-[11px] font-medium">
+                      <div className="text-xs font-medium">
                         {isAccepted && (
                           <span className="text-[#355A46] font-semibold inline-flex items-center gap-1">
-                            <Check className="w-3 h-3 text-[#355A46]" /> Accepted by Creator
+                            <Check className="w-3.5 h-3.5 text-[#355A46]" /> Accepted by Creator
                           </span>
                         )}
                         {isRejected && (
                           <span className="text-[#B85C46] inline-flex items-center gap-1">
-                            <X className="w-3 h-3 text-[#B85C46]" /> Excluded from canon
+                            <X className="w-3.5 h-3.5 text-[#B85C46]" /> Excluded from canon
                           </span>
                         )}
                         {isPending && (
-                          <span className="text-[#718875] text-[10px]">Awaiting decision</span>
+                          <span className="text-[#718875] text-xs">Awaiting decision</span>
                         )}
                       </div>
 
@@ -393,7 +393,7 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
                 <HelpCircle className="w-4 h-4" />
                 <span>Open Creative Questions</span>
               </div>
-              <span className="text-[10px] font-mono text-[#466A55] px-2 py-0.5 rounded-full bg-[#FAF5EE] border border-[#E8DCC8]">
+              <span className="text-xs font-mono font-bold text-[#466A55] px-2.5 py-1 rounded-full bg-[#FAF5EE] border border-[#E8DCC8]">
                 Catalytic Mysteries
               </span>
             </div>
@@ -411,7 +411,7 @@ export const SeedPotentialCanvas: React.FC<SeedPotentialCanvasProps> = ({ compac
                     </span>
                   </div>
                   {item.source_evidence && (
-                    <div className="text-[11px] text-[#718875] font-mono pt-1">
+                    <div className="text-xs text-[#718875] font-mono pt-1">
                       <span className="text-[#C59A55]">Tension Anchor: </span>
                       <span className="italic">{item.source_evidence}</span>
                     </div>

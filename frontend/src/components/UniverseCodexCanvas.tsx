@@ -111,15 +111,15 @@ export const UniverseCodexCanvas: React.FC = () => {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#D8CCB7]">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
+              <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#DDE2D2] text-[#294B3A] border border-[#C8D0BE]">
                 Tattva 2: Forms Hidden in Formless • Stage 5 Unfolding
               </span>
-              <span className="text-xs text-[#718875] font-mono">• Universe Codex</span>
+              <span className="text-xs text-[#5F6D63] font-mono">• Universe Codex</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold font-serif text-[#294B3A] tracking-tight">
               {selectedWorld ? selectedWorld.title : 'Progressive World Unfolding'}
             </h1>
-            <p className="text-xs md:text-sm text-[#466A55] max-w-2xl leading-relaxed">
+            <p className="text-sm md:text-[15px] text-[#394840] max-w-2xl leading-relaxed">
               {selectedWorld?.concept ||
                 'Expanding the committed world candidate into a multi-layered, living story-world codex.'}
             </p>
@@ -129,7 +129,7 @@ export const UniverseCodexCanvas: React.FC = () => {
             <button
               id="launcher-simulate-what-if-btn"
               onClick={() => setActiveCodexTab('mutation')}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#294B3A] transition shadow-2xs font-semibold"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#294B3A] transition shadow-2xs font-semibold min-h-[38px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
               title="Launch Seed Mutation Lab"
             >
               <Sparkles className="w-4 h-4 text-[#C59A55]" />
@@ -138,7 +138,7 @@ export const UniverseCodexCanvas: React.FC = () => {
             <button
               id="launcher-counterfactual-replay-btn"
               onClick={() => setActiveCodexTab('replay')}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#6A4B67] transition shadow-2xs font-semibold"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#6A4B67] transition shadow-2xs font-semibold min-h-[38px] focus:outline-none focus:ring-1 focus:ring-[#6A4B67]"
               title="Launch Counterfactual Replay"
             >
               <GitFork className="w-4 h-4 text-[#6A4B67]" />
@@ -149,7 +149,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 setInspectorTab('provenance');
                 toggleInspector(true);
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#294B3A] transition shadow-2xs"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#294B3A] transition shadow-2xs font-semibold min-h-[38px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
               title="Open Causal Lineage"
             >
               <GitBranch className="w-4 h-4 text-[#355A46]" />
@@ -163,20 +163,20 @@ export const UniverseCodexCanvas: React.FC = () => {
           <div className="p-4 rounded-[20px] bg-[#F2EBDD] border border-[#D8CCB7] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] font-mono font-bold text-[11px]">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] font-mono font-bold text-xs min-h-[26px]">
                   <Sparkles className="w-3.5 h-3.5 text-[#355A46]" />
                   <span>Decision DNA</span>
                 </span>
-                <span className="px-2.5 py-1 rounded-md bg-[#F8F4E8] text-[#805B20] font-mono font-bold border border-[#D8C79D]">
+                <span className="px-2.5 py-1 rounded-md bg-[#F8F4E8] text-[#805B20] font-mono font-bold border border-[#D8C79D] text-xs min-h-[26px] inline-flex items-center">
                   {selectedWorld.archetype}
                 </span>
                 {selectedWorld.divergence_archetype && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#F8F4E8] text-[#466A55] border border-[#D8CCB7]">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-mono uppercase bg-[#F8F4E8] text-[#394840] border border-[#D8CCB7] font-semibold min-h-[26px] inline-flex items-center">
                     {selectedWorld.divergence_archetype}
                   </span>
                 )}
                 {(decisionDNA?.user_rationale || selectedWorldRationale) && (
-                  <span className="text-[#466A55] italic text-[11px] line-clamp-1 max-w-sm">
+                  <span className="text-[#394840] italic text-xs line-clamp-1 max-w-sm">
                     "{decisionDNA?.user_rationale || selectedWorldRationale}"
                   </span>
                 )}
@@ -193,7 +193,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                   .map((p) => (
                     <span
                       key={p}
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] text-[10.5px] font-medium"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] text-xs font-semibold min-h-[26px]"
                       title={`Mandatory Creative Priority: ${p}`}
                     >
                       <span className="text-[#355A46] font-bold">★</span>
@@ -210,7 +210,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                   .map((r) => (
                     <span
                       key={r}
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F5E6DC] border border-[#E2BFAC] text-[#B8734F] text-[10.5px] font-medium"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5E6DC] border border-[#E2BFAC] text-[#B8734F] text-xs font-semibold min-h-[26px]"
                       title={`Active Negative Guardrail: Avoid ${r}`}
                     >
                       <span className="text-[#B8734F] font-bold">⊘</span>
@@ -227,7 +227,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                   setInspectorTab('provenance');
                   toggleInspector(true);
                 }}
-                className="px-4 py-2 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] text-[11px] font-semibold flex items-center gap-1.5 transition shadow-2xs"
+                className="px-4 py-2 rounded-xl bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] text-xs font-semibold flex items-center gap-1.5 transition shadow-2xs min-h-[38px] focus:outline-none focus:ring-2 focus:ring-[#294B3A]"
                 title="Inspect Decision DNA and full causal lineage DAG"
               >
                 <span>Inspect Full DNA</span>
@@ -244,18 +244,18 @@ export const UniverseCodexCanvas: React.FC = () => {
             className="p-4 rounded-[20px] bg-[#F2EBDD] border border-[#D8CCB7] shadow-xs space-y-3"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D8CCB7] pb-2.5">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="p-1 rounded-md bg-[#E9DDBF] text-[#805B20]">
                   <Lock className="w-4 h-4" />
                 </span>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#294B3A]">
                   Human-Only Zones: Inviolable Creative Axioms
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-[10px] font-mono font-bold">
+                <span className="px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold min-h-[24px] inline-flex items-center">
                   CREATOR LOCKED
                 </span>
               </div>
-              <span className="text-[11px] text-[#718875] font-mono">
+              <span className="text-xs text-[#5F6D63] font-mono font-medium">
                 Dual-Layer AI Invariance Enforced
               </span>
             </div>
@@ -263,8 +263,8 @@ export const UniverseCodexCanvas: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
               {hoz.core_theme && (
                 <div className="p-3 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-1">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#C59A55] font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
+                  <div className="text-xs font-mono uppercase tracking-wider text-[#805B20] font-bold flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
                     <span>Core Theme</span>
                   </div>
                   <p className="text-[#294B3A] line-clamp-2 leading-relaxed font-medium">
@@ -274,8 +274,8 @@ export const UniverseCodexCanvas: React.FC = () => {
               )}
               {hoz.protagonist_motivation && (
                 <div className="p-3 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-1">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#C59A55] font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
+                  <div className="text-xs font-mono uppercase tracking-wider text-[#805B20] font-bold flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
                     <span>Protagonist Motivation</span>
                   </div>
                   <p className="text-[#294B3A] line-clamp-2 leading-relaxed font-medium">
@@ -285,8 +285,8 @@ export const UniverseCodexCanvas: React.FC = () => {
               )}
               {hoz.central_conflict && (
                 <div className="p-3 rounded-xl bg-[#F8F4E8] border border-[#D8CCB7] space-y-1">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#C59A55] font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
+                  <div className="text-xs font-mono uppercase tracking-wider text-[#805B20] font-bold flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
                     <span>Central Conflict</span>
                   </div>
                   <p className="text-[#294B3A] line-clamp-2 leading-relaxed font-medium">
@@ -441,13 +441,13 @@ export const UniverseCodexCanvas: React.FC = () => {
                       {isPassed ? (
                         <Check className="w-3.5 h-3.5 text-[#355A46]" />
                       ) : (
-                        <span className="w-4 h-4 rounded-full bg-[#E2EBE2] text-[#294B3A] flex items-center justify-center text-[10px]">
+                        <span className="w-5 h-5 rounded-full bg-[#E2EBE2] text-[#294B3A] flex items-center justify-center text-xs font-bold">
                           {item.step}
                         </span>
                       )}
                       <span>{item.title}</span>
                     </div>
-                    <p className="text-[10px] leading-tight text-[#5A6E5E]">{item.desc}</p>
+                    <p className="text-xs leading-tight text-[#5A6E5E]">{item.desc}</p>
                   </div>
                 );
               })}
@@ -472,7 +472,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>World Bible & Locations</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#E2EBE2] text-[#294B3A] font-mono">
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#E2EBE2] text-[#294B3A] font-mono font-bold">
                     {unfoldedUniverse.world_bible.key_locations.length}
                   </span>
                 </button>
@@ -488,7 +488,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 >
                   <Users className="w-4 h-4" />
                   <span>Characters & Dynamics</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#E2EBE2] text-[#294B3A] font-mono">
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#E2EBE2] text-[#294B3A] font-mono font-bold">
                     {unfoldedUniverse.characters.length}
                   </span>
                 </button>
@@ -504,7 +504,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 >
                   <Film className="w-4 h-4" />
                   <span>Story Beats / Scenes</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#E2EBE2] text-[#294B3A] font-mono">
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#E2EBE2] text-[#294B3A] font-mono font-bold">
                     {unfoldedUniverse.scenes.length}
                   </span>
                 </button>
@@ -520,7 +520,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 >
                   <Sparkles className="w-4 h-4 text-[#A0522D]" />
                   <span>Seed Mutation Lab</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#F5E6DC] text-[#A0522D] border border-[#E2BFAC] font-mono">
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#F5E6DC] text-[#A0522D] border border-[#E2BFAC] font-mono font-bold">
                     NEW
                   </span>
                 </button>
@@ -536,7 +536,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 >
                   <GitFork className="w-4 h-4 text-[#6A4B67]" />
                   <span>Counterfactual Replay</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE] font-mono">
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE] font-mono font-bold">
                     NEW
                   </span>
                 </button>
@@ -713,13 +713,13 @@ export const UniverseCodexCanvas: React.FC = () => {
                                   />
                                   <button
                                     onClick={() => jumpToTraceNode(`node-loc-${idx}`)}
-                                    className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition"
+                                    className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
                                     title="Trace causal lineage in DAG"
                                   >
-                                    <GitFork className="w-3 h-3" />
+                                    <GitFork className="w-3.5 h-3.5" />
                                     <span>Trace Lineage</span>
                                   </button>
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#F2EBDD] text-[#5A6E5E] border border-[#D8CCB7]">
+                                  <span className="px-2.5 py-1 rounded-lg text-xs font-mono bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7] font-medium">
                                     Location {idx + 1}
                                   </span>
                                 </div>
@@ -729,14 +729,14 @@ export const UniverseCodexCanvas: React.FC = () => {
 
                             {/* Visual Prompt Callout */}
                             <div className="pt-2 border-t border-[#D8CCB7] space-y-2">
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-[#5A6E5E] font-mono flex items-center gap-1">
-                                  <Sparkles className="w-3 h-3 text-[#C59A55]" />
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-[#5A6E5E] font-mono flex items-center gap-1 font-semibold">
+                                  <Sparkles className="w-3.5 h-3.5 text-[#C59A55]" />
                                   Visual Prompt
                                 </span>
                                 <button
                                   onClick={() => handleCopyPrompt(copyKey, loc.visual_prompt, loc.name)}
-                                  className="copy-prompt-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-[11px] text-[#355A46] border border-[#D8CCB7] transition"
+                                  className="copy-prompt-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-semibold text-[#355A46] border border-[#D8CCB7] transition"
                                   title="Copy visual prompt to clipboard"
                                 >
                                   {copiedId === copyKey ? (
@@ -786,7 +786,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                       >
                         <div className="flex items-center justify-between">
                           <h3 className="font-bold font-serif text-[#294B3A] text-xs md:text-sm">{f.name}</h3>
-                          <span className="px-2 py-0.5 rounded text-[10px] bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30 font-medium">
+                          <span className="px-2.5 py-0.5 rounded text-xs bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30 font-semibold">
                             {f.role}
                           </span>
                         </div>
@@ -810,7 +810,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                     <div className="space-y-2.5">
                       {unfoldedUniverse.world_bible.history_timeline.map((item, idx) => (
                         <div key={idx} className="border-l-2 border-[#355A46]/60 pl-3 space-y-0.5">
-                          <span className="text-[10px] font-mono text-[#355A46] font-bold block">
+                          <span className="text-xs font-mono text-[#355A46] font-bold block">
                             {item.era}
                           </span>
                           <p className="text-xs text-[#394840] leading-relaxed">{item.event}</p>
@@ -834,12 +834,12 @@ export const UniverseCodexCanvas: React.FC = () => {
                           (fact === hoz.core_theme || fact.includes(hoz.core_theme) || idx === 0));
                         return (
                           <li key={idx} className="flex items-start justify-between gap-2">
-                            <div className="flex items-start gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#355A46] mt-1.5 shrink-0" />
+                            <div className="flex flex-wrap items-start gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#355A46] mt-2 shrink-0" />
                               <span className="leading-relaxed">{fact}</span>
                               {isHozTheme && (
-                                <span className="creator-locked-badge px-2 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-[9px] font-mono font-bold flex items-center gap-1 shrink-0">
-                                  <Lock className="w-2.5 h-2.5" /> CREATOR LOCKED
+                                <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shrink-0 min-h-[24px]">
+                                  <Lock className="w-3 h-3" /> CREATOR LOCKED
                                 </span>
                               )}
                             </div>
@@ -915,26 +915,26 @@ export const UniverseCodexCanvas: React.FC = () => {
                                   }
                                   size="xs"
                                 />
-                                <span className="char-version-badge px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
+                                <span className="char-version-badge px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#E9DDBF] text-[#805B20] border border-[#C59A55]/30">
                                   v{char.version || 1}
                                 </span>
                                 <button
                                   onClick={() => setRefiningEntity({ type: 'character', data: char })}
-                                  className="refine-character-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 transition font-medium"
+                                  className="refine-character-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#805B20]"
                                   title="Refine character traits and motivation (PERS-01)"
                                 >
-                                  <Edit3 className="w-3 h-3" />
+                                  <Edit3 className="w-3.5 h-3.5" />
                                   <span>Refine</span>
                                 </button>
                                 <button
                                   onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
-                                  className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition"
+                                  className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
                                   title="Trace causal lineage in DAG"
                                 >
-                                  <GitFork className="w-3 h-3" />
+                                  <GitFork className="w-3.5 h-3.5" />
                                   <span>Trace Lineage</span>
                                 </button>
-                                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#F2EBDD] text-[#5A6E5E] border border-[#D8CCB7]">
+                                <span className="px-2.5 py-1 rounded-lg text-xs font-mono bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7] font-medium">
                                   {char.archetype}
                                 </span>
                               </div>
@@ -945,22 +945,22 @@ export const UniverseCodexCanvas: React.FC = () => {
                           </div>
 
                           <div className="space-y-2 text-xs">
-                            <div className="p-2.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
                               <div className="flex items-center justify-between">
-                                <span className="text-[10px] uppercase font-bold text-[#5A6E5E]">
+                                <span className="text-xs uppercase font-bold text-[#5F6D63]">
                                   Motivation
                                 </span>
                                 {hoz && hoz.is_locked && hoz.protagonist_motivation && (char.motivation === hoz.protagonist_motivation || (char.origin_source && char.origin_source.includes('Human-Only Zone'))) && (
-                                  <span className="creator-locked-badge px-2 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-[9px] font-mono font-bold flex items-center gap-1 shadow-2xs">
-                                    <Lock className="w-2.5 h-2.5" /> CREATOR LOCKED
+                                  <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px]">
+                                    <Lock className="w-3 h-3" /> CREATOR LOCKED
                                   </span>
                                 )}
                               </div>
                               <p className="text-[#394840] leading-relaxed">{char.motivation}</p>
                             </div>
 
-                            <div className="p-2.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-[#5A6E5E]">
+                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
+                              <span className="text-xs uppercase font-bold text-[#5F6D63]">
                                 Core Conflict
                               </span>
                               <p className="text-[#394840] leading-relaxed">{char.core_conflict}</p>
@@ -970,14 +970,14 @@ export const UniverseCodexCanvas: React.FC = () => {
 
                         {/* Visual Prompt Section */}
                         <div className="pt-2 border-t border-[#D8CCB7] space-y-2">
-                          <div className="flex items-center justify-between text-[11px]">
-                            <span className="text-[#5A6E5E] font-mono flex items-center gap-1">
-                              <Sparkles className="w-3 h-3 text-[#C59A55]" />
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-[#5A6E5E] font-mono flex items-center gap-1 font-semibold">
+                              <Sparkles className="w-3.5 h-3.5 text-[#C59A55]" />
                               Concept Prompt
                             </span>
                             <button
                               onClick={() => handleCopyPrompt(copyKey, char.visual_prompt, char.name)}
-                              className="copy-prompt-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-[11px] text-[#355A46] border border-[#D8CCB7] transition"
+                              className="copy-prompt-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-semibold text-[#355A46] border border-[#D8CCB7] transition"
                             >
                               {copiedId === copyKey ? (
                                 <>
@@ -1039,16 +1039,16 @@ export const UniverseCodexCanvas: React.FC = () => {
                             {rel.target_character_name || 'Character B'}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div className="inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC]">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC]">
                             {rel.relation_type}
                           </div>
                           <button
                             onClick={() => jumpToTraceNode(`node-rel-${rel.id}`)}
-                            className="trace-lineage-btn flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition"
+                            className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
                             title="Trace causal lineage in DAG"
                           >
-                            <GitFork className="w-3 h-3" />
+                            <GitFork className="w-3.5 h-3.5" />
                             <span>Trace Lineage</span>
                           </button>
                         </div>
@@ -1108,12 +1108,12 @@ export const UniverseCodexCanvas: React.FC = () => {
                             }
                             size="xs"
                           />
-                          <span className="scene-version-badge px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE]">
+                          <span className="scene-version-badge px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE]">
                             v{scene.version || 1}
                           </span>
                           <button
                             onClick={() => setRefiningEntity({ type: 'scene', data: scene })}
-                            className="refine-scene-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#EFE8EE] hover:bg-[#DFD1DE] text-[#6A4B67] border border-[#DFD1DE] transition font-medium"
+                            className="refine-scene-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg text-xs font-mono bg-[#EFE8EE] hover:bg-[#DFD1DE] text-[#6A4B67] border border-[#DFD1DE] transition font-semibold"
                             title="Refine scene beats and outcomes (PERS-01)"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1121,7 +1121,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                           </button>
                           <button
                             onClick={() => jumpToTraceNode(`node-scene-${scene.id}`)}
-                            className="trace-lineage-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-medium"
+                            className="trace-lineage-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold"
                             title="Trace causal lineage in DAG"
                           >
                             <GitFork className="w-3.5 h-3.5" />
@@ -1136,22 +1136,22 @@ export const UniverseCodexCanvas: React.FC = () => {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                         <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
-                          <span className="text-[10px] uppercase font-bold text-[#6A4B67]">
+                          <span className="text-xs uppercase font-bold text-[#6A4B67]">
                             Dramatic Question
                           </span>
-                          <p className="text-[#294B3A] font-medium leading-relaxed">
+                          <p className="text-[#294B3A] font-semibold leading-relaxed">
                             {scene.dramatic_question}
                           </p>
                         </div>
 
                         <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] uppercase font-bold text-[#A0522D]">
+                            <span className="text-xs uppercase font-bold text-[#A0522D]">
                               Conflict Narrative
                             </span>
                             {hoz && hoz.is_locked && hoz.central_conflict && (scene.conflict_narrative === hoz.central_conflict || (scene.origin_source && scene.origin_source.includes('Human-Only Zone'))) && (
-                              <span className="creator-locked-badge px-2 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-[9px] font-mono font-bold flex items-center gap-1 shadow-2xs">
-                                <Lock className="w-2.5 h-2.5" /> CREATOR LOCKED
+                              <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px]">
+                                <Lock className="w-3 h-3" /> CREATOR LOCKED
                               </span>
                             )}
                           </div>
@@ -1161,7 +1161,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                         </div>
 
                         <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1">
-                          <span className="text-[10px] uppercase font-bold text-[#355A46]">
+                          <span className="text-xs uppercase font-bold text-[#355A46]">
                             Pivotal Outcome
                           </span>
                           <p className="text-[#394840] leading-relaxed">{scene.pivotal_outcome}</p>
