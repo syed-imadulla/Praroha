@@ -843,7 +843,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
           const selRes = await apiClient.getActiveSelection(targetProjectId);
           if (selRes.success && selRes.data) {
-            set({ activeSelection: selRes.data, selectedWorldId: selRes.data.world_candidate_id });
+            set({
+              activeSelection: selRes.data,
+              selectedWorldId: selRes.data.world_candidate_id,
+              humanOnlyZones: selRes.data.human_only_zones || null,
+            });
           }
 
           const unfoldRes = await apiClient.getUnfoldedUniverse(targetProjectId);

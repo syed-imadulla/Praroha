@@ -99,6 +99,17 @@ async def test_canonical_demo_api_endpoint(client: httpx.AsyncClient):
     assert len(unfolded_data["characters"]) == 3
     assert len(unfolded_data["scenes"]) == 3
 
+    # Verify HOZ-01 & HOZ-02: Canonical demo carries exact locked Human-Only Zones
+    sel_res = await client.get(f"/api/projects/{project_id}/selection")
+    assert sel_res.status_code == 200
+    sel_data = sel_res.json()["data"]
+    hoz = sel_data.get("human_only_zones")
+    assert hoz is not None
+    assert hoz["core_theme"] == "Coexistence between synthetic human biology and ancient abyssal intelligence"
+    assert hoz["protagonist_motivation"] == "Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive"
+    assert hoz["central_conflict"] == "Bio-symbiont collective survival vs. extractive corporate exploitation"
+    assert hoz["is_locked"] is True
+
 
 @pytest.mark.asyncio
 async def test_gemini_provider_graceful_fallback():

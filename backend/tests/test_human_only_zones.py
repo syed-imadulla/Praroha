@@ -338,7 +338,7 @@ async def test_canonical_demo_includes_human_only_zones(client: httpx.AsyncClien
     demo_data = demo_res.json()["data"]
     project_id = demo_data["id"]
 
-    # Active selection has canonical HOZ
+    # 1. Active selection has exact canonical HOZ strings
     sel_res = await client.get(f"/api/projects/{project_id}/selection")
     assert sel_res.status_code == 200
     sel = sel_res.json()["data"]
@@ -349,21 +349,56 @@ async def test_canonical_demo_includes_human_only_zones(client: httpx.AsyncClien
     assert hoz["central_conflict"] == "Bio-symbiont collective survival vs. extractive corporate exploitation"
     assert hoz["is_locked"] is True
 
-    # Codex has locked character motivation and climax conflict
+    # 2. Decision DNA carries exact canonical HOZ strings
+    assert sel.get("decision_dna") is not None
+    dna_hoz = sel["decision_dna"].get("human_only_zones")
+    assert dna_hoz is not None
+    assert dna_hoz["core_theme"] == "Coexistence between synthetic human biology and ancient abyssal intelligence"
+    assert dna_hoz["protagonist_motivation"] == "Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive"
+    assert dna_hoz["central_conflict"] == "Bio-symbiont collective survival vs. extractive corporate exploitation"
+
+    # 3. Codex has locked core theme, character motivation, and climax conflict
     codex_res = await client.get(f"/api/projects/{project_id}/unfolded")
     assert codex_res.status_code == 200
     codex = codex_res.json()["data"]
 
+    # Check World Bible canon fact #0
+    assert len(codex["world_bible"]["canon_facts"]) > 0
+    assert codex["world_bible"]["canon_facts"][0] == "Coexistence between synthetic human biology and ancient abyssal intelligence"
+
     # Check Dr. Althea Thorne
     althea = next((c for c in codex["characters"] if "althea" in c["name"].lower()), None)
     assert althea is not None
-    assert althea["motivation"] == hoz["protagonist_motivation"]
+    assert althea["motivation"] == "Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive"
     assert althea["origin_type"] == "HUMAN_DECISION"
     assert althea["origin_source"] == "Human-Only Zone: Protagonist Motivation"
 
     # Check Scene 3
     scene_3 = next((s for s in codex["scenes"] if s["scene_number"] == 3), None)
     assert scene_3 is not None
-    assert scene_3["conflict_narrative"] == hoz["central_conflict"]
+    assert scene_3["conflict_narrative"] == "Bio-symbiont collective survival vs. extractive corporate exploitation"
     assert scene_3["origin_type"] == "HUMAN_DECISION"
     assert scene_3["origin_source"] == "Human-Only Zone: Central Conflict"
+
+    # 4. Lineage DAG attribution for canonical demo
+    lineage_res = await client.get(f"/api/projects/{project_id}/lineage")
+    assert lineage_res.status_code == 200
+    lineage = lineage_res.json()["data"]
+    
+    # Selection node in DAG carries exact HOZ in metadata
+    sel_node = next((n for n in lineage["nodes"] if n["id"] == "node-selection"), None)
+    assert sel_node is not None
+    assert sel_node["metadata"].get("human_only_zones") is not None
+    assert sel_node["metadata"]["human_only_zones"]["core_theme"] == "Coexistence between synthetic human biology and ancient abyssal intelligence"
+
+    # Character node has HUMAN_DECISION and deterministic causal explanation
+    char_node = next((n for n in lineage["nodes"] if n["entity_type"] == "character" and n["origin_source"] == "Human-Only Zone: Protagonist Motivation"), None)
+    assert char_node is not None
+    assert char_node["origin_type"] == "HUMAN_DECISION"
+    assert "Locked by the human creator as an inviolable Human-Only Zone before universe expansion." in char_node["causal_explanation"]
+
+    # Scene node has HUMAN_DECISION and deterministic causal explanation
+    scene_node = next((n for n in lineage["nodes"] if n["entity_type"] == "scene" and n["origin_source"] == "Human-Only Zone: Central Conflict"), None)
+    assert scene_node is not None
+    assert scene_node["origin_type"] == "HUMAN_DECISION"
+    assert "Locked by the human creator as an inviolable Human-Only Zone before universe expansion." in scene_node["causal_explanation"]

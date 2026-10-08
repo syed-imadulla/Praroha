@@ -1,7 +1,7 @@
 # Graph Report - Praroha  (2026-10-08)
 
 ## Corpus Check
-- 275 files · ~304,355 words
+- 275 files · ~305,147 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 4 file(s) not represented in the graph (top: .example 1, (none) 1, .css 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `762991ec`
+- Built from commit: `61754168`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -843,7 +843,7 @@ Nodes (14): SeedDNARecord, Project, WorldBibleRecord, Key Changes, Plan 02-01 Su
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `ProjectRepository` connect `ProjectRepository` to `What Was Built`, `Asset`, `Implementation Decisions`, `MockProvider`, `Milestone 2 Phase Details`, `WorldSelectionRecord`, `test_audio_generation.py`, `LineageService`, `test_selection.py`, `ProjectRead`, `test_human_only_zones.py`, `test_mutation_lab.py`, `WorldCandidateRecord`, `Phase 1: Foundation / Project Shell - Discussion Log`, `WorldBibleRecord`, `test_voice_generation.py`, `counterfactual_service.py`, `models/__init__.py`, `SceneRecord`, `.generate_worlds`, `Phase 16 Research: Video Generation (Pyramid Flow & Wan2.1)`, `PersistenceService`, `test_potential.py`, `CharacterRelationshipRecord`, `test_counterfactual_replay.py`, `test_video_generation.py`, `routers/potential.py`, `Phase 9 Context: Seed Potential Map`, `6. Automated Pytest Verification (`backend/tests/test_decision_dna.py`)`, `MockVideoProvider`, `EntityRevisionRecord`, `MediaService`, `project_repo.py`, `api_success`, `StorageProvider`, `test_media_provider.py`, `test_gemini_provider_graceful_fallback`?**
-  _High betweenness centrality (0.177) - this node is a cross-community bridge._
+  _High betweenness centrality (0.176) - this node is a cross-community bridge._
 - **Why does `playwright` connect `playwright` to `frontend/package.json`, `test_phase16_video_generation.cjs`, `test_phase17_audio_atmosphere.cjs`, `ref_assert`, `test_phase11_decision_dna.cjs`, `test_phase15_voice_generation.cjs`, `run_uat.cjs`, `test_phase10_divergence.cjs`, `test_phase12_origin_ledger.cjs`, `test_phase13_media_provider.cjs`, `test_phase3_worlds.cjs`, `test_phase4_selection.cjs`, `test_phase5_unfold.cjs`, `test_phase6_traceability.cjs`, `test_phase7_refine.cjs`, `test_phase9_potential.cjs`, `test_phase14_image_generation.cjs`, `test_phase20_human_only_zones.cjs`?**
   _High betweenness centrality (0.092) - this node is a cross-community bridge._
 - **Why does `StorageProvider` connect `StorageProvider` to `Asset`, `Implementation Decisions`, `EdgeTTSProvider`, `test_audio_generation.py`, `Phase 7 User Acceptance Testing (UAT) Report`, `ADR-003: Cloud Object Storage and Asset Management`, `1. Locked Decisions & Implementation Scope`, `AIProvider`, `Phase 16 Research: Video Generation (Pyramid Flow & Wan2.1)`, `PersistenceService`, `1. Questions & Locked Decisions`, `ProjectRepository`, `MockImageProvider`, `Praroha Data & Storage Architecture`, `MockVideoProvider`, `Milestone 2: Semantic Intelligence + Generative Media Requirements (Active)`, `EntityRevisionRecord`, `MediaService`, `api_success`, `1. Locked Decisions & Implementation Scope`?**

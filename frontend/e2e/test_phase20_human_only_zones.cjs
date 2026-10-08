@@ -93,7 +93,23 @@ async function runPhase20E2E() {
     await page.waitForTimeout(400);
 
     const suggestedTheme = await themeInput.inputValue();
-    assert(suggestedTheme.length > 5, 'Theme input should be populated by suggestion');
+    assert.strictEqual(
+      suggestedTheme,
+      'Coexistence between synthetic human biology and ancient abyssal intelligence',
+      'Suggested theme must match canonical Bio-City core theme exactly'
+    );
+    const suggestedMotiv = await motivInput.inputValue();
+    assert.strictEqual(
+      suggestedMotiv,
+      "Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive",
+      'Suggested motivation must match canonical Bio-City protagonist motivation exactly'
+    );
+    const suggestedConflict = await conflictInput.inputValue();
+    assert.strictEqual(
+      suggestedConflict,
+      'Bio-symbiont collective survival vs. extractive corporate exploitation',
+      'Suggested conflict must match canonical Bio-City central conflict exactly'
+    );
     assert(await lockToggleBtn.innerText().then(t => t.includes('Lock Parameters')), 'Must remain unlocked draft after suggestion');
     assert(!(await themeInput.isEditable().then(e => !e)), 'Theme input must remain editable while unlocked');
 
@@ -241,6 +257,54 @@ async function runPhase20E2E() {
     await closeBtn.click();
     console.log('✅ Scenario 7 Passed: Why Is This Here modal provides explicit Human-Only Zone attribution');
     results.push('Scenario 7: Why Is This Here Modal HOZ Attribution - PASSED');
+
+    // -------------------------------------------------------------
+    // Scenario 8: Canonical Demo Human-Only Zones Verification (DEMO-01 + HOZ-01/02)
+    // -------------------------------------------------------------
+    console.log('\n--- Scenario 8: Canonical Demo Human-Only Zones Verification ---');
+    const demoBtn = page.locator('#instant-demo-topbar-btn').first();
+    await demoBtn.waitFor({ timeout: 5000 });
+
+    // Wait for the canonical demo API response and branch switch
+    await Promise.all([
+      page.waitForResponse((res) => res.url().includes('/api/projects/canonical-demo') && res.status() === 201),
+      demoBtn.click(),
+    ]);
+
+    // Wait for canonical project title to appear in TopBar
+    await page.locator('text=The Sunken City: Bio-City').first().waitFor({ timeout: 15000 });
+    await page.waitForTimeout(1000);
+
+    // Wait for Stage 5 Codex to populate from canonical demo
+    const demoSummaryBanner = page.locator('#human-only-zones-summary-banner');
+    await demoSummaryBanner.waitFor({ timeout: 15000 });
+    assert(await demoSummaryBanner.isVisible(), 'Canonical demo must display Human-Only Zones summary banner');
+
+    const demoBannerText = await demoSummaryBanner.innerText();
+    assert(
+      demoBannerText.includes('Coexistence between synthetic human biology and ancient abyssal intelligence'),
+      'Canonical banner must display exact canonical Core Theme'
+    );
+    assert(
+      demoBannerText.includes("Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive"),
+      'Canonical banner must display exact canonical Protagonist Motivation'
+    );
+    assert(
+      demoBannerText.includes('Bio-symbiont collective survival vs. extractive corporate exploitation'),
+      'Canonical banner must display exact canonical Central Conflict'
+    );
+    assert(demoBannerText.includes('CREATOR LOCKED'), 'Canonical banner must display CREATOR LOCKED pill badge');
+
+    // Verify Dr. Althea Thorne in Characters Tab carries canonical motivation
+    const demoCharsTab = page.locator('#codex-tab-characters');
+    await demoCharsTab.click();
+    await page.waitForTimeout(500);
+    const altheaMotivation = page.locator("text=Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive").first();
+    await altheaMotivation.waitFor({ timeout: 5000 });
+    assert(await altheaMotivation.isVisible(), 'Dr. Althea Thorne motivation must match canonical HOZ string');
+
+    console.log('✅ Scenario 8 Passed: Canonical Demo carries exact Human-Only Zones across all layers');
+    results.push('Scenario 8: Canonical Demo Exact HOZ Verification - PASSED');
 
     // -------------------------------------------------------------
     // Regression Verification: Mutation Lab & Counterfactual Replay

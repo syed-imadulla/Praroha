@@ -27,15 +27,19 @@ Phase 20 delivers **Human-Only Zones (HOZ)**, granting human creators inviolable
    - `#human-only-zones-summary-banner` rendered in Stage 5 showing active creator locks before and after unfolding.
    - `CREATOR LOCKED` pill badges displayed on Character cards (Protagonist Motivation), Scene cards (Central Conflict), and World Bible lore (Core Theme).
 5. **Instant Demo Universe Seeding**:
-   - Canonical ocean seed project seeded with all 3 canonical Human-Only Zones and proper `HUMAN_DECISION` citations.
+   - Canonical ocean seed project seeded with all 3 canonical Human-Only Zones:
+     - **Core Theme**: `"Coexistence between synthetic human biology and ancient abyssal intelligence"`
+     - **Protagonist Motivation**: `"Decipher the sentient coral reef's neural frequency before corporate salvage crews arrive"`
+     - **Central Conflict**: `"Bio-symbiont collective survival vs. extractive corporate exploitation"`
+   - Stamped with `HUMAN_DECISION` citations across World Bible, Characters, and Story Beats.
 
 ---
 
 ## 2. Test Execution Results
 
 ### 2.1 Backend Automated Suite (Pytest)
-- **Scope:** 154 total tests across all modules (including 8 dedicated tests in `backend/tests/test_human_only_zones.py`).
-- **Result:** `154 passed in 23.84s` (100% pass rate, 0 regressions across Phases 1–20).
+- **Scope:** 154 total tests across all modules (including 8 dedicated tests in `backend/tests/test_human_only_zones.py` and canonical demo endpoint assertions in `backend/tests/test_demo.py`).
+- **Result:** `154 passed in 18.51s` (100% pass rate, 0 regressions across Phases 1–20).
 - **Dedicated Phase 20 Tests:**
   - `test_human_only_zones_model_serialization`: Validates Pydantic schema validation, serialization, and round-trip fidelity.
   - `test_backward_compatibility_legacy_selections`: Verifies legacy projects without `human_only_zones_json` deserialize safely without crashes.
@@ -44,7 +48,7 @@ Phase 20 delivers **Human-Only Zones (HOZ)**, granting human creators inviolable
   - `test_schema_guard_enforces_all_three_zones_exact_immutability`: Injects deliberately drifted/hallucinated model response; asserts backend schema guard deterministically restores exact strings for all 3 zones with `HUMAN_DECISION` origin citations.
   - `test_full_pipeline_unfold_with_human_only_zones`: Verifies full end-to-end unfolding through API preserves creator locks in the returned codex.
   - `test_origin_ledger_and_causal_dag_attribution`: Verifies `origin_type = 'HUMAN_DECISION'` across entity records, Origin Ledger, Causal DAG nodes, and deterministic "Why is this here?" explainer.
-  - `test_canonical_demo_includes_human_only_zones`: Verifies instant demo universe seeds all 3 canonical zones with `HUMAN_DECISION` lineage.
+  - `test_canonical_demo_includes_human_only_zones`: Verifies instant demo universe seeds all 3 canonical zones with exact string equality across `selection.human_only_zones`, `decision_dna.human_only_zones`, `world_bible.canon_facts[0]`, Dr. Althea Thorne motivation, Scene 3 climax conflict, and Lineage DAG attribution.
 
 ### 2.2 Frontend Build & TypeScript Validation
 - **Command:** `npm --prefix frontend run build`
@@ -52,13 +56,13 @@ Phase 20 delivers **Human-Only Zones (HOZ)**, granting human creators inviolable
 
 ### 2.3 End-to-End Browser Automation (Playwright)
 - **Script:** `frontend/e2e/test_phase20_human_only_zones.cjs`
-- **Result:** All 7 user scenarios executed and passed with exit code 0.
+- **Result:** All 8 user scenarios executed and passed with exit code 0.
 - **Scenarios Verified:**
   1. **Stage 4 Human-Only Zones Panel Render (HOZ-01):**
      - Navigated fresh project from Stage 1 to Stage 4.
      - Verified `#human-only-zones-panel` renders with 3 inputs (`#hoz-input-theme`, `#hoz-input-motivation`, `#hoz-input-conflict`), lock toggle (`#hoz-lock-toggle-btn`), and suggest button (`#hoz-suggest-btn`).
   2. **Suggestion Draft & Lock Semantics (HOZ-01):**
-     - Clicked "Suggest from Selected World", confirmed fields populated as unlocked draft text.
+     - Clicked "Suggest from Selected World", confirmed fields populated with exact canonical Bio-City strings as unlocked draft text.
      - Entered custom values for all 3 zones.
      - Clicked "Lock Parameters", verified inputs froze into readonly state with glowing amber lock badges.
      - Captured visual artifact: `phase20_human_only_zones_panel.png`.
@@ -76,9 +80,13 @@ Phase 20 delivers **Human-Only Zones (HOZ)**, granting human creators inviolable
      - Verified dual-layer defense guarantees exact creator lock strings in UI without any model hallucination.
   7. **"Why is this here?" Modal HOZ Attributions (HOZ-02):**
      - Clicked origin badge on locked scene; verified `#why-modal-hoz-callout` appears with explicit lock attribution: *"Locked by human creator before universe expansion. AI models are strictly prohibited from overriding this constraint."*
-  8. **Regression Verification:**
-     - Verified Phase 19 Counterfactual Replay remains fully operational.
-     - Verified Phase 18 Seed Mutation Lab remains fully operational.
+  8. **Canonical Demo Exact HOZ Verification (DEMO-01 + HOZ-01/02):**
+     - Triggered Canonical Instant Demo via `#instant-demo-topbar-btn`.
+     - Verified `#human-only-zones-summary-banner` renders the 3 canonical strings in Stage 5.
+     - Verified Dr. Althea Thorne's motivation in Characters Tab matches canonical string verbatim.
+  9. **Regression Verification:**
+     - Verified Phase 19 Counterfactual Replay remains fully operational (5/5 scenarios pass).
+     - Verified Phase 18 Seed Mutation Lab remains fully operational (5/5 scenarios pass).
 
 ---
 
@@ -95,5 +103,5 @@ Phase 20 delivers **Human-Only Zones (HOZ)**, granting human creators inviolable
 
 - **HOZ-01 (Creator-Locked Controls & Dual-Layer AI Invariance):** Verified ✅
 - **HOZ-02 (Causal Provenance, Lineage DAG & Codex Visual Indicators):** Verified ✅
-- **Zero Regressions:** 154/154 backend tests pass, full frontend production bundle builds cleanly, Playwright E2E 7/7 scenarios pass ✅
+- **Zero Regressions:** 154/154 backend tests pass, full frontend production bundle builds cleanly, Playwright E2E 8/8 scenarios pass, Phase 18 and Phase 19 regression suites pass ✅
 - **Milestone 2 Completion:** Phase 20 is complete, achieving 100% delivery of Milestone 2 (Phases 11–20, 40/40 plans)!

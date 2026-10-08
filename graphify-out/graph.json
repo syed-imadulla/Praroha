@@ -4052,7 +4052,7 @@
       "file_type": "code",
       "norm_label": "test_gemini_provider_graceful_fallback()",
       "source_file": "backend/tests/test_demo.py",
-      "source_location": "L104"
+      "source_location": "L115"
     },
     {
       "id": "backend_app_repositories_project_repo_migrate_columns",
@@ -14018,7 +14018,7 @@
       "source_location": "L10"
     },
     {
-      "id": "backend_tests_test_demo_rationale_105",
+      "id": "backend_tests_test_demo_rationale_116",
       "label": "Verify DEMO-02: Gemini provider gracefully falls back to mock fixtures upon\u2026",
       "_origin": "ast",
       "community": 125,
@@ -14026,7 +14026,7 @@
       "file_type": "rationale",
       "norm_label": "verify demo-02: gemini provider gracefully falls back to mock fixtures upon...",
       "source_file": "backend/tests/test_demo.py",
-      "source_location": "L105"
+      "source_location": "L116"
     },
     {
       "id": "backend_tests_test_demo_rationale_77",
@@ -14349,7 +14349,7 @@
       "node_kind": "heading",
       "norm_label": "2.2 frontend build & typescript validation",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L49"
+      "source_location": "L53"
     },
     {
       "id": "planning_phases_20_human_only_zones_20_uat_2_3_end_to_end_browser_automation_playwright",
@@ -14361,7 +14361,7 @@
       "node_kind": "heading",
       "norm_label": "2.3 end-to-end browser automation (playwright)",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L53"
+      "source_location": "L57"
     },
     {
       "id": "planning_phases_20_human_only_zones_20_uat_2_test_execution_results",
@@ -14373,7 +14373,7 @@
       "node_kind": "heading",
       "norm_label": "2. test execution results",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L34"
+      "source_location": "L38"
     },
     {
       "id": "planning_phases_20_human_only_zones_20_uat_3_visual_artifacts_captured",
@@ -14385,7 +14385,7 @@
       "node_kind": "heading",
       "norm_label": "3. visual artifacts captured",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L85"
+      "source_location": "L93"
     },
     {
       "id": "planning_phases_20_human_only_zones_20_uat_4_verification_sign_off",
@@ -14397,7 +14397,7 @@
       "node_kind": "heading",
       "norm_label": "4. verification sign-off",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L94"
+      "source_location": "L102"
     },
     {
       "id": "planning_phases_20_human_only_zones_20_uat_phase_20_human_only_zones_user_acceptance_testing_uat_report",
@@ -17925,7 +17925,7 @@
       "node_kind": "heading",
       "norm_label": "2.1 backend automated suite (pytest)",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L36"
+      "source_location": "L40"
     },
     {
       "id": "backend_app_routers_unfold_rationale_21",
@@ -38216,7 +38216,7 @@
       "confidence_score": 1.0,
       "context": "decorator",
       "source_file": "backend/tests/test_demo.py",
-      "source_location": "L103",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -65928,7 +65928,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/tests/test_demo.py",
-      "source_location": "L104",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -81515,7 +81515,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L36",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -81526,7 +81526,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L49",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -81537,7 +81537,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L53",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "planning_phases_20_human_only_zones_20_uat_phase_20_human_only_zones_user_acceptance_testing_uat_report",
+      "target": "planning_phases_20_human_only_zones_20_uat_4_verification_sign_off",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
+      "source_location": "L102",
       "weight": 1.0
     },
     {
@@ -81559,7 +81570,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L34",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
@@ -81570,18 +81581,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L85",
-      "weight": 1.0
-    },
-    {
-      "source": "planning_phases_20_human_only_zones_20_uat_phase_20_human_only_zones_user_acceptance_testing_uat_report",
-      "target": "planning_phases_20_human_only_zones_20_uat_4_verification_sign_off",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L94",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -88612,14 +88612,14 @@
       "weight": 1.0
     },
     {
-      "source": "backend_tests_test_demo_rationale_105",
+      "source": "backend_tests_test_demo_rationale_116",
       "target": "backend_tests_test_demo_test_gemini_provider_graceful_fallback",
       "relation": "rationale_for",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/tests/test_demo.py",
-      "source_location": "L105",
+      "source_location": "L116",
       "weight": 1.0
     },
     {
@@ -101594,7 +101594,7 @@
       "confidence_score": 0.95,
       "context": "test_backward_compatibility_legacy_selections",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L41",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -101690,7 +101690,7 @@
       "confidence_score": 0.95,
       "context": "test_canonical_demo_includes_human_only_zones",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L47",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -102074,7 +102074,7 @@
       "confidence_score": 0.95,
       "context": "test_full_pipeline_unfold_with_human_only_zones",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L45",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -102218,7 +102218,7 @@
       "confidence_score": 0.95,
       "context": "test_human_only_zones_model_serialization",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L40",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
@@ -102422,7 +102422,7 @@
       "confidence_score": 0.95,
       "context": "test_origin_ledger_and_causal_dag_attribution",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L46",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -102518,7 +102518,7 @@
       "confidence_score": 0.95,
       "context": "test_prompt_contract_exact_invariance",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L43",
+      "source_location": "L47",
       "weight": 1.0
     },
     {
@@ -102698,7 +102698,7 @@
       "confidence_score": 0.95,
       "context": "test_save_world_selection_with_human_only_zones",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L42",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -102722,7 +102722,7 @@
       "confidence_score": 0.95,
       "context": "test_schema_guard_enforces_all_three_zones_exact_immutability",
       "source_file": ".planning/phases/20-human-only-zones/20-UAT.md",
-      "source_location": "L44",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -105513,7 +105513,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.95,
       "source_file": "backend/tests/test_demo.py",
-      "source_location": "L107",
+      "source_location": "L118",
       "weight": 0.8
     },
     {
@@ -107278,5 +107278,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "762991ecfbf62f8464562408edcf08535c196c9d"
+  "built_at_commit": "617541681503ab470807c66ba0824d2ad7560be1"
 }
