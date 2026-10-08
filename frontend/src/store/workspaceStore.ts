@@ -38,6 +38,8 @@ import {
 } from '../types';
 
 interface WorkspaceState {
+  activeNav: 'home' | 'creations' | 'graveyard' | 'profile';
+  setActiveNav: (nav: 'home' | 'creations' | 'graveyard' | 'profile') => void;
   activeStage: StageType;
   unlockedStages: StageType[];
   seedText: string;
@@ -189,6 +191,8 @@ const DEFAULT_STAGES: StageType[] = ['seed'];
 export const useWorkspaceStore = create<WorkspaceState>()(
   persist(
     (set, get) => ({
+      activeNav: 'home',
+      setActiveNav: (nav) => set({ activeNav: nav }),
       activeStage: 'seed',
       unlockedStages: DEFAULT_STAGES,
       seedText: '',
