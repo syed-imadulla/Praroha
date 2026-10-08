@@ -1,13 +1,8 @@
-import React from 'react';
-import { Image, Play, Music, MoreHorizontal, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { CreationCard, CreationItem } from '../creation';
 
-export interface RecentCreationItem {
-  id: string;
-  title: string;
-  type: 'Image' | 'Story' | 'Sound' | 'Video' | 'Chat';
-  timestamp: string;
-  imageUrl: string;
-}
+export type RecentCreationItem = CreationItem;
 
 interface RecentCreationsRowProps {
   creations?: RecentCreationItem[];
@@ -23,6 +18,7 @@ export const CANONICAL_RECENT_CREATIONS: RecentCreationItem[] = [
     type: 'Image',
     timestamp: '2 min ago',
     imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80',
+    isFavorite: false,
   },
   {
     id: 'rc-2',
@@ -30,6 +26,7 @@ export const CANONICAL_RECENT_CREATIONS: RecentCreationItem[] = [
     type: 'Video',
     timestamp: '12 min ago',
     imageUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&auto=format&fit=crop&q=80',
+    isFavorite: false,
   },
   {
     id: 'rc-3',
@@ -37,16 +34,29 @@ export const CANONICAL_RECENT_CREATIONS: RecentCreationItem[] = [
     type: 'Sound',
     timestamp: '1 hr ago',
     imageUrl: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600&auto=format&fit=crop&q=80',
+    isFavorite: true,
   },
 ];
 
 export const RecentCreationsRow: React.FC<RecentCreationsRowProps> = ({
-  creations = CANONICAL_RECENT_CREATIONS,
+  creations: initialCreations = CANONICAL_RECENT_CREATIONS,
   onViewAll,
   onSelectCreation,
   onPlantSeed,
 }) => {
-  const hasCreations = creations && creations.length > 0;
+  const [items, setItems] = useState<RecentCreationItem[]>(initialCreations);
+
+  useEffect(() => {
+    setItems(initialCreations);
+  }, [initialCreations]);
+
+  const handleToggleFavorite = (target: RecentCreationItem) => {
+    setItems((prev) =>
+      prev.map((c) => (c.id === target.id ? { ...c, isFavorite: !c.isFavorite } : c))
+    );
+  };
+
+  const hasCreations = items && items.length > 0;
 
   return (
     <section className="w-full select-none mt-6" aria-label="Recent Creations">
@@ -99,62 +109,22 @@ export const RecentCreationsRow: React.FC<RecentCreationsRowProps> = ({
           </button>
         </div>
       ) : (
-        /* 3-card horizontal grid */
+        /* 3-card horizontal grid using canonical CreationCard */
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4 max-w-3xl">
-          {creations.slice(0, 3).map((item) => (
-            <div
+          {items.slice(0, 3).map((item) => (
+            <CreationCard
               key={item.id}
-              onClick={() => onSelectCreation?.(item)}
-              className="card-botanical overflow-hidden p-2.5 flex flex-col gap-2.5 cursor-pointer group hover:-translate-y-1 transition-all duration-180"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') onSelectCreation?.(item);
+              creation={item}
+              onOpen={onSelectCreation}
+              onToggleFavorite={handleToggleFavorite}
+              onAction={(actionKey, creation) => {
+                if (actionKey === 'open') {
+                  onSelectCreation?.(creation);
+                } else if (actionKey === 'favorite') {
+                  handleToggleFavorite(creation);
+                }
               }}
-              aria-label={`View creation: ${item.title}`}
-            >
-              {/* 16:9 Thumbnail Container */}
-              <div className="relative aspect-16/9 w-full rounded-[14px] overflow-hidden bg-[#E8E0D0]">
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-
-                {/* Content-Type Badge Overlay */}
-                <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-[#F8F4E8]/90 backdrop-blur-xs flex items-center justify-center text-[#294B3A] shadow-xs">
-                  {item.type === 'Image' && <Image className="w-3.5 h-3.5 stroke-[2]" />}
-                  {item.type === 'Video' && <Play className="w-3.5 h-3.5 stroke-[2] fill-none" />}
-                  {item.type === 'Sound' && <Music className="w-3.5 h-3.5 stroke-[2]" />}
-                  {item.type !== 'Image' && item.type !== 'Video' && item.type !== 'Sound' && (
-                    <Image className="w-3.5 h-3.5 stroke-[2]" />
-                  )}
-                </div>
-              </div>
-
-              {/* Title & Metadata */}
-              <div className="px-1 pb-1 flex items-center justify-between">
-                <div>
-                  <h4 className="text-[14.5px] font-medium text-[#294B3A] leading-tight truncate">
-                    {item.title}
-                  </h4>
-                  <p className="text-[11.5px] text-[#718875] mt-0.5">
-                    {item.type} <span className="opacity-60">·</span> {item.timestamp}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  className="p-1 text-[#718875] hover:text-[#294B3A] rounded transition-colors focus:outline-none"
-                  aria-label="Options"
-                >
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            />
           ))}
         </div>
       )}

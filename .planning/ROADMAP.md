@@ -340,3 +340,39 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. Creator-locked input fields for core theme, protagonist motivation, and central conflict in Stage 4.
   2. Locked parameters are marked `HUMAN_DECISION` in Decision DNA, Origin Ledger, and Causal Lineage DAG.
   3. AI models are strictly prohibited from overriding or diluting locked zones via dual-layer defense (prompt contract + backend schema guard).
+
+---
+
+# Milestone 3: Complete UI Upgrade
+
+## Milestone 3 Phases Overview
+
+- [x] **Phase 21: Design System Foundation** — Global design tokens, Cormorant Garamond & Inter typography, warm cream parchment, subtle paper texture, button/card/input utility tokens (`design.md`).
+- [x] **Phase 22: Global App Shell** — Warm cream sidebar (265-280px), botanical leaf branding, navigation (Home, My Creations, Graveyard, Profile), corner botanical accents.
+- [x] **Phase 23: Home Screen** — Poetic hero statement, leaf separator, 72px pill seed input, 5 creation modes, recent creations row.
+- [x] **Phase 24: Creation Component System** — Unified reusable `CreationCard` component supporting Image, Story, Sound, Video, Chat.
+- [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, empty states.
+- [ ] **Phase 26: Graveyard Screen** — Reflective & poetic idea cemetery, restore, permanent deletion with confirmation modal.
+- [ ] **Phase 27: Profile Screen** — Botanical identity card, stats, creation tabs, account settings panel, soft danger logout.
+- [ ] **Phase 28: Seed → Universe Workspace** — Botanical redesign of the 7 workspace stages preserving all functional logic.
+- [ ] **Phase 29: Secondary UI** — Botanical modals, drawer, lightboxes, dropdowns, shortcuts.
+- [ ] **Phase 30: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
+- [ ] **Phase 31: Responsive & Accessibility** — Multi-device responsive layout, 44px touch targets, focus rings.
+- [ ] **Phase 32: Final Visual Audit & Verification** — Complete review against `design.md` checklist and test verification.
+
+---
+
+### Phase 24: Creation Component System
+**Goal**: Create ONE canonical, strongly-typed, accessible `CreationCard` component for the entire PRAROHA application.  
+**Depends on**: Phase 21, Phase 22, Phase 23  
+**Plans**: 1 plan (completed)
+- [x] **24-PLAN.md**: Strongly-typed `CreationCard` (`types.ts`, `CreationCard.tsx`), 16:9 thumbnail, 5 content types (Image, Story, Sound, Video, Chat), type badges, calm fallbacks, context menu, favorite toggle, Graveyard variant, Home `RecentCreationsRow` refactoring, and Playwright E2E suite (`test_phase24_creation_component.cjs`).  
+**Success Criteria**:
+  1. Single reusable `CreationCard` supports Image, Story, Sound, Video, Chat.
+  2. Type-specific color/icon language adheres strictly to `design.md`.
+  3. Actions and context menu are configurable by parent.
+  4. 44x44px accessible favorite toggle and keyboard support verified.
+  5. Missing/failed media degrades gracefully into calm botanical placeholder.
+  6. `RecentCreationsRow` refactored to consume `CreationCard` with zero duplicated styles.
+  7. Automated Playwright test suite passes 100% across all 13 criteria.
+

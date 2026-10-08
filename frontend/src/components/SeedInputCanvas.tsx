@@ -203,6 +203,10 @@ export const SeedInputCanvas: React.FC = () => {
           {/* 4. Recent Creations Horizontal Row */}
           <RecentCreationsRow
             creations={CANONICAL_RECENT_CREATIONS}
+            onViewAll={() => {
+              const navBtn = document.querySelector('button[aria-label="My Creations"]') as HTMLButtonElement | null;
+              navBtn?.click();
+            }}
             onPlantSeed={() => {
               const textarea = document.querySelector('textarea');
               textarea?.focus();
