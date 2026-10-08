@@ -56,12 +56,15 @@ async function runTest() {
     const recentCardCount = await recentCards.count();
     console.log(`✅ Recent Creations row rendered with ${recentCardCount} cards (Mountain Sunset, Forest Vibes, Dreamscape)`);
 
-    // 6. Right Side "From a seed..." Journey Card
-    const journeyCard = page.locator('div:has-text("From a seed...")').first();
-    await journeyCard.waitFor({ state: 'visible' });
-    const motto = page.locator('p:has-text("Same seed, endless worlds...")');
-    await motto.waitFor({ state: 'visible' });
-    console.log('✅ Desktop "From a seed..." journey preview card and motto verified');
+    // 6. Verify Removal of Large Side Journey Card & Presence of Compact Continuity Indicator
+    const journeyCard = page.locator('div:has-text("From a seed...")');
+    const isJourneyCardPresent = await journeyCard.count();
+    if (isJourneyCardPresent > 0) {
+      throw new Error('Large right-side "From a seed..." journey card should NOT be present on Home');
+    }
+    const continuityIndicator = page.locator('div:has-text("Seed → Universe")').first();
+    await continuityIndicator.waitFor({ state: 'visible' });
+    console.log('✅ Large side journey card correctly removed; compact "Seed → Universe" continuity indicator verified');
 
     // 7. Preset Selection
     const oceanPreset = page.locator('button:has-text("Sunken Ocean City")');

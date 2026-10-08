@@ -39,8 +39,11 @@ export const StageProgressHeader: React.FC = () => {
   };
 
   return (
-    <nav className="border-b border-canvas-border bg-canvas-deep/80 px-4 py-2 overflow-x-auto select-none">
-      <div className="flex items-center min-w-max mx-auto justify-start md:justify-center gap-1">
+    <nav
+      className="border-b border-[#D8CCB7] bg-[#F8F4E8] px-3 sm:px-6 py-2 overflow-x-auto select-none shrink-0"
+      aria-label="Seed Unfold Stage Navigation"
+    >
+      <div className="flex items-center min-w-max mx-auto justify-start md:justify-center gap-1 sm:gap-1.5">
         {STAGES.map((stage, idx) => {
           const unlocked = isUnlocked(stage.id);
           const current = isCurrent(stage.id);
@@ -49,7 +52,7 @@ export const StageProgressHeader: React.FC = () => {
           return (
             <React.Fragment key={stage.id}>
               {idx > 0 && (
-                <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0 mx-0.5" />
+                <ChevronRight className="w-3.5 h-3.5 text-[#D8CCB7] shrink-0 mx-0.5" />
               )}
               <button
                 id={`stage-nav-${stage.id}`}
@@ -59,22 +62,24 @@ export const StageProgressHeader: React.FC = () => {
                   }
                 }}
                 disabled={!unlocked}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   current
-                    ? 'bg-cyan-950/80 text-cyan-200 border border-cyan-500/60 shadow-glow-cyan'
+                    ? 'bg-[#355A46] text-[#F8F4E8] border border-[#294B3A] shadow-xs'
                     : completed
-                    ? 'bg-canvas-card hover:bg-slate-800 text-slate-300 border border-canvas-border hover:border-slate-600'
-                    : 'bg-transparent text-slate-600 border border-transparent cursor-not-allowed opacity-50'
+                    ? 'bg-[#EAE4D4] hover:bg-[#DDE2D2] text-[#294B3A] border border-[#D8CCB7]'
+                    : 'bg-transparent text-[#718875]/50 border border-transparent cursor-not-allowed opacity-60'
                 }`}
+                aria-current={current ? 'step' : undefined}
+                aria-label={`Stage ${stage.number}: ${stage.label}`}
               >
                 {/* Stage status indicator icon */}
                 <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
                     current
-                      ? 'bg-cyan-500 text-black shadow-glow-cyan'
+                      ? 'bg-[#F8F4E8] text-[#294B3A]'
                       : completed
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                      : 'bg-slate-800 text-slate-500'
+                      ? 'bg-[#DDE2D2] text-[#294B3A]'
+                      : 'bg-[#E8E0D0] text-[#718875]'
                   }`}
                 >
                   {completed ? (
@@ -87,10 +92,14 @@ export const StageProgressHeader: React.FC = () => {
                 </div>
 
                 <div className="text-left">
-                  <div className="leading-tight font-semibold tracking-wide">
+                  <div className="leading-tight font-sans font-medium tracking-wide">
                     {stage.label}
                   </div>
-                  <div className="text-[10px] text-slate-400 hidden lg:block leading-none">
+                  <div
+                    className={`text-[9.5px] hidden xl:block leading-none ${
+                      current ? 'text-[#C8D0BE]' : 'text-[#718875]'
+                    }`}
+                  >
                     {stage.description}
                   </div>
                 </div>

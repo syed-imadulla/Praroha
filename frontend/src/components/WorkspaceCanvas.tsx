@@ -12,6 +12,8 @@ import { RefineCanvas } from './RefineCanvas';
 import { GuidedTourOverlay } from './GuidedTourOverlay';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 
+import { PageContainer } from './shell/PageContainer';
+
 export const WorkspaceCanvas: React.FC = () => {
   const {
     activeStage,
@@ -111,21 +113,28 @@ export const WorkspaceCanvas: React.FC = () => {
   return (
     <main
       ref={mainRef}
-      className={`flex-1 overflow-y-auto transition-all duration-300 p-6 md:p-10 flex flex-col items-center justify-start ${
+      className={`flex-1 overflow-y-auto transition-all duration-300 py-6 sm:py-8 flex flex-col items-center justify-start ${
         inspectorOpen ? 'mr-0 md:mr-80 lg:mr-96' : ''
       }`}
     >
-      <div className={`w-full ${activeStage === 'worlds' || activeStage === 'choose' || activeStage === 'unfold' || activeStage === 'trace' || activeStage === 'refine' ? 'max-w-7xl' : 'max-w-4xl'} space-y-8`}>
+      <PageContainer
+        maxWidth={
+          activeStage === 'worlds' || activeStage === 'choose' || activeStage === 'unfold' || activeStage === 'trace' || activeStage === 'refine'
+            ? 'wide'
+            : 'standard'
+        }
+        className="space-y-8"
+      >
         {/* Provider Fallback Toast Banner */}
         {providerFallbackWarning && (
-          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center justify-between gap-3 text-xs shadow-lg shadow-amber-500/5 animate-fade-in">
+          <div className="p-3.5 rounded-xl bg-[#FAF5EE] border border-[#E8DCC8] text-[#B8734F] flex items-center justify-between gap-3 text-xs shadow-2xs animate-fade-in">
             <div className="flex items-center gap-2.5">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-[#B8734F] shrink-0" />
               <span>{providerFallbackWarning}</span>
             </div>
             <button
               onClick={() => setProviderFallbackWarning(null)}
-              className="p-1 rounded text-amber-400/60 hover:text-amber-300 hover:bg-amber-500/20 transition-colors"
+              className="p-1 rounded text-[#B8734F]/70 hover:text-[#B8734F] hover:bg-[#F2EBDD] transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -148,20 +157,20 @@ export const WorkspaceCanvas: React.FC = () => {
 
         {activeStage !== 'seed' && activeStage !== 'understand' && activeStage !== 'worlds' && activeStage !== 'choose' && activeStage !== 'unfold' && activeStage !== 'trace' && activeStage !== 'refine' && (
           <div className="py-12 text-center space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] flex items-center justify-center mx-auto">
               <Compass className="w-6 h-6 animate-pulse" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-100 font-sans capitalize">
+            <h2 className="text-2xl font-bold text-[#294B3A] font-serif capitalize">
               Stage: {activeStage}
             </h2>
-            <p className="text-sm text-slate-400 max-w-md mx-auto">
+            <p className="text-sm text-[#466A55] max-w-md mx-auto">
               Universe unfolding will activate in Phase 5 (Stage-by-Stage Unfolding Pipeline).
             </p>
             <div className="pt-2">
               <button
                 type="button"
                 onClick={() => setActiveStage('choose')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] text-xs font-semibold border border-[#D8CCB7] transition shadow-2xs"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Return to World Selection</span>
@@ -171,47 +180,47 @@ export const WorkspaceCanvas: React.FC = () => {
         )}
 
         {/* Architecture & Engine Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-canvas-border/60">
-          <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-            <div className="flex items-center gap-2 text-cyan-400 text-xs font-semibold">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-[#D8CCB7]">
+          <div className="rounded-xl p-4 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
+            <div className="flex items-center gap-2 text-[#355A46] text-xs font-bold uppercase tracking-wider">
               <Layers className="w-4 h-4" />
               <span>AI Provider Engine</span>
             </div>
-            <p className="text-xs text-slate-300 font-mono">
-              Configured: <span className="text-cyan-300 font-bold">{health?.ai_provider.configured || 'gemini'}</span>
+            <p className="text-xs text-[#294B3A] font-mono">
+              Configured: <span className="font-bold">{health?.ai_provider.configured || 'gemini'}</span>
             </p>
-            <p className="text-[11px] text-slate-400">
-              Resolved: <span className="text-slate-200 font-mono">{health?.ai_provider.resolved || 'mock'}</span> with automatic fallback.
+            <p className="text-[11px] text-[#466A55]">
+              Resolved: <span className="font-mono text-[#294B3A]">{health?.ai_provider.resolved || 'mock'}</span> with automatic fallback.
             </p>
           </div>
 
-          <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-            <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold">
+          <div className="rounded-xl p-4 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
+            <div className="flex items-center gap-2 text-[#466A55] text-xs font-bold uppercase tracking-wider">
               <Database className="w-4 h-4" />
               <span>Persistence Layer</span>
             </div>
-            <p className="text-xs text-slate-300 font-mono">
-              Engine: <span className="text-emerald-300 font-bold">SQLModel / SQLite</span>
+            <p className="text-xs text-[#294B3A] font-mono">
+              Engine: <span className="font-bold">SQLModel / SQLite</span>
             </p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#466A55]">
               PostgreSQL/Supabase target with local SQLite fallback for offline execution.
             </p>
           </div>
 
-          <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-            <div className="flex items-center gap-2 text-violet-400 text-xs font-semibold">
+          <div className="rounded-xl p-4 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
+            <div className="flex items-center gap-2 text-[#6A4B67] text-xs font-bold uppercase tracking-wider">
               <HardDrive className="w-4 h-4" />
               <span>Cloud Object Storage</span>
             </div>
-            <p className="text-xs text-slate-300 font-mono">
-              Storage: <span className="text-violet-300 font-bold">{health?.storage_provider.type || 'LocalStorage'}</span>
+            <p className="text-xs text-[#294B3A] font-mono">
+              Storage: <span className="font-bold">{health?.storage_provider.type || 'LocalStorage'}</span>
             </p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#466A55]">
               Binary assets strictly separated from database; stored in local ./uploads/ directory.
             </p>
           </div>
         </div>
-      </div>
+      </PageContainer>
 
       {/* 7-Stage Guided Demo Tour Overlay */}
       <GuidedTourOverlay />

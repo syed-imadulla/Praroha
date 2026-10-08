@@ -52,7 +52,7 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 ### Milestone 3: Complete UI Upgrade (Active)
 - [x] **Phase 21: Design System Foundation** — Global design tokens, Cormorant Garamond & Inter typography, warm cream parchment, subtle paper texture, button/card/input utility tokens (`design.md`).
 - [x] **Phase 22: Global App Shell** — Warm cream sidebar (265-280px), botanical leaf branding, navigation (Home, My Creations, Graveyard, Profile), corner botanical accents.
-- [x] **Phase 23: Home Screen** — Poetic hero statement, leaf separator, 72px pill seed input, 5 creation modes, recent creations row.
+- [x] **Phase 23: Home Screen & UI Refinement Pass** — Poetic hero statement, leaf separator, 72px pill seed input, 5 creation modes, recent creations row; unified global `PageContainer` grid, removal of large side journey card, modernization of Stage 2 (Understand) and Stage 3 (Divergent Worlds) to PRAROHA botanical system, and 6-viewport responsive validation.
 - [x] **Phase 24: Creation Component System** — Unified reusable `CreationCard` component supporting Image, Story, Sound, Video, Chat.
 - [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, empty states.
 - [ ] **Phase 26: Graveyard Screen** — Reflective & poetic idea cemetery, restore, permanent deletion with confirmation modal.

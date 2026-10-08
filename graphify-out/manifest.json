@@ -126,27 +126,27 @@
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
-    "mtime": 1791375107.3288414,
-    "seen": 1791375803.2919426,
-    "ast_hash": "b8ff4a49cbf06f0fcec124d9960ce090",
+    "mtime": 1791436442.3646939,
+    "seen": 1791436575.8371775,
+    "ast_hash": "c027eca56dd89a85a46f5e6257dd6c35",
     "semantic_hash": ""
   },
   "frontend/src/components/StageProgressHeader.tsx": {
-    "mtime": 1791103819.6726935,
-    "seen": 1791103973.265082,
-    "ast_hash": "4d19e3d2b36e9f1b7bfe5ebdd8bc7b72",
+    "mtime": 1791435274.1739252,
+    "seen": 1791436575.8371987,
+    "ast_hash": "0bb931eed4860a4e7f271852d7556fa1",
     "semantic_hash": ""
   },
   "frontend/src/components/TopBar.tsx": {
-    "mtime": 1791107428.4865255,
-    "seen": 1791107850.3000932,
-    "ast_hash": "47b2ef0d0bd572fb13606688df221095",
+    "mtime": 1791435241.2832117,
+    "seen": 1791436575.8372006,
+    "ast_hash": "c3aeab059c83aa3604d73b7b8a301438",
     "semantic_hash": ""
   },
   "frontend/src/components/WorkspaceCanvas.tsx": {
-    "mtime": 1791105717.3793838,
-    "seen": 1791106275.8671527,
-    "ast_hash": "7742a1fd045ebbdf3c70da2f48c70f0b",
+    "mtime": 1791435784.829495,
+    "seen": 1791436575.837211,
+    "ast_hash": "364a854348ebf7b5b0f01c3f7a8f91b5",
     "semantic_hash": ""
   },
   "frontend/src/main.tsx": {
@@ -210,9 +210,9 @@
     "semantic_hash": ""
   },
   ".planning/PROJECT.md": {
-    "mtime": 1791433425.1819043,
-    "seen": 1791433489.073831,
-    "ast_hash": "2397ee305a43f24edb90c11f2d67a56f",
+    "mtime": 1791436533.9918854,
+    "seen": 1791436575.8372574,
+    "ast_hash": "ae55ac3534ac878873f8714255a8eaf0",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791433450.069004,
-    "seen": 1791433489.073836,
-    "ast_hash": "8c15360e022188103502b6871f899796",
+    "mtime": 1791436545.0887876,
+    "seen": 1791436575.8372607,
+    "ast_hash": "63cffdbc84116faf225d9b75e7b281ea",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791433472.2038767,
-    "seen": 1791433489.0738382,
-    "ast_hash": "f5a6c940dafabaa7550b32f986371fc3",
+    "mtime": 1791436561.3776438,
+    "seen": 1791436575.8372624,
+    "ast_hash": "a4078845b7615ed4a947111ef4c8e07f",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/SeedDnaViewer.tsx": {
-    "mtime": 1791364253.6434913,
-    "seen": 1791364675.788194,
-    "ast_hash": "fd84fe617e5f8488a41a7007cb1ec52d",
+    "mtime": 1791435536.154652,
+    "seen": 1791436575.8371906,
+    "ast_hash": "478e3cba8a9b37ae933d9c19b9e834c0",
     "semantic_hash": ""
   },
   "frontend/src/components/SeedInputCanvas.tsx": {
-    "mtime": 1791432959.9927678,
-    "seen": 1791433489.0737464,
-    "ast_hash": "6286ef0846b086992c4a200d95c49c73",
+    "mtime": 1791435835.3770497,
+    "seen": 1791436575.837193,
+    "ast_hash": "f14cc1ee57a480bd12a120daf8bfb017",
     "semantic_hash": ""
   },
   ".planning/phases/02-seed-understanding-seed-dna/02-01-PLAN.md": {
@@ -558,15 +558,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/WorldCandidateCard.tsx": {
-    "mtime": 1791382043.0275652,
-    "seen": 1791382873.3985999,
-    "ast_hash": "b266852ee17d23799423454cee97efd5",
+    "mtime": 1791435724.4890184,
+    "seen": 1791436575.8372123,
+    "ast_hash": "dd7b7baf31c597c0c8e4de2d40204f41",
     "semantic_hash": ""
   },
   "frontend/src/components/WorldCandidatesCanvas.tsx": {
-    "mtime": 1791371344.1544256,
-    "seen": 1791372283.9588518,
-    "ast_hash": "c6f99a67c54ec8f22eceb0b83d1ff591",
+    "mtime": 1791435678.4724176,
+    "seen": 1791436575.8372142,
+    "ast_hash": "89b68c0b678a140f6bac20e8d44d3f08",
     "semantic_hash": ""
   },
   ".planning/phases/03-three-world-generation/03-01-SUMMARY.md": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/SeedPotentialCanvas.tsx": {
-    "mtime": 1791364504.0749226,
-    "seen": 1791364675.7881982,
-    "ast_hash": "1701b5c1ae3403d4a3e84a10026cd6f0",
+    "mtime": 1791435634.2128015,
+    "seen": 1791436575.8371968,
+    "ast_hash": "7b8b0d0099ba3dcb3d33fe19e19ca9be",
     "semantic_hash": ""
   },
   ".planning/phases/09-seed-potential-map/09-UAT.md": {
@@ -1710,15 +1710,15 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase23_home_screen.cjs": {
-    "mtime": 1791432099.0498781,
-    "seen": 1791432252.3482616,
-    "ast_hash": "9ce9de86567b8d7dcaab5fa10251eb2c",
+    "mtime": 1791435925.455255,
+    "seen": 1791436575.837118,
+    "ast_hash": "2ce7e8f8122dfe82e5bd903ec8e7ab12",
     "semantic_hash": ""
   },
   "frontend/src/components/home/CreationModes.tsx": {
-    "mtime": 1791431798.2977026,
-    "seen": 1791432252.348329,
-    "ast_hash": "282de9429e1c191473d2a4f4ee8f5c64",
+    "mtime": 1791436110.4616225,
+    "seen": 1791436575.8372242,
+    "ast_hash": "2ca6069918d3e47fc99aeb0ac388f672",
     "semantic_hash": ""
   },
   "frontend/src/components/home/HomeHero.tsx": {
@@ -1728,9 +1728,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/home/RecentCreationsRow.tsx": {
-    "mtime": 1791432782.5882728,
-    "seen": 1791433489.0737925,
-    "ast_hash": "bd72fbe41a96b44db3ad10f686e47d46",
+    "mtime": 1791434975.5635269,
+    "seen": 1791436575.8372276,
+    "ast_hash": "4fca4fb09b6133dfd80f0c327f537553",
     "semantic_hash": ""
   },
   "frontend/src/components/home/SeedJourneyPreviewCard.tsx": {
@@ -2049,6 +2049,36 @@
     "mtime": 1791433407.1052167,
     "seen": 1791433489.0740495,
     "ast_hash": "017f9e9492188426184a44b8e9933912",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_responsive_refinement.cjs": {
+    "mtime": 1791436296.2279832,
+    "seen": 1791436575.8371534,
+    "ast_hash": "d69f86996db6a5c3d67d698508f9e43a",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/shell/PageContainer.tsx": {
+    "mtime": 1791434867.441469,
+    "seen": 1791436575.8372352,
+    "ast_hash": "71ea78d257cd655ab39a123e12e8fc9c",
+    "semantic_hash": ""
+  },
+  ".planning/phases/23-ui-refinement/23-REFINEMENT-PLAN.md": {
+    "mtime": 1791434825.318836,
+    "seen": 1791436575.837526,
+    "ast_hash": "8e4c8f7d15f2b4933e35de47bfe8ff76",
+    "semantic_hash": ""
+  },
+  ".planning/phases/23-ui-refinement/23-REFINEMENT-VERIFICATION.md": {
+    "mtime": 1791436504.343147,
+    "seen": 1791436575.8375282,
+    "ast_hash": "f876e121685e0135cceae62bd24b54d3",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/stage3_botanical_worlds.png": {
+    "mtime": 1791436468.6064622,
+    "seen": 1791436575.8375916,
+    "ast_hash": "7f3d5904ac38b5ba1c33b3968e863588",
     "semantic_hash": ""
   }
 }

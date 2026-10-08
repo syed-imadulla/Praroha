@@ -110,7 +110,7 @@ export const RecentCreationsRow: React.FC<RecentCreationsRowProps> = ({
         </div>
       ) : (
         /* 3-card horizontal grid using canonical CreationCard */
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4 max-w-3xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4 w-full">
           {items.slice(0, 3).map((item) => (
             <CreationCard
               key={item.id}

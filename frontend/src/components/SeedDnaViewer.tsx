@@ -39,12 +39,12 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
 
   if (!dnaRecord) {
     return (
-      <div className="p-6 rounded-xl bg-canvas-card/40 border border-canvas-border text-center space-y-3">
-        <Dna className="w-8 h-8 text-slate-600 mx-auto" />
-        <div className="text-sm font-semibold text-slate-300">
+      <div className="p-8 rounded-2xl bg-[#F8F4E8] border border-[#D8CCB7] text-center space-y-3">
+        <Dna className="w-8 h-8 text-[#466A55] mx-auto" />
+        <div className="text-base font-serif font-bold text-[#294B3A]">
           No Seed DNA Extracted Yet
         </div>
-        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+        <p className="text-xs text-[#466A55] max-w-sm mx-auto">
           Enter a creative seed in Stage 1 and run the understanding pass to generate structural Seed DNA.
         </p>
       </div>
@@ -76,15 +76,15 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
     <div className={`space-y-6 ${compact ? 'text-xs' : 'w-full max-w-5xl py-2'}`}>
       {/* Sub-stage Lens Switcher (DNA Blueprint vs Seed Potential Map) */}
       {!compact && (
-        <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-900/80 border border-slate-800 w-fit">
+        <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-[#EAE4D4] border border-[#D8CCB7] w-fit shadow-2xs">
           <button
             type="button"
             data-testid="tab-dna-blueprint"
             onClick={() => setUnderstandSubTab('dna')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition ${
               understandSubTab === 'dna'
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                ? 'bg-[#355A46] text-[#F8F4E8] shadow-xs'
+                : 'text-[#466A55] hover:text-[#294B3A]'
             }`}
           >
             <Dna className="w-3.5 h-3.5" />
@@ -95,16 +95,16 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
             type="button"
             data-testid="tab-seed-potential"
             onClick={() => setUnderstandSubTab('potential')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition ${
               understandSubTab === 'potential'
-                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-indigo-300 border border-transparent'
+                ? 'bg-[#355A46] text-[#F8F4E8] shadow-xs'
+                : 'text-[#466A55] hover:text-[#294B3A]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <Sparkles className="w-3.5 h-3.5" />
             <span>Seed Potential Map</span>
             {potentialItems.length > 0 && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#DDE2D2] text-[#294B3A]">
                 {potentialItems.length}
               </span>
             )}
@@ -117,215 +117,218 @@ export const SeedDnaViewer: React.FC<SeedDnaViewerProps> = ({
       ) : (
         <>
           {/* Header bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-canvas-border">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-400">
-              <Dna className="w-4 h-4" />
-            </span>
-            <h2 className={`font-bold text-slate-100 font-sans ${compact ? 'text-sm' : 'text-xl'}`}>
-              Distilled Seed DNA
-            </h2>
-          </div>
-          <p className="text-slate-400 text-xs">
-            Semantic foundation synthesized from raw creative premise.
-          </p>
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleCopyJson}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition"
-            title="Copy structured DNA JSON"
-          >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied JSON</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5 text-slate-400" />
-                <span>Export JSON</span>
-              </>
-            )}
-          </button>
-
-          {!compact && (
-            <button
-              type="button"
-              onClick={handleAdjustSeed}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Refine Seed</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Model & Provenance Badges */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
-          <span>Engine:</span>
-          <span className="text-slate-200 font-semibold">{model_used}</span>
-        </div>
-
-        {fallback_used && (
-          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-950/40 border border-amber-800/60 text-[11px] font-mono text-amber-300">
-            <span>Mock Fallback Active</span>
-          </div>
-        )}
-
-        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-cyan-950/30 border border-cyan-800/40 text-[11px] text-cyan-300 font-mono">
-          <span>DNA Schema v1.0</span>
-        </div>
-      </div>
-
-      {/* Original Raw Seed Quote (Rule #1 Immutability Check) */}
-      <div className="p-3.5 rounded-xl bg-canvas-card/40 border border-canvas-border space-y-1">
-        <div className="text-[10px] uppercase font-mono tracking-wider text-slate-500 flex items-center gap-1">
-          <Info className="w-3 h-3 text-slate-400" />
-          <span>Immutable Input Seed (Permanent Provenance)</span>
-        </div>
-        <p className="text-xs text-slate-300 italic font-serif">
-          "{raw_seed}"
-        </p>
-      </div>
-
-      {/* Core Premise */}
-      <div className="glass-card rounded-xl p-4 md:p-5 border border-cyan-800/30 relative overflow-hidden space-y-2">
-        <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-emerald-400" />
-        <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Core Distilled Premise</span>
-        </div>
-        <p className="text-sm md:text-base text-slate-100 font-medium leading-relaxed">
-          {dna.premise}
-        </p>
-      </div>
-
-      {/* Tone & Themes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Emotional Tone */}
-        <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-          <div className="flex items-center gap-2 text-violet-400 text-xs font-semibold uppercase tracking-wider">
-            <Flame className="w-3.5 h-3.5" />
-            <span>Emotional & Aesthetic Tone</span>
-          </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-violet-950/40 border border-violet-800/50 text-violet-200 text-xs font-medium">
-            <Sparkles className="w-3 h-3 text-violet-400" />
-            <span>{dna.tone}</span>
-          </div>
-        </div>
-
-        {/* Implicit Themes */}
-        <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-          <div className="flex items-center gap-2 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
-            <Layers className="w-3.5 h-3.5" />
-            <span>Implicit Thematic Tensions</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {dna.themes.map((theme, i) => (
-              <span
-                key={i}
-                className="px-2.5 py-1 rounded-md bg-cyan-950/40 border border-cyan-800/40 text-cyan-300 text-xs font-medium"
-              >
-                {theme}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Entities & Boundary Constraints */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Core Entities */}
-        <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-          <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
-            <Layers className="w-3.5 h-3.5" />
-            <span>Core Entities & Artifacts</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {dna.entities.map((entity, i) => (
-              <span
-                key={i}
-                className="px-2.5 py-1 rounded-md bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-xs font-medium"
-              >
-                {entity}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Strict Boundary Constraints */}
-        <div className="glass-card rounded-xl p-4 border border-amber-900/30 space-y-2">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Strict Creative Constraints</span>
-          </div>
-          <div className="space-y-1.5">
-            {dna.constraints.map((constraint, i) => (
-              <div
-                key={i}
-                className="px-2.5 py-1.5 rounded-md bg-amber-950/30 border border-amber-800/40 text-amber-300/90 text-xs flex items-center gap-2"
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                <span>{constraint}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#D8CCB7]">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A]">
+                  <Dna className="w-4 h-4" />
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#466A55]">
+                  Stage 2 / 07 — Understand
+                </span>
               </div>
-            ))}
+              <h2 className={`font-serif font-bold text-[#294B3A] tracking-tight ${compact ? 'text-lg' : 'text-2xl sm:text-3xl'}`}>
+                Distilled Seed DNA
+              </h2>
+              <p className="text-[#466A55] text-xs sm:text-sm">
+                Semantic foundation synthesized from raw creative premise.
+              </p>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleCopyJson}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] text-xs font-medium transition shadow-2xs"
+                title="Copy structured DNA JSON"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-[#294B3A]" />
+                    <span className="text-[#294B3A] font-semibold">Copied JSON</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-[#466A55]" />
+                    <span>Export JSON</span>
+                  </>
+                )}
+              </button>
+
+              {!compact && (
+                <button
+                  type="button"
+                  onClick={handleAdjustSeed}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#294B3A] border border-[#D8CCB7] text-xs font-medium transition shadow-2xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-[#466A55]" />
+                  <span>Refine Seed</span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Domain Keywords */}
-      <div className="glass-card rounded-xl p-4 border border-canvas-border space-y-2">
-        <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold uppercase tracking-wider">
-          <Tag className="w-3.5 h-3.5 text-slate-400" />
-          <span>Domain Semantic Keywords</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {dna.domain_keywords.map((kw, i) => (
-            <span
-              key={i}
-              className="px-2 py-0.5 rounded bg-slate-800/70 border border-slate-700 text-slate-300 text-[11px] font-mono"
-            >
-              #{kw}
-            </span>
-          ))}
-        </div>
-      </div>
+          {/* Model & Provenance Badges */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F2EBDD] border border-[#D8CCB7] text-[11px] font-mono text-[#466A55]">
+              <span>Engine:</span>
+              <span className="text-[#294B3A] font-semibold">{model_used}</span>
+            </div>
 
-      {/* Stage 2 Primary Call To Action (Canvas mode only) */}
-      {!compact && (
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-canvas-border">
-          <div className="text-xs text-slate-400">
-            Seed DNA is locked and immutable for this project. Ready to explore semantic potential or branch into 3 distinct worlds.
+            {fallback_used && (
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F5E6DC] border border-[#E2BFAC] text-[11px] font-mono text-[#B8734F]">
+                <span>Mock Fallback Active</span>
+              </div>
+            )}
+
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#DDE2D2] border border-[#C8D0BE] text-[11px] text-[#294B3A] font-mono">
+              <span>DNA Schema v1.0</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => setUnderstandSubTab('potential')}
-              className="px-4 py-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-300 font-semibold text-xs flex items-center justify-center gap-2 transition"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Explore Potential Map ({potentialItems.length})</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleProceedToWorlds}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-glow-cyan transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <span>Generate 3 Worlds (Stage 3)</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+          {/* Original Raw Seed Quote (Rule #1 Immutability Check) */}
+          <div className="p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1.5 shadow-2xs">
+            <div className="text-[11px] uppercase font-mono tracking-wider text-[#466A55] flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 text-[#466A55]" />
+              <span>Immutable Input Seed (Permanent Provenance)</span>
+            </div>
+            <p className="text-sm text-[#294B3A] italic font-serif leading-relaxed">
+              "{raw_seed}"
+            </p>
           </div>
-        </div>
-      )}
+
+          {/* Core Distilled Premise */}
+          <div className="rounded-xl p-5 md:p-6 bg-[#F8F4E8] border border-[#D8CCB7] relative overflow-hidden space-y-2.5 shadow-xs">
+            <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#355A46]" />
+            <div className="flex items-center gap-2 text-[#355A46] text-xs font-bold uppercase tracking-wider pl-1">
+              <Sparkles className="w-3.5 h-3.5 text-[#355A46]" />
+              <span>Core Distilled Premise</span>
+            </div>
+            <p className="text-base md:text-lg text-[#294B3A] font-medium leading-relaxed font-sans pl-1">
+              {dna.premise}
+            </p>
+          </div>
+
+          {/* Tone & Themes Grid (2-column layout on desktop) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Emotional Tone */}
+            <div className="rounded-xl p-4 sm:p-5 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2.5 shadow-2xs">
+              <div className="flex items-center gap-2 text-[#6A4B67] text-xs font-bold uppercase tracking-wider">
+                <Flame className="w-3.5 h-3.5" />
+                <span>Emotional & Aesthetic Tone</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#EFE8EE] border border-[#D1BECD] text-[#6A4B67] text-xs font-medium">
+                <Sparkles className="w-3 h-3 text-[#6A4B67]" />
+                <span>{dna.tone}</span>
+              </div>
+            </div>
+
+            {/* Implicit Themes */}
+            <div className="rounded-xl p-4 sm:p-5 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2.5 shadow-2xs">
+              <div className="flex items-center gap-2 text-[#355A46] text-xs font-bold uppercase tracking-wider">
+                <Layers className="w-3.5 h-3.5" />
+                <span>Implicit Thematic Tensions</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {dna.themes.map((theme, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-1 rounded-md bg-[#DDE2D2] border border-[#C8D0BE] text-[#294B3A] text-xs font-medium"
+                  >
+                    {theme}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Entities & Boundary Constraints (2-column layout on desktop) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Core Entities */}
+            <div className="rounded-xl p-4 sm:p-5 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2.5 shadow-2xs">
+              <div className="flex items-center gap-2 text-[#294B3A] text-xs font-bold uppercase tracking-wider">
+                <Layers className="w-3.5 h-3.5" />
+                <span>Core Entities & Artifacts</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {dna.entities.map((entity, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-1 rounded-md bg-[#F2EBDD] border border-[#D8CCB7] text-[#294B3A] text-xs font-medium"
+                  >
+                    {entity}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Strict Boundary Constraints */}
+            <div className="rounded-xl p-4 sm:p-5 bg-[#F8F4E8] border border-[#E2BFAC] space-y-2.5 shadow-2xs">
+              <div className="flex items-center gap-2 text-[#B8734F] text-xs font-bold uppercase tracking-wider">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Strict Creative Constraints</span>
+              </div>
+              <div className="space-y-1.5">
+                {dna.constraints.map((constraint, i) => (
+                  <div
+                    key={i}
+                    className="px-2.5 py-1.5 rounded-md bg-[#FAF5EE] border border-[#E8DCC8] text-[#394840] text-xs flex items-center gap-2"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#B8734F] shrink-0" />
+                    <span>{constraint}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Domain Keywords */}
+          <div className="rounded-xl p-4 sm:p-5 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
+            <div className="flex items-center gap-2 text-[#466A55] text-xs font-bold uppercase tracking-wider">
+              <Tag className="w-3.5 h-3.5 text-[#466A55]" />
+              <span>Domain Semantic Keywords</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {dna.domain_keywords.map((kw, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 rounded bg-[#F2EBDD] border border-[#D8CCB7] text-[#394840] text-[11px] font-mono"
+                >
+                  #{kw}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Stage 2 Primary Call To Action (Canvas mode only) */}
+          {!compact && (
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#D8CCB7]">
+              <div className="text-xs text-[#466A55]">
+                Seed DNA is locked and immutable for this project. Ready to explore semantic potential or branch into 3 distinct worlds.
+              </div>
+
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setUnderstandSubTab('potential')}
+                  className="px-4 py-2.5 rounded-full bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-[#294B3A] font-semibold text-xs flex items-center justify-center gap-2 transition"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#294B3A]" />
+                  <span>Explore Potential Map ({potentialItems.length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleProceedToWorlds}
+                  className="px-6 py-2.5 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  <span>Generate 3 Worlds (Stage 3)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

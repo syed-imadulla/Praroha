@@ -42,56 +42,59 @@ export const TopBar: React.FC = () => {
   const isHealthy = health?.status === 'healthy';
 
   return (
-    <header className="h-14 border-b border-canvas-border bg-canvas-panel/90 backdrop-blur-md px-4 flex items-center justify-between select-none z-30">
+    <header className="h-14 border-b border-[#D8CCB7] bg-[#F4EEDF] px-4 sm:px-6 flex items-center justify-between select-none z-30 shrink-0">
       {/* Left: Brand & Title */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-glow-cyan">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#DDE2D2] border border-[#C8D0BE] flex items-center justify-center text-[#294B3A] shadow-2xs">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-100 tracking-tight text-sm md:text-base font-sans">
+              <span className="font-serif font-bold text-[#294B3A] tracking-tight text-base sm:text-[17px]">
                 Praroha
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/50">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#EAE4D4] text-[#466A55] border border-[#D8CCB7]">
                 Tattva 2
               </span>
-              <span className="hidden sm:inline text-[11px] text-slate-400 font-mono">
+              <span className="hidden sm:inline text-[11px] text-[#718875] font-sans">
                 Forms hidden in formless
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-none truncate max-w-[200px] md:max-w-xs mt-0.5">
-              {activeProject ? activeProject.title : 'Seed → Universe · Generative AI (Idea 1)'}
+            <p className="text-[11px] text-[#718875] leading-none truncate max-w-[180px] sm:max-w-xs mt-0.5 font-sans">
+              {activeProject ? activeProject.title : 'Seed → Universe · Creative Journal'}
             </p>
           </div>
         </div>
 
         {/* Interactive Branch Switcher Dropdown (PERS-02) */}
-        <div className="relative">
+        <div className="relative ml-1">
           <button
             onClick={() => {
               setBranchMenuOpen(!branchMenuOpen);
               fetchBranches();
             }}
             id="branch-switcher-btn"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-canvas-card hover:bg-neutral-800 border border-canvas-border text-xs text-slate-300 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F8F4E8] hover:bg-[#E8E0D0] border border-[#D8CCB7] text-xs text-[#294B3A] transition shadow-2xs"
           >
-            <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-slate-400">Branch:</span>
-            <span className="font-mono text-cyan-300 font-medium truncate max-w-[120px]">
+            <GitBranch className="w-3.5 h-3.5 text-[#466A55]" />
+            <span className="text-[#718875]">Branch:</span>
+            <span className="font-mono text-[#294B3A] font-medium truncate max-w-[110px]">
               {activeProject?.branch_name || 'main'}
             </span>
-            <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+            <ChevronDown className="w-3 h-3 text-[#718875] ml-0.5" />
           </button>
 
           {branchMenuOpen && (
-            <div id="branch-switcher-popover" className="absolute left-0 mt-2 w-72 bg-neutral-900 border border-neutral-700/80 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95">
-              <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-neutral-800 mb-1.5">
-                <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+            <div
+              id="branch-switcher-popover"
+              className="absolute left-0 mt-2 w-72 bg-[#F8F4E8] border border-[#D8CCB7] rounded-[16px] shadow-lg p-2 z-50 animate-fade-in"
+            >
+              <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-[#D8CCB7]/60 mb-1.5">
+                <span className="text-[11px] font-semibold text-[#466A55] uppercase tracking-wider">
                   Timeline Branches
                 </span>
-                <span className="text-[10px] text-neutral-500">
+                <span className="text-[10px] text-[#718875]">
                   {projectBranches.length} branch(es)
                 </span>
               </div>
@@ -108,22 +111,22 @@ export const TopBar: React.FC = () => {
                       }}
                       className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition ${
                         isActive
-                          ? 'bg-cyan-950/70 text-cyan-300 font-medium border border-cyan-800/40'
-                          : 'text-neutral-300 hover:bg-neutral-800/60'
+                          ? 'bg-[#DDE2D2] text-[#294B3A] font-medium border border-[#C8D0BE]'
+                          : 'text-[#394840] hover:bg-[#E8E0D0]/60'
                       }`}
                     >
                       <div className="flex items-center gap-2 truncate">
-                        <GitBranch className={`w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'text-neutral-500'}`} />
+                        <GitBranch className={`w-3.5 h-3.5 ${isActive ? 'text-[#294B3A]' : 'text-[#718875]'}`} />
                         <span className="truncate">{branch.branch_name}</span>
                       </div>
-                      {isActive && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+                      {isActive && <Check className="w-3.5 h-3.5 text-[#294B3A] shrink-0" />}
                     </button>
                   );
                 })}
               </div>
 
               {/* Fork Form / Button */}
-              <div className="pt-2 mt-1.5 border-t border-neutral-800">
+              <div className="pt-2 mt-1.5 border-t border-[#D8CCB7]/60">
                 {isForking ? (
                   <div className="space-y-1.5">
                     <input
@@ -142,12 +145,12 @@ export const TopBar: React.FC = () => {
                           setIsForking(false);
                         }
                       }}
-                      className="w-full px-2 py-1 text-xs bg-neutral-950 border border-cyan-500/50 rounded-md text-neutral-200 outline-none"
+                      className="w-full px-2.5 py-1 text-xs bg-white border border-[#D8CCB7] rounded-md text-[#294B3A] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
                     />
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => setIsForking(false)}
-                        className="px-2 py-0.5 text-[11px] text-neutral-400 hover:text-neutral-200"
+                        className="px-2 py-0.5 text-[11px] text-[#718875] hover:text-[#294B3A]"
                       >
                         Cancel
                       </button>
@@ -160,7 +163,7 @@ export const TopBar: React.FC = () => {
                             setBranchMenuOpen(false);
                           }
                         }}
-                        className="px-2 py-0.5 text-[11px] bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium"
+                        className="px-2.5 py-0.5 text-[11px] bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] rounded-md font-medium"
                       >
                         Fork
                       </button>
@@ -169,7 +172,7 @@ export const TopBar: React.FC = () => {
                 ) : (
                   <button
                     onClick={() => setIsForking(true)}
-                    className="w-full flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-cyan-400 hover:bg-cyan-950/40 rounded-lg transition font-medium"
+                    className="w-full flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#294B3A] hover:bg-[#E8E0D0] rounded-lg transition font-medium"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>+ Fork New Branch</span>
@@ -182,25 +185,25 @@ export const TopBar: React.FC = () => {
       </div>
 
       {/* Right: Status Badges & Action Buttons */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-2.5">
         {/* Backend & AI Provider Status */}
-        <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-canvas-card border border-canvas-border text-xs">
+        <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#F8F4E8] border border-[#D8CCB7] text-xs">
           <div className="flex items-center gap-1.5">
             {isHealthy ? (
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#466A55] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#294B3A]"></span>
               </span>
             ) : (
-              <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+              <AlertCircle className="w-3.5 h-3.5 text-[#B8734F]" />
             )}
-            <span className="text-slate-300 font-medium">
+            <span className="text-[#294B3A] font-medium text-[11.5px]">
               {isHealthy ? `AI: ${health?.ai_provider.resolved}` : 'Connecting...'}
             </span>
           </div>
           {isHealthy && (
-            <span className="text-[10px] text-slate-500 border-l border-slate-700 pl-2">
-              {health?.storage_provider.type === 'LocalStorageProvider' ? 'Local Storage' : 'Supabase Storage'}
+            <span className="text-[10px] text-[#718875] border-l border-[#D8CCB7] pl-2 font-mono">
+              {health?.storage_provider.type === 'LocalStorageProvider' ? 'Local' : 'Supabase'}
             </span>
           )}
         </div>
@@ -210,10 +213,10 @@ export const TopBar: React.FC = () => {
           onClick={() => loadCanonicalDemoUniverse()}
           id="instant-demo-topbar-btn"
           title="Instantly generate and unfold complete Bio-City universe (DEMO-01)"
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/30 transition font-medium"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-[#E7C8B5] hover:bg-[#DFAFA0] text-[#A0522D] border border-[#B8734F]/30 transition font-medium shadow-2xs"
         >
           <Sparkles className="w-3.5 h-3.5 fill-current" />
-          <span className="hidden lg:inline">Demo Universe</span>
+          <span className="hidden md:inline">Demo Universe</span>
         </button>
 
         {/* 7-Stage Guided Tour Launcher */}
@@ -221,7 +224,7 @@ export const TopBar: React.FC = () => {
           onClick={() => startTour()}
           id="guided-tour-btn"
           title="Launch 7-Stage Guided Demo Tour (t)"
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 transition font-medium"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-[#DDE2D2] hover:bg-[#C8D0BE] text-[#294B3A] border border-[#C8D0BE] transition font-medium shadow-2xs"
         >
           <Compass className="w-3.5 h-3.5" />
           <span className="hidden lg:inline">Guided Tour</span>
@@ -233,7 +236,7 @@ export const TopBar: React.FC = () => {
           id="keyboard-shortcuts-btn"
           title="Keyboard Shortcuts (?)"
           aria-label="Keyboard Shortcuts"
-          className="p-1.5 text-xs rounded-md bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 transition"
+          className="p-1.5 text-xs rounded-full bg-[#F8F4E8] hover:bg-[#E8E0D0] text-[#466A55] hover:text-[#294B3A] border border-[#D8CCB7] transition shadow-2xs"
         >
           <HelpCircle className="w-3.5 h-3.5" />
         </button>
@@ -242,7 +245,7 @@ export const TopBar: React.FC = () => {
         <button
           onClick={handleReset}
           title="Start with a new seed idea"
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-slate-100 border border-slate-700 transition"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-[#F8F4E8] hover:bg-[#E8E0D0] text-[#466A55] hover:text-[#294B3A] border border-[#D8CCB7] transition shadow-2xs"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span className="hidden md:inline">New Seed</span>
@@ -251,10 +254,10 @@ export const TopBar: React.FC = () => {
         {/* Inspector Drawer Toggle */}
         <button
           onClick={() => toggleInspector()}
-          className={`flex items-center gap-1.5 px-3 py-1 text-xs rounded-md font-medium border transition ${
+          className={`flex items-center gap-1.5 px-3 py-1 text-xs rounded-full font-medium border transition shadow-2xs ${
             inspectorOpen
-              ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50 shadow-glow-cyan'
-              : 'bg-canvas-card hover:bg-slate-800 text-slate-300 border-canvas-border'
+              ? 'bg-[#355A46] text-[#F8F4E8] border-[#294B3A]'
+              : 'bg-[#F8F4E8] hover:bg-[#E8E0D0] text-[#294B3A] border-[#D8CCB7]'
           }`}
         >
           <PanelRight className="w-3.5 h-3.5" />
