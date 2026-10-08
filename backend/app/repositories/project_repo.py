@@ -105,6 +105,11 @@ def _migrate_columns(connection):
                 connection.execute(text("ALTER TABLE projects ADD COLUMN deleted_at TIMESTAMP"))
             except Exception:
                 pass
+        if "owner_id" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE projects ADD COLUMN owner_id VARCHAR"))
+            except Exception:
+                pass
 
     if "characters" in table_names:
         cols = [c["name"] for c in inspector.get_columns("characters")]
@@ -291,11 +296,12 @@ class ProjectRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_project(self, data: ProjectCreate) -> Project:
+    async def create_project(self, data: ProjectCreate, owner_id: Optional[str] = None) -> Project:
         project = Project(
             title=data.title,
             seed_text=data.seed_text or "",
             status="draft",
+            owner_id=owner_id,
         )
         self.session.add(project)
         await self.session.commit()
@@ -308,9 +314,11 @@ class ProjectRepository:
         return result.scalar_one_or_none()
 
     async def list_projects(
-        self, include_deleted: bool = False, archived_only: bool = False
+        self, owner_id: Optional[str] = None, include_deleted: bool = False, archived_only: bool = False
     ) -> List[Project]:
         statement = select(Project)
+        if owner_id is not None:
+            statement = statement.where(Project.owner_id == owner_id)
         if archived_only:
             statement = statement.where(Project.deleted_at.is_not(None))
         elif not include_deleted:
@@ -667,15 +675,22 @@ class ProjectRepository:
             raw_geo = bible_data.get("geography", "")
             geography = json.dumps(raw_geo) if isinstance(raw_geo, (list, dict)) else str(raw_geo or "")
 
+            def _clean_item(item: Any) -> Any:
+                if hasattr(item, "model_dump"):
+                    return item.model_dump()
+                if isinstance(item, (dict, list, str, int, float, bool)):
+                    return item
+                return str(item)
+
             bible_record = WorldBibleRecord(
                 project_id=project_id,
                 world_candidate_id=world_candidate_id,
                 geography=geography,
                 physics_rules=physics_rules,
-                history_timeline_json=json.dumps([t if isinstance(t, dict) else t.model_dump() for t in timeline_items]),
-                factions_json=json.dumps([f if isinstance(f, dict) else f.model_dump() for f in factions_items]),
+                history_timeline_json=json.dumps([_clean_item(t) for t in timeline_items]),
+                factions_json=json.dumps([_clean_item(f) for f in factions_items]),
                 canon_facts_json=json.dumps(clean_canon_facts),
-                key_locations_json=json.dumps([loc if isinstance(loc, dict) else loc.model_dump() for loc in locations_items]),
+                key_locations_json=json.dumps([_clean_item(loc) for loc in locations_items]),
                 visual_style_prompt=str(bible_data.get("visual_style_prompt", "") or ""),
             )
             self.session.add(bible_record)
@@ -684,6 +699,11 @@ class ProjectRepository:
             created_characters: List[CharacterRecord] = []
             char_items = data.get("characters", [])
             for c in char_items:
+                if not isinstance(c, dict):
+                    if hasattr(c, "model_dump"):
+                        c = c.model_dump()
+                    else:
+                        continue
                 char_record = CharacterRecord(
                     project_id=project_id,
                     world_candidate_id=world_candidate_id,
@@ -707,6 +727,11 @@ class ProjectRepository:
             # 4. Persist Character Relationships
             rel_items = data.get("relationships", [])
             for r in rel_items:
+                if not isinstance(r, dict):
+                    if hasattr(r, "model_dump"):
+                        r = r.model_dump()
+                    else:
+                        continue
                 source_id = r.get("source_character_id")
                 if not source_id and r.get("source_character_name"):
                     source_id = name_to_id.get(r["source_character_name"].strip().lower())
@@ -730,6 +755,11 @@ class ProjectRepository:
             # 5. Persist Scenes
             scene_items = data.get("scenes", [])
             for s in scene_items:
+                if not isinstance(s, dict):
+                    if hasattr(s, "model_dump"):
+                        s = s.model_dump()
+                    else:
+                        continue
                 characters_involved = s.get("characters_involved", [])
                 scene_record = SceneRecord(
                     project_id=project_id,
@@ -1068,7 +1098,7 @@ class ProjectRepository:
         res = await self.session.execute(stmt)
         return list(res.scalars().all())
 
-    async def create_canonical_demo_project(self) -> Project:
+    async def create_canonical_demo_project(self, owner_id: Optional[str] = None) -> Project:
         """Atomically seed the complete canonical Bio-City universe for zero-latency hackathon demos.
 
         Populates:
@@ -1088,6 +1118,7 @@ class ProjectRepository:
             seed_text="A child discovers a forgotten city beneath the ocean.",
             status="universe_unfolded",
             branch_name="main",
+            owner_id=owner_id,
         )
         self.session.add(project)
         await self.session.flush()

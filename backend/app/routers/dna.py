@@ -51,22 +51,19 @@ async def generate_dna_task(job_id: str, project_id: str, raw_seed: str):
         await update_job_status(job_id, "failed", error_code="INTERNAL_ERROR", error_message=str(e))
 
 
+from backend.app.core.auth import require_project_owner
+from backend.app.models.project import Project
+
+
 @router.post("/extract", response_model=APIResponse[GenerationJobRead])
 async def extract_seed_dna(
     project_id: str,
     background_tasks: BackgroundTasks,
     payload: ExtractDNARequest = ExtractDNARequest(),
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[GenerationJobRead]:
     """Execute the Seed Understanding pass to distill raw creative seed into structured Seed DNA."""
-    repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     raw_seed = (payload.raw_seed or project.seed_text or "").strip()
     if not raw_seed:
         raise HTTPException(
@@ -96,17 +93,11 @@ async def extract_seed_dna(
 @router.get("", response_model=APIResponse[SeedDNARead])
 async def get_latest_seed_dna(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[SeedDNARead]:
     """Retrieve the latest extracted Seed DNA for a project."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     record = await repo.get_latest_seed_dna(project_id)
     if not record:
         raise HTTPException(

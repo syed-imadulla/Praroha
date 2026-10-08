@@ -2,7 +2,9 @@ from typing import Optional
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import require_project_owner
 from backend.app.core.response import APIResponse, api_success
+from backend.app.models.project import Project
 from backend.app.models.selection import WorldSelectionCreate, WorldSelectionRead
 from backend.app.repositories.project_repo import ProjectRepository, get_session
 
@@ -14,24 +16,19 @@ async def select_world_candidate(
     project_id: str,
     candidate_id: str,
     body: Optional[WorldSelectionCreate] = Body(default=None),
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[WorldSelectionRead]:
     """
     Select a creative world candidate for a project.
 
     Enforces:
-    1. Project exists (HTTP 404 if missing)
+    1. Project exists and user is owner (HTTP 404 if missing or mismatched)
     2. Candidate exists and belongs to the project (HTTP 404 if missing or mismatched)
     3. Candidate belongs to the project's LATEST world generation batch (HTTP 400 if older batch)
     4. Records human selection and creator rationale, updates project status to 'world_selected'.
     """
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
 
     user_rationale = body.user_rationale if body else None
     creative_priorities = body.creative_priorities if body else None
@@ -79,17 +76,11 @@ async def select_world_candidate(
 @router.get("/selection", response_model=APIResponse[WorldSelectionRead])
 async def get_active_selection(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[WorldSelectionRead]:
     """Retrieve the active human world selection and selected candidate details for a project."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     active_selection = await repo.get_active_world_selection(project_id)
     if not active_selection:
         raise HTTPException(

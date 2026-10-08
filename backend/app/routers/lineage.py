@@ -2,8 +2,10 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import require_project_owner
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.lineage import AncestorPathRead, TraceGraphRead
+from backend.app.models.project import Project
 from backend.app.repositories.project_repo import ProjectRepository, get_session
 from backend.app.services.lineage_service import LineageService
 
@@ -15,6 +17,7 @@ router = APIRouter(prefix="/projects/{project_id}", tags=["lineage"])
 @router.get("/lineage", response_model=APIResponse[TraceGraphRead])
 async def get_project_lineage(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[TraceGraphRead]:
     """
@@ -43,6 +46,7 @@ async def get_project_lineage(
 async def get_node_ancestor_path(
     project_id: str,
     node_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[AncestorPathRead]:
     """

@@ -732,8 +732,16 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             else if (job.status === 'completed') set({ unfoldingStep: 4 });
           });
 
+          let finalData = unfoldedData;
+          if (!finalData || !finalData.world_bible) {
+            const freshRes = await apiClient.getUnfoldedUniverse(project.id);
+            if (freshRes.success && freshRes.data) {
+              finalData = freshRes.data;
+            }
+          }
+
           set((s) => ({
-            unfoldedUniverse: unfoldedData,
+            unfoldedUniverse: finalData,
             isUnfolding: false,
             unfoldingStep: 4,
             unfoldError: null,
@@ -1357,6 +1365,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           isLoadingCounterfactual: false,
           isForkingCounterfactual: false,
           counterfactualBranchName: '',
+          creations: [],
+          isLoadingCreations: false,
+          creationsError: null,
+          graveyard: [],
+          isLoadingGraveyard: false,
+          graveyardError: null,
         }),
 
       recoverActiveJobs: async () => {

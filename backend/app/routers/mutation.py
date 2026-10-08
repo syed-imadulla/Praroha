@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import require_project_owner
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.mutation import (
     ForkMutationRequest,
@@ -10,7 +11,7 @@ from backend.app.models.mutation import (
     PremiseVariableRead,
     SeedMutationRequest,
 )
-from backend.app.models.project import ProjectRead
+from backend.app.models.project import Project, ProjectRead
 from backend.app.providers.factory import get_storage_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session
 from backend.app.services.lineage_service import LineageService
@@ -33,6 +34,7 @@ def get_mutation_service(session: AsyncSession = Depends(get_session)) -> Mutati
 @router.get("/{project_id}/mutation/variables", response_model=APIResponse[List[PremiseVariableRead]])
 async def get_premise_variables(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     service: MutationService = Depends(get_mutation_service),
 ) -> APIResponse[List[PremiseVariableRead]]:
     """
@@ -55,6 +57,7 @@ async def get_premise_variables(
 async def simulate_mutation(
     project_id: str,
     payload: SeedMutationRequest,
+    project: Project = Depends(require_project_owner),
     service: MutationService = Depends(get_mutation_service),
 ) -> APIResponse[MutationSimulationResponse]:
     """
@@ -78,6 +81,7 @@ async def simulate_mutation(
 async def fork_mutated_universe(
     project_id: str,
     payload: ForkMutationRequest,
+    project: Project = Depends(require_project_owner),
     service: MutationService = Depends(get_mutation_service),
 ) -> APIResponse[ProjectRead]:
     """

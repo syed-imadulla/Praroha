@@ -18,6 +18,7 @@ class ProjectBase(SQLModel):
     mutation_metadata_json: Optional[str] = Field(default=None, nullable=True)
     counterfactual_metadata_json: Optional[str] = Field(default=None, nullable=True)
     deleted_at: Optional[datetime] = Field(default=None, nullable=True)
+    owner_id: Optional[str] = Field(default=None, index=True, nullable=True)
 
 
 class Project(ProjectBase, table=True):

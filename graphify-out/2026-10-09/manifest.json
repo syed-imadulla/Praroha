@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791487505.7559345,
-    "seen": 1791487527.5473516,
-    "ast_hash": "f3c5d99e88274f5f8d49d5efa6a3a4ef",
+    "mtime": 1791458851.3501222,
+    "seen": 1791459149.2999713,
+    "ast_hash": "1968d235ca9481d2d4023c12c316287e",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791487498.247004,
-    "seen": 1791487527.5473552,
-    "ast_hash": "e28a05e6e60ffb0c7ba2b4d61f7d235c",
+    "mtime": 1791481441.2137938,
+    "seen": 1791484196.6688275,
+    "ast_hash": "02acd349b630099804865b056dc6fece",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -2511,12 +2511,6 @@
     "mtime": 1791485385.9147928,
     "seen": 1791485944.7537065,
     "ast_hash": "5059448128a8f364b9521b4b72d9ab72",
-    "semantic_hash": ""
-  },
-  ".planning/phases/31.7/31.7-UAT.md": {
-    "mtime": 1791487482.9091463,
-    "seen": 1791487527.5476096,
-    "ast_hash": "83694b6538254fb11a76d2cbfb7ce140",
     "semantic_hash": ""
   }
 }

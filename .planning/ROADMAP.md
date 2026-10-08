@@ -42,7 +42,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   - [ ] **Phase 31.4**: Realtime Store Synchronization (Live DB updates reflect in Zustand store across multi-tab without refresh).
   - [ ] **Phase 31.5**: Project Routing & Authoritative Rehydration (`/projects/:projectId`, backend rehydration, Project Library UI).
   - [ ] **Phase 31.6**: Real My Creations & Graveyard (Live database records, soft delete, real restore, and permanent deletion).
-  - [ ] **Phase 31.7**: Authentication & Project Ownership (User ownership `projects.user_id`, backend authorization guards).
+  - [x] **Phase 31.7**: Authentication & Project Ownership (User ownership `projects.owner_id`, Supabase JWT verification, backend authorization guards, pre-confirmed signups).
   - [ ] **Phase 31.8**: Media Realtime Pipeline (Realtime generation events, browser reload resilience).
   - [ ] **Phase 31.9**: Production Error Semantics & Demo Isolation (Explicit errors, retry states, strict separation of Demo vs Real Mode).
   - [ ] **Phase 31.10**: Production E2E & Two-Tab Realtime Tests (Non-canonical seed validation, multi-tab real-time sync tests).

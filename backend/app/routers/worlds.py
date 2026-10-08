@@ -5,9 +5,11 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import require_project_owner
 from backend.app.core.errors import AIProviderError
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.job import GenerationJob, GenerationJobRead
+from backend.app.models.project import Project
 from backend.app.models.world import WorldCandidate, WorldCandidateRead
 from backend.app.providers.factory import get_ai_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session, async_session
@@ -23,8 +25,6 @@ async def generate_worlds_task(job_id: str, project_id: str, dna_dict: dict, pot
             repo = ProjectRepository(session)
             ai_provider = get_ai_provider()
             raw_candidates = await ai_provider.generate_worlds(dna_dict, potential_items=potential_items)
-            
-            
             
             if not isinstance(raw_candidates, list) or len(raw_candidates) != 3:
                 raise ValueError(f"World branching engine failed to produce exactly 3 candidates (received {len(raw_candidates) if isinstance(raw_candidates, list) else 0}).")
@@ -63,17 +63,11 @@ async def generate_worlds_task(job_id: str, project_id: str, dna_dict: dict, pot
 async def generate_world_candidates(
     project_id: str,
     background_tasks: BackgroundTasks,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[GenerationJobRead]:
     """Generate exactly three contrasting world candidates grounded in the project's Seed DNA."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     latest_dna_record = await repo.get_latest_seed_dna(project_id)
     if not latest_dna_record:
         raise HTTPException(
@@ -120,17 +114,11 @@ async def generate_world_candidates(
 @router.get("", response_model=APIResponse[List[WorldCandidateRead]])
 async def get_latest_world_candidates(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[List[WorldCandidateRead]]:
     """Retrieve the latest batch of three world candidates for a project."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     records = await repo.get_latest_world_candidates(project_id)
     if not records:
         raise HTTPException(

@@ -161,6 +161,15 @@ class ProjectSubscription {
     }
     this.currentProjectId = null;
   }
+
+  public disconnectAll() {
+    this.disconnect();
+    if (this.globalProjectsChannel) {
+      console.log('[Realtime] Disconnecting global projects channel');
+      supabase?.removeChannel(this.globalProjectsChannel);
+      this.globalProjectsChannel = null;
+    }
+  }
 }
 
 export const projectSubscription = new ProjectSubscription();

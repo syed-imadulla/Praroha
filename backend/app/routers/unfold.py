@@ -139,10 +139,15 @@ async def generate_unfold_task(job_id: str, project_id: str, context: dict, acti
             logger.error("Failed to reset project status after error: %s", reset_exc)
 
 
+from backend.app.core.auth import require_project_owner
+from backend.app.models.project import Project
+
+
 @router.post("/unfold", response_model=APIResponse[GenerationJobRead])
 async def unfold_universe(
     project_id: str,
     background_tasks: BackgroundTasks,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[GenerationJobRead]:
     """
@@ -150,7 +155,7 @@ async def unfold_universe(
     (World Bible with key locations, Characters, Relationship Web, and Scenes).
 
     Enforces:
-    1. Project exists (HTTP 404 if missing)
+    1. Project exists and user is owner (HTTP 404 if missing)
     2. Concurrency guard: Rejects requests while 'unfolding' with HTTP 409 Conflict.
     3. Idempotency guard: If already 'universe_unfolded', returns existing codex without re-generating.
     4. Lifecycle state machine: Project must be in 'world_selected' status to begin unfolding.
@@ -158,12 +163,6 @@ async def unfold_universe(
        so creator can safely retry without corrupt partial records.
     """
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
 
     # Concurrency guard: already in progress
     if project.status == "unfolding":
@@ -267,17 +266,11 @@ async def unfold_universe(
 @router.get("/unfolded", response_model=APIResponse[UnfoldedUniverseRead])
 async def get_unfolded_universe(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[UnfoldedUniverseRead]:
     """Retrieve the unfolded universe codex for a project."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     codex = await repo.get_unfolded_universe(project_id)
     if not codex:
         raise HTTPException(

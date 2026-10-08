@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import AuthenticatedUser, get_current_user
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.media import (
     MediaAssetRead,
@@ -26,6 +27,12 @@ def get_media_service(session: AsyncSession = Depends(get_session)) -> MediaServ
     return MediaService(repo=repo, storage=storage, media_provider=media_provider)
 
 
+async def verify_project_owner(project_id: str, user_id: str, repo: ProjectRepository):
+    project = await repo.get_project(project_id)
+    if not project or project.owner_id != user_id:
+        raise HTTPException(status_code=404, detail=f"Project with ID '{project_id}' not found.")
+
+
 @router.post(
     "/projects/{project_id}/media/generate",
     response_model=APIResponse[MediaJobResponse],
@@ -33,12 +40,14 @@ def get_media_service(session: AsyncSession = Depends(get_session)) -> MediaServ
 async def generate_media(
     project_id: str,
     payload: MediaGenerationRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
     service: MediaService = Depends(get_media_service),
 ) -> APIResponse[MediaJobResponse]:
     """
     Dispatch non-blocking media generation job across modal providers (MED-01, MED-03).
     Returns immediately with queued job status.
     """
+    await verify_project_owner(project_id, current_user.id, service.repo)
     try:
         job = await service.dispatch_job(project_id, payload)
         return api_success(job)
@@ -56,11 +65,13 @@ async def generate_media(
 async def get_media_job_status(
     project_id: str,
     job_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user),
     service: MediaService = Depends(get_media_service),
 ) -> APIResponse[MediaJobResponse]:
     """
     Poll status of a media generation job (queued -> processing -> completed / failed).
     """
+    await verify_project_owner(project_id, current_user.id, service.repo)
     asset = await service.get_job(job_id)
     if not asset or asset.project_id != project_id:
         raise HTTPException(status_code=404, detail="Media job not found")
@@ -85,11 +96,13 @@ async def list_media_assets(
     project_id: str,
     entity_id: Optional[str] = Query(None, description="Filter by entity ID"),
     media_type: Optional[str] = Query(None, description="Filter by media type (image, voice, video, audio)"),
+    current_user: AuthenticatedUser = Depends(get_current_user),
     service: MediaService = Depends(get_media_service),
 ) -> APIResponse[List[MediaAssetRead]]:
     """
     List all media assets associated with a project or specific entity (MED-02).
     """
+    await verify_project_owner(project_id, current_user.id, service.repo)
     assets = await service.list_assets(
         project_id=project_id,
         entity_id=entity_id,

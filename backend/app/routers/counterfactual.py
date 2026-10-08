@@ -3,13 +3,14 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import require_project_owner
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.counterfactual import (
     CounterfactualCandidateRead,
     CounterfactualDeltaResponse,
     ForkCounterfactualRequest,
 )
-from backend.app.models.project import ProjectRead
+from backend.app.models.project import Project, ProjectRead
 from backend.app.providers.factory import get_ai_provider, get_storage_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session
 from backend.app.services.counterfactual_service import CounterfactualService
@@ -37,6 +38,7 @@ def get_counterfactual_service(session: AsyncSession = Depends(get_session)) -> 
 @router.get("/{project_id}/counterfactual/candidates", response_model=APIResponse[List[CounterfactualCandidateRead]])
 async def get_counterfactual_candidates(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     service: CounterfactualService = Depends(get_counterfactual_service),
 ) -> APIResponse[List[CounterfactualCandidateRead]]:
     """
@@ -62,6 +64,7 @@ async def get_counterfactual_delta(
     project_id: str,
     candidate_id: str,
     use_ai: bool = Query(default=True),
+    project: Project = Depends(require_project_owner),
     service: CounterfactualService = Depends(get_counterfactual_service),
 ) -> APIResponse[CounterfactualDeltaResponse]:
     """
@@ -86,6 +89,7 @@ async def get_counterfactual_delta(
 async def fork_counterfactual_branch(
     project_id: str,
     payload: ForkCounterfactualRequest,
+    project: Project = Depends(require_project_owner),
     service: CounterfactualService = Depends(get_counterfactual_service),
 ) -> APIResponse[ProjectRead]:
     """

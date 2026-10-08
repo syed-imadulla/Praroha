@@ -2,10 +2,13 @@ import json
 import traceback
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import require_project_owner
 from backend.app.core.errors import AIProviderError
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.job import GenerationJob, GenerationJobRead
+from backend.app.models.project import Project
 from backend.app.models.potential import (
     BatchPotentialStatusUpdate,
     SeedPotentialItemRead,
@@ -25,7 +28,6 @@ async def generate_potential_task(job_id: str, project_id: str, seed_text: str, 
             repo = ProjectRepository(session)
             ai_provider = get_ai_provider()
             extraction_result = await ai_provider.extract_potential(seed_text, dna_dict)
-            
             
             if isinstance(extraction_result, list):
                 raw_items = extraction_result
@@ -48,18 +50,11 @@ async def generate_potential_task(job_id: str, project_id: str, seed_text: str, 
 async def extract_potential_map(
     project_id: str,
     background_tasks: BackgroundTasks,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[GenerationJobRead]:
     """Extract Seed Potential items (explicit, inferred, open) from seed and DNA."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
-    # Need seed text and DNA if available
     seed_text = (project.seed_text or "").strip()
     if not seed_text:
         raise HTTPException(
@@ -87,17 +82,11 @@ async def extract_potential_map(
 @router.get("", response_model=APIResponse[List[SeedPotentialItemRead]])
 async def get_potential_map(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[List[SeedPotentialItemRead]]:
     """Retrieve all potential items stored for this project."""
     repo = ProjectRepository(session)
-    project = await repo.get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project with ID '{project_id}' not found.",
-        )
-
     records = await repo.get_potential_items(project_id)
     return api_success(data=[r.to_read_schema() for r in records])
 
@@ -107,6 +96,7 @@ async def update_potential_item(
     project_id: str,
     item_id: str,
     payload: SeedPotentialItemUpdate,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[SeedPotentialItemRead]:
     """Update status of a specific potential item (e.g. accepted, rejected, pending)."""
@@ -129,6 +119,7 @@ async def update_potential_item(
 async def batch_update_potential_items(
     project_id: str,
     payload: BatchPotentialStatusUpdate,
+    project: Project = Depends(require_project_owner),
     session: AsyncSession = Depends(get_session),
 ) -> APIResponse[List[SeedPotentialItemRead]]:
     """Batch update user status of multiple potential items."""

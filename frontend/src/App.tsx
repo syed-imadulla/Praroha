@@ -7,6 +7,8 @@ import { apiClient } from './api/client';
 import { useWorkspaceStore } from './store/workspaceStore';
 import { AppShell } from './components/shell/AppShell';
 import { CreationCard, CreationItem } from './components/creation';
+import { useAuthStore } from './store/authStore';
+import { AuthScreen } from './components/auth/AuthScreen';
 
 export const App: React.FC = () => {
   const [selectedCreationToast, setSelectedCreationToast] = useState<string | null>(null);
@@ -36,20 +38,33 @@ export const App: React.FC = () => {
     permanentlyDeleteProjectAction,
   } = useWorkspaceStore();
 
-  useEffect(() => {
-    if (activeNav === 'creations') {
-      fetchCreations();
-    } else if (activeNav === 'graveyard') {
-      fetchGraveyard();
-    }
-  }, [activeNav, fetchCreations, fetchGraveyard]);
+  const { authStatus, initAuth } = useAuthStore();
 
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  useEffect(() => {
+    if (authStatus === 'AUTHENTICATED') {
+      if (activeNav === 'creations') {
+        fetchCreations();
+      } else if (activeNav === 'graveyard') {
+        fetchGraveyard();
+      }
+    }
+  }, [authStatus, activeNav, fetchCreations, fetchGraveyard]);
 
   const [isHydrating, setIsHydrating] = useState(true);
   const [hydrationError, setHydrationError] = useState<string | null>(null);
 
   // Deep routing & authoritative hydration from PostgreSQL
   useEffect(() => {
+    if (authStatus === 'AUTH_LOADING') return;
+    if (authStatus === 'UNAUTHENTICATED') {
+      setIsHydrating(false);
+      return;
+    }
+
     const handleRoute = async () => {
       const match = window.location.pathname.match(/^\/projects\/([a-zA-Z0-9-]+)$/);
       if (match) {
@@ -60,18 +75,18 @@ export const App: React.FC = () => {
             const res = await apiClient.getProjectBundle(projectId);
             if (res.success && res.data) {
               hydrateProject(res.data);
+              setHydrationError(null);
             } else {
-              setHydrationError("Project not found.");
+              setHydrationError("This project isn't available.");
             }
           } catch (err) {
-            setHydrationError("Failed to load project.");
+            setHydrationError("This project isn't available.");
           } finally {
             setIsHydrating(false);
           }
           return;
         }
       } else if (window.location.pathname === '/' && activeProject) {
-        // If user navigated back to root but store has active project, clear it
         resetWorkspace();
       }
       setIsHydrating(false);
@@ -84,11 +99,11 @@ export const App: React.FC = () => {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []); // Run on mount and popstate
+  }, [authStatus]); // Run when authStatus is determined and on popstate
 
   // Sync URL to active project changes
   useEffect(() => {
-    if (!isHydrating) {
+    if (authStatus === 'AUTHENTICATED' && !isHydrating) {
       if (activeProject) {
         const newPath = `/projects/${activeProject.id}`;
         if (window.location.pathname !== newPath) {
@@ -100,10 +115,10 @@ export const App: React.FC = () => {
         }
       }
     }
-  }, [activeProject, isHydrating]);
+  }, [authStatus, activeProject, isHydrating]);
 
   useEffect(() => {
-    // Initial health check against backend API
+    if (authStatus !== 'AUTHENTICATED') return;
     const checkBackend = async () => {
       const response = await apiClient.getHealth();
       if (response.success && response.data) {
@@ -112,10 +127,9 @@ export const App: React.FC = () => {
     };
 
     checkBackend();
-    // Poll every 10 seconds for real-time status indication
     const interval = setInterval(checkBackend, 10000);
     return () => clearInterval(interval);
-  }, [setHealth]);
+  }, [authStatus, setHealth]);
 
   // Sync active selection & unfolded codex if project exists
   useEffect(() => {
@@ -131,6 +145,21 @@ export const App: React.FC = () => {
       }
     }
   }, [activeProject, unfoldedUniverse, selectedWorldId, fetchUnfoldedUniverse, fetchActiveSelection]);
+
+  if (authStatus === 'AUTH_LOADING') {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#F8F4E8]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#294B3A] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#294B3A] font-serif text-lg">Connecting to Praroha...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (authStatus === 'UNAUTHENTICATED') {
+    return <AuthScreen />;
+  }
 
   if (isHydrating) {
     return (
@@ -151,8 +180,9 @@ export const App: React.FC = () => {
           <p className="text-[#394840] mb-6">{hydrationError}</p>
           <button 
             onClick={() => {
+              setHydrationError(null);
+              resetWorkspace();
               window.history.pushState(null, '', '/');
-              window.location.reload();
             }}
             className="btn-sage-primary"
           >

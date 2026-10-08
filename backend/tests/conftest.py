@@ -35,12 +35,24 @@ def event_loop():
 
 @pytest_asyncio.fixture(autouse=True)
 async def initialize_test_db():
+    from backend.app.main import app
+    from backend.app.core.auth import get_current_user, AuthenticatedUser
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        id="test-default-user",
+        email="test@praroha.local",
+    )
     await project_repo.init_db()
 
 
 @pytest_asyncio.fixture
 async def client():
     from backend.app.main import app
+    from backend.app.core.auth import get_current_user, AuthenticatedUser
+
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        id="test-default-user",
+        email="test@praroha.local",
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"

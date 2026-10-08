@@ -14,8 +14,10 @@ import {
   Layers,
   Database,
   Globe,
+  LogOut,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
+import { useAuthStore } from '../store/authStore';
 import { SearchModal } from './SearchModal';
 
 export const TopBar: React.FC = () => {
@@ -33,6 +35,8 @@ export const TopBar: React.FC = () => {
     toggleShortcutsModal,
     loadCanonicalDemoUniverse,
   } = useWorkspaceStore();
+
+  const { user, signOut } = useAuthStore();
 
   const [branchMenuOpen, setBranchMenuOpen] = useState(false);
   const [overflowMenuOpen, setOverflowMenuOpen] = useState(false);
@@ -406,6 +410,29 @@ export const TopBar: React.FC = () => {
                     {health?.storage_provider.type === 'LocalStorageProvider' ? 'Local' : 'Supabase'}
                   </span>
                 </div>
+
+                {/* Section 3: Account & Session */}
+                <div className="my-2 border-t border-[#D8CCB7]" />
+                <div className="px-3 pt-1 pb-1 text-[11px] font-mono uppercase tracking-wider text-[#718875] font-semibold">
+                  Account
+                </div>
+
+                <div className="px-3 py-1.5 text-xs text-[#294B3A] font-sans truncate">
+                  {user?.email || 'Signed in'}
+                </div>
+
+                <button
+                  type="button"
+                  id="sign-out-btn"
+                  onClick={() => {
+                    setOverflowMenuOpen(false);
+                    signOut();
+                  }}
+                  className="w-full mt-1 px-3 py-2 text-left text-xs text-red-700 hover:bg-red-50/80 rounded flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
               </div>
             )}
           </div>

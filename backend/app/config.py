@@ -18,9 +18,10 @@ class Settings(BaseSettings):
 
     # Optional provider keys
     GEMINI_API_KEY: Optional[str] = None
-    GEMINI_MODEL: str = "gemini-3.6-flash"
+    GEMINI_MODEL: str = "gemini-3.1-flash-lite"
     GEMINI_FALLBACK_MODELS: List[str] = [
-        "gemini-3.1-flash-lite",
+        "gemini-flash-latest",
+        "gemini-3.5-flash-lite",
     ]
     SUPABASE_URL: Optional[str] = None
     SUPABASE_KEY: Optional[str] = None

@@ -3,6 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import AuthenticatedUser, get_current_user, require_project_owner
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.persistence import (
     BranchCreate,
@@ -13,7 +14,7 @@ from backend.app.models.persistence import (
     SceneRefineRequest,
     SnapshotRead,
 )
-from backend.app.models.project import ProjectRead
+from backend.app.models.project import Project, ProjectRead
 from backend.app.models.unfold import CharacterRead, SceneRead
 from backend.app.providers.factory import get_storage_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session
@@ -36,6 +37,7 @@ def get_persistence_service(session: AsyncSession = Depends(get_session)) -> Per
 async def branch_project(
     project_id: str,
     payload: BranchCreate,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[ProjectRead]:
     """
@@ -57,6 +59,7 @@ async def branch_project(
 @router.get("/{project_id}/branches", response_model=APIResponse[List[BranchRead]])
 async def list_project_branches(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[List[BranchRead]]:
     """
@@ -78,6 +81,7 @@ async def refine_character(
     project_id: str,
     char_id: str,
     payload: CharacterRefineRequest,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[CharacterRead]:
     """
@@ -101,6 +105,7 @@ async def refine_scene(
     project_id: str,
     scene_id: str,
     payload: SceneRefineRequest,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[SceneRead]:
     """
@@ -123,6 +128,7 @@ async def refine_scene(
 async def get_project_revisions(
     project_id: str,
     entity_id: Optional[str] = Query(None, description="Optional entity ID filter"),
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[List[EntityRevisionRead]]:
     """
@@ -142,6 +148,7 @@ async def get_project_revisions(
 @router.get("/{project_id}/bundle", response_model=APIResponse[ProjectBundle])
 async def export_project_bundle(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[ProjectBundle]:
     """
@@ -163,13 +170,19 @@ async def export_project_bundle(
 @router.post("/import", response_model=APIResponse[ProjectRead])
 async def import_project_bundle(
     bundle: ProjectBundle,
+    current_user: AuthenticatedUser = Depends(get_current_user),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[ProjectRead]:
     """
     Import portable project bundle with complete ID remapping into database (PERS-03).
+    Assigns ownership to current_user.id.
     """
     try:
         new_project = await service.import_project_bundle(bundle)
+        new_project.owner_id = current_user.id
+        service.repo.session.add(new_project)
+        await service.repo.session.commit()
+        await service.repo.session.refresh(new_project)
         return api_success(new_project.to_read_schema())
     except Exception as exc:
         logger.error(f"Failed to import project bundle: {exc}", exc_info=True)
@@ -182,6 +195,7 @@ async def import_project_bundle(
 @router.post("/{project_id}/snapshots", response_model=APIResponse[SnapshotRead])
 async def create_storage_snapshot(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[SnapshotRead]:
     """
@@ -203,6 +217,7 @@ async def create_storage_snapshot(
 @router.get("/{project_id}/snapshots", response_model=APIResponse[List[SnapshotRead]])
 async def list_storage_snapshots(
     project_id: str,
+    project: Project = Depends(require_project_owner),
     service: PersistenceService = Depends(get_persistence_service),
 ) -> APIResponse[List[SnapshotRead]]:
     """

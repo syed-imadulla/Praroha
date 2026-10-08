@@ -34,15 +34,27 @@ import {
   GenerationJobRead,
 } from '../types';
 
+import { supabase } from '../realtime/supabaseRealtime';
+import { useAuthStore } from '../store/authStore';
+
 class ApiClient {
   private baseUrl = '/api';
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<APIResponse<T>> {
     try {
+      const authHeader: Record<string, string> = {};
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          authHeader['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      }
+
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
+          ...authHeader,
           ...(options?.headers || {}),
         },
         ...options,
@@ -56,6 +68,11 @@ class ApiClient {
       }
 
       if (!response.ok) {
+        if (response.status === 401) {
+          if (useAuthStore.getState().authStatus === 'AUTHENTICATED') {
+            useAuthStore.getState().handleSessionExpired();
+          }
+        }
         return {
           success: false,
           data: null,
@@ -81,6 +98,13 @@ class ApiClient {
         },
       };
     }
+  }
+
+  async signUp(email: string, password: string): Promise<APIResponse<{ id: string; email: string }>> {
+    return this.request<{ id: string; email: string }>('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
   }
 
   async getHealth(): Promise<APIResponse<SystemHealthData>> {
