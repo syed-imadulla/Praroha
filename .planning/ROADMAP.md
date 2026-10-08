@@ -356,8 +356,8 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [ ] **Phase 27: Profile Screen** — Botanical identity card, stats, creation tabs, account settings panel, soft danger logout.
 - [x] **Phase 28: Seed → Universe Workspace** — Botanical redesign of the 7 workspace stages preserving all functional logic.
 - [x] **Phase 29: Secondary UI** — Botanical modals, drawer, lightboxes, dropdowns, shortcuts, typography standardization, and minimum 12px text polish.
-- [ ] **Phase 30: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
-- [ ] **Phase 31: Responsive & Accessibility** — Multi-device responsive layout, 44px touch targets, focus rings.
+- [/] **Phase 30: UI Density, Clustering & Composition Polish** — Comprehensive density audit and multi-wave decluttering (Wave 1 P0 Canvas Cleanup completed).
+- [ ] **Phase 31: Motion & Organic Unfolding** — Organic transitions (180ms), seed pulse, gentle unfolding motion.
 - [ ] **Phase 32: Final Visual Audit & Verification** — Complete review against `design.md` checklist and test verification.
 
 ---
@@ -402,4 +402,21 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   3. Minimum 44px touch targets on primary actions, modal close triggers, and drawer headers.
   4. Origin badges, media controls, and stage progress headers styled with comfortable padding and readable font sizes.
   5. 154/154 pytest tests, clean production build (`npm run build`), and 100% pass rate in `test_phase29_ui_polish.cjs`.
+
+---
+
+### Phase 30: UI Density, Clustering & Composition Polish
+**Goal**: Systematic elimination of visual clutter, misplaced developer telemetry, and competing actions across primary creative workspaces.  
+**Depends on**: Phase 29  
+**Plans**: 4 Waves (Wave 1 completed)
+- [x] **30-01-PLAN.md / Wave 1 (P0 Clutter Reduction)**: Removal of canvas architecture/engine status cards across all 7 stages, removal of premature media generation from Stage 3 candidates, removal of duplicate branching launchers/tabs from Stage 5 Codex, removal of competing Stage 3 bottom CTA, and Stage 7 refinement sub-view consolidation (`test_phase30_01_clutter_reduction.cjs`).
+- [ ] **Wave 2 (TopBar & Navigation Density)**: TopBar action consolidation and mobile progress drawer recomposition.
+- [ ] **Wave 3 (Stage 4 & Stage 2 Layout Flattening)**: Stage 4 selection gate consolidation and Stage 2 DNA blueprint flattening.
+- [ ] **Wave 4 (Stage 3 & Stage 6 Progressive Disclosure)**: Stage 3 narrative dimensions progressive disclosure and Stage 6 DAG filter toolbar unification.
+**Success Criteria (Wave 1)**:
+  1. Zero technical architecture cards rendered on creative canvases.
+  2. Stage 3 candidate comparison contains zero premature media generation inputs/buttons.
+  3. Stage 5 Codex contains zero duplicate Mutation Lab or Counterfactual Replay launchers.
+  4. Stage 3 retains exactly one dominant progression CTA.
+  5. 100% pass across all 8 test suites with zero horizontal overflow across 6 viewports.
 

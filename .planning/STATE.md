@@ -4,10 +4,10 @@ milestone: 'Milestone 3: Complete UI Upgrade'
 status: in_progress
 progress:
   total_phases: 32
-  completed_phases: 26
+  completed_phases: 27
   total_plans: 64
-  completed_plans: 46
-  percent: 71.88
+  completed_plans: 47
+  percent: 73.44
 ---
 
 # Project State: Seed Unfold (Praroha)
@@ -17,25 +17,26 @@ progress:
 See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-08)
 
 **Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, and creator-locked human-only zones.  
-**Current focus:** Milestone 3: Complete UI Upgrade (Phase 29: Secondary UI + Typography + Visibility Polish Complete)
+**Current focus:** Milestone 3: Complete UI Upgrade (Phase 30.1: Wave 1 — Canvas Cleanup & P0 Clutter Removal Complete)
 
 ## Current Position
 
-Phase: 29 Secondary UI + Typography + Visibility Polish — 100% Completed & Verified!
+Phase: 30.1 Wave 1 Canvas Cleanup & P0 Clutter Removal — 100% Completed & Verified!
 Milestone 1 (Phases 1–8): 100% Completed & Verified (53 backend tests, 16 E2E tests, clean frontend build).
 Milestone 2 (Phases 9–20): 100% Completed & Verified (154 backend tests, 77 E2E scenarios, all engines verified).
 Milestone 3 UI Refinement & Polish Achievements:
 - Phase 21–24: Design System Foundation, Global App Shell, Home Screen, and Canonical `CreationCard` component system.
 - Phase 28 (Botanical Workspace): 100% reskinned Stages 4 (Choose & Decision DNA), 5 (Unfold Codex), 6 (Traceability DAG), and 7 (Refine & Mutation Lab & Counterfactual Replay). Zero residual dark cyber elements.
-- Phase 29 (Secondary UI & Typography Polish):
-  - Standardized typography scale: Headings Cormorant Garamond (20–36px), UI controls Inter (14–15px), body Inter (14–16px), metadata Inter/mono (12–13px min).
-  - Absolute elimination of all text under 12px: 0 occurrences of `text-[9px]` or `text-[10px]` across `frontend/src`.
-  - Contrast elevation: Replaced faint `/40` and `/50` opacities with solid botanical tokens (`#294B3A`, `#394840`, `#5F6D63`).
-  - Touch targets: Minimum 44px hit bounds on primary actions and modal close buttons (`w-11 h-11`); minimum 32–38px for inline chips and tools.
-  - Secondary UI components: Upgraded `OriginBadge`, `TopBar`, `StageProgressHeader`, `InspectorDrawer`, `WhyIsThisHereModal`, `RefinementModal`, `KeyboardShortcutsModal`, `GuidedTourOverlay`, `AtmosphereDeck`, and lightboxes.
-  - Multi-viewport stability: Zero horizontal page overflow verified across 1440px desktop, 1024px tablet, and 390px mobile viewports.
-Status: Phase 29 Complete & Verified (154 backend tests passing, `test_phase29_ui_polish.cjs` passing 100%, clean production build).
-Last activity: 2026-10-08 — Completed Phase 29 Secondary UI, Typography & Visibility Polish Pass with zero backend changes and zero functional compromises.
+- Phase 29 (Secondary UI & Typography Polish): Standardized typography scale (Cormorant 20–36px, Inter 14–16px, metadata 12–13px min), zero instances of `text-[9px]` or `text-[10px]`, high contrast botanical tokens, 44px min touch targets.
+- Phase 30.1 (Wave 1 P0 Clutter Removal):
+  - Removed canvas architecture cards (`AI Provider Engine`, `Persistence Layer`, `Cloud Object Storage`) across all 7 creative canvases.
+  - Removed premature media generation prompt textboxes, aspect ratio selectors, and buttons from Stage 3 candidate cards.
+  - Removed duplicate header branching launchers (`launcher-simulate-what-if-btn`, `launcher-counterfactual-replay-btn`) and tabs (`codex-tab-mutation`, `codex-tab-replay`) from Stage 5 Codex.
+  - Consolidated Mutation Lab and Counterfactual Replay into Stage 7 Refine sub-views (`#refine-tab-timeline`, `#refine-tab-mutation`, `#refine-tab-replay`).
+  - Removed duplicate `Continue to Stage 4` button from Stage 3 lower guidance banner, leaving single dominant header CTA.
+  - Zero empty space backfilling; pure whitespace restoration.
+Status: Phase 30.1 Complete & Verified (154 backend tests passing, `test_phase30_01_clutter_reduction.cjs` passing 100%, 7 existing regression suites passing 100%, clean production build).
+Last activity: 2026-10-08 — Completed Phase 30.1 Wave 1 Canvas Cleanup & P0 Clutter Removal.
 
 Progress: [██████████] 100.0%
 

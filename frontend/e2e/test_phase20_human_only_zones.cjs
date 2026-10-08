@@ -308,20 +308,22 @@ async function runPhase20E2E() {
     results.push('Scenario 8: Canonical Demo Exact HOZ Verification - PASSED');
 
     // -------------------------------------------------------------
-    // Regression Verification: Mutation Lab & Counterfactual Replay
+    // Regression Verification: Mutation Lab & Counterfactual Replay (Stage 7 Refine)
     // -------------------------------------------------------------
-    console.log('\n--- Regression Verification: Phase 18 & 19 Features ---');
-    const replayLauncher = page.locator('#launcher-counterfactual-replay-btn');
-    assert(await replayLauncher.isVisible(), 'Counterfactual Replay launcher must remain accessible');
-    const mutationLauncher = page.locator('#launcher-simulate-what-if-btn');
-    assert(await mutationLauncher.isVisible(), 'Mutation Lab launcher must remain accessible');
+    console.log('\n--- Regression Verification: Phase 18 & 19 Features (Stage 7 Refine) ---');
+    await page.evaluate(() => window.__workspaceStore.getState().setActiveStage('refine'));
+    await page.waitForTimeout(500);
 
-    await replayLauncher.click();
+    const replayTab = page.locator('#refine-tab-replay, [data-testid="refine-tab-replay"]');
+    assert(await replayTab.isVisible(), 'Counterfactual Replay in Stage 7 must remain accessible');
+    await replayTab.click();
     await page.locator('[data-testid="counterfactual-replay-canvas"]').waitFor({ timeout: 5000 });
     console.log('✅ Phase 19 Counterfactual Replay remains operational');
 
-    await mutationLauncher.click();
-    await page.locator('#codex-tab-mutation, [data-testid="seed-mutation-lab-canvas"], [data-testid*="premise-var-btn"]').first().waitFor({ timeout: 5000 });
+    const mutationTab = page.locator('#refine-tab-mutation, [data-testid="refine-tab-mutation"]');
+    assert(await mutationTab.isVisible(), 'Mutation Lab in Stage 7 must remain accessible');
+    await mutationTab.click();
+    await page.locator('[data-testid="seed-mutation-lab-canvas"], [data-testid*="premise-var-btn"]').first().waitFor({ timeout: 5000 });
     console.log('✅ Phase 18 Mutation Lab remains operational');
 
     console.log('\n======================================================');

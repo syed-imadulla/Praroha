@@ -26,8 +26,6 @@ import { OriginBadge } from './OriginBadge';
 import { WhyIsThisHereModal, WhyIsThisHereData } from './WhyIsThisHereModal';
 import { EntityMediaSection } from './EntityMediaSection';
 import { AtmosphereDeck } from './AtmosphereDeck';
-import { SeedMutationLabCanvas } from './SeedMutationLabCanvas';
-import { CounterfactualReplayCanvas } from './CounterfactualReplayCanvas';
 import type { OriginType } from '../types';
 
 export const UniverseCodexCanvas: React.FC = () => {
@@ -126,24 +124,6 @@ export const UniverseCodexCanvas: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            <button
-              id="launcher-simulate-what-if-btn"
-              onClick={() => setActiveCodexTab('mutation')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#294B3A] transition shadow-2xs font-semibold min-h-[38px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
-              title="Launch Seed Mutation Lab"
-            >
-              <Sparkles className="w-4 h-4 text-[#C59A55]" />
-              <span>Simulate "What If?"</span>
-            </button>
-            <button
-              id="launcher-counterfactual-replay-btn"
-              onClick={() => setActiveCodexTab('replay')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2EBDD] hover:bg-[#EAE4D4] border border-[#D8CCB7] text-xs text-[#6A4B67] transition shadow-2xs font-semibold min-h-[38px] focus:outline-none focus:ring-1 focus:ring-[#6A4B67]"
-              title="Launch Counterfactual Replay"
-            >
-              <GitFork className="w-4 h-4 text-[#6A4B67]" />
-              <span>What If I Chose Another World?</span>
-            </button>
             <button
               onClick={() => {
                 setInspectorTab('provenance');
@@ -508,43 +488,10 @@ export const UniverseCodexCanvas: React.FC = () => {
                     {unfoldedUniverse.scenes.length}
                   </span>
                 </button>
-
-                <button
-                  id="codex-tab-mutation"
-                  onClick={() => setActiveCodexTab('mutation')}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold border-b-2 transition ${
-                    activeCodexTab === 'mutation'
-                      ? 'border-[#A0522D] text-[#A0522D] bg-[#F5E6DC]/60 font-serif'
-                      : 'border-transparent text-[#718875] hover:text-[#294B3A] hover:bg-[#F2EBDD]/60'
-                  }`}
-                >
-                  <Sparkles className="w-4 h-4 text-[#A0522D]" />
-                  <span>Seed Mutation Lab</span>
-                  <span className="px-2 py-0.5 rounded text-xs bg-[#F5E6DC] text-[#A0522D] border border-[#E2BFAC] font-mono font-bold">
-                    NEW
-                  </span>
-                </button>
-
-                <button
-                  id="codex-tab-replay"
-                  onClick={() => setActiveCodexTab('replay')}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold border-b-2 transition ${
-                    activeCodexTab === 'replay'
-                      ? 'border-[#6A4B67] text-[#6A4B67] bg-[#EFE8EE]/60 font-serif'
-                      : 'border-transparent text-[#718875] hover:text-[#294B3A] hover:bg-[#F2EBDD]/60'
-                  }`}
-                >
-                  <GitFork className="w-4 h-4 text-[#6A4B67]" />
-                  <span>Counterfactual Replay</span>
-                  <span className="px-2 py-0.5 rounded text-xs bg-[#EFE8EE] text-[#6A4B67] border border-[#DFD1DE] font-mono font-bold">
-                    NEW
-                  </span>
-                </button>
               </div>
             </div>
 
             {/* Origin Filter Toolbar (ORIG-02) */}
-            {activeCodexTab !== 'mutation' && activeCodexTab !== 'replay' && (
             <div
               className="flex flex-wrap items-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-xs"
               data-testid="origin-filter-toolbar"
@@ -591,7 +538,6 @@ export const UniverseCodexCanvas: React.FC = () => {
                 );
               })}
             </div>
-            )}
 
             {/* TAB 1: World Bible & Locations */}
             {activeCodexTab === 'bible' && (
@@ -1203,28 +1149,6 @@ export const UniverseCodexCanvas: React.FC = () => {
                     </div>
                   );
                 })}
-              </motion.div>
-            )}
-
-            {/* TAB 4: Seed Mutation Lab (MUT-01 to MUT-04) */}
-            {activeCodexTab === 'mutation' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
-              >
-                <SeedMutationLabCanvas />
-              </motion.div>
-            )}
-
-            {/* TAB 5: Counterfactual Replay (CNTR-01, CNTR-02) */}
-            {activeCodexTab === 'replay' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
-              >
-                <CounterfactualReplayCanvas />
               </motion.div>
             )}
           </div>

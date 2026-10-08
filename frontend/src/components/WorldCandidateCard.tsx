@@ -14,7 +14,6 @@ import {
   Orbit,
 } from 'lucide-react';
 import { WorldCandidateRead } from '../types';
-import { EntityMediaSection } from './EntityMediaSection';
 
 interface WorldCandidateCardProps {
   candidate: WorldCandidateRead;
@@ -306,17 +305,6 @@ export const WorldCandidateCard: React.FC<WorldCandidateCardProps> = ({
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Hero World Cover Visual Generation */}
-      <div className="px-5 pb-3">
-        <EntityMediaSection
-          entityType="world"
-          entityId={candidate.id}
-          defaultPrompt={`Hero cover visual for ${candidate.title}. ${candidate.concept}. Aesthetic: ${candidate.aesthetic}. Key visual: ${candidate.key_visual}`}
-          availableModalities={['image']}
-          compact={true}
-        />
       </div>
 
       {/* Card Footer / Selection state */}

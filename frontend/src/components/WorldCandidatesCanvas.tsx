@@ -198,22 +198,12 @@ export const WorldCandidatesCanvas: React.FC = () => {
               ))}
             </div>
 
-            {/* Bottom Guidance Banner */}
-            <div className="p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-[#466A55] text-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <Info className="w-4 h-4 text-[#355A46] shrink-0" />
-                <span>
-                  Compare the three archetypes side-by-side. In <strong className="text-[#294B3A]">Stage 4: World Selection</strong>, you will choose one world to progressively unfold into bible, characters, and scenes.
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleProceedToStage4}
-                className="text-[#355A46] hover:text-[#294B3A] font-semibold whitespace-nowrap flex items-center gap-1 text-xs"
-              >
-                <span>Continue to Stage 4</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            {/* Bottom Guidance Banner (Informational Only) */}
+            <div className="p-4 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] text-[#466A55] text-xs flex items-center gap-2 shadow-2xs">
+              <Info className="w-4 h-4 text-[#355A46] shrink-0" />
+              <span>
+                Compare the three archetypes side-by-side. In <strong className="text-[#294B3A]">Stage 4: World Selection</strong>, you will choose one world to progressively unfold into bible, characters, and scenes.
+              </span>
             </div>
           </motion.div>
         ) : (

@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { RefinementModal } from './RefinementModal';
+import { SeedMutationLabCanvas } from './SeedMutationLabCanvas';
+import { CounterfactualReplayCanvas } from './CounterfactualReplayCanvas';
 import { apiClient } from '../api/client';
 
 export const RefineCanvas: React.FC = () => {
@@ -44,6 +46,7 @@ export const RefineCanvas: React.FC = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [selectedEntityFilter, setSelectedEntityFilter] = useState<'all' | 'character' | 'scene'>('all');
+  const [activeRefineSubTab, setActiveRefineSubTab] = useState<'timeline' | 'mutation' | 'replay'>('timeline');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -214,6 +217,57 @@ export const RefineCanvas: React.FC = () => {
         </div>
       </div>
 
+      {/* Sub-Stage Refinement Lens Switcher */}
+      <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-[#EAE4D4] border border-[#D8CCB7] w-fit shadow-2xs">
+        <button
+          type="button"
+          id="refine-tab-timeline"
+          data-testid="refine-tab-timeline"
+          onClick={() => setActiveRefineSubTab('timeline')}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition ${
+            activeRefineSubTab === 'timeline'
+              ? 'bg-[#355A46] text-[#F8F4E8] shadow-xs'
+              : 'text-[#466A55] hover:text-[#294B3A]'
+          }`}
+        >
+          <GitBranch className="w-3.5 h-3.5" />
+          <span>Timeline Branches & Revisions</span>
+        </button>
+
+        <button
+          type="button"
+          id="refine-tab-mutation"
+          data-testid="refine-tab-mutation"
+          onClick={() => setActiveRefineSubTab('mutation')}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition ${
+            activeRefineSubTab === 'mutation'
+              ? 'bg-[#355A46] text-[#F8F4E8] shadow-xs'
+              : 'text-[#466A55] hover:text-[#294B3A]'
+          }`}
+        >
+          <History className="w-3.5 h-3.5" />
+          <span>Seed Mutation Lab</span>
+        </button>
+
+        <button
+          type="button"
+          id="refine-tab-replay"
+          data-testid="refine-tab-replay"
+          onClick={() => setActiveRefineSubTab('replay')}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition ${
+            activeRefineSubTab === 'replay'
+              ? 'bg-[#355A46] text-[#F8F4E8] shadow-xs'
+              : 'text-[#466A55] hover:text-[#294B3A]'
+          }`}
+        >
+          <GitFork className="w-3.5 h-3.5" />
+          <span>Counterfactual Replay</span>
+        </button>
+      </div>
+
+      {/* Content View Routing */}
+      {activeRefineSubTab === 'timeline' && (
+      <>
       {/* GRID SECTION 1 & 2: Timeline Branching + Refinement Station */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT: Timeline & Branch Navigator (5 cols) */}
@@ -636,6 +690,30 @@ export const RefineCanvas: React.FC = () => {
           )}
         </div>
       </div>
+      </>
+      )}
+
+      {/* SUB-VIEW 2: Seed Mutation Lab */}
+      {activeRefineSubTab === 'mutation' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <SeedMutationLabCanvas />
+        </motion.div>
+      )}
+
+      {/* SUB-VIEW 3: Counterfactual Replay */}
+      {activeRefineSubTab === 'replay' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <CounterfactualReplayCanvas />
+        </motion.div>
+      )}
 
       {/* Refinement Modal */}
       <RefinementModal />

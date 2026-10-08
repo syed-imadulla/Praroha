@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, Database, HardDrive, Compass, ArrowLeft, AlertTriangle, X } from 'lucide-react';
+import { Compass, ArrowLeft, AlertTriangle, X } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { StageType } from '../types';
 import { SeedInputCanvas } from './SeedInputCanvas';
@@ -19,7 +19,6 @@ export const WorkspaceCanvas: React.FC = () => {
     activeStage,
     setActiveStage,
     unlockedStages,
-    health,
     inspectorOpen,
     toggleInspector,
     seedDNA,
@@ -179,47 +178,6 @@ export const WorkspaceCanvas: React.FC = () => {
           </div>
         )}
 
-        {/* Architecture & Engine Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-[#D8CCB7]">
-          <div className="rounded-xl p-4 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
-            <div className="flex items-center gap-2 text-[#355A46] text-xs font-bold uppercase tracking-wider">
-              <Layers className="w-4 h-4" />
-              <span>AI Provider Engine</span>
-            </div>
-            <p className="text-xs text-[#294B3A] font-mono">
-              Configured: <span className="font-bold">{health?.ai_provider.configured || 'gemini'}</span>
-            </p>
-            <p className="text-[11px] text-[#466A55]">
-              Resolved: <span className="font-mono text-[#294B3A]">{health?.ai_provider.resolved || 'mock'}</span> with automatic fallback.
-            </p>
-          </div>
-
-          <div className="rounded-xl p-4 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
-            <div className="flex items-center gap-2 text-[#466A55] text-xs font-bold uppercase tracking-wider">
-              <Database className="w-4 h-4" />
-              <span>Persistence Layer</span>
-            </div>
-            <p className="text-xs text-[#294B3A] font-mono">
-              Engine: <span className="font-bold">SQLModel / SQLite</span>
-            </p>
-            <p className="text-[11px] text-[#466A55]">
-              PostgreSQL/Supabase target with local SQLite fallback for offline execution.
-            </p>
-          </div>
-
-          <div className="rounded-xl p-4 bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-2xs">
-            <div className="flex items-center gap-2 text-[#6A4B67] text-xs font-bold uppercase tracking-wider">
-              <HardDrive className="w-4 h-4" />
-              <span>Cloud Object Storage</span>
-            </div>
-            <p className="text-xs text-[#294B3A] font-mono">
-              Storage: <span className="font-bold">{health?.storage_provider.type || 'LocalStorage'}</span>
-            </p>
-            <p className="text-[11px] text-[#466A55]">
-              Binary assets strictly separated from database; stored in local ./uploads/ directory.
-            </p>
-          </div>
-        </div>
       </PageContainer>
 
       {/* 7-Stage Guided Demo Tour Overlay */}
