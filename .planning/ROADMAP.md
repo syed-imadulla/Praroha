@@ -27,7 +27,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 20: Human-Only Zones** — Creator-locked creative constraints protected from AI modification.
 - [x] **Phase 21: Design System Foundation** — Global design tokens, Cormorant Garamond / Inter typography, warm parchment background, paper grain, and core utilities.
 - [x] **Phase 22: Global App Shell** — Warm cream sidebar (265-280px), botanical branding, and corner accents.
-- [ ] **Phase 23: Home Screen** — Editorial hero statement, leaf separator, 72px pill seed input, 5 creation modes, and recent creations row.
+- [x] **Phase 23: Home Screen** — Editorial hero statement, leaf separator, 72px pill seed input, 5 creation modes, and recent creations row.
 - [ ] **Phase 24: Creation Component System** — Unified reusable CreationCard component supporting Image, Story, Sound, Video, and Chat.
 - [ ] **Phase 25: My Creations Screen** — 3-column gallery, search, sort, filter pills, and empty states.
 - [ ] **Phase 26: Graveyard Screen** — Calm, poetic cemetery for removed ideas with restore and permanent deletion confirmation.

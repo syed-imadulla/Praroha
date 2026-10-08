@@ -80,7 +80,7 @@ async function runTest() {
     await returnBtn.click();
     await page.waitForTimeout(300);
 
-    const seedCanvas = page.locator('h1:has-text("Plant the Creative Seed")');
+    const seedCanvas = page.locator('blockquote:has-text("Universes exist in a seed form")');
     await seedCanvas.waitFor({ state: 'visible' });
     console.log('✅ Returned to Home; full Seed Unfold workspace is visible and active');
 

@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Compass,
   Sparkles,
+  ArrowRight,
+  Loader2,
   Waves,
   Rocket,
   Trees,
-  ArrowRight,
-  Shield,
-  Loader2,
-  CheckCircle2,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { SeedPreset } from '../types';
+import { HomeHero } from './home/HomeHero';
+import { CreationModes, CreationMode } from './home/CreationModes';
+import { RecentCreationsRow, CANONICAL_RECENT_CREATIONS } from './home/RecentCreationsRow';
+import { SeedJourneyPreviewCard } from './home/SeedJourneyPreviewCard';
 
 export const SEED_PRESETS: SeedPreset[] = [
   {
@@ -48,8 +49,7 @@ export const SeedInputCanvas: React.FC = () => {
     loadCanonicalDemoUniverse,
   } = useWorkspaceStore();
 
-  const wordCount = seedText.trim() ? seedText.trim().split(/\s+/).length : 0;
-  const charCount = seedText.length;
+  const [activeCreationMode, setActiveCreationMode] = useState<CreationMode | null>('image');
 
   const handleSelectPreset = (seed: string) => {
     setSeedText(seed);
@@ -60,183 +60,159 @@ export const SeedInputCanvas: React.FC = () => {
     await extractSeedDNA(seedText.trim());
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleExtract();
+    }
+  };
+
   return (
-    <div className="w-full max-w-4xl space-y-8 py-4">
-      {/* Hero Header */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 text-xs font-medium tracking-wide font-mono">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Tattva 2: Forms Hidden in Formless • Stage 1: Seed</span>
-        </div>
+    <div className="w-full flex-1 flex flex-col justify-start py-4 px-2 sm:px-6 max-w-7xl mx-auto select-none">
+      <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12 w-full">
+        {/* Main Left Column: Hero, Seed Input, Creation Modes, Recent Creations */}
+        <div className="flex-1 flex flex-col items-start w-full min-w-0 max-w-3xl">
+          {/* 1. Editorial Hero Statement & Leaf Separator */}
+          <HomeHero />
 
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-100 font-sans">
-          Plant the Creative Seed
-        </h1>
-        <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-          Provide an incomplete, evocative premise. Praroha will progressively reveal the latent forms hidden within this seed through structured Generative AI unfolding.
-        </p>
-
-        {/* Instant Canonical Demo Launcher */}
-        <div className="pt-2 flex items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => loadCanonicalDemoUniverse()}
-            className="px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-300 text-slate-950 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2 font-mono"
-            title="Instantly generate and unfold complete Bio-City universe for hackathon judging"
-          >
-            <Sparkles className="w-4 h-4 text-slate-950 fill-current" />
-            <span>🌟 Instant Full Universe (Demo)</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Preset Curations */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-          <span className="font-semibold uppercase tracking-wider text-slate-300">
-            Quick Seed Presets
-          </span>
-          <span className="text-[11px] text-slate-500">
-            Click to populate or type custom seed below
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {SEED_PRESETS.map((preset) => {
-            const isSelected = seedText === preset.seed;
-            const Icon =
-              preset.id === 'ocean-city'
-                ? Waves
-                : preset.id === 'orbital-ark'
-                ? Rocket
-                : Trees;
-
-            return (
-              <button
-                key={preset.id}
-                type="button"
-                onClick={() => handleSelectPreset(preset.seed)}
-                className={`text-left p-3.5 rounded-xl border transition-all relative overflow-hidden group ${
-                  isSelected
-                    ? 'bg-cyan-950/40 border-cyan-500 shadow-glow-cyan/30'
-                    : preset.id === 'ocean-city'
-                    ? 'bg-cyan-950/20 hover:bg-cyan-950/40 border-cyan-500/50 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                    : 'bg-canvas-card/60 hover:bg-canvas-card border-canvas-border hover:border-slate-700'
+          {/* 2. Primary 72px Seed Input Container */}
+          <div className="w-full relative mt-1 mb-3">
+            <div
+              className={`w-full min-h-[72px] rounded-[36px] bg-[#F8F4E8] border border-[#D8CCB7] px-5 py-2.5 flex items-center gap-3.5 shadow-xs transition-all duration-180 ${
+                isExtracting
+                  ? 'border-[#718875] ring-2 ring-[#718875]/30'
+                  : 'hover:border-[#C8D0BE] focus-within:border-[#294B3A] focus-within:ring-2 focus-within:ring-[#294B3A]/20'
+              }`}
+            >
+              {/* Botanical Seed Emblem on the Left */}
+              <div
+                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                  isExtracting ? 'text-[#355A46] animate-pulse' : 'text-[#466A55]'
                 }`}
+                aria-hidden="true"
               >
-                <div className="flex items-center justify-between mb-1.5 gap-2">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition">
-                    <Icon className="w-3.5 h-3.5 text-cyan-400" />
-                    {preset.title}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    {preset.id === 'ocean-city' && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                        🌟 Canonical Demo
-                      </span>
-                    )}
-                    {isSelected && (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-                    )}
-                  </div>
-                </div>
-                <div className="text-[10px] text-cyan-400/80 font-mono mb-1">
-                  {preset.genre}
-                </div>
-                <p className="text-slate-400 text-xs line-clamp-2 leading-relaxed">
-                  {preset.seed}
-                </p>
-                <div className="mt-2 text-[10px] text-slate-500 italic">
-                  {preset.tagline}
-                </div>
+                <svg
+                  className="w-6 h-6 stroke-[1.8]"
+                  viewBox="0 0 36 36"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 31 C 18 20, 9 17, 7 8 C 17 8, 20 18, 18 31 Z" />
+                  <path d="M18 31 C 18 20, 27 17, 29 8 C 19 8, 16 18, 18 31 Z" />
+                </svg>
+              </div>
+
+              {/* Seed Text Input (TextArea styled as single-line/expandable input) */}
+              <textarea
+                rows={1}
+                value={seedText}
+                onChange={(e) => setSeedText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isExtracting}
+                placeholder="Enter your seed... (text, image, sound or idea)"
+                className="flex-1 bg-transparent border-none text-[#294B3A] placeholder:text-[#718875]/75 focus:outline-none focus:ring-0 text-[16px] sm:text-[17px] font-sans resize-none py-2 leading-relaxed"
+                aria-label="Enter your seed idea"
+              />
+
+              {/* Circular Sage Submit Button */}
+              <button
+                type="button"
+                onClick={handleExtract}
+                disabled={!seedText.trim() || isExtracting}
+                className="w-12 h-12 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] flex items-center justify-center transition-all duration-180 shadow-xs hover:shadow-md disabled:opacity-40 shrink-0 focus:outline-none focus:ring-2 focus:ring-[#294B3A] focus:ring-offset-2"
+                title="Extract Seed DNA"
+                aria-label="Extract Seed DNA"
+              >
+                {isExtracting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <ArrowRight className="w-5 h-5 stroke-[2.2]" />
+                )}
+                {/* Screen-reader and selector compatibility label */}
+                <span className="sr-only">Extract Seed DNA</span>
               </button>
-            );
-          })}
-        </div>
-      </div>
+            </div>
 
-      {/* Main Seed Input Box */}
-      <div className="glass-panel rounded-2xl p-6 md:p-8 space-y-5 border border-canvas-border shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-500 opacity-60" />
-
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <Compass className="w-4 h-4 text-cyan-400" />
-            <span>Creative Seed Textarea</span>
-          </label>
-          <div className="text-xs text-slate-500 font-mono">
-            {wordCount} words • {charCount} chars
+            {/* In-flight extraction status pill */}
+            <AnimatePresence>
+              {isExtracting && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  className="mt-2 px-4 py-1.5 rounded-full bg-[#EAE4D4] border border-[#D8CCB7] inline-flex items-center gap-2 text-xs text-[#294B3A] font-medium"
+                >
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#355A46]" />
+                  <span>
+                    {extractionStep || 'Understanding seed intent and extracting latent DNA...'}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
 
-        <div className="relative">
-          <textarea
-            rows={5}
-            value={seedText}
-            onChange={(e) => setSeedText(e.target.value)}
-            disabled={isExtracting}
-            placeholder="Type or paste your creative premise here... (e.g. A solitary cartographer maps islands that vanish when unobserved)"
-            className="w-full bg-canvas-deep/90 border border-slate-700/80 rounded-xl p-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition font-sans text-sm md:text-base resize-none shadow-inner disabled:opacity-50"
+          {/* Preset Chips & Instant Demo Launcher */}
+          <div className="flex flex-wrap items-center gap-2 mb-3 w-full">
+            <span className="text-[12px] font-medium text-[#718875] mr-1">Presets:</span>
+            {SEED_PRESETS.map((preset) => {
+              const isSelected = seedText === preset.seed;
+              const Icon =
+                preset.id === 'ocean-city'
+                  ? Waves
+                  : preset.id === 'orbital-ark'
+                  ? Rocket
+                  : Trees;
+
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => handleSelectPreset(preset.seed)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1.5 transition-all duration-180 focus:outline-none focus:ring-1 focus:ring-[#294B3A] ${
+                    isSelected
+                      ? 'bg-[#294B3A] text-[#F8F4E8] shadow-xs'
+                      : 'bg-[#F2EBDD] text-[#394840] border border-[#D8CCB7] hover:bg-[#E8E0D0] hover:text-[#294B3A]'
+                  }`}
+                >
+                  <Icon className="w-3 h-3 opacity-75" />
+                  <span>{preset.title}</span>
+                </button>
+              );
+            })}
+
+            {/* Instant Canonical Demo Launcher Button */}
+            <button
+              type="button"
+              onClick={() => loadCanonicalDemoUniverse()}
+              className="ml-auto px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#E7C8B5] hover:bg-[#DFAFA0] text-[#A0522D] border border-[#B8734F]/30 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-[#A0522D]"
+              title="Instantly generate and unfold complete Bio-City universe for hackathon judging"
+            >
+              <Sparkles className="w-3.5 h-3.5 fill-current" />
+              <span>Instant Full Universe</span>
+            </button>
+          </div>
+
+          {/* 3. Creation Modes (5 Cards) */}
+          <CreationModes
+            activeMode={activeCreationMode}
+            onSelectMode={(mode) => setActiveCreationMode(mode)}
           />
 
-          {/* Animated Extraction Overlay */}
-          <AnimatePresence>
-            {isExtracting && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-slate-950/85 backdrop-blur-md rounded-xl flex flex-col items-center justify-center p-6 text-center space-y-4 z-10"
-              >
-                <div className="relative">
-                  <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
-                  <Sparkles className="w-4 h-4 text-emerald-400 absolute top-0 right-0 animate-ping" />
-                </div>
-                <div className="space-y-1">
-                  <div className="text-sm font-bold text-slate-100 font-mono">
-                    UNDERSTANDING PASS IN PROGRESS
-                  </div>
-                  <motion.p
-                    key={extractionStep}
-                    initial={{ y: 5, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className="text-xs text-cyan-300 font-medium max-w-sm"
-                  >
-                    {extractionStep || 'Analyzing semantic latent intent...'}
-                  </motion.p>
-                </div>
-                <div className="w-48 h-1 bg-slate-800 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400"
-                    animate={{ x: ['-100%', '100%'] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* 4. Recent Creations Horizontal Row */}
+          <RecentCreationsRow
+            creations={CANONICAL_RECENT_CREATIONS}
+            onPlantSeed={() => {
+              const textarea = document.querySelector('textarea');
+              textarea?.focus();
+            }}
+          />
         </div>
 
-        {/* Footer actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-slate-800">
-          <div className="text-xs text-slate-400 flex items-center gap-2">
-            <Shield className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>Immutable input guarantee — raw seed is permanently recorded alongside extracted DNA</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleExtract}
-            disabled={!seedText.trim() || isExtracting}
-            className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all ${
-              !seedText.trim() || isExtracting
-                ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 shadow-glow-cyan hover:scale-[1.02] active:scale-[0.98]'
-            }`}
-          >
-            <span>Extract Seed DNA</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+        {/* Right Column: "From a seed..." Journey Preview Card (Desktop) */}
+        <div className="hidden lg:flex flex-col items-center shrink-0 pt-2 sticky top-4">
+          <SeedJourneyPreviewCard />
         </div>
       </div>
     </div>
