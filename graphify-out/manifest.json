@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
-    "mtime": 1791097635.3925784,
-    "seen": 1791097877.3634937,
-    "ast_hash": "fed54875065b2be4c9bc1c48552e1f39",
+    "mtime": 1791428592.037839,
+    "seen": 1791432252.3482814,
+    "ast_hash": "181786aa01c0cab34d521cb4a421bdcf",
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791423427.1104698,
-    "seen": 1791423898.8893938,
-    "ast_hash": "37cf8ae8b3319a911a1c820a32f0c688",
+    "mtime": 1791428568.0420418,
+    "seen": 1791432252.3483398,
+    "ast_hash": "8958498e352a72533ef53908f4370499",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
@@ -168,9 +168,9 @@
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
-    "mtime": 1791082745.0146527,
-    "seen": 1791082976.2541323,
-    "ast_hash": "cd0633a4369ce5bdd6af50bb87bf893f",
+    "mtime": 1791428050.5844145,
+    "seen": 1791432252.348343,
+    "ast_hash": "fd399a178eaf0d65ca73bca054eb043b",
     "semantic_hash": ""
   },
   "frontend/tsconfig.json": {
@@ -210,9 +210,9 @@
     "semantic_hash": ""
   },
   ".planning/PROJECT.md": {
-    "mtime": 1791365345.3632207,
-    "seen": 1791365509.8364375,
-    "ast_hash": "66598996f1536d039e31401393b86167",
+    "mtime": 1791432142.689594,
+    "seen": 1791432252.348355,
+    "ast_hash": "a9ff946c24999d31e47822b1476f3d9b",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791410773.657643,
-    "seen": 1791410824.2420583,
-    "ast_hash": "f4f68a4544a7d96b7c0c00cf674d12d7",
+    "mtime": 1791432150.97654,
+    "seen": 1791432252.3483584,
+    "ast_hash": "243cb3ade49cb21b839992c672d7113d",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791410812.22429,
-    "seen": 1791410824.24206,
-    "ast_hash": "a22b93e0da9530c1de25e1933af28b04",
+    "mtime": 1791432161.4154723,
+    "seen": 1791432252.3483598,
+    "ast_hash": "52a8fbec39f2fac637b62985c79c1040",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "frontend/index.html": {
-    "mtime": 1791086623.811423,
-    "seen": 1791086669.575298,
-    "ast_hash": "4fb2b925baf6f55cf32cf191457bf731",
+    "mtime": 1791428030.8185816,
+    "seen": 1791432252.3485568,
+    "ast_hash": "083f17748b52dd2811877339adca1855",
     "semantic_hash": ""
   },
   "startDocs/SEED UNFOLD product documentation.pdf": {
@@ -414,9 +414,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/SeedInputCanvas.tsx": {
-    "mtime": 1791107440.064363,
-    "seen": 1791107850.3000886,
-    "ast_hash": "fcb65c5254b8dbf2622b7a7056922f54",
+    "mtime": 1791431909.824188,
+    "seen": 1791432252.3483067,
+    "ast_hash": "0823dfdeea7d9d169509d76efcd0878f",
     "semantic_hash": ""
   },
   ".planning/phases/02-seed-understanding-seed-dna/02-01-PLAN.md": {
@@ -1695,6 +1695,318 @@
     "mtime": 1791423886.1961951,
     "seen": 1791423898.8895311,
     "ast_hash": "e0a36521c8ee7ce11ade28dab4228384",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/capture_all_site_flows.cjs": {
+    "mtime": 1791424533.3268828,
+    "seen": 1791424652.031198,
+    "ast_hash": "57a06177b57a6595cb04f6c5f9e4eb47",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase22_app_shell.cjs": {
+    "mtime": 1791432028.916294,
+    "seen": 1791432252.3482587,
+    "ast_hash": "b88ec9ec5fbd55b88fddc7c808c65ffc",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase23_home_screen.cjs": {
+    "mtime": 1791432099.0498781,
+    "seen": 1791432252.3482616,
+    "ast_hash": "9ce9de86567b8d7dcaab5fa10251eb2c",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/home/CreationModes.tsx": {
+    "mtime": 1791431798.2977026,
+    "seen": 1791432252.348329,
+    "ast_hash": "282de9429e1c191473d2a4f4ee8f5c64",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/home/HomeHero.tsx": {
+    "mtime": 1791431782.494825,
+    "seen": 1791432252.3483303,
+    "ast_hash": "8d76502b30d3af841dff0e35ff110024",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/home/RecentCreationsRow.tsx": {
+    "mtime": 1791431819.3388712,
+    "seen": 1791432252.3483315,
+    "ast_hash": "e231dce08c528b1542b0f7ff2845ceb9",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/home/SeedJourneyPreviewCard.tsx": {
+    "mtime": 1791431837.897902,
+    "seen": 1791432252.3483326,
+    "ast_hash": "5c26df69234ec6a5959746067ec9d6b6",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/shell/AppShell.tsx": {
+    "mtime": 1791428941.0008903,
+    "seen": 1791432252.3483338,
+    "ast_hash": "906fc478cc3e309b533cb7f354d10650",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/shell/BotanicalDecorations.tsx": {
+    "mtime": 1791428475.5738232,
+    "seen": 1791432252.348335,
+    "ast_hash": "45e76d179485744733b62d959aa1200b",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/shell/Sidebar.tsx": {
+    "mtime": 1791428501.7696018,
+    "seen": 1791432252.3483362,
+    "ast_hash": "62802472d0125c5e680117deb76de9ce",
+    "semantic_hash": ""
+  },
+  ".planning/phases/21-design-system-foundation/21-PLAN.md": {
+    "mtime": 1791428015.3937118,
+    "seen": 1791432252.3485277,
+    "ast_hash": "b3363b76d5f662136e8b6a02a505001c",
+    "semantic_hash": ""
+  },
+  ".planning/phases/21-design-system-foundation/21-VERIFICATION.md": {
+    "mtime": 1791428163.53446,
+    "seen": 1791432252.3485289,
+    "ast_hash": "356b229dc00bed28c60ca8a0706c8256",
+    "semantic_hash": ""
+  },
+  ".planning/phases/22-global-app-shell/22-PLAN.md": {
+    "mtime": 1791428455.018997,
+    "seen": 1791432252.3485296,
+    "ast_hash": "e39ebe10fcdcd5d53edb7513e9d6acab",
+    "semantic_hash": ""
+  },
+  ".planning/phases/22-global-app-shell/22-VERIFICATION.md": {
+    "mtime": 1791428999.0104,
+    "seen": 1791432252.3485305,
+    "ast_hash": "1cd16638a13af9ca2c6c2e758920e0a2",
+    "semantic_hash": ""
+  },
+  ".planning/phases/23-home-screen/23-PLAN.md": {
+    "mtime": 1791431768.213299,
+    "seen": 1791432252.3485315,
+    "ast_hash": "0516b629c7e55a9b6798a3f867a80138",
+    "semantic_hash": ""
+  },
+  ".planning/phases/23-home-screen/23-VERIFICATION.md": {
+    "mtime": 1791432132.9546576,
+    "seen": 1791432252.3485324,
+    "ast_hash": "0f0184e17bd41fde1889bfb05a1268c6",
+    "semantic_hash": ""
+  },
+  "design.md": {
+    "mtime": 1791427861.108018,
+    "seen": 1791432252.3485367,
+    "ast_hash": "e056a6fea794a4d30b12ab7157d13f94",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/index.html": {
+    "mtime": 1791424964.9229243,
+    "seen": 1791432252.3485582,
+    "ast_hash": "165a77fc8634ad4964a0e1e74a22f767",
+    "semantic_hash": ""
+  },
+  "gallery.html": {
+    "mtime": 1791424974.2126217,
+    "seen": 1791432252.3485591,
+    "ast_hash": "165a77fc8634ad4964a0e1e74a22f767",
+    "semantic_hash": ""
+  },
+  "gallery/index.html": {
+    "mtime": 1791424974.2092092,
+    "seen": 1791432252.3485603,
+    "ast_hash": "165a77fc8634ad4964a0e1e74a22f767",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_01_stage1_seed_input.png": {
+    "mtime": 1791424882.4489315,
+    "seen": 1791432252.3485668,
+    "ast_hash": "824d47f11cbfbb58a0fc6417febf979e",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_02_stage2_seed_dna.png": {
+    "mtime": 1791424882.449443,
+    "seen": 1791432252.3485682,
+    "ast_hash": "1c6d6fd4754b734ec83b89db54ffab1e",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_03_stage2_seed_potential_map.png": {
+    "mtime": 1791424882.4499884,
+    "seen": 1791432252.3485694,
+    "ast_hash": "a13569d13d7ca506d406096e7e327235",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_04_stage3_divergent_worlds.png": {
+    "mtime": 1791424882.4504926,
+    "seen": 1791432252.3485703,
+    "ast_hash": "a98bbdb2a78189933ea2adfa84021553",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_05_stage4_world_selection_hoz.png": {
+    "mtime": 1791424882.4509888,
+    "seen": 1791432252.3485715,
+    "ast_hash": "02cc0e792f93926f2d0fd9b64f871370",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_06_stage5_codex_world_bible.png": {
+    "mtime": 1791424882.4515831,
+    "seen": 1791432252.3485725,
+    "ast_hash": "f18fb8a346883f82f149e4b20c0e58f6",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_07_stage5_codex_characters.png": {
+    "mtime": 1791424882.4516294,
+    "seen": 1791432252.3485734,
+    "ast_hash": "f87f1fa7e2b1257e4f943527c38e2771",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_08_stage5_codex_story_beats.png": {
+    "mtime": 1791424882.4530141,
+    "seen": 1791432252.3485744,
+    "ast_hash": "6ec11bd199f2b72c9c51ce8590a4bf0e",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_09_stage6_provenance_dag.png": {
+    "mtime": 1791424882.4537873,
+    "seen": 1791432252.348575,
+    "ast_hash": "abba92df4abee617ddec088518c32288",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_10_stage7_refine_branch.png": {
+    "mtime": 1791424882.4542809,
+    "seen": 1791432252.3485763,
+    "ast_hash": "90f27297f7f700ada1abef15bf3dee22",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_11_flow_why_is_this_here_modal.png": {
+    "mtime": 1791424882.4547684,
+    "seen": 1791432252.348577,
+    "ast_hash": "c1e1e1ee2a902e7e439d5b1f87f67568",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_12_flow_seed_mutation_lab.png": {
+    "mtime": 1791424882.4554129,
+    "seen": 1791432252.348578,
+    "ast_hash": "d80e4867a6779b289463c1d833038fb5",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_13_flow_counterfactual_replay.png": {
+    "mtime": 1791424882.4556293,
+    "seen": 1791432252.3485792,
+    "ast_hash": "8f92febbfcb90819acb0f9d853b18994",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_14_flow_guided_tour.png": {
+    "mtime": 1791424882.4568706,
+    "seen": 1791432252.34858,
+    "ast_hash": "21157b0ec71550f11e1e0a5017e2fcaf",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_15_flow_keyboard_shortcuts.png": {
+    "mtime": 1791424882.4574578,
+    "seen": 1791432252.3485808,
+    "ast_hash": "48370971f96ca29e9a47b0ef3283c075",
+    "semantic_hash": ""
+  },
+  "frontend/public/gallery/gallery_16_flow_workspace_inspector.png": {
+    "mtime": 1791424882.4579604,
+    "seen": 1791432252.348582,
+    "ast_hash": "5a29485eb1832ddc95a03d795183d33b",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_01_stage1_seed_input.png": {
+    "mtime": 1791424882.4612947,
+    "seen": 1791432252.3485851,
+    "ast_hash": "824d47f11cbfbb58a0fc6417febf979e",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_02_stage2_seed_dna.png": {
+    "mtime": 1791424882.4614348,
+    "seen": 1791432252.3485863,
+    "ast_hash": "1c6d6fd4754b734ec83b89db54ffab1e",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_03_stage2_seed_potential_map.png": {
+    "mtime": 1791424882.461536,
+    "seen": 1791432252.3485873,
+    "ast_hash": "a13569d13d7ca506d406096e7e327235",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_04_stage3_divergent_worlds.png": {
+    "mtime": 1791424882.4616466,
+    "seen": 1791432252.348588,
+    "ast_hash": "a98bbdb2a78189933ea2adfa84021553",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_05_stage4_world_selection_hoz.png": {
+    "mtime": 1791424882.4617624,
+    "seen": 1791432252.348589,
+    "ast_hash": "02cc0e792f93926f2d0fd9b64f871370",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_06_stage5_codex_world_bible.png": {
+    "mtime": 1791424882.4618895,
+    "seen": 1791432252.3485904,
+    "ast_hash": "f18fb8a346883f82f149e4b20c0e58f6",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_07_stage5_codex_characters.png": {
+    "mtime": 1791424882.462054,
+    "seen": 1791432252.348592,
+    "ast_hash": "f87f1fa7e2b1257e4f943527c38e2771",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_08_stage5_codex_story_beats.png": {
+    "mtime": 1791424882.4622505,
+    "seen": 1791432252.3485935,
+    "ast_hash": "6ec11bd199f2b72c9c51ce8590a4bf0e",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_09_stage6_provenance_dag.png": {
+    "mtime": 1791424882.4624283,
+    "seen": 1791432252.3485947,
+    "ast_hash": "abba92df4abee617ddec088518c32288",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_10_stage7_refine_branch.png": {
+    "mtime": 1791424882.4625587,
+    "seen": 1791432252.3485956,
+    "ast_hash": "90f27297f7f700ada1abef15bf3dee22",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_11_flow_why_is_this_here_modal.png": {
+    "mtime": 1791424882.462675,
+    "seen": 1791432252.348597,
+    "ast_hash": "c1e1e1ee2a902e7e439d5b1f87f67568",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_12_flow_seed_mutation_lab.png": {
+    "mtime": 1791424882.462802,
+    "seen": 1791432252.348598,
+    "ast_hash": "d80e4867a6779b289463c1d833038fb5",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_13_flow_counterfactual_replay.png": {
+    "mtime": 1791424882.4630482,
+    "seen": 1791432252.3485994,
+    "ast_hash": "8f92febbfcb90819acb0f9d853b18994",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_14_flow_guided_tour.png": {
+    "mtime": 1791424882.4632769,
+    "seen": 1791432252.3486004,
+    "ast_hash": "21157b0ec71550f11e1e0a5017e2fcaf",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_15_flow_keyboard_shortcuts.png": {
+    "mtime": 1791424882.463407,
+    "seen": 1791432252.3486013,
+    "ast_hash": "48370971f96ca29e9a47b0ef3283c075",
+    "semantic_hash": ""
+  },
+  "gallery/gallery_16_flow_workspace_inspector.png": {
+    "mtime": 1791424882.4635007,
+    "seen": 1791432252.3486023,
+    "ast_hash": "5a29485eb1832ddc95a03d795183d33b",
     "semantic_hash": ""
   }
 }

@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791410126.122801,
-    "seen": 1791410824.2420275,
-    "ast_hash": "398a1bc5f854d0738ba100ab38bd2121",
+    "mtime": 1791423427.1104698,
+    "seen": 1791423898.8893938,
+    "ast_hash": "37cf8ae8b3319a911a1c820a32f0c688",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
@@ -894,9 +894,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_demo.py": {
-    "mtime": 1791105537.423597,
-    "seen": 1791106275.8670738,
-    "ast_hash": "9ece4bfa7343bf1aa5800b1fb497b128",
+    "mtime": 1791423167.3988285,
+    "seen": 1791423898.8893068,
+    "ast_hash": "88815574975bbcea1ddb19f89814390f",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase8_demo.cjs": {
@@ -1680,21 +1680,27 @@
     "semantic_hash": ""
   },
   "backend/tests/test_human_only_zones.py": {
-    "mtime": 1791410016.7604988,
-    "seen": 1791410824.2418683,
-    "ast_hash": "e21eb4cb6bf030f89dcf7c59ad15403d",
+    "mtime": 1791423129.9435854,
+    "seen": 1791423898.8893132,
+    "ast_hash": "cc2afb36675df52318d2a95122b4a315",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase20_human_only_zones.cjs": {
-    "mtime": 1791410608.4991548,
-    "seen": 1791410824.2419357,
-    "ast_hash": "efc6973fdbb3df0b529dccdd71a664d2",
+    "mtime": 1791423453.1609282,
+    "seen": 1791423898.8893468,
+    "ast_hash": "101ace9f738bc8627fa90efdebeef253",
     "semantic_hash": ""
   },
   ".planning/phases/20-human-only-zones/20-UAT.md": {
-    "mtime": 1791410710.200224,
-    "seen": 1791410824.2423031,
-    "ast_hash": "14f5f239a33579bd6027f940324b3627",
+    "mtime": 1791423886.1961951,
+    "seen": 1791423898.8895311,
+    "ast_hash": "e0a36521c8ee7ce11ade28dab4228384",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/capture_all_site_flows.cjs": {
+    "mtime": 1791424533.3268828,
+    "seen": 1791424652.031198,
+    "ast_hash": "57a06177b57a6595cb04f6c5f9e4eb47",
     "semantic_hash": ""
   }
 }
