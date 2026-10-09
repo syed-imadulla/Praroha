@@ -59,18 +59,18 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [x] **Phase 30: Shell Simplification & Clutter Reduction** — Evicted developer telemetry, streamlined header to 3 utility controls, unified Workspace Menu (`•••`), Universe Search (⌘K), non-scrolling mobile carousel.
 - [x] **Phase 30.4: Deep Product Integrity Audit** — Comprehensive 17-part audit documenting real vs mock architecture, AI model naming failure, test false positives, and realtime gaps.
 
-### Milestone 4: Real Product Hardening + True Realtime (Active)
-- [ ] **Phase 31.1: Gemini & AI Provider Repair** — Valid Gemini model (`gemini-2.5-flash`), live generation verification, remove silent mock fallback, support arbitrary creative seeds, real error & retry handling.
-- [ ] **Phase 31.2: Server-Backed Generation Job State** — Persistent `generation_jobs` table, real progress tracking, replace client `setTimeout` fake timers with true job events.
-- [ ] **Phase 31.3: Supabase Realtime Infrastructure** — Scoped Supabase Realtime subscriptions per project, dedicated `frontend/src/realtime/` layer, connect/subscribe/disconnect lifecycle.
-- [ ] **Phase 31.4: Realtime Store Synchronization** — Realtime database events dynamically updating Zustand store without page refresh (verified across multi-tab).
-- [ ] **Phase 31.5: Project Routing & Authoritative Rehydration** — URL-based routing (`/projects/:projectId`), authoritative server rehydration, real Project Library UI (`GET /api/projects`).
-- [ ] **Phase 31.6: Real Creations & Graveyard** — Remove static mock arrays, connect My Creations and Graveyard to live Postgres data with real restore and permanent delete.
-- [ ] **Phase 31.7: Authentication & Project Ownership** — Supabase Auth, `user_id` ownership on projects, backend security verification, zero unauthorized cross-user access.
-- [ ] **Phase 31.8: Media Realtime Pipeline** — Realtime events for image, voice, and audio generation, surviving browser close and reload.
-- [ ] **Phase 31.9: Error Semantics & Demo Isolation** — Explicit error codes, retryable states, strict isolation of Canonical Demo Mode from Real Mode.
-- [ ] **Phase 31.10: Production E2E & Two-Tab Realtime Tests** — Automated Playwright tests with arbitrary non-canonical seeds and dual-browser-context realtime synchronization.
-- [ ] **Phase 31.11: Final Full-System Audit & Live Verification** — Live dual-seed test (Seed A vs Seed B proof), multi-tab realtime proof, and milestone sign-off.
+### Milestone 4: Real Product Hardening + True Realtime (Complete)
+- [x] **Phase 31.1: Gemini & AI Provider Repair** — Valid Gemini model (`gemini-2.5-flash`), live generation verification, remove silent mock fallback, support arbitrary creative seeds, real error & retry handling.
+- [x] **Phase 31.2: Server-Backed Generation Job State** — Persistent `generation_jobs` table, real progress tracking, replace client `setTimeout` fake timers with true job events.
+- [x] **Phase 31.3: Supabase Realtime Infrastructure** — Scoped Supabase Realtime subscriptions per project, dedicated `frontend/src/realtime/` layer, connect/subscribe/disconnect lifecycle.
+- [x] **Phase 31.4: Realtime Store Synchronization** — Realtime database events dynamically updating Zustand store without page refresh (verified across multi-tab).
+- [x] **Phase 31.5: Project Routing & Authoritative Rehydration** — URL-based routing (`/projects/:projectId`), authoritative server rehydration, real Project Library UI (`GET /api/projects`).
+- [x] **Phase 31.6: Real Creations & Graveyard** — Remove static mock arrays, connect My Creations and Graveyard to live Postgres data with real restore and permanent delete.
+- [x] **Phase 31.7: Authentication & Project Ownership** — Supabase Auth, `user_id` ownership on projects, backend security verification, zero unauthorized cross-user access.
+- [x] **Phase 31.8: Media Realtime Pipeline** — Realtime events for image, voice, and audio generation, surviving browser close and reload.
+- [x] **Phase 31.9: Error Semantics & Demo Isolation** — Explicit error codes, retryable states, strict isolation of Canonical Demo Mode from Real Mode.
+- [x] **Phase 31.10: Production E2E & Two-Tab Realtime Tests** — Automated Playwright tests with arbitrary non-canonical seeds and dual-browser-context realtime synchronization.
+- [x] **Phase 31.11: Final Full-System Audit & Live Verification** — Live dual-seed test (Seed A vs Seed B proof), multi-tab realtime proof, and milestone sign-off.
 
 ### Out of Scope (Milestone 2)
 - Autonomous multi-agent swarms (preserves human agency and single-creator focus).

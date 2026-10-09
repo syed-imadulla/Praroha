@@ -101,16 +101,16 @@ async def test_ace_step_retry_and_timeout():
 async def test_stable_audio_provider_parameters():
     """Validates Stable Audio Open parameter mapping and payload normalization."""
     provider = StableAudioOpenProvider(
-        endpoint="https://api.stability.ai/v2beta/stable-audio/generate",
+        endpoint="https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio",
         api_key="sk-stability-test",
         timeout_sec=30.0,
     )
 
-    dummy_wav = b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00" + b"\x00" * 100
+    dummy_mp3 = b"ID3\x03\x00\x00\x00\x00\x00\x00" + b"\xff\xfb\x90d" + b"\x00" * 100
     mock_response = httpx.Response(
         200,
-        content=dummy_wav,
-        headers={"content-type": "audio/wav"},
+        content=dummy_mp3,
+        headers={"content-type": "audio/mpeg"},
     )
 
     with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
@@ -123,14 +123,100 @@ async def test_stable_audio_provider_parameters():
 
         mock_post.assert_called_once()
         call_kwargs = mock_post.call_args.kwargs
-        assert call_kwargs["json"]["prompt"] == "Dramatic orchestral strings"
-        assert call_kwargs["json"]["seconds_total"] == 20
-        assert call_kwargs["json"]["mood"] == "epic-orchestral"
+        assert call_kwargs["data"]["prompt"] == "Dramatic orchestral strings"
+        assert call_kwargs["data"]["duration"] == "20"
+        assert call_kwargs["data"]["output_format"] == "mp3"
         assert call_kwargs["headers"]["Authorization"] == "Bearer sk-stability-test"
 
         assert payload.metadata["resolved_provider"] == "stable-audio"
         assert payload.metadata["mood"] == "epic-orchestral"
         assert payload.metadata["duration_sec"] == 20
+        assert payload.mime_type == "audio/mpeg"
+        assert payload.filename.endswith(".mp3")
+
+
+@pytest.mark.asyncio
+async def test_stable_audio_direct_success_mp3():
+    """Validates Stable Audio 2 direct HTTP 200 binary audio payload handling."""
+    provider = StableAudioOpenProvider(api_key="sk-test-live-key")
+    dummy_audio = b"\xff\xfb\x90d" + b"\x00" * 250
+    mock_resp = httpx.Response(
+        200,
+        content=dummy_audio,
+        headers={"content-type": "audio/mpeg"},
+    )
+
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_resp
+        payload = await provider.generate_audio("Ambient tide resonance", mood="calm-ambient", duration_sec=12)
+        assert payload.data == dummy_audio
+        assert payload.mime_type == "audio/mpeg"
+        assert payload.metadata["duration_sec"] == 12
+        assert payload.metadata["resolved_provider"] == "stable-audio"
+
+
+@pytest.mark.asyncio
+async def test_stable_audio_malformed_response():
+    """Validates malformed or empty responses raise ProviderUnavailableError."""
+    provider = StableAudioOpenProvider(api_key="sk-test-key")
+
+    # Empty content
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = httpx.Response(200, content=b"", headers={"content-type": "audio/mpeg"})
+        with pytest.raises(ProviderUnavailableError) as exc_empty:
+            await provider.generate_audio("Test prompt")
+        assert "empty response" in str(exc_empty.value).lower()
+
+    # Too short / malformed bytes
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = httpx.Response(200, content=b"ab", headers={"content-type": "text/plain"})
+        with pytest.raises(ProviderUnavailableError) as exc_malformed:
+            await provider.generate_audio("Test prompt")
+        assert "malformed" in str(exc_malformed.value).lower()
+
+
+@pytest.mark.asyncio
+async def test_stable_audio_auth_failure_401():
+    """Validates HTTP 401 triggers ProviderUnavailableError with clear authorization message."""
+    provider = StableAudioOpenProvider(api_key="sk-invalid-key")
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = httpx.Response(401, text="Unauthorized: invalid api key")
+        with pytest.raises(ProviderUnavailableError) as exc:
+            await provider.generate_audio("Test prompt")
+        assert "401" in str(exc.value) or "unauthorized" in str(exc.value).lower()
+
+
+@pytest.mark.asyncio
+async def test_stable_audio_insufficient_credits_402():
+    """Validates HTTP 402 triggers ProviderUnavailableError with credits message."""
+    provider = StableAudioOpenProvider(api_key="sk-depleted-key")
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = httpx.Response(402, text="Payment Required: insufficient credits")
+        with pytest.raises(ProviderUnavailableError) as exc:
+            await provider.generate_audio("Test prompt")
+        assert "credits" in str(exc.value).lower() or "402" in str(exc.value)
+
+
+@pytest.mark.asyncio
+async def test_stable_audio_rate_limit_429():
+    """Validates HTTP 429 triggers ProviderUnavailableError with rate limit message."""
+    provider = StableAudioOpenProvider(api_key="sk-valid-key")
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = httpx.Response(429, text="Rate limit exceeded")
+        with pytest.raises(ProviderUnavailableError) as exc:
+            await provider.generate_audio("Test prompt")
+        assert "rate limit" in str(exc.value).lower() or "429" in str(exc.value)
+
+
+@pytest.mark.asyncio
+async def test_stable_audio_timeout():
+    """Validates network timeouts trigger ProviderUnavailableError."""
+    provider = StableAudioOpenProvider(api_key="sk-valid-key", timeout_sec=2.0)
+    with patch("httpx.AsyncClient.post", side_effect=httpx.TimeoutException("Read timed out")):
+        with pytest.raises(ProviderUnavailableError) as exc:
+            await provider.generate_audio("Test prompt")
+        assert "timeout" in str(exc.value).lower() or "network error" in str(exc.value).lower()
+
 
 
 @pytest.mark.asyncio

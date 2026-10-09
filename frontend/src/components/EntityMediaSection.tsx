@@ -257,10 +257,10 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
           isGeneratingMedia[`${entityId}_${m}`]
       ) && (
         <div
-          className={`grid gap-3 ${
+          className={`grid gap-3 min-w-0 ${
             compact || availableModalities.length === 1
               ? 'grid-cols-1'
-              : 'grid-cols-1 sm:grid-cols-2'
+              : 'grid-cols-1 2xl:grid-cols-2'
           }`}
         >
           {availableModalities.map((modality) => {

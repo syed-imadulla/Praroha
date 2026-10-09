@@ -9,6 +9,7 @@ from httpx import ASGITransport, AsyncClient
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_seed_unfold.db"
 os.environ["STORAGE_PROVIDER"] = "local"
 os.environ["AI_PROVIDER"] = "mock"
+os.environ["ENVIRONMENT"] = "demo"
 
 from backend.app.config import settings
 settings.DATABASE_URL = "sqlite+aiosqlite:///./test_seed_unfold.db"

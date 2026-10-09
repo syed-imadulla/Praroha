@@ -35,18 +35,18 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 28: Seed → Universe Workspace** — Redesign experience of the 7 stages (Seed, DNA, Divergent Worlds, Choice & HOZ, Codex, Lineage DAG, Mutation Lab, Counterfactual Replay) with botanical aesthetics while keeping 100% of functional contracts intact.
 - [x] **Phase 29: Secondary UI** — Standardize typography scale, eliminate text <12px, 44px touch targets, modal and drawer polish.
 - [x] **Phase 30: UI Clutter Reduction & Shell Simplification** — Wave 1 P0 clutter removal, Wave 2 TopBar & StageProgressHeader redesign, and Deep Product Integrity Audit (30.4).
-- [ ] **Phase 31: Real Product Hardening + True Realtime (Milestone 4)**
-  - [ ] **Phase 31.1**: Gemini & AI Provider Repair (Valid model, live API calls, arbitrary seed support, no silent fallback).
-  - [ ] **Phase 31.2**: Server-Backed Generation Job State (Persistent `generation_jobs`, real progress, remove client setTimeout timers).
-  - [ ] **Phase 31.3**: Supabase Realtime Infrastructure (Project-scoped channels, dedicated `frontend/src/realtime/` layer).
-  - [ ] **Phase 31.4**: Realtime Store Synchronization (Live DB updates reflect in Zustand store across multi-tab without refresh).
-  - [ ] **Phase 31.5**: Project Routing & Authoritative Rehydration (`/projects/:projectId`, backend rehydration, Project Library UI).
-  - [ ] **Phase 31.6**: Real My Creations & Graveyard (Live database records, soft delete, real restore, and permanent deletion).
+- [x] **Phase 31: Real Product Hardening + True Realtime (Milestone 4)**
+  - [x] **Phase 31.1**: Gemini & AI Provider Repair (Valid model, live API calls, arbitrary seed support, no silent fallback).
+  - [x] **Phase 31.2**: Server-Backed Generation Job State (Persistent `generation_jobs`, real progress, remove client setTimeout timers).
+  - [x] **Phase 31.3**: Supabase Realtime Infrastructure (Project-scoped channels, dedicated `frontend/src/realtime/` layer).
+  - [x] **Phase 31.4**: Realtime Store Synchronization (Live DB updates reflect in Zustand store across multi-tab without refresh).
+  - [x] **Phase 31.5**: Project Routing & Authoritative Rehydration (`/projects/:projectId`, backend rehydration, Project Library UI).
+  - [x] **Phase 31.6**: Real My Creations & Graveyard (Live database records, soft delete, real restore, and permanent deletion).
   - [x] **Phase 31.7**: Authentication & Project Ownership (User ownership `projects.owner_id`, Supabase JWT verification, backend authorization guards, pre-confirmed signups).
-  - [ ] **Phase 31.8**: Media Realtime Pipeline (Realtime generation events, browser reload resilience).
-  - [ ] **Phase 31.9**: Production Error Semantics & Demo Isolation (Explicit errors, retry states, strict separation of Demo vs Real Mode).
-  - [ ] **Phase 31.10**: Production E2E & Two-Tab Realtime Tests (Non-canonical seed validation, multi-tab real-time sync tests).
-  - [ ] **Phase 31.11**: Final Full-System Audit & Verification (Empirical Seed A vs Seed B proof, live multi-tab proof).
+  - [x] **Phase 31.8**: Media Realtime Pipeline (Realtime generation events, browser reload resilience).
+  - [x] **Phase 31.9**: Production Error Semantics & Demo Isolation (Explicit errors, retry states, strict separation of Demo vs Real Mode).
+  - [x] **Phase 31.10**: Production E2E & Two-Tab Realtime Tests (Non-canonical seed validation, multi-tab real-time sync tests).
+  - [x] **Phase 31.11**: Final Full-System Audit & Verification (Empirical Seed A vs Seed B proof, live multi-tab proof).
 
 ---
 

@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import logging
 import os
+import random
 import urllib.parse
 from typing import Any, Dict, Optional
 import httpx
@@ -22,20 +23,25 @@ ASPECT_RATIO_DIMENSIONS = {
 
 
 class PollinationsImageProvider(ImageProvider):
-    """Concrete image provider integrating Pollinations.ai keyless REST endpoint
+    """Concrete image provider integrating Pollinations.ai REST endpoint.
 
-    Features configurable timeout (default 25s), exponential backoff retry for
-    transient rate limits / 5xx / network errors, and ProviderUnavailableError
-    cascade on retry exhaustion.
+    Features configurable timeout (default 25s), authenticated Bearer token
+    support via POLLINATIONS_API_KEY, exponential backoff with jitter for
+    transient errors (429, 5xx, network errors), and immediate non-retrying
+    ProviderUnavailableError cascade for 401/402 authentication/credits failures.
     """
 
     def __init__(
         self,
+        api_key: Optional[str] = None,
+        model: Optional[str] = None,
         timeout_sec: Optional[float] = None,
         max_retries: int = 2,
         initial_backoff: float = 1.0,
         backoff_multiplier: float = 2.0,
     ) -> None:
+        from backend.app.config import settings
+
         env_timeout = os.getenv("POLLINATIONS_TIMEOUT_SEC")
         self.timeout_sec = (
             timeout_sec
@@ -45,7 +51,17 @@ class PollinationsImageProvider(ImageProvider):
         self.max_retries = max_retries
         self.initial_backoff = initial_backoff
         self.backoff_multiplier = backoff_multiplier
-        self.default_model = os.getenv("POLLINATIONS_MODEL", "flux")
+
+        self.api_key = (
+            api_key
+            if api_key is not None
+            else (settings.POLLINATIONS_API_KEY or os.getenv("POLLINATIONS_API_KEY", ""))
+        )
+        self.default_model = (
+            model
+            if model is not None
+            else (settings.POLLINATIONS_MODEL or os.getenv("POLLINATIONS_MODEL", "flux"))
+        )
         self.base_url = "https://image.pollinations.ai/prompt"
 
     def _derive_seed(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> int:
@@ -74,10 +90,12 @@ class PollinationsImageProvider(ImageProvider):
         params = {
             "width": str(width),
             "height": str(height),
-            "model": self.default_model,
             "seed": str(seed),
             "nologo": "true",
         }
+        if self.default_model:
+            params["model"] = self.default_model
+
         query_string = urllib.parse.urlencode(params)
         url = f"{self.base_url}/{encoded_prompt}?{query_string}"
         return url, width, height, seed
@@ -93,6 +111,13 @@ class PollinationsImageProvider(ImageProvider):
 
         current_backoff = self.initial_backoff
 
+        headers = {
+            "Accept": "image/*",
+            "User-Agent": "Praroha/1.0",
+        }
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
         for attempt in range(self.max_retries + 1):
             try:
                 logger.info(
@@ -106,20 +131,31 @@ class PollinationsImageProvider(ImageProvider):
                     timeout=self.timeout_sec,
                     follow_redirects=True,
                 ) as client:
-                    response = await client.get(url)
+                    response = await client.get(url, headers=headers)
 
-                    # Transient retryable status codes (429 Rate Limit, 5xx server errors)
+                    # 1. Non-retryable payment and authorization errors
+                    if response.status_code == 401:
+                        logger.error("Pollinations returned 401 Unauthorized (Invalid API Key). Halting.")
+                        raise ProviderUnavailableError("Pollinations API Key is invalid or unauthorized (HTTP 401)")
+                    if response.status_code == 402:
+                        logger.error("Pollinations returned 402 Payment Required (Insufficient credits). Halting.")
+                        raise ProviderUnavailableError(
+                            "Pollinations account has insufficient credits or requires payment (HTTP 402)"
+                        )
+
+                    # 2. Transient retryable status codes (429 Rate Limit, 5xx server errors)
                     if response.status_code in (429, 500, 502, 503, 504):
                         error_msg = f"HTTP {response.status_code} received from Pollinations"
+                        jitter = random.uniform(0.1, 0.4)
                         logger.warning(
                             "Transient failure on attempt %d: %s. Backoff %.1fs.",
                             attempt + 1,
                             error_msg,
-                            current_backoff,
+                            current_backoff + jitter,
                         )
                         last_exception = ProviderUnavailableError(error_msg)
                         if attempt < self.max_retries:
-                            await asyncio.sleep(current_backoff)
+                            await asyncio.sleep(current_backoff + jitter)
                             current_backoff *= self.backoff_multiplier
                             continue
                         raise ProviderUnavailableError(f"Pollinations retry exhaustion: {error_msg}")
@@ -130,9 +166,20 @@ class PollinationsImageProvider(ImageProvider):
                     if not content or len(content) < 50:
                         raise ProviderUnavailableError("Empty or truncated image binary from Pollinations")
 
+                    # Validate binary magic bytes for image formats (JPEG: \xff\xd8, PNG: \x89PNG, WebP: RIFF...WEBP)
+                    is_valid_image = (
+                        content.startswith(b"\xff\xd8")
+                        or content.startswith(b"\x89PNG")
+                        or (content.startswith(b"RIFF") and b"WEBP" in content[:16])
+                    )
+                    if not is_valid_image:
+                        logger.warning("Pollinations returned binary payload without standard image magic bytes.")
+
                     content_type = response.headers.get("content-type", "image/jpeg").split(";")[0].strip()
                     ext = "png" if "png" in content_type else "jpg"
                     file_hash = hashlib.md5(content[:256]).hexdigest()[:10]
+
+                    resolved_model = response.headers.get("x-model-used", self.default_model)
 
                     return MediaPayload(
                         data=content,
@@ -143,7 +190,7 @@ class PollinationsImageProvider(ImageProvider):
                             "height": height,
                             "aspect_ratio": aspect_ratio,
                             "resolved_provider": "pollinations",
-                            "model": self.default_model,
+                            "model": resolved_model,
                             "seed": seed,
                             "prompt": prompt,
                         },
@@ -151,31 +198,15 @@ class PollinationsImageProvider(ImageProvider):
 
             except (httpx.TimeoutException, httpx.NetworkError, httpx.ConnectError) as net_err:
                 last_exception = net_err
+                jitter = random.uniform(0.1, 0.4)
                 logger.warning(
                     "Network error on attempt %d: %s. Backoff %.1fs.",
                     attempt + 1,
                     net_err,
-                    current_backoff,
+                    current_backoff + jitter,
                 )
                 if attempt < self.max_retries:
-                    await asyncio.sleep(current_backoff)
-                    current_backoff *= self.backoff_multiplier
-                    continue
-                break
-            except httpx.HTTPStatusError as http_err:
-                if http_err.response.status_code == 402:
-                    logger.error("Pollinations returned 402 Payment Required. Halting retries.")
-                    raise ProviderUnavailableError("Client error '402 Payment Required'") from http_err
-                
-                last_exception = http_err
-                logger.warning(
-                    "HTTP error on attempt %d: %s. Backoff %.1fs.",
-                    attempt + 1,
-                    http_err,
-                    current_backoff,
-                )
-                if attempt < self.max_retries:
-                    await asyncio.sleep(current_backoff)
+                    await asyncio.sleep(current_backoff + jitter)
                     current_backoff *= self.backoff_multiplier
                     continue
                 break
@@ -200,7 +231,7 @@ class PollinationsImageProvider(ImageProvider):
             self.max_retries + 1,
         )
         raise ProviderUnavailableError(
-            f"Pollinations retry exhaustion: {last_exception}"
+            f"Pollinations service unavailable after {self.max_retries + 1} attempts: {last_exception}"
         ) from last_exception
 
     async def health_check(self) -> Dict[str, Any]:
@@ -209,5 +240,5 @@ class PollinationsImageProvider(ImageProvider):
             "provider": "PollinationsImageProvider",
             "model": self.default_model,
             "timeout_sec": self.timeout_sec,
-            "max_retries": self.max_retries,
+            "has_api_key": bool(self.api_key),
         }

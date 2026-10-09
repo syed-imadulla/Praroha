@@ -252,6 +252,7 @@ async def test_real_mode_prevents_mock_fallback(monkeypatch):
     """Explicit test that forces real provider failure and ensures the job fails without reaching MockProvider."""
     # We will set PRAROHA_ENV=real to trigger real mode
     monkeypatch.setenv("PRAROHA_ENV", "real")
+    monkeypatch.setenv("ENVIRONMENT", "real")
     
     from backend.app.providers.media.composite import CompositeImageProvider
     from backend.app.providers.media.base import ProviderUnavailableError

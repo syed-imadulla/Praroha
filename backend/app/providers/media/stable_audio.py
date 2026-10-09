@@ -17,10 +17,15 @@ logger = logging.getLogger(__name__)
 
 
 class StableAudioOpenProvider(AudioProvider):
-    """Concrete Stable Audio Open Provider (Tier 2 Local/API).
+    """Concrete Stable Audio Provider (Tier 2 Local/API).
 
-    Connects via STABLE_AUDIO_ENDPOINT or Stability API with STABILITY_API_KEY.
-    Features 30s timeout, outage simulation, response isolation, and actual MIME type preservation.
+    Connects to official Stability AI Stable Audio 2 endpoint:
+    POST https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio
+    or custom self-hosted endpoint via STABLE_AUDIO_ENDPOINT.
+
+    Synchronous text-to-audio flow:
+    - Sends multipart/form-data with prompt, duration (5-190s), output_format='mp3'
+    - Receives direct binary audio payload on HTTP 200.
     """
 
     def __init__(
@@ -29,8 +34,17 @@ class StableAudioOpenProvider(AudioProvider):
         api_key: Optional[str] = None,
         timeout_sec: Optional[float] = None,
     ) -> None:
-        self.endpoint = endpoint if endpoint is not None else os.getenv("STABLE_AUDIO_ENDPOINT", "")
-        self.api_key = api_key if api_key is not None else os.getenv("STABILITY_API_KEY", "")
+        from backend.app.config import settings
+        self.endpoint = (
+            endpoint
+            if endpoint is not None
+            else (settings.STABLE_AUDIO_ENDPOINT or os.getenv("STABLE_AUDIO_ENDPOINT", ""))
+        )
+        self.api_key = (
+            api_key
+            if api_key is not None
+            else (settings.STABILITY_API_KEY or os.getenv("STABILITY_API_KEY", ""))
+        )
         self.timeout_sec = (
             timeout_sec
             if timeout_sec is not None
@@ -58,37 +72,84 @@ class StableAudioOpenProvider(AudioProvider):
             logger.info("StableAudioOpenProvider unconfigured (no endpoint or API key). Cascading.")
             raise ProviderUnavailableError("Stable Audio endpoint or API key not configured")
 
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
+        is_official_api = not self.endpoint or "api.stability.ai" in self.endpoint
+        url = self.endpoint or "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
+
+        headers: Dict[str, str] = {
+            "Accept": "audio/*",
+        }
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
 
-        payload = {
+        # Clamped to documented bounds: 5s to 190s
+        clamped_duration = str(min(max(duration_sec, 5), 190))
+        form_data = {
             "prompt": prompt,
-            "seconds_total": duration_sec,
-            "mood": mood,
+            "duration": clamped_duration,
+            "output_format": "mp3",
         }
-
-        url = self.endpoint or "https://api.stability.ai/v2beta/stable-audio/generate"
 
         try:
             async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
-                response = await client.post(url, json=payload, headers=headers)
+                if is_official_api:
+                    # Official Stability AI v2beta Stable Audio 2 API uses multipart/form-data
+                    response = await client.post(url, data=form_data, headers=headers)
+                else:
+                    # Self-hosted / custom endpoints may accept JSON
+                    response = await client.post(
+                        url,
+                        json={
+                            "prompt": prompt,
+                            "duration": int(clamped_duration),
+                            "output_format": "mp3",
+                            "mood": mood,
+                        },
+                        headers={"Content-Type": "application/json", **headers},
+                    )
+
+                if response.status_code == 401:
+                    raise ProviderUnavailableError("Stability AI API Key is invalid or unauthorized (HTTP 401)")
+                if response.status_code == 402:
+                    raise ProviderUnavailableError("Stability AI account has insufficient credits (HTTP 402)")
+                if response.status_code == 429:
+                    raise ProviderUnavailableError("Stability AI rate limit exceeded (HTTP 429)")
                 if response.status_code != 200:
                     raise ProviderUnavailableError(
                         f"Stable Audio API returned HTTP {response.status_code}: {response.text[:200]}"
                     )
 
                 content_type = response.headers.get("content-type", "")
-                if "audio" in content_type or "octet-stream" in content_type:
-                    raw_bytes = response.content
+                content_bytes = response.content
+
+                if not content_bytes:
+                    raise ProviderUnavailableError("Stable Audio returned empty response payload")
+
+                raw_bytes: bytes
+                if (
+                    content_bytes.startswith(b"RIFF")
+                    or content_bytes.startswith(b"ID3")
+                    or content_bytes.startswith(b"\xff\xfb")
+                    or content_bytes.startswith(b"fLaC")
+                    or content_bytes.startswith(b"OggS")
+                    or "audio" in content_type
+                    or "octet-stream" in content_type
+                ):
+                    raw_bytes = content_bytes
                 else:
-                    data = response.json()
+                    try:
+                        data = response.json()
+                    except Exception:
+                        data = {}
+
                     if isinstance(data, dict) and "audio" in data:
                         raw_bytes = base64.b64decode(data["audio"])
                     elif isinstance(data, dict) and "audio_base64" in data:
                         raw_bytes = base64.b64decode(data["audio_base64"])
                     else:
-                        raw_bytes = response.content
+                        raw_bytes = content_bytes
+
+                if not raw_bytes or len(raw_bytes) < 4:
+                    raise ProviderUnavailableError("Stable Audio returned malformed audio bytes")
 
                 mime_type, ext = detect_audio_mime_type(content_type, raw_bytes)
                 file_hash = hashlib.md5(f"{prompt}_{mood}_{duration_sec}".encode("utf-8")).hexdigest()[:10]
@@ -100,7 +161,7 @@ class StableAudioOpenProvider(AudioProvider):
                     metadata={
                         "resolved_provider": "stable-audio",
                         "mood": mood,
-                        "duration_sec": duration_sec,
+                        "duration_sec": int(clamped_duration),
                         "prompt": prompt,
                     },
                 )
@@ -118,6 +179,6 @@ class StableAudioOpenProvider(AudioProvider):
         return {
             "status": "configured" if configured else "unconfigured",
             "provider": "StableAudioOpenProvider",
-            "endpoint": self.endpoint or "stability-api",
+            "endpoint": self.endpoint or "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio",
             "timeout_sec": self.timeout_sec,
         }

@@ -177,6 +177,9 @@ class EdgeTTSProvider(VoiceProvider):
             except (asyncio.TimeoutError, Exception) as exc:
                 last_error = exc
                 if attempt < self.max_retries:
+                    if resolved_voice != DEFAULT_VOICE and (isinstance(exc, ValueError) or "voice" in str(exc).lower()):
+                        logger.info("EdgeTTS invalid voice '%s'. Falling back to DEFAULT_VOICE (%s).", resolved_voice, DEFAULT_VOICE)
+                        resolved_voice = DEFAULT_VOICE
                     sleep_time = self.backoff_factor * (2 ** attempt)
                     logger.warning(
                         "EdgeTTS attempt %d failed (%s: %s). Retrying in %.1fs...",

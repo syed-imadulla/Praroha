@@ -23,6 +23,13 @@ class Settings(BaseSettings):
         "gemini-flash-latest",
         "gemini-3.5-flash-lite",
     ]
+    # Optional audio/atmosphere provider keys
+    HF_TOKEN: Optional[str] = None
+    ACE_STEP_ENDPOINT: Optional[str] = None
+    STABILITY_API_KEY: Optional[str] = None
+    STABLE_AUDIO_ENDPOINT: Optional[str] = None
+    POLLINATIONS_API_KEY: Optional[str] = None
+    POLLINATIONS_MODEL: str = "flux"
     SUPABASE_URL: Optional[str] = None
     SUPABASE_KEY: Optional[str] = None
     SUPABASE_BUCKET: str = "seed-unfold-assets"

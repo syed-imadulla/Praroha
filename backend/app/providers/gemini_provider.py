@@ -557,7 +557,7 @@ class GeminiProvider(AIProvider):
             "   - key_locations: array of objects with 'name', 'description', and 'visual_prompt'.\n"
             "   - visual_style_prompt: artistic style and rendering directives.\n"
             "2. Characters (2 to 4 core cast members grounded in World Bible rules, with archetypes, motivations, conflicts, visual_prompts).\n"
-            "3. Relationships (socio-emotional dynamics, tension/alliance types between characters).\n"
+            "3. Relationships: array of objects each with 'source_character_name' (exact name matching one of the Characters), 'target_character_name' (exact name matching another Character), 'relation_type' (e.g. 'Symbiotic Alliance', 'Philosophical Friction', 'Rivalry'), and 'dynamic_description' (1-2 sentences explaining their tension and connection).\n"
             "4. Scenes (2 to 3 pivotal narrative scenes: array of objects each with 'scene_number' (integer starting from 1), 'title' (a short, evocative 2-5 word name for the scene, e.g. 'The Shattered Seal' or 'Encounter at the Sunken Spire'), 'location_setting' (clear physical place), 'dramatic_question', 'conflict_narrative', 'pivotal_outcome', and 'visual_prompt' describing the scene's exact visual action and environment).\n"
             "Use simple, direct Indian English wordings that feel relatable and natural, avoiding overly pompous jargon.\n"
             "Strictly adhere to the DECISION DNA CREATIVE CONTRACT if present:\n"

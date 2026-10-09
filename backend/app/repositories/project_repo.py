@@ -777,21 +777,67 @@ class ProjectRepository:
                         r = r.model_dump()
                     else:
                         continue
+
+                src_val = (
+                    r.get("source_character_name")
+                    or r.get("source")
+                    or r.get("character_a")
+                    or r.get("character_1")
+                    or r.get("char1")
+                    or ""
+                ).strip()
+                tgt_val = (
+                    r.get("target_character_name")
+                    or r.get("target")
+                    or r.get("character_b")
+                    or r.get("character_2")
+                    or r.get("char2")
+                    or ""
+                ).strip()
+
+                if not src_val and not tgt_val and isinstance(r.get("characters"), list) and len(r["characters"]) >= 2:
+                    src_val = str(r["characters"][0]).strip()
+                    tgt_val = str(r["characters"][1]).strip()
+
                 source_id = r.get("source_character_id")
-                if not source_id and r.get("source_character_name"):
-                    source_id = name_to_id.get(r["source_character_name"].strip().lower())
+                if not source_id and src_val:
+                    source_id = name_to_id.get(src_val.lower())
+                    if not source_id:
+                        for c in created_characters:
+                            if c.name.lower() in src_val.lower() or src_val.lower() in c.name.lower():
+                                source_id = c.id
+                                break
 
                 target_id = r.get("target_character_id")
-                if not target_id and r.get("target_character_name"):
-                    target_id = name_to_id.get(r["target_character_name"].strip().lower())
+                if not target_id and tgt_val:
+                    target_id = name_to_id.get(tgt_val.lower())
+                    if not target_id:
+                        for c in created_characters:
+                            if c.name.lower() in tgt_val.lower() or tgt_val.lower() in c.name.lower():
+                                target_id = c.id
+                                break
+
+                # Fallback: if we have >= 2 characters, ensure relationship links distinct characters
+                if (not source_id or not target_id) and len(created_characters) >= 2:
+                    if not source_id:
+                        source_id = created_characters[0].id
+                    if not target_id or target_id == source_id:
+                        target_id = created_characters[1].id if created_characters[0].id == source_id else created_characters[0].id
 
                 # If we have both character IDs, persist relationship
-                if source_id and target_id:
+                if source_id and target_id and source_id != target_id:
+                    src_char = next((c for c in created_characters if c.id == source_id), None)
+                    tgt_char = next((c for c in created_characters if c.id == target_id), None)
+                    src_name = src_char.name if src_char else (src_val or "Character A")
+                    tgt_name = tgt_char.name if tgt_char else (tgt_val or "Character B")
+
                     rel_record = CharacterRelationshipRecord(
                         project_id=project_id,
                         world_candidate_id=world_candidate_id,
                         source_character_id=source_id,
                         target_character_id=target_id,
+                        source_character_name=src_name,
+                        target_character_name=tgt_name,
                         relation_type=r.get("relation_type", "Dynamic Tension"),
                         dynamic_description=r.get("dynamic_description", ""),
                     )

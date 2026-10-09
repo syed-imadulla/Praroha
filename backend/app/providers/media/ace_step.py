@@ -26,6 +26,14 @@ def detect_audio_mime_type(content_type: str, data: bytes) -> Tuple[str, str]:
     """
     ct = (content_type or "").lower()
 
+    # Byte-level check for FLAC: 'fLaC' magic word
+    if data.startswith(b"fLaC") or "audio/flac" in ct or "audio/x-flac" in ct:
+        return "audio/flac", ".flac"
+
+    # Byte-level check for OGG: 'OggS' magic word
+    if data.startswith(b"OggS") or "audio/ogg" in ct or "audio/vorbis" in ct:
+        return "audio/ogg", ".ogg"
+
     # Byte-level check for MP3 magic bytes: ID3 tag or MPEG sync word (0xFFE0 mask)
     is_mp3_bytes = data.startswith(b"ID3") or (
         len(data) >= 2 and data[:2] in (b"\xff\xfb", b"\xff\xf3", b"\xff\xf2")
@@ -67,8 +75,17 @@ class ACEStepAudioProvider(AudioProvider):
         hf_token: Optional[str] = None,
         timeout_sec: Optional[float] = None,
     ) -> None:
-        self.endpoint = endpoint if endpoint is not None else os.getenv("ACE_STEP_ENDPOINT", "")
-        self.hf_token = hf_token if hf_token is not None else os.getenv("HF_TOKEN", "")
+        from backend.app.config import settings
+        self.endpoint = (
+            endpoint
+            if endpoint is not None
+            else (settings.ACE_STEP_ENDPOINT or os.getenv("ACE_STEP_ENDPOINT", ""))
+        )
+        self.hf_token = (
+            hf_token
+            if hf_token is not None
+            else (settings.HF_TOKEN or os.getenv("HF_TOKEN", ""))
+        )
         self.timeout_sec = (
             timeout_sec
             if timeout_sec is not None
@@ -96,7 +113,10 @@ class ACEStepAudioProvider(AudioProvider):
             logger.info("ACEStepAudioProvider unconfigured (no endpoint or HF_TOKEN). Cascading.")
             raise ProviderUnavailableError("ACE-Step endpoint or HF_TOKEN not configured")
 
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
+        headers: Dict[str, str] = {
+            "Content-Type": "application/json",
+            "x-wait-for-model": "true",
+        }
         if self.hf_token:
             headers["Authorization"] = f"Bearer {self.hf_token}"
 
@@ -108,32 +128,69 @@ class ACEStepAudioProvider(AudioProvider):
             },
         }
 
-        url = self.endpoint or "https://api-inference.huggingface.co/models/facebook/musicgen-small"
+        url = self.endpoint or "https://router.huggingface.co/hf-inference/models/facebook/musicgen-small"
 
         last_error: Optional[Exception] = None
         max_attempts = 3
-        backoff_sec = 0.2
+        backoff_sec = 0.5
 
         for attempt in range(1, max_attempts + 1):
             try:
                 async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
                     response = await client.post(url, json=payload, headers=headers)
+                    if response.status_code == 503 and "loading" in response.text.lower() and attempt < max_attempts:
+                        try:
+                            est_wait = float(response.json().get("estimated_time", 5.0))
+                            wait_time = min(max(est_wait, 1.0), 15.0)
+                        except Exception:
+                            wait_time = 3.0
+                        logger.info("ACE-Step model loading (503). Waiting %.1fs before attempt %d...", wait_time, attempt + 1)
+                        await asyncio.sleep(wait_time)
+                        continue
+
                     if response.status_code != 200:
                         raise ProviderUnavailableError(
                             f"ACE-Step API returned HTTP {response.status_code}: {response.text[:200]}"
                         )
 
                     content_type = response.headers.get("content-type", "")
-                    if "audio" in content_type or "octet-stream" in content_type:
-                        raw_bytes = response.content
+                    content_bytes = response.content
+
+                    # Check for direct binary audio
+                    if (
+                        content_bytes.startswith(b"RIFF")
+                        or content_bytes.startswith(b"ID3")
+                        or content_bytes.startswith(b"fLaC")
+                        or content_bytes.startswith(b"OggS")
+                        or "audio" in content_type
+                        or "octet-stream" in content_type
+                    ):
+                        raw_bytes = content_bytes
                     else:
-                        data = response.json()
+                        try:
+                            data = response.json()
+                        except Exception:
+                            data = {}
+
                         if isinstance(data, dict) and "audio_base64" in data:
                             raw_bytes = base64.b64decode(data["audio_base64"])
-                        elif isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict) and "blob" in data[0]:
-                            raw_bytes = base64.b64decode(data[0]["blob"])
+                        elif isinstance(data, dict) and "audio" in data:
+                            raw_bytes = base64.b64decode(data["audio"])
+                        elif isinstance(data, dict) and "generated_audio" in data:
+                            val = data["generated_audio"]
+                            raw_bytes = base64.b64decode(val) if isinstance(val, str) else content_bytes
+                        elif isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict):
+                            first = data[0]
+                            if "blob" in first:
+                                raw_bytes = base64.b64decode(first["blob"])
+                            elif "generated_audio" in first and isinstance(first["generated_audio"], str):
+                                raw_bytes = base64.b64decode(first["generated_audio"])
+                            elif "audio" in first and isinstance(first["audio"], str):
+                                raw_bytes = base64.b64decode(first["audio"])
+                            else:
+                                raw_bytes = content_bytes
                         else:
-                            raw_bytes = response.content
+                            raw_bytes = content_bytes
 
                     mime_type, ext = detect_audio_mime_type(content_type, raw_bytes)
                     file_hash = hashlib.md5(f"{prompt}_{mood}_{duration_sec}".encode("utf-8")).hexdigest()[:10]

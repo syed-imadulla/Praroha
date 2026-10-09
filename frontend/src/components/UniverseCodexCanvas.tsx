@@ -826,7 +826,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 className="space-y-6"
               >
                 {/* Character Cards */}
-                <div id="codex-characters-grid" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div id="codex-characters-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 min-w-0">
                   {unfoldedUniverse.characters
                     .filter(
                       (char) =>
@@ -838,11 +838,11 @@ export const UniverseCodexCanvas: React.FC = () => {
                     return (
                       <div
                         key={idx}
-                        className="p-6 rounded-[22px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-4 flex flex-col justify-between shadow-xs min-w-0 break-words overflow-hidden"
+                        className="p-5 md:p-6 rounded-[22px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-4 flex flex-col justify-between shadow-xs min-w-0 break-words overflow-hidden"
                       >
-                        <div className="space-y-3 min-w-0">
+                        <div className="space-y-3.5 min-w-0">
                           {/* Character Card Header */}
-                          <div className="space-y-2 pb-2 border-b border-[#D8CCB7] min-w-0">
+                          <div className="space-y-2 pb-2.5 border-b border-[#D8CCB7] min-w-0">
                             <div className="min-w-0 space-y-0.5">
                               <h3 className="font-bold font-serif text-[#294B3A] text-base md:text-lg break-words">
                                 {char.name}
@@ -853,7 +853,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                             </div>
 
                             {/* Origin & Archetype Badges */}
-                            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 min-w-0 pt-0.5">
                               <OriginBadge
                                 originType={char.origin_type || 'SEED_INFERRED'}
                                 originSource={char.origin_source || 'Character Roster'}
@@ -876,62 +876,43 @@ export const UniverseCodexCanvas: React.FC = () => {
                                 {char.archetype}
                               </span>
                             </div>
-
-                            {/* Entity Actions */}
-                            <div className="flex flex-wrap items-center gap-2 pt-1 min-w-0">
-                              <button
-                                onClick={() => setRefiningEntity({ type: 'character', data: char })}
-                                className="refine-character-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#805B20] shrink-0"
-                                title="Refine character traits and motivation (PERS-01)"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                                <span>Refine</span>
-                              </button>
-                              <button
-                                onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
-                                className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A] shrink-0"
-                                title="Trace origin trail in DAG"
-                              >
-                                <GitFork className="w-3.5 h-3.5" />
-                                <span>See Where It Came From</span>
-                              </button>
-                            </div>
                           </div>
 
-                          <div className="space-y-2 text-xs min-w-0">
-                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
-                              <div className="flex flex-wrap items-center justify-between gap-1">
-                                <span className="text-xs uppercase font-bold text-[#5F6D63]">
+                          {/* Motivation & Core Conflict */}
+                          <div className="space-y-2.5 text-xs min-w-0">
+                            <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1.5 min-w-0 break-words">
+                              <div className="flex flex-wrap items-center justify-between gap-1.5">
+                                <span className="text-[11px] uppercase tracking-wider font-bold text-[#5F6D63]">
                                   Motivation
                                 </span>
                                 {hoz && hoz.is_locked && hoz.protagonist_motivation && (char.motivation === hoz.protagonist_motivation || (char.origin_source && char.origin_source.includes('Human-Only Zone'))) && (
-                                  <span className="creator-locked-badge px-2.5 py-1 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs min-h-[24px] shrink-0">
+                                  <span className="creator-locked-badge px-2.5 py-0.5 rounded-full bg-[#E9DDBF] border border-[#C59A55]/40 text-[#805B20] text-[11px] font-mono font-bold flex items-center gap-1.5 shadow-2xs shrink-0">
                                     <Lock className="w-3 h-3" /> CREATOR LOCKED
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[#394840] leading-relaxed break-words whitespace-normal">{char.motivation}</p>
+                              <p className="text-[#394840] leading-relaxed break-words whitespace-normal text-xs">{char.motivation}</p>
                             </div>
 
-                            <div className="p-3 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1 min-w-0 break-words">
-                              <span className="text-xs uppercase font-bold text-[#5F6D63]">
+                            <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] space-y-1.5 min-w-0 break-words">
+                              <span className="text-[11px] uppercase tracking-wider font-bold text-[#5F6D63]">
                                 Core Conflict
                               </span>
-                              <p className="text-[#394840] leading-relaxed break-words whitespace-normal">{char.core_conflict}</p>
+                              <p className="text-[#394840] leading-relaxed break-words whitespace-normal text-xs">{char.core_conflict}</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Visual Prompt Section */}
-                        <div className="pt-2 border-t border-[#D8CCB7] space-y-2 min-w-0">
+                        <div className="pt-2.5 border-t border-[#D8CCB7] space-y-2 min-w-0">
                           <div className="flex flex-wrap items-center justify-between gap-2 text-xs min-w-0">
-                            <span className="text-[#5A6E5E] font-mono flex items-center gap-1 font-semibold">
+                            <span className="text-[#5A6E5E] font-mono flex items-center gap-1 font-semibold text-xs">
                               <Sparkles className="w-3.5 h-3.5 text-[#C59A55]" />
                               Image Idea
                             </span>
                             <button
                               onClick={() => handleCopyPrompt(copyKey, char.visual_prompt, char.name)}
-                              className="copy-prompt-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-semibold text-[#355A46] border border-[#D8CCB7] transition shrink-0"
+                              className="copy-prompt-btn flex items-center gap-1.5 px-3 py-1.5 min-h-[30px] rounded-lg bg-[#F2EBDD] hover:bg-[#EAE0D0] text-xs font-semibold text-[#355A46] border border-[#D8CCB7] transition-colors shrink-0"
                             >
                               {copiedId === copyKey ? (
                                 <>
@@ -946,7 +927,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                               )}
                             </button>
                           </div>
-                          <p className="text-[11.5px] text-[#5A6E5E] italic bg-[#F2EBDD] p-2.5 rounded-lg border border-[#D8CCB7] break-words whitespace-normal leading-relaxed">
+                          <p className="text-[11.5px] text-[#5A6E5E] italic bg-[#F2EBDD] p-3 rounded-lg border border-[#D8CCB7] break-words whitespace-normal leading-relaxed">
                             "{char.visual_prompt}"
                           </p>
                         </div>
@@ -961,6 +942,26 @@ export const UniverseCodexCanvas: React.FC = () => {
                           roleHint={`${char.role} ${char.archetype}`}
                         />
 
+                        {/* Consistent Card Footer */}
+                        <div className="mt-auto pt-3.5 border-t border-[#D8CCB7] flex flex-wrap items-center justify-between gap-2.5 min-w-0">
+                          <button
+                            onClick={() => setRefiningEntity({ type: 'character', data: char })}
+                            className="refine-character-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-[#E9DDBF] hover:bg-[#DFCFAC] text-[#805B20] border border-[#C59A55]/40 transition-colors font-semibold min-h-[30px] focus:outline-none focus:ring-1 focus:ring-[#805B20] shrink-0"
+                            title="Refine character traits and motivation (PERS-01)"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Refine</span>
+                          </button>
+                          <button
+                            onClick={() => jumpToTraceNode(`node-char-${char.id}`)}
+                            className="trace-lineage-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition-colors font-semibold min-h-[30px] focus:outline-none focus:ring-1 focus:ring-[#294B3A] shrink-0"
+                            title="Trace origin trail in DAG"
+                          >
+                            <GitFork className="w-3.5 h-3.5" />
+                            <span>See Where It Came From</span>
+                          </button>
+                        </div>
+
                       </div>
 
                     );
@@ -968,7 +969,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                 </div>
 
                 {/* Relationship Web Section */}
-                <div id="codex-relationship-web" className="space-y-3 pt-2">
+                <div id="codex-relationship-web" className="space-y-3 pt-3">
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-bold font-serif text-[#294B3A] flex items-center gap-2">
                       <Flame className="w-4 h-4 text-[#A0522D]" />
@@ -979,37 +980,53 @@ export const UniverseCodexCanvas: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-w-0">
                     {unfoldedUniverse.relationships.map((rel, idx) => (
                       <div
                         key={idx}
-                        className="p-4 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 text-xs shadow-xs"
+                        className="p-5 rounded-[22px] bg-[#F8F4E8] border border-[#D8CCB7] flex flex-col justify-between shadow-xs min-w-0 break-words space-y-3.5"
                       >
-                        <div className="flex items-center justify-between border-b border-[#D8CCB7] pb-2">
-                          <span className="font-bold font-serif text-[#294B3A]">
-                            {rel.source_character_name || 'Character A'}
-                          </span>
-                          <span className="text-[#8C9E90]">↔</span>
-                          <span className="font-bold font-serif text-[#294B3A]">
-                            {rel.target_character_name || 'Character B'}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC]">
-                            {rel.relation_type}
+                        <div className="space-y-2.5 min-w-0">
+                          {/* Relationship Header */}
+                          <div className="flex flex-wrap items-center justify-between border-b border-[#D8CCB7] pb-2 min-w-0 gap-2">
+                            <span className="font-bold font-serif text-[#294B3A] text-sm md:text-base">
+                              {rel.source_character_name || 'Character A'}
+                            </span>
+                            <span className="text-[#8C9E90] shrink-0 font-bold">↔</span>
+                            <span className="font-bold font-serif text-[#294B3A] text-sm md:text-base text-right">
+                              {rel.target_character_name || 'Character B'}
+                            </span>
                           </div>
+
+                          {/* Relation Type Badge */}
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-[#F5E6DC] text-[#B8734F] border border-[#E2BFAC] shrink-0">
+                              {rel.relation_type}
+                            </span>
+                          </div>
+
+                          {/* Dynamic Description */}
+                          <div className="p-3.5 rounded-xl bg-[#F2EBDD] border border-[#D8CCB7] min-w-0 break-words">
+                            <span className="text-[11px] uppercase tracking-wider font-bold text-[#5F6D63] block mb-1">
+                              Dynamic Tension
+                            </span>
+                            <p className="text-[#394840] leading-relaxed text-xs break-words whitespace-normal">
+                              {rel.dynamic_description}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Consistent Footer for Relationship Card */}
+                        <div className="mt-auto pt-3 border-t border-[#D8CCB7] flex items-center justify-end min-w-0">
                           <button
                             onClick={() => jumpToTraceNode(`node-rel-${rel.id}`)}
-                            className="trace-lineage-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition font-semibold min-h-[28px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
+                            className="trace-lineage-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-[#E2EBE2] hover:bg-[#D5E2D5] text-[#294B3A] border border-[#BACBB8] transition-colors font-semibold min-h-[30px] focus:outline-none focus:ring-1 focus:ring-[#294B3A] shrink-0"
                             title="Trace origin trail in DAG"
                           >
                             <GitFork className="w-3.5 h-3.5" />
                             <span>See Where It Came From</span>
                           </button>
                         </div>
-                        <p className="text-[#394840] leading-relaxed text-[11.5px]">
-                          {rel.dynamic_description}
-                        </p>
                       </div>
                     ))}
                   </div>
