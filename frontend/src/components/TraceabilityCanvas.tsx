@@ -16,6 +16,7 @@ import {
   Compass,
   ZoomIn,
   ZoomOut,
+  ArrowRight,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { TraceNode, TraceNodeType, OriginType } from '../types';
@@ -31,6 +32,8 @@ export const TraceabilityCanvas: React.FC = () => {
     fetchLineage,
     setSelectedNodeId,
     setLineageFilter,
+    setActiveStage,
+    unlockStage,
   } = useWorkspaceStore();
 
   const [zoomLevel, setZoomLevel] = React.useState<number>(1.0);
@@ -270,6 +273,21 @@ export const TraceabilityCanvas: React.FC = () => {
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
           </div>
+
+          {/* Go to Refine (Stage 7) */}
+          <button
+            type="button"
+            data-testid="header-goto-refine-btn"
+            onClick={() => {
+              unlockStage('refine');
+              setActiveStage('refine');
+            }}
+            className="px-4 py-2 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] text-xs font-semibold flex items-center gap-1.5 transition shadow-xs hover:scale-[1.01] active:scale-[0.98]"
+            title="Continue to Stage 7: Refine & Branch"
+          >
+            <span>Go to Refine (Stage 7)</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       </header>
 
@@ -698,6 +716,26 @@ export const TraceabilityCanvas: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Bottom Action Area: Direct Navigation to Stage 7 */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#D8CCB7] mt-8 min-w-0">
+        <div className="text-xs text-[#5A6E5E]">
+          Origin trail verified. Ready to mutate premises, replay counterfactuals, or export your world in Stage 7.
+        </div>
+        <button
+          type="button"
+          data-testid="bottom-goto-refine-btn"
+          onClick={() => {
+            unlockStage('refine');
+            setActiveStage('refine');
+          }}
+          className="w-full sm:w-auto shrink-0 px-6 py-3 rounded-full bg-[#355A46] hover:bg-[#294B3A] text-[#F8F4E8] font-bold text-sm flex items-center justify-center gap-2.5 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.98]"
+        >
+          <Sparkles className="w-4 h-4 fill-current" />
+          <span>Continue to Refine & Branch (Stage 7)</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );

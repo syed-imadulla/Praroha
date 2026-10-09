@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Sidebar, NavView } from './Sidebar';
-import { BotanicalDecorations } from './BotanicalDecorations';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { projectSubscription } from '../../realtime/projectSubscription';
 
@@ -47,8 +46,6 @@ export const AppShell: React.FC<AppShellProps> = ({
 
   return (
     <div className="flex h-screen w-screen bg-[#F8F4E8] text-[#394840] overflow-hidden font-sans relative selection:bg-[#C8D0BE] selection:text-[#294B3A]">
-      {/* Background Subtle Botanical Edge Foilage */}
-      <BotanicalDecorations />
 
       {/* Desktop Permanent Sidebar */}
       <div data-testid="desktop-sidebar" className="hidden lg:flex shrink-0 h-full relative z-20">

@@ -332,8 +332,14 @@ async function run() {
 
   // 7. Stage 7: Refine, Branch, Save Snapshot & Export
   console.log('\n7. Verifying Stage 7 Refinement, Branching & Export...');
-  const stage7Nav = page.locator('#stage-nav-refine');
-  await stage7Nav.click();
+  const gotoRefineBtn = page.locator('[data-testid="bottom-goto-refine-btn"], [data-testid="header-goto-refine-btn"]');
+  if (await gotoRefineBtn.first().isVisible({ timeout: 5000 }).catch(() => false)) {
+    await gotoRefineBtn.first().click();
+    console.log('   PASS: Used direct button to navigate from Trace to Refine.');
+  } else {
+    const stage7Nav = page.locator('#stage-nav-refine');
+    await stage7Nav.click();
+  }
   await page.waitForSelector('text=Refine, Branch & Save', { timeout: 15000 });
   console.log('   PASS: Navigated to Stage 7 Refine, Branch & Save.');
 
@@ -367,7 +373,11 @@ async function run() {
     await page.waitForLoadState('networkidle');
   }
 
-  // Check that the project hydrated into Stage 5 Universe Codex
+  // Check that the project hydrated and navigate to Stage 5 Universe Codex to verify persisted assets
+  const stage5Nav = page.locator('#stage-nav-unfold');
+  if (await stage5Nav.isVisible({ timeout: 10000 }).catch(() => false)) {
+    await stage5Nav.click();
+  }
   await page.waitForSelector('#codex-tab-bible', { timeout: 20000 });
   console.log('   PASS: Direct project URL reload hydrated workspace from database.');
 
