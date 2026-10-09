@@ -260,7 +260,7 @@ async def test_frontend_ui(project_id: str):
         assert creation_mode_cards == 0, "CreationModes cards still present in Stage 1!"
 
         # Verify seed input area is present
-        textarea = page.locator("textarea[placeholder='Enter your seed... (text, image, sound or idea)']")
+        textarea = page.locator("textarea[aria-label='Enter your seed idea']")
         assert await textarea.count() > 0, "Seed input textarea not found!"
         print("Stage 1 verified: No extra cards, clean and focused seed input area.")
 

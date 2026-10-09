@@ -22,9 +22,9 @@ async function runTest() {
     console.log(`✅ Botanical Leaf Separator verified (${leafCount} SVG emblems)`);
 
     // 3. 72px Pill Seed Input Verification
-    const seedTextarea = page.locator('textarea[placeholder="Enter your seed... (text, image, sound or idea)"]');
+    const seedTextarea = page.locator('textarea[aria-label="Enter your seed idea"]');
     await seedTextarea.waitFor({ state: 'visible' });
-    console.log('✅ 72px Pill Seed Input with exact placeholder is rendered and visible');
+    console.log('✅ 72px Pill Seed Input is rendered and visible');
 
     // Circular sage submit button
     const submitBtn = page.locator('button[aria-label="Extract Seed DNA"]');

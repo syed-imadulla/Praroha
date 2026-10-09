@@ -130,7 +130,7 @@ export const SeedInputCanvas: React.FC = () => {
               onChange={(e) => setSeedText(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isExtracting}
-              placeholder="Enter your seed... (text, image, sound or idea)"
+              placeholder="Enter your seed idea..."
               className="flex-1 bg-transparent border-none text-[#294B3A] placeholder:text-[#718875]/75 focus:outline-none focus:ring-0 text-[16px] sm:text-[17px] font-sans resize-none py-2 leading-relaxed"
               aria-label="Enter your seed idea"
             />

@@ -255,7 +255,7 @@ async function runTest() {
     await homeNav.click();
     await page.waitForTimeout(300);
 
-    const seedTextarea = page.locator('textarea[placeholder="Enter your seed... (text, image, sound or idea)"]');
+    const seedTextarea = page.locator('textarea[aria-label="Enter your seed idea"]');
     await seedTextarea.waitFor({ state: 'visible' });
     console.log('✅ Home Screen seed workflow intact and fully functional');
 
