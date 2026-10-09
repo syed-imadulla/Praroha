@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "backend/app/config.py": {
-    "mtime": 1791511721.1633341,
-    "seen": 1791512735.2456949,
-    "ast_hash": "023854fd8031ad0acd3e426ebe36bf1a",
+    "mtime": 1791516965.1921813,
+    "seen": 1791519279.6613493,
+    "ast_hash": "03cfbc956907928fbf90a8a846be4c1f",
     "semantic_hash": ""
   },
   "backend/app/core/response.py": {
@@ -1314,9 +1314,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/media/pollinations.py": {
-    "mtime": 1791501300.7974412,
-    "seen": 1791512735.2457414,
-    "ast_hash": "62333af05662f4a7bd6e1530e9587a15",
+    "mtime": 1791516997.5338817,
+    "seen": 1791519279.6614156,
+    "ast_hash": "ed5f6d898e4613dc1fa737a62198b363",
     "semantic_hash": ""
   },
   "backend/tests/test_image_generation.py": {
@@ -1392,9 +1392,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/media/edge_tts.py": {
-    "mtime": 1791387570.7259414,
-    "seen": 1791388014.788706,
-    "ast_hash": "98c275fb8ef4b2c361e4c7553889c1f2",
+    "mtime": 1791517440.9570975,
+    "seen": 1791519279.6614077,
+    "ast_hash": "3c3fec045242b151795a03707d9cfefa",
     "semantic_hash": ""
   },
   "backend/app/providers/media/kokoro.py": {
@@ -2571,6 +2571,18 @@
     "mtime": 1791500411.6707017,
     "seen": 1791512735.2461429,
     "ast_hash": "82549dc76c49cdc6d7e393a30295bc92",
+    "semantic_hash": ""
+  },
+  "backend/tests/smoke_test_providers.py": {
+    "mtime": 1791517184.3050315,
+    "seen": 1791519279.661455,
+    "ast_hash": "cacfa12ce153115d002330819abf4b78",
+    "semantic_hash": ""
+  },
+  ".planning/phases/31.11-final-judging-readiness/31.11-PLAN.md": {
+    "mtime": 1791516798.9077232,
+    "seen": 1791519279.6618419,
+    "ast_hash": "3d9642a516049c24c673ed972d8b076f",
     "semantic_hash": ""
   }
 }
