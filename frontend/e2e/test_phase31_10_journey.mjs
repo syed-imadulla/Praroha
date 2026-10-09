@@ -7,7 +7,7 @@ const ARTIFACT_DIR = '/home/syed-imadulla/.gemini/antigravity-ide/brain/bb18073e
 const SUPABASE_URL = 'https://stxnxkzaftmwcbtvgzbm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Bds6tNvkx3jLLAuG7OhSeg_HS60imCp';
 const API_BASE = 'http://localhost:8000/api';
-const FRONTEND_URL = 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5174';
 
 const TEST_EMAIL = 'user_a@praroha.local';
 const TEST_PASSWORD = 'Password123!';
@@ -356,7 +356,7 @@ async function run() {
 
   // 8. Page Refresh & Direct Project URL Reopening
   console.log('\n8. Testing Page Refresh & Direct Project URL Reopening...');
-  await page.goto(`http://127.0.0.1:5173/projects/${projectId}`);
+  await page.goto(`${FRONTEND_URL}/projects/${projectId}`);
   await page.waitForLoadState('networkidle');
 
   const reloadAuthHeading = page.locator('h1, h2').filter({ hasText: /Welcome back/i }).first();

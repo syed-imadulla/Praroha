@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const SUPABASE_URL = 'https://stxnxkzaftmwcbtvgzbm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Bds6tNvkx3jLLAuG7OhSeg_HS60imCp';
 const API_BASE = 'http://localhost:8000/api';
-const FRONTEND_URL = 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5174';
 
 const TEST_EMAIL = 'user_a@praroha.local';
 const TEST_PASSWORD = 'Password123!';

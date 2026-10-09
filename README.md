@@ -119,7 +119,7 @@ pip install -r backend/requirements.txt
 # 2. Start the Backend API (Port 8000)
 uvicorn backend.app.main:app --port 8000 --host 0.0.0.0 --reload
 
-# 3. Start the Frontend (Port 5173)
+# 3. Start the Frontend (Port 5174)
 npm --prefix frontend run dev
 ```
 
