@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 96" width="300" height="96" fill="none">
+  <!-- Terracotta Spark -->
+  <g transform="translate(142, 2) scale(0.6667)">
+    <path d="M12 0L14 9L23 12L14 15L12 24L10 15L1 12L10 9Z" fill="#D98A5F" />
+  </g>
+  <!-- Dual Leaf Emblem -->
+  <g transform="translate(132, 22)">
+    <path d="M18 31 C 18 20, 9 17, 7 8 C 17 8, 20 18, 18 31 Z" stroke="#467B5E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M18 31 C 18 20, 27 17, 29 8 C 19 8, 16 18, 18 31 Z" stroke="#467B5E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <!-- Brand Name PRAROHA -->
+  <text x="150" y="85" text-anchor="middle" font-family="'Cormorant Garamond', 'Georgia', serif" font-size="28" font-weight="700" letter-spacing="5.5" fill="#F4EEDF">PRAROHA</text>
+</svg>

@@ -1,8 +1,10 @@
 <div align="center">
 
-<img src="docs/assets/emblem.svg" alt="PRAROHA Emblem" width="50" />
-
-<h1 style="border-bottom: none; border: none; margin-bottom: 0;">PRAROHA</h1>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/brand-light.svg">
+  <img alt="PRAROHA" src="docs/assets/brand-light.svg" width="220">
+</picture>
 
 **Seed → Universe**
 
