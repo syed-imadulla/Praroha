@@ -3,10 +3,8 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/brand-light.svg">
-  <img alt="PRAROHA" src="docs/assets/brand-light.svg" width="220">
+  <img alt="PRAROHA — Seed → Universe" src="docs/assets/brand-light.svg" width="250">
 </picture>
-
-**Seed → Universe**
 
 *Tatva 2 — Forms Hidden in Formless*
 
