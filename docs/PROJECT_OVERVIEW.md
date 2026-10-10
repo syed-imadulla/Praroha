@@ -4,7 +4,7 @@
 
 **Hackathon:** Vedanta Makeathon
 **Team:** Supreme
-**Members:** Sandhya C, Syed Imadulla, Thriveni S A, Teja J
+**Members:** Syed Imadulla, Sandhya C, Thriveni S A, Teja J
 **Status:** Completed hackathon project.
 
 ---

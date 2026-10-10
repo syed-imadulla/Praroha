@@ -61,4 +61,4 @@ flowchart TD
 ## 5. Primary References & Concept Glossary
 - [PROJECT_OVERVIEW.md](../PROJECT_OVERVIEW.md) — Comprehensive narrative and user stories.
 - [CONCEPTS.md](CONCEPTS.md) — Definitions of all core product entities.
-- Original blueprints in [`startDocs/`](../../startDocs).
+- Original blueprints in [startDocs/](../../startDocs).

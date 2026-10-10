@@ -66,7 +66,7 @@ cp .env.example backend/.env
 | `POLLINATIONS_API_KEY` | *(None)* | Optional API key for Pollinations.ai (unauthenticated defaults to `sana`). |
 | `STORAGE_PROVIDER` | `local` | Asset storage backend (`local` for disk storage in `./uploads`, `supabase` for cloud buckets). |
 | `DATABASE_URL` | `sqlite+aiosqlite:///./seed_unfold.db` | Local SQLite database path or PostgreSQL connection string. |
-| `CORS_ORIGINS` | `["http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:5173"]` | Permitted client origins. |
+| `CORS_ORIGINS` | `["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:3000", "http://127.0.0.1:3000"]` | Permitted client origins. |
 
 *Security Warning: Never commit actual API keys or credentials to version control.*
 
