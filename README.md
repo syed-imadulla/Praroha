@@ -4,7 +4,6 @@
 
 **Vedanta Makeathon Project**  
 **Team Name:** Supreme  
-**Institution:** SJCIT, Chikkaballapura  
 **Team Members:** Sandhya C, Syed Imadulla, Thriveni S A, Teja J  
 **Project Status:** Completed hackathon project; documentation consolidated post-Vedanta Makeathon.
 
@@ -314,7 +313,7 @@ Praroha/
 
 ## 16. Team Members
 
-**Team Supreme (SJCIT, Chikkaballapura):**
+**Team Supreme:**
 1. **Sandhya C**
 2. **Syed Imadulla**
 3. **Thriveni S A**

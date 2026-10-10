@@ -2,7 +2,7 @@
 
 **Project:** PRAROHA  
 **Hackathon:** Vedanta Makeathon  
-**Team:** Supreme (SJCIT, Chikkaballapura)  
+**Team:** Supreme  
 **Status:** Post-Hackathon Verification Record
 
 ---

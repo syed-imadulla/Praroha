@@ -2,7 +2,7 @@
 
 **Project:** PRAROHA (Seed → Universe)  
 **Hackathon:** Vedanta Makeathon  
-**Team:** Supreme (SJCIT, Chikkaballapura)  
+**Team:** Supreme  
 **Philosophy:** Tatva 2 — Forms Hidden in Formless
 
 This glossary defines the foundational concepts that form the conceptual grammar of **PRAROHA**.

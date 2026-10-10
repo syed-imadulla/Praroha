@@ -3,7 +3,6 @@
 
 **Hackathon:** Vedanta Makeathon  
 **Team:** Supreme  
-**Institution:** SJCIT, Chikkaballapura  
 **Team Members:** Sandhya C, Syed Imadulla, Thriveni S A, Teja J  
 **Project Status:** Completed hackathon project; documentation consolidated post-Vedanta Makeathon.
 

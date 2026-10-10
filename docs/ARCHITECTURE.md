@@ -3,7 +3,7 @@
 **Project:** PRAROHA  
 **Core Concept:** Seed → Universe  
 **Hackathon:** Vedanta Makeathon  
-**Team:** Supreme (SJCIT, Chikkaballapura)  
+**Team:** Supreme  
 **Status:** Completed Hackathon Technical Specification
 
 ---

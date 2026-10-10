@@ -2,7 +2,7 @@
 ### Seed → Universe (Tatva 2: Forms Hidden in Formless)
 
 **Hackathon:** Vedanta Makeathon  
-**Team:** Supreme (SJCIT, Chikkaballapura)  
+**Team:** Supreme  
 **Project Status:** Completed Hackathon Product Specification
 
 ---
