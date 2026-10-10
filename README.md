@@ -5,6 +5,7 @@
 <h1 style="border-bottom: none; border: none; margin-bottom: 0;">PRAROHA</h1>
 
 **Seed → Universe**
+
 *Tatva 2 — Forms Hidden in Formless*
 
 An AI-powered creative worldbuilding platform built for the **Vedanta Makeathon** by **Team Supreme**.
