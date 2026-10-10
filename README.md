@@ -1,8 +1,14 @@
+<div align="center">
+
+<img src="docs/assets/emblem.svg" alt="PRAROHA Emblem" width="50" />
+
 # PRAROHA
 
 **Seed → Universe** · Tatva 2 — Forms Hidden in Formless
 
 An AI-powered creative worldbuilding platform built for the **Vedanta Makeathon** by **Team Supreme**.
+
+</div>
 
 ---
 
