@@ -2,7 +2,7 @@
 
 <img src="docs/assets/emblem.svg" alt="PRAROHA Emblem" width="50" />
 
-### PRAROHA
+<h1 style="border-bottom: none; border: none; margin-bottom: 0;">PRAROHA</h1>
 
 **Seed → Universe**
 
