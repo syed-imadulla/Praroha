@@ -37,7 +37,7 @@ The following results reflect the verified final audit pass:
 | :--- | :--- | :--- | :--- | :--- |
 | **Backend Suite** | All unit, integration, and service tests | `pytest backend/tests` | **182 Passed, 1 Skipped** | ~27.8s |
 | **Frontend Production Build** | TypeScript compilation & Vite bundling | `npm run build` (in `frontend/`) | **0 Errors, 2028 Modules** | ~13.2s |
-| **Provider Live Smoke Suite** | Network connectivity & binary decoding | `python3 backend/tests/smoke_test_providers.py` | **Gemini, Pollinations, Edge-TTS LIVE** | ~4.8s |
+| **Provider Live Smoke Suite** | Network connectivity & binary decoding | `PYTHONPATH=. python3 backend/tests/smoke_test_providers.py` | **Gemini, Pollinations, Edge-TTS LIVE** | ~4.8s |
 | **8-Stage E2E Journey** | Full user journey (Seed to Export) | `node frontend/e2e/test_phase31_10_journey.mjs` | **All 8 Stages Passed (Exit 0)** | ~38.6s |
 | **Realtime Sync & Isolation** | Multi-tab state sync & project isolation | `node frontend/e2e/test_phase31_10_realtime.mjs` | **Multi-Tab Sync Verified (Exit 0)** | ~15.2s |
 

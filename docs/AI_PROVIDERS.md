@@ -32,7 +32,7 @@ PRAROHA decouples all artificial intelligence generation behind clean, modular p
 
 ### 3.1 Google Gemini
 - **Role:** Natural language understanding, Seed DNA extraction, divergent world generation, and 5-layer universe codex synthesis.
-- **Models Used:** `gemini-3.1-flash-lite`, `gemini-flash-latest`, with fallback to `gemini-2.5-flash`.
+- **Models Used:** `gemini-3.1-flash-lite`, `gemini-flash-latest`, with fallback to `gemini-3.5-flash-lite`.
 - **Protocol:** REST API calls with strict schema enforcement (`responseMimeType="application/json"`).
 - **Authentication:** Server-side `GEMINI_API_KEY` environment variable.
 - **Error Handling:** Bounded exponential backoff with jitter for transient HTTP 429 rate limits; non-retryable 4xx errors surface immediate user feedback.

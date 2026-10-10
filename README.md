@@ -188,10 +188,10 @@ See [docs/TESTING.md](docs/TESTING.md) for the full test ledger and instructions
 
 | Member | GitHub |
 | :--- | :--- |
-| Sandhya C | [@Sandhya2209-ui](https://github.com/Sandhya2209-ui) |
-| Syed Imadulla | [@syed-imadulla](https://github.com/syed-imadulla) |
-| Thriveni S A | [@thriveni-sa](https://github.com/thriveni-sa) |
-| Teja J | [@TEJA-12345678](https://github.com/TEJA-12345678) |
+| Syed Imadulla | [https://github.com/syed-imadulla](https://github.com/syed-imadulla) |
+| Sandhya C | [https://github.com/Sandhya2209-ui](https://github.com/Sandhya2209-ui) |
+| Thriveni S A | [https://github.com/thriveni-sa](https://github.com/thriveni-sa) |
+| Teja J | [https://github.com/TEJA-12345678](https://github.com/TEJA-12345678) |
 
 ## Hackathon
 
