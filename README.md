@@ -1,342 +1,201 @@
 # PRAROHA
-### Seed → Universe
-### Tatva 2 — Forms Hidden in Formless
 
-**Vedanta Makeathon Project**  
-**Team Name:** Supreme  
-**Team Members:** Sandhya C, Syed Imadulla, Thriveni S A, Teja J  
-**Project Status:** Completed hackathon project; documentation consolidated post-Vedanta Makeathon.
+**Seed → Universe** · Tatva 2 — Forms Hidden in Formless
+
+An AI-powered creative worldbuilding platform built for the **Vedanta Makeathon** by **Team Supreme**.
 
 ---
 
-## 1. Introduction
+## Introduction
 
 What if one small idea could become an entire universe?
 
-That is the idea behind PRAROHA. Inspired by Tatva 2 — Seed to Universe, PRAROHA helps uncover the hidden potential inside an idea and develop it into a fictional world that people can explore, edit, and build stories around.
+PRAROHA takes a single creative prompt and unfolds it into a structured fictional world — complete with lore, characters, relationships, story scenes, concept art, and voice narration. The creator stays in control throughout, choosing which direction the world develops and inspecting how every element traces back to the original idea.
 
----
+The name comes from Sanskrit: *sprouting*, *germination* — the moment latent potential becomes visible form.
 
-## 2. What is PRAROHA?
+## The Problem
 
-PRAROHA is an AI-powered creative worldbuilding platform. A user starts with a simple idea, explores three possible worlds, selects one, and develops it into a connected universe containing world details, characters, relationships, story beats, and scenes. The platform can also generate concept images and character voices or narration using available AI services.
+Generative AI can produce text, images, and audio, but building a *consistent* fictional world across these outputs requires repeated prompting, manual coordination, and careful continuity management. Characters drift, lore contradicts itself, and the connection between the original idea and later outputs gets lost.
 
-The creator can inspect how generated elements connect to the original idea, continue refining the universe, and export the project.
+PRAROHA solves this by treating world creation as a structured pipeline rather than an open-ended chat. Every generated element is anchored to the root idea through a database-backed provenance model.
 
----
-
-## 3. What Problem Does It Solve?
-
-Generative AI can produce text, images, and audio, but creating a consistent fictional world across multiple tools often requires repeated prompting and manual effort.
-
-Characters may become inconsistent, story details may contradict each other, and the connection between the original idea and later outputs can be lost.
-
-PRAROHA brings these creative elements into one connected workspace while preserving the original idea, the creator's choices, and the relationships between generated elements.
-
----
-
-## 4. Who Can Use It?
-
-- **Writers:** Develop story ideas, characters, settings, and plotlines.
-- **Game developers:** Explore fictional worlds, characters, and narrative concepts.
-- **Filmmakers:** Develop story concepts and visualise scenes.
-- **Content creators:** Turn initial ideas into connected creative content.
-- **Creative students and hobbyists:** Explore different directions for an idea and develop the one they prefer.
-
----
-
-## 5. Philosophical Foundation: Tatva 2
-
-PRAROHA is grounded in a single guiding philosophy: **Tatva 2 — Seed to Universe: Forms Hidden in Formless**.
+## Philosophical Foundation: Tatva 2
 
 > *"The seed is the idea. The universe is what it can become."*
 
-A small seed holds the potential to become something much larger. In the same way, a simple idea contains possibilities that are not immediately visible. PRAROHA helps uncover these possibilities and develop the original idea into a structured, explorable fictional universe.
+PRAROHA is guided by a single philosophy: **Tatva 2 — Seed to Universe: Forms Hidden in Formless**. A simple idea contains hidden themes, possible settings, characters, conflicts, and story directions. PRAROHA unfolds that potential into alternative worlds, lets the creator choose a direction, and develops the selection into a connected universe.
 
-- **Seed:** The user's initial idea or concept.
-- **Hidden potential:** Themes, possibilities, settings, characters, conflicts, and creative directions contained within that idea.
-- **Unfolding:** AI develops the idea into multiple possible worlds.
-- **Human choice:** The user selects the direction they want to pursue.
-- **Visible universe:** The selected direction becomes a connected world with characters, relationships, story scenes, images, and voice narration where available.
+The application's workflow stages are practical implementation steps demonstrating this philosophy. They are not separate Tatvas.
 
-The seven technical workflow stages in the application are practical implementation steps that demonstrate this single philosophy. They are not separate Tatvas.
+## How It Works
 
----
+1. **Enter an idea** — A short narrative premise (a sentence, question, or scenario).
+2. **Understand the seed** — Gemini extracts structured Seed DNA: core motifs, themes, tone, and constraints.
+3. **Explore three worlds** — The engine generates three divergent world candidates along different creative axes.
+4. **Choose a direction** — The creator commits to one world and records their rationale. Downstream generation is locked until this human choice is made.
+5. **Develop the universe** — The selected world unfolds into a World Bible, Characters, Relationships, and Story Scenes.
+6. **Bring elements to life** — Concept art (Pollinations.ai) and character voices (Edge-TTS) are generated for scenes and characters.
+7. **Explore connections** — An interactive Origin Trail DAG shows how every rule, character, and scene traces back to the original seed.
+8. **Refine and export** — Test premise mutations, replay counterfactuals, and export a portable `.seedunfold.json` bundle.
 
-## 6. How It Works: The Product Workflow
+## Key Features
 
-The PRAROHA workflow guides a creator from an initial prompt to an unfolded, explorable world:
+- **Seed DNA Extraction** — Structured identification of latent motifs, conflicts, and constraints.
+- **Three-World Divergence** — Three meaningfully distinct candidate worlds from a single seed.
+- **Human Choice Gate** — No autonomous runaway; the creator must commit before unfolding proceeds.
+- **Universe Codex** — Interconnected World Bible, Cast Profiles, Relational Dynamics, and Story Scenes.
+- **Concept Art** — Server-side Pollinations.ai integration producing validated JPEG images.
+- **Voice & Narration** — Edge-TTS neural speech synthesis with curated character personas.
+- **Origin Trail DAG** — Visual provenance graph mapping every entity back to the root seed.
+- **Causal Inspector** — Plain-language explanations of why any element exists.
+- **Mutation Lab** — Test how changing the premise affects downstream content.
+- **Counterfactual Replay** — Compare the chosen world against rejected alternatives.
+- **Realtime Sync** — Multi-tab synchronization via Supabase Realtime.
+- **Portable Export** — Full project export/import as structured JSON.
 
-1. **Enter an idea:** The creator enters an initial narrative seed (e.g., a premise, question, or scenario).
-2. **Understand the seed:** Google Gemini analyses the seed, extracting structured Seed DNA (core motifs, themes, tone, constraints, and latent vectors).
-3. **Explore three worlds:** The engine generates three divergent, high-contrast world candidates along orthogonal creative axes.
-4. **Choose a world:** The creator selects one world direction and commits to it, capturing their creative rationale into Decision DNA.
-5. **Develop the universe:** The platform progressively unfolds the selected world into a comprehensive Universe Codex:
-   - **World Bible:** Physical laws, history, cultural factions, and key locations.
-   - **Characters:** Profiles, motivations, personal conflicts, and archetypes.
-   - **Relationships:** A dynamic socio-emotional web defining conflicts and alliances.
-   - **Story Beats & Scenes:** Structured dramatic beats and scene settings.
-6. **Bring elements to life:** Available AI providers generate real concept art for scenes and locations (via Pollinations.ai) and synthesized character voices and scene narration (via Edge-TTS).
-7. **Explore connections:** The creator inspects the interactive Origin Trail (a Directed Acyclic Graph) to see the causal lineage connecting every rule, character, and scene back to the original seed.
-8. **Save, refine, and export:** The creator can experiment in the Mutation Lab, replay counterfactual timelines, snapshot project state, and export a portable `.seedunfold.json` project bundle.
+## Example: "A village where nobody can lie"
 
----
+**Seed DNA extracted:** Involuntary truth, societal vulnerability, trust economics, emotional friction.
 
-## 7. Main Features
+**Three worlds generated:**
+- *Botanical Truth* — Sacred pollen physically chokes anyone attempting falsehood.
+- *Cognitive Mirror* — Thoughts project visually above citizens' heads as bioluminescent halos.
+- *Architectural Vow* — An ancient bell tower tolls violently whenever deceit is spoken.
 
-- **Seed DNA Extraction:** Identifies latent motifs, conflicts, and constraints from arbitrary prompts.
-- **Three-World Divergence Engine:** Produces three meaningfully distinct candidate worlds (e.g., grounded, radical, and inverse explorations).
-- **Human Choice Gate:** Enforces creator commitment before unfolding; downstream generation is locked until a choice is confirmed.
-- **Universe Codex (5 Layers):** Interconnected World Bible, Cast Profiles, Relational Dynamics, Story Beats, and Detailed Scenes.
-- **Concept Art Generation:** Server-side integration with Pollinations.ai for location concept art and character portraits with JPEG validation.
-- **Neural Voice & Narration:** Online speech synthesis via Edge-TTS supporting curated persona voices and HTML5 playback.
-- **Origin Trail Lineage DAG:** Visual directed acyclic graph mapping every entity's provenance (`SEED_EXPLICIT`, `SEED_INFERRED`, `HUMAN_DECISION`, `DERIVED`, `AI_INTRODUCED`).
-- **Causal Provenance Inspector:** Explains why any character, law, or beat exists in plain language without exposing internal model chain-of-thought.
-- **Seed Mutation Lab:** Allows testing premise modifications to preview downstream impacts (Affected, Conditional, Preserved).
-- **Counterfactual Replay:** Compares the selected world against rejected candidates along key creative dimensions.
-- **Human-Only Zones:** Creator-locked creative guardrails that prevent AI drift across core themes, protagonist motivations, and central conflicts.
-- **Supabase Realtime Sync:** Two browser tabs or devices stay synchronized without manual page refresh.
-- **Project Isolation & Ownership:** Enforced server-side project authorization and data isolation.
-- **Portable Bundle Export:** Export and re-import complete fictional worlds as structured JSON (`.seedunfold.json`).
+**Creator selects** *Cognitive Mirror*. The platform unfolds the village name, social hierarchy, characters (an archivist wearing a mirrored veil), strained relationships, and an opening scene. Concept art visualizes the misty valley; narration audio reads the archivist's monologue. Every element traces back to the original sentence.
 
----
-
-## 8. Example Walkthrough
-
-**Starting idea:**  
-> *"A village where nobody can lie."*
-
-1. **Seed Understanding:** Gemini extracts the latent themes: involuntary truth, societal vulnerability, trust economics, and emotional friction.
-2. **Three Worlds Generated:**
-   - *World A (Botanical Truth):* A pollen from a sacred valley physically chokes anyone attempting falsehood.
-   - *World B (Cognitive Mirror):* Thoughts are projected visually above citizens' heads as bioluminescent halos.
-   - *World C (Architectural Vow):* An ancient stone bell tower tolls violently whenever deceit is uttered within its perimeter.
-3. **Human Choice:** The creator selects *World B (Cognitive Mirror)*.
-4. **Universe Unfolding:** The platform generates the village name, social hierarchy, characters (e.g., an archivist who wears a mirrored veil), their strained relationships, and an opening scene where someone learns to think in riddles.
-5. **Media Generation:** Concept art visualizes the misty valley with glowing head-halos; narration audio reads the archivist's opening monologue.
-6. **Final Result:** An editable, persistent, and exportable fictional universe developed from one simple sentence.
-
----
-
-## 9. Technology Stack
+## Technology Stack
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, Zustand, Framer Motion, Lucide Icons |
-| **Backend** | Python 3.10+, FastAPI, SQLModel (SQLAlchemy 2 core), Pydantic v2 |
-| **Database & Persistence** | SQLite with aiosqlite (local) / Supabase PostgreSQL (cloud), Supabase Storage / local `./uploads` |
-| **Realtime** | Supabase Realtime broadcast layer (`projects:<id>` channels) |
+| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, Zustand, Framer Motion |
+| **Backend** | Python 3.10+, FastAPI, SQLModel, Pydantic v2 |
+| **Database** | SQLite / aiosqlite (local), Supabase PostgreSQL (cloud) |
+| **Realtime** | Supabase Realtime broadcast channels |
 | **Text Generation** | Google Gemini (`gemini-3.1-flash-lite`, `gemini-flash-latest`) |
-| **Image Generation** | Pollinations.ai (Flux / Sana models with Bearer auth) |
-| **Speech & Narration** | Edge-TTS (online neural speech service) |
-| **Soundscape (Code Integrated)** | Stability AI Stable Audio 2 (`/v2beta/audio/stable-audio-2/text-to-audio`) |
-| **Music (Code Integrated)** | Hugging Face Inference (`facebook/musicgen-small`) / ACE-Step |
+| **Image Generation** | Pollinations.ai (Flux / Sana models) |
+| **Speech** | Edge-TTS (online neural speech) |
+| **Soundscape** | Stability AI Stable Audio 2 *(blocked — requires funded key)* |
+| **Music** | Hugging Face MusicGen *(blocked — requires dedicated endpoint)* |
 
----
-
-## 10. System Architecture
+## Architecture
 
 ```mermaid
 graph TD
-    subgraph Client ["Frontend (React 18 + Vite + TypeScript)"]
+    subgraph Client ["Frontend (React + Vite + TypeScript)"]
         UI[Workspace & Stage Navigation]
-        Store[Zustand Workspace Store]
-        RT_Client[Supabase Realtime Client]
-        UI --> Store
-        Store --> RT_Client
+        Store[Zustand Store]
+        RT[Supabase Realtime]
+        UI --> Store --> RT
     end
 
-    subgraph Server ["Backend (FastAPI + Python 3.10+)"]
-        API[FastAPI Routers: Projects, Generation, Media, Lineage]
-        Repo[SQLModel Repository Layer]
-        MediaSvc[Media Generation Service]
-        API --> Repo
-        API --> MediaSvc
+    subgraph Server ["Backend (FastAPI + Python)"]
+        API[API Routers]
+        Svc[UniverseService · MediaService · LineageService]
+        Repo[SQLModel Repository]
+        API --> Svc --> Repo
     end
 
-    subgraph Persistence ["Persistence Layer"]
-        DB[(SQLite / Supabase PostgreSQL)]
-        Storage[(Local ./uploads / Supabase Storage)]
+    subgraph Data ["Persistence"]
+        DB[(SQLite / PostgreSQL)]
+        Storage[(Local disk / Supabase Storage)]
         Repo --> DB
-        MediaSvc --> Storage
+        Svc --> Storage
     end
 
-    subgraph Providers ["AI Provider Layer"]
-        Gemini[Google Gemini API: Seed DNA, 3 Worlds, Codex]
-        Pollinations[Pollinations.ai: Concept Art & Portraits]
-        EdgeTTS[Microsoft Edge-TTS: Voice & Narration]
-        Stability[Stability AI: Soundscape - BLOCKED]
-        HF[Hugging Face / ACE-Step: Music - BLOCKED]
+    subgraph AI ["AI Providers"]
+        Gemini[Google Gemini]
+        Pollinations[Pollinations.ai]
+        EdgeTTS[Edge-TTS]
     end
 
-    Client -- HTTP / REST --> API
-    RT_Client -- WebSockets --> DB
-    API --> Gemini
-    MediaSvc --> Pollinations
-    MediaSvc --> EdgeTTS
-    MediaSvc -.-> Stability
-    MediaSvc -.-> HF
+    Client -- REST --> API
+    RT -- WebSockets --> DB
+    Svc --> Gemini
+    Svc --> Pollinations
+    Svc --> EdgeTTS
 ```
 
----
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full data model, sequence diagrams, and security details.
 
-## 11. Installation and Developer Setup
+## Quick Start
 
-### Prerequisites
-- **Node.js:** 18.x or later
-- **Python:** 3.10 or later
-- **Git**
+**Prerequisites:** Node.js 18+, Python 3.10+, Git.
 
-### 1. Clone Repository & Setup Virtual Environment
 ```bash
+# Clone and set up
 git clone https://github.com/syed-imadulla/Praroha.git
 cd Praroha
 
-# Create and activate Python virtual environment
+# Backend
 python3 -m venv venv
-source venv/bin/activate
-
-# Install backend dependencies
+source venv/bin/activate        # Windows: .\venv\Scripts\Activate.ps1
 pip install -r backend/requirements.txt
 
-# Install frontend dependencies
-npm --prefix frontend install
-```
+# Frontend
+cd frontend && npm install && cd ..
 
-### 2. Configure Environment Variables
-Copy `.env.example` to `backend/.env` (or configure in root):
-```bash
+# Configure environment
 cp .env.example backend/.env
-```
-Key configuration items:
-- `AI_PROVIDER=gemini` (enables live Gemini text generation; set to `mock` for deterministic offline fixtures).
-- `GEMINI_API_KEY=your_gemini_api_key_here` (from Google AI Studio).
-- `POLLINATIONS_API_KEY=your_pollinations_key_here` (optional; unauthenticated requests fall back to supported public models).
-- `STORAGE_PROVIDER=local` (or `supabase` when cloud credentials are provided).
+# Edit backend/.env — set GEMINI_API_KEY for live generation,
+# or leave AI_PROVIDER=mock for offline demo mode.
 
-### 3. Run the Backend API (Port 8000)
-```bash
-uvicorn backend.app.main:app --port 8000 --host 0.0.0.0 --reload
-```
-API Documentation will be live at `http://localhost:8000/docs`.
-
-### 4. Run the Frontend Development Server (Port 5174)
-```bash
-npm --prefix frontend run dev
-```
-Open `http://localhost:5174` in your browser.
-
----
-
-## 12. AI Provider Status & Capabilities
-
-PRAROHA maintains strict transparency regarding third-party AI provider availability:
-
-| Provider | Purpose | Status | Live Result | Output & Persistence |
-| :--- | :--- | :--- | :--- | :--- |
-| **Google Gemini** | Seed DNA, 3 Worlds, Codex unfolding | **VERIFIED LIVE** | Live response in ~1.9s | Structured JSON validated against Pydantic schema, saved to database |
-| **Pollinations.ai** | Location concept art, character portraits | **VERIFIED LIVE** | Generated in ~450ms | Valid 1024×1024 JPEG binary payload saved to storage |
-| **Edge-TTS** | Character voices, scene narration | **VERIFIED LIVE** | Generated in ~960ms | Valid MP3 audio saved to storage, attached to entity, playable via HTML5 |
-| **Stability AI Stable Audio** | Atmospheric soundscape generation | **BLOCKED** | HTTP 401/402 | Implementation updated to Stable Audio 2 synchronous protocol; requires funded API key |
-| **Hugging Face / ACE-Step** | Atmospheric music generation | **BLOCKED** | HTTP 404/410 | Implemented in code; blocked because serverless inference is not supported for MusicGen without a dedicated endpoint |
-
-*Note: In Real Mode, when an audio provider is blocked, PRAROHA displays a clear error state and retry action. It never generates fabricated mock media in place of real assets.*
-
----
-
-## 13. Testing and Verification
-
-The PRAROHA codebase has undergone end-to-end regression testing:
-
-- **Backend Test Suite:** 182 passed, 1 skipped (`pytest backend/tests`).
-- **Frontend Production Build:** Built cleanly in 13.2s with zero TypeScript errors (`npm run build`).
-- **Live Provider Smoke Test:** Verified Gemini, Pollinations, and Edge-TTS live execution via `PYTHONPATH=. python3 backend/tests/smoke_test_providers.py`.
-- **Eight-Stage Journey E2E:** Automated browser test ([test_phase31_10_journey.mjs](file:///home/syed-imadulla/Desktop/Praroha/frontend/e2e/test_phase31_10_journey.mjs)) completed end-to-end with arbitrary seeds.
-- **Multi-Tab Realtime Synchronization:** Verified multi-tab state sync and project isolation via [test_phase31_10_realtime.mjs](file:///home/syed-imadulla/Desktop/Praroha/frontend/e2e/test_phase31_10_realtime.mjs).
-
-To run backend tests:
-```bash
-pytest backend/tests
+# Run (two terminals)
+uvicorn backend.app.main:app --port 8000 --reload    # Backend
+npm --prefix frontend run dev                          # Frontend → http://localhost:5174
 ```
 
-To run provider smoke verification:
-```bash
-PYTHONPATH=. python3 backend/tests/smoke_test_providers.py
-```
+## AI Provider Status
 
----
+| Provider | Purpose | Status |
+| :--- | :--- | :--- |
+| **Google Gemini** | Text generation (Seed DNA, Worlds, Codex) | Previously verified live |
+| **Pollinations.ai** | Concept art and character portraits | Previously verified live |
+| **Edge-TTS** | Character voice and scene narration | Previously verified live (online service) |
+| **Stability AI** | Atmospheric soundscapes | Blocked — requires funded API key |
+| **Hugging Face / ACE-Step** | Background music | Blocked — requires dedicated inference endpoint |
 
-## 14. Project Structure
+When a provider is unavailable, PRAROHA displays a clear error state. Setting `AI_PROVIDER=mock` enables deterministic offline fixtures for demonstration.
 
-```
-Praroha/
-├── backend/
-│   ├── app/
-│   │   ├── api/            # FastAPI endpoints (projects, worlds, unfold, media, lineage)
-│   │   ├── models/         # SQLModel database and domain schemas
-│   │   ├── providers/      # AIProvider implementations (Gemini, Pollinations, Edge-TTS, Stability)
-│   │   ├── repositories/   # Database access layer
-│   │   ├── services/       # Domain logic: UniverseService, MediaService, LineageService
-│   │   ├── config.py       # Pydantic BaseSettings configuration
-│   │   └── main.py         # FastAPI application entrypoint
-│   └── tests/              # Pytest test suite (182+ tests)
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # Canvas components for Stages 1–7, modals, cards
-│   │   ├── store/          # Zustand workspace store
-│   │   ├── realtime/       # Supabase Realtime channel subscriptions
-│   │   ├── types/          # TypeScript domain interfaces
-│   │   ├── App.tsx         # Root workspace routing and application shell
-│   │   └── main.tsx        # React entrypoint
-│   ├── e2e/                # Playwright end-to-end test scenarios
-│   └── vite.config.ts      # Vite configuration (Port 5174, API proxy)
-├── docs/                   # Consolidated project documentation
-│   ├── PROJECT_OVERVIEW.md # Comprehensive narrative and concept guide
-│   ├── ARCHITECTURE.md     # In-depth technical architecture
-│   ├── AI_PROVIDERS.md     # Detailed AI provider specification
-│   ├── SETUP.md            # Developer setup and run guide
-│   └── TESTING.md          # Test ledger and verification results
-├── startDocs/              # Original product blueprints and PDFs
-└── README.md               # Primary project documentation entrypoint
-```
+See [docs/AI_PROVIDERS.md](docs/AI_PROVIDERS.md) for integration details and error handling.
 
----
+## Testing
 
-## 15. Known Limitations
+Historical regression results from the final hackathon audit:
 
-- **Atmospheric Audio Generation:** While the synchronous Stable Audio 2 API protocol and Hugging Face client are implemented and covered by unit tests, live generation requires external funded credits and dedicated inference endpoints.
-- **Offline Dependency for Speech:** Edge-TTS relies on an online Microsoft service; it is not an offline embedded model.
-- **Rate Limits:** Gemini generation is subject to standard Google Cloud API quota and rate limits.
-- **Single-User Project Editing:** While multiple tabs update in real time for a project owner, collaborative multi-user live cursors are outside the current project scope.
+| Suite | Command | Result |
+| :--- | :--- | :--- |
+| Backend tests | `pytest backend/tests` | 182 passed, 1 skipped |
+| Frontend build | `npm --prefix frontend run build` | Clean (0 errors) |
+| Provider smoke test | `PYTHONPATH=. python3 backend/tests/smoke_test_providers.py` | Gemini, Pollinations, Edge-TTS verified |
+| E2E journey | `node frontend/e2e/test_phase31_10_journey.mjs` | All stages passed |
+| Realtime sync | `node frontend/e2e/test_phase31_10_realtime.mjs` | Multi-tab sync verified |
 
----
+See [docs/TESTING.md](docs/TESTING.md) for the full test ledger and instructions.
 
-## 16. Team Members
+## Documentation
 
-**Team Supreme:**
-1. **Sandhya C**
-2. **Syed Imadulla**
-3. **Thriveni S A**
-4. **Teja J**
+- [Project Overview](docs/PROJECT_OVERVIEW.md) — Purpose, philosophy, workflow, and a detailed example.
+- [Architecture](docs/ARCHITECTURE.md) — System design, data model, request flow, and security.
+- [AI Providers](docs/AI_PROVIDERS.md) — Provider contracts, authentication, and limitations.
+- [Setup Guide](docs/SETUP.md) — Installation, configuration, and troubleshooting.
+- [Testing Report](docs/TESTING.md) — Test strategy, results, and execution instructions.
 
----
+## Team
 
-## 17. Hackathon Background & Acknowledgements
+**Team Supreme**
 
-PRAROHA was conceived, architected, and built for the **Vedanta Makeathon**.
+| Member | GitHub |
+| :--- | :--- |
+| Sandhya C | [@Sandhya2209-ui](https://github.com/Sandhya2209-ui) |
+| Syed Imadulla | [@syed-imadulla](https://github.com/syed-imadulla) |
+| Thriveni S A | [@thriveni-sa](https://github.com/thriveni-sa) |
+| Teja J | [@TEJA-12345678](https://github.com/TEJA-12345678) |
 
-We express our gratitude to the organizers, mentors, and evaluators of the Vedanta Makeathon for the creative theme challenge that inspired this work:
+## Hackathon
 
-> **Theme 2 (Tattva 2):** *Forms hidden in formless*  
-> **Idea 1:** *Generative AI: “Seed → Tree / Word → Movie / Sound → Song”*
+PRAROHA was built for the **Vedanta Makeathon**.
 
----
-
-## 18. Documentation Index
-
-For comprehensive documentation, see:
-- [PROJECT_OVERVIEW.md](file:///home/syed-imadulla/Desktop/Praroha/docs/PROJECT_OVERVIEW.md) — Detailed narrative, philosophical connection, and user stories.
-- [ARCHITECTURE.md](file:///home/syed-imadulla/Desktop/Praroha/docs/ARCHITECTURE.md) — System architecture, database schema, data flow, and security.
-- [AI_PROVIDERS.md](file:///home/syed-imadulla/Desktop/Praroha/docs/AI_PROVIDERS.md) — Complete AI provider matrix, contracts, and limitations.
-- [SETUP.md](file:///home/syed-imadulla/Desktop/Praroha/docs/SETUP.md) — Developer installation, configuration, and troubleshooting guide.
-- [TESTING.md](file:///home/syed-imadulla/Desktop/Praroha/docs/TESTING.md) — Full test report, regression suites, and verification evidence.
+> **Theme 2 (Tattva 2):** *Forms hidden in formless*
+> **Idea 1:** *Generative AI — Seed → Tree / Word → Movie / Sound → Song*

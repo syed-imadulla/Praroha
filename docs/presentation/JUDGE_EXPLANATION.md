@@ -63,7 +63,7 @@ Praroha builds a topological **Causal Lineage DAG** (Directed Acyclic Graph). Ev
 Structured domain state is stored in a relational database using **SQLModel** (SQLite for local zero-cloud development, PostgreSQL for production). Foreign keys enforce relational integrity across projects, seeds, candidates, bibles, cast members, relationships, scenes, and revision logs.
 
 ## 17. What is cloud storage?
-Binary payloads, portable project bundles, and state snapshots are handled through the abstract [`StorageProvider`](file:///home/syed-imadulla/Desktop/Praroha/backend/app/providers/storage.py). The system supports local filesystem storage (`LocalStorageProvider`) and cloud bucket storage (`SupabaseStorageProvider`).
+Binary payloads, portable project bundles, and state snapshots are handled through the abstract [`StorageProvider`](../../backend/app/providers/storage.py). The system supports local filesystem storage (`LocalStorageProvider`) and cloud bucket storage (`SupabaseStorageProvider`).
 
 ## 18. What is currently implemented?
 - 100% of the 7-stage unfolding pipeline.

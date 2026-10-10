@@ -46,7 +46,7 @@ Structured application state is managed using **SQLModel** (Pydantic v2 + SQLAlc
 
 ## 2. Object Storage Layer (`StorageProvider`)
 
-Binary payloads, portable project export bundles, and serialized state snapshots are managed via the abstract [`StorageProvider`](file:///home/syed-imadulla/Desktop/Praroha/backend/app/providers/storage.py) interface.
+Binary payloads, portable project export bundles, and serialized state snapshots are managed via the abstract [`StorageProvider`](../../backend/app/providers/storage.py) interface.
 
 ### Providers Implemented in Source Code
 1. **`LocalStorageProvider`**:

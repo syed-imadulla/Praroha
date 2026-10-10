@@ -59,6 +59,6 @@ flowchart TD
 ---
 
 ## 5. Primary References & Concept Glossary
-- [PROJECT_OVERVIEW.md](file:///home/syed-imadulla/Desktop/Praroha/docs/PROJECT_OVERVIEW.md) — Comprehensive narrative and user stories.
-- [CONCEPTS.md](file:///home/syed-imadulla/Desktop/Praroha/docs/product/CONCEPTS.md) — Definitions of all core product entities.
-- Original blueprints in [`startDocs/`](file:///home/syed-imadulla/Desktop/Praroha/startDocs).
+- [PROJECT_OVERVIEW.md](../PROJECT_OVERVIEW.md) — Comprehensive narrative and user stories.
+- [CONCEPTS.md](CONCEPTS.md) — Definitions of all core product entities.
+- Original blueprints in [`startDocs/`](../../startDocs).

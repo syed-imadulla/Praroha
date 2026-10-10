@@ -9,7 +9,7 @@
 
 ## 1. Actual AI Provider Architecture
 
-The AI layer in Praroha is decoupled behind an abstract base class [`AIProvider`](file:///home/syed-imadulla/Desktop/Praroha/backend/app/providers/base.py) defined in `backend/app/providers/base.py`:
+The AI layer in Praroha is decoupled behind an abstract base class [`AIProvider`](../../backend/app/providers/base.py) defined in `backend/app/providers/base.py`:
 
 ```
                     ┌────────────────────────┐
@@ -57,7 +57,7 @@ The AI layer in Praroha is decoupled behind an abstract base class [`AIProvider`
 
 ## 3. Fallback & Failure Modes (Actual Source Behavior)
 
-From [`backend/app/providers/gemini_provider.py`](file:///home/syed-imadulla/Desktop/Praroha/backend/app/providers/gemini_provider.py):
+From [`backend/app/providers/gemini_provider.py`](../../backend/app/providers/gemini_provider.py):
 
 ```python
 FALLBACK_WARNING_MESSAGE = (
