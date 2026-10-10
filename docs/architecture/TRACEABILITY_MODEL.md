@@ -1,6 +1,6 @@
-# Seed Unfold — Traceability & Provenance Model
+# PRAROHA — Traceability & Provenance Model
 
-Traceability is a core differentiator and architectural pillar of **Seed Unfold**. It transforms AI from an opaque black box into an explainable, auditable, and navigable creative development tree.
+Traceability is a core differentiator and architectural pillar of **PRAROHA**. It transforms AI from an opaque black box into an explainable, auditable, and navigable creative development tree.
 
 ---
 

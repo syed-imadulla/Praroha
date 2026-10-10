@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-Seed Unfold is built around *Tattva 2: Forms Hidden in the Formless*. Traditional generative storytelling tools immediately jump from a prompt into an unguided narrative wall, robbing the user of agency and obscuring how decisions were made.
+PRAROHA is built around *Tattva 2: Forms Hidden in the Formless*. Traditional generative storytelling tools immediately jump from a prompt into an unguided narrative wall, robbing the user of agency and obscuring how decisions were made.
 
 ## Decision
 1. **Exactly Three Worlds**: The branching engine strictly generates three distinct world options. This balances creative divergence with decision fatigue.

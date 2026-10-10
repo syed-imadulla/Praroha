@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-Seed Unfold supports both user-inputted assets (reference imagery, moodboards, user uploads) and AI-generated multimedia assets (concept art, audio cues, storyboards). Storing raw binary files directly inside PostgreSQL (e.g., as BYTEA columns) severely degrades database performance, bloats backups, complicates horizontal scaling, and violates clean separation of concerns.
+PRAROHA supports both user-inputted assets (reference imagery, moodboards, user uploads) and AI-generated multimedia assets (concept art, audio cues, storyboards). Storing raw binary files directly inside PostgreSQL (e.g., as BYTEA columns) severely degrades database performance, bloats backups, complicates horizontal scaling, and violates clean separation of concerns.
 
 Additionally, asset handling intersects three distinct architectural dimensions:
 1. The raw binary payload itself.

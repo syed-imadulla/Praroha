@@ -1,7 +1,7 @@
 # Praroha 3-Minute Live Judging Demo Script
 
 **Target Duration**: 3 minutes (180 seconds)  
-**Presenter Flow**: Live walkthrough on `http://localhost:5173`  
+**Presenter Flow**: Live walkthrough on `http://localhost:5174`  
 **Theme**: Tattva 2 — *Forms hidden in formless*  
 **Idea**: Idea 1 — *Generative AI (Seed → Universe)*
 

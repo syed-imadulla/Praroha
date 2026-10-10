@@ -4,7 +4,7 @@
 Accepted (Revised)
 
 ## Context
-Seed Unfold is an AI-powered creative development workspace requiring high responsiveness, strict schema validation for AI outputs, progressive disclosure UX, rapid local iteration, and a durable, relational persistence architecture for story-world entities and their causal provenance.
+PRAROHA is an AI-powered creative development workspace requiring high responsiveness, strict schema validation for AI outputs, progressive disclosure UX, rapid local iteration, and a durable, relational persistence architecture for story-world entities and their causal provenance.
 
 The source documentation specifies:
 - Frontend: React + Vite + TypeScript + Tailwind CSS + Framer Motion

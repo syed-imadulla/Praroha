@@ -1,6 +1,6 @@
-# Seed Unfold — System Architecture
+# PRAROHA — System Architecture
 
-This document records the intended architectural direction, technical stack, and design patterns for the **Seed Unfold** platform.
+This document records the intended architectural direction, technical stack, and design patterns for the **PRAROHA** platform.
 
 ---
 

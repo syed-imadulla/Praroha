@@ -1,6 +1,6 @@
-# Seed Unfold — Project Wiki Index
+# PRAROHA — Project Wiki Index
 
-Welcome to the **Seed Unfold** knowledge base. This wiki provides direct access to all specifications, architecture documentation, architectural decision records, and operational guidelines.
+Welcome to the **PRAROHA** knowledge base. This wiki provides direct access to all specifications, architecture documentation, architectural decision records, and operational guidelines.
 
 ---
 

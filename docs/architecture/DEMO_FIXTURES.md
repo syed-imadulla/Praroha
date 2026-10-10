@@ -1,6 +1,6 @@
-# Seed Unfold — Canonical Demo Fixtures
+# PRAROHA — Canonical Demo Fixtures
 
-To ensure rock-solid, zero-latency demonstrations and offline development capability, Seed Unfold maintains canonical fixture data for testing and presentations.
+To ensure rock-solid, zero-latency demonstrations and offline development capability, PRAROHA maintains canonical fixture data for testing and presentations.
 
 ---
 

@@ -1,36 +1,64 @@
-# Seed Unfold — Product Documentation
+# PRAROHA — Product Documentation
+### Seed → Universe (Tatva 2: Forms Hidden in Formless)
 
-## Overview
+**Hackathon:** Vedanta Makeathon  
+**Team:** Supreme (SJCIT, Chikkaballapura)  
+**Project Status:** Completed Hackathon Product Specification
 
-**Seed Unfold** is a human-guided Generative AI engine that takes one incomplete idea (a "seed"), understands its latent intent, generates **exactly three** distinct creative/solution worlds, lets the human choose one direction, and progressively unfolds that selected direction into a coherent, persistent, and traceable mini-universe.
+---
 
-## The Core Product Loop
+## 1. Overview
+
+**PRAROHA** (*formerly Seed Unfold during early development*) is a human-guided Generative AI engine that takes one incomplete idea (a "seed"), understands its latent intent, generates **exactly three** distinct creative worlds along orthogonal axes, lets the human creator choose one direction, and progressively unfolds that selected direction into a coherent, persistent, and traceable fictional universe.
+
+---
+
+## 2. Philosophical Connection: Tatva 2
+
+PRAROHA is founded on **Tatva 2 — Seed to Universe: Forms Hidden in Formless**.
+
+> *“The seed is the idea. The universe is what it can become.”*
+
+Just as a mighty tree exists in unmanifest potential inside a physical seed, a simple story prompt contains latent lore, character motivations, tensions, and visual imagery. PRAROHA reveals these hidden forms without creative drift or lore contradictions.
+
+---
+
+## 3. The Core Product Workflow
 
 ```mermaid
 flowchart TD
-    A[Seed] --> B[Understanding / Intent Extraction]
-    B --> C[Seed DNA]
-    C --> D[Exactly 3 World Candidates]
-    D --> E[Human Choice / Selection Gate]
-    E --> F[Selected World]
-    F --> G[Progressive Unfolding]
-    G --> H[World Bible / Context]
-    G --> I[Characters & Relationships]
-    G --> J[Scenes & Story Arcs]
-    G --> K[Visual / Audio / Video Assets Optional]
-    H --> L[End-to-End Traceability Graph]
+    A[Seed Premise] --> B[Seed DNA Extraction via Gemini]
+    B --> C[Structured Seed DNA]
+    C --> D[3 Divergent World Candidates]
+    D --> E[Human Choice Gate & Decision DNA]
+    E --> F[Committed World Direction]
+    F --> G[Progressive Universe Unfolding]
+    G --> H[World Bible & Canon Rules]
+    G --> I[Characters & Dynamic Relationships]
+    G --> J[Dramatic Beats & Narrative Scenes]
+    G --> K[Concept Art & Voice Narration]
+    H --> L[Origin Trail Lineage DAG]
     I --> L
     J --> L
     K --> L
-    L --> M[Refine / Branch / Save]
+    L --> M[Refine, Mutate, Branch & Export]
 ```
 
-## Primary References
-The original high-fidelity project specifications are preserved in [`startDocs/`](file:///home/syed-imadulla/Desktop/Praroha/startDocs):
-- [`Seed_Unfold_Complete_Project_Documentation.pdf`](file:///home/syed-imadulla/Desktop/Praroha/startDocs/Seed_Unfold_Complete_Project_Documentation.pdf): Master hackathon product blueprint, market positioning, and full end-to-end workflow.
-- [`Seed Unfold technical project documentation.pdf`](file:///home/syed-imadulla/Desktop/Praroha/startDocs/Seed%20Unfold%20technical%20project%20documentation.pdf): Deep technical reference for story-world development, schemas, and MVP stage architecture.
-- [`SEED UNFOLD product documentation.pdf`](file:///home/syed-imadulla/Desktop/Praroha/startDocs/SEED%20UNFOLD%20product%20documentation.pdf): Product thesis, Tattva 2 philosophical connection, and UX wireframes.
-- [`Seed Unfold Architecture and Workflow.png`](file:///home/syed-imadulla/Desktop/Praroha/startDocs/Seed%20Unfold%20Architecture%20and%20Workflow.png): Complete visual map of stages, actors, and data flow.
+---
 
-## Key Concept Definitions
-See the companion document: [CONCEPTS.md](file:///home/syed-imadulla/Desktop/Praroha/docs/product/CONCEPTS.md) for detailed definitions of all 17 core product entities.
+## 4. Product Stages
+
+1. **Stage 1 (Seed):** Unmanifest creative input.
+2. **Stage 2 (Understand):** Extraction of themes, motifs, constraints, and tone into Seed DNA.
+3. **Stage 3 (3 Worlds):** Synthesis of three divergent candidate worlds.
+4. **Stage 4 (Choose):** Creator commits to one archetype, recording Decision DNA.
+5. **Stage 5 (Unfold):** 5-layer Universe Codex generation (Bible, Cast, Relations, Beats, Scenes, Concept Art, Neural Speech).
+6. **Stage 6 (Trace):** Origin Trail DAG and Causal Provenance Inspector.
+7. **Stage 7 (Refine):** Seed Mutation Lab, Counterfactual Replay, and `.seedunfold.json` bundle export.
+
+---
+
+## 5. Primary References & Concept Glossary
+- [PROJECT_OVERVIEW.md](file:///home/syed-imadulla/Desktop/Praroha/docs/PROJECT_OVERVIEW.md) — Comprehensive narrative and user stories.
+- [CONCEPTS.md](file:///home/syed-imadulla/Desktop/Praroha/docs/product/CONCEPTS.md) — Definitions of all core product entities.
+- Original blueprints in [`startDocs/`](file:///home/syed-imadulla/Desktop/Praroha/startDocs).
