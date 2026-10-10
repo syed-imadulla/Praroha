@@ -294,57 +294,57 @@
     "semantic_hash": ""
   },
   "docs/architecture/DEMO_FIXTURES.md": {
-    "mtime": 1791627698.889597,
-    "seen": 1791630982.368869,
-    "ast_hash": "ad85eb4ed59da2047dbbea9e0f7e4fab",
+    "mtime": 1791076971.8015394,
+    "seen": 1791082976.254171,
+    "ast_hash": "5e855a11b8a00da25533148a68d8a9c4",
     "semantic_hash": ""
   },
   "docs/architecture/SYSTEM_ARCHITECTURE.md": {
-    "mtime": 1791627696.5796206,
-    "seen": 1791630982.3688712,
-    "ast_hash": "53d63c35a20ffbc82270c585e5fc6bd6",
+    "mtime": 1791078593.683277,
+    "seen": 1791082976.2541723,
+    "ast_hash": "b266eacb34a5345b81b37bb8fe9b9566",
     "semantic_hash": ""
   },
   "docs/architecture/TRACEABILITY_MODEL.md": {
-    "mtime": 1791627694.1206458,
-    "seen": 1791630982.3688722,
-    "ast_hash": "d29b9fb4467e808941caaad513ca062b",
+    "mtime": 1791076964.005625,
+    "seen": 1791082976.2541742,
+    "ast_hash": "82962075548d03c843de734be46132b3",
     "semantic_hash": ""
   },
   "docs/decisions/ADR-001-architecture-foundation.md": {
-    "mtime": 1791627662.3089716,
-    "seen": 1791630982.3688731,
-    "ast_hash": "23ffcd5f28e1c36ca406d0beee54031e",
+    "mtime": 1791077228.8267126,
+    "seen": 1791082976.254176,
+    "ast_hash": "fdb6113e98c99ab7d7daf96b11a8de51",
     "semantic_hash": ""
   },
   "docs/decisions/ADR-002-branching-and-traceability.md": {
-    "mtime": 1791627665.0399435,
-    "seen": 1791630982.368874,
-    "ast_hash": "7e54e7ae99596f1fd634ac0bd20cc828",
+    "mtime": 1791076984.650398,
+    "seen": 1791082976.2541776,
+    "ast_hash": "8623a233c7af9a72296f70f7598d39be",
     "semantic_hash": ""
   },
   "docs/decisions/ADR-003-cloud-object-storage.md": {
-    "mtime": 1791627668.1099122,
-    "seen": 1791630982.3688748,
-    "ast_hash": "4cf16c09a134a05e2192bf6a2e316e5e",
+    "mtime": 1791078581.9794102,
+    "seen": 1791082976.2541792,
+    "ast_hash": "e35d8aa1b57bca04b2fbb265e72cdc99",
     "semantic_hash": ""
   },
   "docs/product/CONCEPTS.md": {
-    "mtime": 1791630788.7802002,
-    "seen": 1791630982.3688784,
-    "ast_hash": "6378ddf840ef1d417768e79da0063825",
+    "mtime": 1791076948.472796,
+    "seen": 1791082976.254181,
+    "ast_hash": "6b639f597e483ed2cc9ecc24e725d454",
     "semantic_hash": ""
   },
   "docs/product/README.md": {
-    "mtime": 1791630793.9261668,
-    "seen": 1791630982.368879,
-    "ast_hash": "f3c9eb1d79eb06f3323f802da5914db7",
+    "mtime": 1791076939.0578995,
+    "seen": 1791082976.2541826,
+    "ast_hash": "eda33c9040998ad1a17b738caafbe8d1",
     "semantic_hash": ""
   },
   "docs/wiki/index.md": {
-    "mtime": 1791630415.1285574,
-    "seen": 1791630982.36888,
-    "ast_hash": "7523f78eb167f49a2d54f463875eeb18",
+    "mtime": 1791078599.6852088,
+    "seen": 1791082976.2541845,
+    "ast_hash": "198173a5b2e0d1b19a0fe3686ae530be",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -972,21 +972,21 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1791630764.0123608,
-    "seen": 1791630982.368851,
-    "ast_hash": "c994f229a119e7bacedea9816f47775f",
+    "mtime": 1791521495.116606,
+    "seen": 1791523050.2971258,
+    "ast_hash": "8cb67186a4945ac8a134183a303aec25",
     "semantic_hash": ""
   },
   "docs/architecture/AI_PIPELINE.md": {
-    "mtime": 1791630444.542647,
-    "seen": 1791630982.368867,
-    "ast_hash": "71017656b8afce542d37d2eb8ec66526",
+    "mtime": 1791115556.8822043,
+    "seen": 1791115676.933882,
+    "ast_hash": "10c96724149d5d20ccae03db1935c28e",
     "semantic_hash": ""
   },
   "docs/architecture/DATA_AND_STORAGE.md": {
-    "mtime": 1791630432.2465842,
-    "seen": 1791630982.3688676,
-    "ast_hash": "170e87ac2bc69f63bdfac36856b15017",
+    "mtime": 1791115579.017922,
+    "seen": 1791115676.9338837,
+    "ast_hash": "77e351897a43c5cf8168ff9a0a6efab5",
     "semantic_hash": ""
   },
   "docs/architecture/PRAROHA_ARCHITECTURE.md": {
@@ -996,15 +996,15 @@
     "semantic_hash": ""
   },
   "docs/presentation/DEMO_SCRIPT.md": {
-    "mtime": 1791627673.3608584,
-    "seen": 1791630982.3688757,
-    "ast_hash": "b7ab7f3ef9760cd29fca76c8d605b91b",
+    "mtime": 1791107733.6282432,
+    "seen": 1791107850.3003285,
+    "ast_hash": "12ff7f1ed57a942329026a00dc9d497d",
     "semantic_hash": ""
   },
   "docs/presentation/JUDGE_EXPLANATION.md": {
-    "mtime": 1791630430.070573,
-    "seen": 1791630982.3688765,
-    "ast_hash": "c284d1287b044b8854553cf7dbab5db5",
+    "mtime": 1791115532.5035152,
+    "seen": 1791115676.9338953,
+    "ast_hash": "73b2837ae987dd50669455e5bf235ccb",
     "semantic_hash": ""
   },
   "docs/presentation/JUDGE_QA.md": {
@@ -2589,36 +2589,6 @@
     "mtime": 1791520143.864379,
     "seen": 1791523050.2971077,
     "ast_hash": "a3a6adc25197a34f20e3cc5ad46c6825",
-    "semantic_hash": ""
-  },
-  "docs/AI_PROVIDERS.md": {
-    "mtime": 1791630799.4241312,
-    "seen": 1791630982.368862,
-    "ast_hash": "d47cbf6fd1911e862186d400b4af19e5",
-    "semantic_hash": ""
-  },
-  "docs/ARCHITECTURE.md": {
-    "mtime": 1791630769.6243243,
-    "seen": 1791630982.3688629,
-    "ast_hash": "1d2760e1a57599bde7873d32a1d8d8bc",
-    "semantic_hash": ""
-  },
-  "docs/PROJECT_OVERVIEW.md": {
-    "mtime": 1791630810.6630585,
-    "seen": 1791630982.368864,
-    "ast_hash": "ca65dd39f281e038ab34dc2d2e598347",
-    "semantic_hash": ""
-  },
-  "docs/SETUP.md": {
-    "mtime": 1791630783.1442368,
-    "seen": 1791630982.3688648,
-    "ast_hash": "96beabbc4df81b0eced5705465b78969",
-    "semantic_hash": ""
-  },
-  "docs/TESTING.md": {
-    "mtime": 1791630804.880096,
-    "seen": 1791630982.3688657,
-    "ast_hash": "8ca5ed9edf96be5494ae27b2d77f8c22",
     "semantic_hash": ""
   }
 }
