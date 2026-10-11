@@ -29,16 +29,16 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
 - **Milestone 5 (Phases 32–39: Production Product Completion)**: 100% Completed & Verified.
   - Phase 32: Product Audit & Production Foundation (Completed & Verified)
   - Phase 33: Email Authentication & Account Security (Completed & Verified)
-  - Phase 34: Atmospheric Audio Generation (Completed & Verified)
-  - Phase 35: Real Video Generation (Completed & Verified)
+  - Phase 34: Atmospheric Audio Generation (Completed & Verified — Curated CC0 Ambient Library verified and active for zero-cost soundscapes; Stable Audio 2, Pixazo Tracks, and Rewind Lyria adapters integrated with credit/error transparency)
+  - Phase 35: Real Video Generation (Completed & Verified — JSON2Video composition preview engine verified and live with `is_synthetic: true`; Generative AI video visibly disabled with "Credits Required" pill to prevent repeated failed calls; Wan 2.1, Pyramid Flow, Pixazo, and Rewind Seedance integrated)
   - Phase 36: UI Reliability, Accessibility & Responsive Polish (Completed & Verified)
   - Phase 37: PWA Installation & Offline Behaviour (Completed & Verified)
-  - Phase 38: Production Deployment & Operational Readiness (Completed & Verified)
-  - Phase 39: Full-System Verification & Release Documentation (Completed & Verified)
+  - Phase 38: Production Deployment & Operational Readiness (Completed & Verified — Docker, Nginx, Compose, Health Checks, Supabase Auth & Storage verified)
+  - Phase 39: Full-System Verification & Release Documentation (Completed & Verified — 100% full user journey, PWA, and release isolation verified)
 
 ## Verification Evidence & Quality Gates
-- **Backend Test Battery**: 190 passed, 1 skipped in 26.19s (`pytest backend/tests`).
-- **Frontend Production Bundle**: Compiled in 12.21s with zero errors (`npm run build --prefix frontend`).
+- **Backend Test Battery**: 210 passed, 1 skipped in 70.2s (`pytest backend/tests`). Includes 48 specialized media and soundscape tests across CC0 Soundscapes, Stable Audio, Hugging Face, Pixazo Video, Pixazo Tracks, JSON2Video, and Rewind.ai.
+- **Frontend Production Bundle**: Compiled in 15.6s with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries.
 - **PWA Installation Audit**: 100% passed (`node frontend/e2e/test_phase37_pwa.mjs`). Verified manifest, icons (192px, 512px, maskable), active Service Worker, and offline transparency banner.
 - **Full User Journey E2E**: 100% passed (`node frontend/e2e/test_phase31_10_journey.mjs`). Verified end-to-end flow with live Gemini AI extraction, divergent 3-world synthesis, EdgeTTS voice generation, concept art and narration, DAG rendering, portable project JSON export, and state reload.
-- **Realtime Multi-Tab & Isolation**: 100% passed (`node frontend/e2e/test_phase31_10_realtime.mjs`). Verified zero-refresh sync between tabs and isolation between projects.
+- **Release Free Media & Isolation E2E**: 100% passed (`node frontend/e2e/test_release_media_and_isolation.mjs`). Verified all 10 checks: CC0 soundscape library, pure WAV synthesis, storage persistence, honest labeling, JSON2Video composed preview, clean failure when generative AI credits are exhausted, and cross-project data isolation.

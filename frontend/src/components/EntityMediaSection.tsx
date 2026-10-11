@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image as ImageIcon,
   Mic,
@@ -6,9 +6,11 @@ import {
   Music,
   Sparkles,
   RotateCw,
+  Volume2,
 } from 'lucide-react';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { MediaPreviewCard } from './MediaPreviewCard';
+import { SoundscapeComposerModal } from './SoundscapeComposerModal';
 import { MediaType, CURATED_VOICE_PERSONAS, CURATED_AUDIO_MOODS } from '../types';
 
 interface EntityMediaSectionProps {
@@ -31,6 +33,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
   entityTitle,
 }) => {
   const {
+    activeProject,
     mediaAssets,
     activeMediaJobs,
     isGeneratingMedia,
@@ -38,6 +41,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
     generateMediaAction,
   } = useWorkspaceStore();
 
+  const [isSoundscapeModalOpen, setIsSoundscapeModalOpen] = useState(false);
   const [selectedAspectRatio, setSelectedAspectRatio] = React.useState<'1:1' | '16:9' | '9:16'>(
     entityType === 'character' ? '1:1' : '16:9'
   );
@@ -82,6 +86,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
       voice_id: mediaType === 'voice' ? selectedVoicePersona : undefined,
       duration_sec: mediaType === 'video' ? 5 : (mediaType === 'audio' ? 15 : undefined),
       mood: mediaType === 'audio' ? selectedAudioMood : undefined,
+      context: mediaType === 'video' ? { provider: 'json2video' } : undefined,
     });
   };
 
@@ -175,42 +180,90 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
           )}
 
           {availableModalities.includes('audio') && (
-            <div
-              className="flex items-center gap-2 bg-[#F2EBDD] px-2.5 py-1 rounded-xl border border-[#D8CCB7] text-xs min-h-[32px]"
-              title="Select atmosphere soundscape mood preset"
-            >
-              <Music className="w-3.5 h-3.5 text-[#355A46] shrink-0" />
-              <select
-                data-testid={`audio-mood-selector-${entityId}`}
-                value={selectedAudioMood}
-                onChange={(e) => setSelectedAudioMood(e.target.value)}
-                className="bg-transparent text-[#294B3A] font-semibold text-xs focus:outline-none cursor-pointer pr-1 py-0.5"
+            <div className="flex items-center gap-2 flex-wrap">
+              <div
+                className="flex items-center gap-2 bg-[#F2EBDD] px-2.5 py-1 rounded-xl border border-[#D8CCB7] text-xs min-h-[32px]"
+                title="Select atmosphere soundscape mood preset"
               >
-                {CURATED_AUDIO_MOODS.map((m) => (
-                  <option
-                    key={m.id}
-                    value={m.id}
-                    className="bg-[#F8F4E8] text-[#294B3A]"
-                    data-testid={`audio-mood-option-${m.id}-${entityId}`}
-                  >
-                    {m.name}
-                  </option>
-                ))}
-              </select>
+                <Music className="w-3.5 h-3.5 text-[#355A46] shrink-0" />
+                <select
+                  data-testid={`audio-mood-selector-${entityId}`}
+                  value={selectedAudioMood}
+                  onChange={(e) => setSelectedAudioMood(e.target.value)}
+                  className="bg-transparent text-[#294B3A] font-semibold text-xs focus:outline-none cursor-pointer pr-1 py-0.5"
+                >
+                  {CURATED_AUDIO_MOODS.map((m) => (
+                    <option
+                      key={m.id}
+                      value={m.id}
+                      className="bg-[#F8F4E8] text-[#294B3A]"
+                      data-testid={`audio-mood-option-${m.id}-${entityId}`}
+                    >
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Verified Curated CC0 Soundscape Library Button */}
+              <button
+                type="button"
+                onClick={() => setIsSoundscapeModalOpen(true)}
+                data-testid={`compose-soundscape-btn-${entityId}`}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[#EAF0E6] hover:bg-[#DDE8D8] text-[#294B3A] border border-[#BACBB8] shadow-2xs transition-all min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#294B3A]"
+                title="Compose ambient soundscape from verified CC0 audio library (wind, rain, bells, forest, drones)"
+              >
+                <Volume2 className="w-3.5 h-3.5 text-[#355A46]" />
+                <span>Compose Soundscape (CC0)</span>
+              </button>
             </div>
           )}
 
           {availableModalities.map((modality) => {
             if (modality === 'video') {
+              const isVideoGenerating = !!isGeneratingMedia[`${entityId}_video`];
+              const existingVideo = assets.find((a) => a.media_type === 'video');
+
               return (
-                <div
-                  key="video"
-                  data-testid={`generate-video-disabled-${entityId}`}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#EAE4D4] text-[#718875] border border-[#D8CCB7] cursor-not-allowed opacity-75 min-h-[32px]"
-                  title="Video synthesis is currently unavailable"
-                >
-                  <Video className="w-3.5 h-3.5 text-[#718875]" />
-                  <span>Video (Coming Soon)</span>
+                <div key="video" className="flex items-center gap-2 flex-wrap">
+                  {/* Real Generative AI Video - Visibly disabled without free cloud allowance */}
+                  <div
+                    data-testid={`generate-video-disabled-${entityId}`}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#EAE4D4] text-[#718875] border border-[#D8CCB7] cursor-not-allowed opacity-80 min-h-[32px]"
+                    title="Real generative AI video requires cloud credits. Composed cinematic preview available via JSON2Video."
+                  >
+                    <Video className="w-3.5 h-3.5 text-[#718875]" />
+                    <span>AI Video (Credits Required)</span>
+                  </div>
+
+                  {/* Composed Cinematic Preview (JSON2Video) */}
+                  {entityType === 'scene' && (
+                    <button
+                      type="button"
+                      onClick={() => handleGenerate('video')}
+                      disabled={isVideoGenerating}
+                      data-testid={`generate-cinematic-preview-${entityId}`}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#6A4B67] ${
+                        isVideoGenerating
+                          ? 'bg-[#EBD8EB] border-[#D4C3D2] text-[#6A4B67] cursor-not-allowed opacity-80'
+                          : 'bg-[#F5EDF5] hover:bg-[#EBD8EB] text-[#6A4B67] border-[#D4C3D2] hover:border-[#BFA8BD] shadow-2xs'
+                      }`}
+                      title="Render composed cinematic preview combining concept art and voice narration via JSON2Video"
+                    >
+                      {isVideoGenerating ? (
+                        <RotateCw className="w-3.5 h-3.5 animate-spin text-[#6A4B67]" />
+                      ) : (
+                        <Video className="w-3.5 h-3.5 text-[#6A4B67]" />
+                      )}
+                      <span>
+                        {isVideoGenerating
+                          ? 'Composing Preview...'
+                          : existingVideo
+                          ? 'Re-compose Preview'
+                          : 'Cinematic Preview (JSON2Video)'}
+                      </span>
+                    </button>
+                  )}
                 </div>
               );
             }
@@ -289,6 +342,19 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
             );
           })}
         </div>
+      )}
+
+      {/* Curated Soundscape Composer Modal */}
+      {activeProject && isSoundscapeModalOpen && (
+        <SoundscapeComposerModal
+          projectId={activeProject.id}
+          entityId={entityId}
+          entityType={entityType === 'scene' ? 'scene' : 'project'}
+          sceneTitle={entityTitle}
+          isOpen={isSoundscapeModalOpen}
+          onClose={() => setIsSoundscapeModalOpen(false)}
+          onComposed={() => fetchEntityMedia(entityId)}
+        />
       )}
     </div>
   );

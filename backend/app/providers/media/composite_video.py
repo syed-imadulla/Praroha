@@ -7,6 +7,7 @@ from backend.app.providers.media.base import (
     VideoProvider,
 )
 from backend.app.providers.media.mock import MockVideoProvider, _generate_minimal_mp4_bytes
+from backend.app.providers.media.pixazo_video import PixazoVideoProvider
 from backend.app.providers.media.pyramid_flow import PyramidFlowProvider
 from backend.app.providers.media.wan import WanVideoProvider
 
@@ -14,17 +15,18 @@ logger = logging.getLogger(__name__)
 
 
 class CompositeVideoProvider(VideoProvider):
-    """3-Tier Resilient Composite Video Provider:
+    """4-Tier Resilient Composite Video Provider:
 
-    Tier 1 (Cloud): PyramidFlowProvider (Pyramid Flow API / HF Inference)
-    Tier 2 (Local): WanVideoProvider (Local Wan2.1 T2V-1.3B microservice)
-    Tier 3 (Safe): MockVideoProvider (Deterministic browser-playable ISO BMFF MP4)
+    Tier 1 (Cloud): PixazoVideoProvider (Pixazo Gateway / Wan 3.0 / LTX)
+    Tier 2 (Cloud): PyramidFlowProvider (Pyramid Flow API / HF Inference)
+    Tier 3 (Local): WanVideoProvider (Local Wan2.1 T2V-1.3B microservice)
+    Tier 4 (Safe): MockVideoProvider (Deterministic browser-playable ISO BMFF MP4)
 
     Guarantees:
     1. Client never receives an unhandled 500 for provider failure.
     2. Mock is the guaranteed final fallback.
     3. MediaPayload.metadata["resolved_provider"] accurately records which
-       tier actually generated the asset ("pyramid-flow", "wan2.1", or "mock").
+       tier actually generated the asset ("pixazo-video", "pyramid-flow", "wan2.1", or "mock").
     4. Consistent video metadata is preserved across all tiers:
        resolved_provider, duration_sec, aspect_ratio, resolution.
     5. Provider responses are strictly normalized within the provider boundary (D-06).
@@ -32,10 +34,12 @@ class CompositeVideoProvider(VideoProvider):
 
     def __init__(
         self,
+        pixazo: Optional[VideoProvider] = None,
         pyramid: Optional[VideoProvider] = None,
         wan: Optional[VideoProvider] = None,
         mock: Optional[VideoProvider] = None,
     ) -> None:
+        self.pixazo = pixazo or PixazoVideoProvider()
         self.pyramid = pyramid or PyramidFlowProvider()
         self.wan = wan or WanVideoProvider()
         self.mock = mock or MockVideoProvider()
@@ -49,7 +53,27 @@ class CompositeVideoProvider(VideoProvider):
         ctx = dict(context or {})
         aspect_ratio = ctx.get("aspect_ratio") or "16:9"
 
-        # --- Tier 1: Pyramid Flow ---
+        # --- Tier 1: Pixazo Video ---
+        try:
+            logger.info("Attempting Tier 1 (Pixazo Video) generation...")
+            payload = await self.pixazo.generate_video(
+                prompt=prompt,
+                duration_sec=duration_sec,
+                context=ctx,
+            )
+            payload.metadata["resolved_provider"] = "pixazo-video"
+            payload.metadata["duration_sec"] = duration_sec
+            payload.metadata["aspect_ratio"] = aspect_ratio
+            payload.metadata["resolution"] = "720p"
+            return payload
+        except (ProviderUnavailableError, Exception) as pix_err:
+            logger.info(
+                "Tier 1 (Pixazo Video) unavailable (%s: %s). Cascading to Tier 2 (Pyramid Flow)...",
+                type(pix_err).__name__,
+                pix_err,
+            )
+
+        # --- Tier 2: Pyramid Flow / HF ---
         try:
             logger.info("Attempting Tier 1 (Pyramid Flow) video generation...")
             payload = await self.pyramid.generate_video(
@@ -95,7 +119,7 @@ class CompositeVideoProvider(VideoProvider):
         if not is_demo_mode:
             logger.error("Real mode: Live video providers failed. Refusing silent fallback to mock.")
             raise ProviderUnavailableError(
-                "Live video generation requires active provider credentials (PYRAMID_FLOW_ENDPOINT or HF_TOKEN for Pyramid Flow, or WAN_ENDPOINT for Wan 2.1). "
+                "Live video generation requires active provider credentials (PIXAZO_API_KEY for Pixazo, PYRAMID_FLOW_ENDPOINT or HF_TOKEN for Pyramid Flow, or WAN_ENDPOINT for Wan 2.1). "
                 "Please configure a video provider in .env to generate live cinematic videos."
             )
 

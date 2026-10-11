@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 from typing import Any, Dict, List, Optional
 from fastapi import HTTPException
 
@@ -280,6 +281,15 @@ class MediaService:
                             generation_prompt = f"Cinematic teaser for world {request.entity_id}."
                     elif request.entity_type == "scene" and request.entity_id:
                         scene = await repo.get_scene(request.entity_id)
+                        # Fetch scene assets to populate image and voice URLs for cinematic preview
+                        if project_id:
+                            existing_assets = await repo.list_media_assets(project_id=project_id, entity_id=request.entity_id)
+                            for ea in existing_assets:
+                                if ea.status == "completed" and ea.asset_url:
+                                    if ea.media_type == "image" and "image_url" not in context:
+                                        context["image_url"] = ea.asset_url
+                                    elif ea.media_type == "voice" and "audio_url" not in context:
+                                        context["audio_url"] = ea.asset_url
                         if scene:
                             title = scene.title
                             location_setting = (scene.location_setting or "").rstrip(".")
@@ -290,11 +300,20 @@ class MediaService:
                     else:
                         generation_prompt = f"Cinematic video for {request.entity_type} {request.entity_id}."
 
-                payload = await self.media_provider.generate_video(
-                    prompt=generation_prompt,
-                    duration_sec=request.duration_sec or 5,
-                    context=context,
-                )
+                if (context.get("provider") == "json2video") or (os.getenv("VIDEO_PROVIDER", "").lower() in ("json2video", "composition")):
+                    from backend.app.providers.media.json2video import JSON2VideoCompositionProvider
+                    j2v_provider = JSON2VideoCompositionProvider()
+                    payload = await j2v_provider.generate_video(
+                        prompt=generation_prompt,
+                        duration_sec=request.duration_sec or 5,
+                        context=context,
+                    )
+                else:
+                    payload = await self.media_provider.generate_video(
+                        prompt=generation_prompt,
+                        duration_sec=request.duration_sec or 5,
+                        context=context,
+                    )
             elif request.media_type == "audio":
                 # Deterministic Acoustic Prompt Derivation Rule:
                 # 1. If creator explicitly supplies prompt text, preserve it exactly without alteration.

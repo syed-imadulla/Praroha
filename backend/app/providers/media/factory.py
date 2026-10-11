@@ -23,6 +23,11 @@ from backend.app.providers.media.kokoro import KokoroVoiceProvider
 from backend.app.providers.media.pyramid_flow import PyramidFlowProvider
 from backend.app.providers.media.wan import WanVideoProvider
 from backend.app.providers.media.ace_step import ACEStepAudioProvider
+from backend.app.providers.media.json2video import JSON2VideoCompositionProvider
+from backend.app.providers.media.pixazo_tracks import PixazoTracksAudioProvider
+from backend.app.providers.media.pixazo_video import PixazoVideoProvider
+from backend.app.providers.media.rewind_audio import RewindMusicAudioProvider
+from backend.app.providers.media.rewind_video import RewindVideoProvider
 from backend.app.providers.media.stable_audio import StableAudioOpenProvider
 
 
@@ -74,16 +79,34 @@ class MediaProviderFactory:
 
     @classmethod
     def get_video_provider(cls) -> VideoProvider:
-        provider_name = os.getenv("VIDEO_PROVIDER", "pyramid_flow").lower()
+        provider_name = os.getenv("VIDEO_PROVIDER", "composite").lower()
         if provider_name == "mock":
             return MockVideoProvider()
+        if provider_name == "rewind":
+            return RewindVideoProvider()
+        if provider_name == "pixazo":
+            return PixazoVideoProvider()
+        if provider_name in ("json2video", "composition"):
+            return JSON2VideoCompositionProvider()
+        if provider_name == "wan":
+            return WanVideoProvider()
+        if provider_name == "pyramid_flow":
+            return PyramidFlowProvider()
         return CompositeVideoProvider()
 
     @classmethod
     def get_audio_provider(cls) -> AudioProvider:
-        provider_name = os.getenv("AUDIO_PROVIDER", "ace_step").lower()
+        provider_name = os.getenv("AUDIO_PROVIDER", "composite").lower()
         if provider_name == "mock":
             return MockAudioProvider()
+        if provider_name in ("rewind", "rewind_music"):
+            return RewindMusicAudioProvider()
+        if provider_name in ("pixazo", "pixazo_tracks"):
+            return PixazoTracksAudioProvider()
+        if provider_name == "stable_audio":
+            return StableAudioOpenProvider()
+        if provider_name == "ace_step":
+            return ACEStepAudioProvider()
         return CompositeAudioProvider()
 
     @classmethod

@@ -432,6 +432,26 @@ class ApiClient {
     return this.request<MediaProviderHealth>('/media/providers/health');
   }
 
+  async getSoundscapeLibrary(projectId: string): Promise<APIResponse<any[]>> {
+    return this.request<any[]>(`/projects/${projectId}/media/soundscapes/library`);
+  }
+
+  async composeSoundscape(
+    projectId: string,
+    payload: {
+      entity_id: string;
+      entity_type?: string;
+      layers: Array<{ id: string; volume: number }>;
+      duration_sec?: number;
+      title?: string;
+    }
+  ): Promise<APIResponse<MediaJobResponse>> {
+    return this.request<MediaJobResponse>(`/projects/${projectId}/media/soundscapes/compose`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   async getPremiseVariables(projectId: string): Promise<APIResponse<PremiseVariable[]>> {
     return this.request<PremiseVariable[]>(`/projects/${projectId}/mutation/variables`);
   }

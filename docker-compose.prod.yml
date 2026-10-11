@@ -17,6 +17,11 @@ services:
       - SUPABASE_BUCKET=${SUPABASE_BUCKET:-seed-unfold-assets}
       - HF_TOKEN=${HF_TOKEN}
       - STABILITY_API_KEY=${STABILITY_API_KEY}
+      - PIXAZO_API_KEY=${PIXAZO_API_KEY}
+      - JSON2VIDEO_API_KEY=${JSON2VIDEO_API_KEY}
+      - REWIND_API_KEY=${REWIND_API_KEY}
+      - VIDEO_PROVIDER=${VIDEO_PROVIDER:-composite}
+      - AUDIO_PROVIDER=${AUDIO_PROVIDER:-composite}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost,http://localhost:80,https://praroha.app}
     volumes:
       - uploads_data:/app/uploads

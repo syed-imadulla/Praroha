@@ -12,11 +12,14 @@ Validate live atmospheric soundscape generation via Stability AI Stable Audio 2 
 | **UAT-34-03** | Live Atmospheric Audio Generation | Makes genuine atmospheric request; receives direct binary audio bytes and `audio/mpeg` MIME type | **PASS** | Live API call returned HTTP 200 OK with `content-type: audio/mpeg`, 98,932 bytes direct MP3 payload in 13.2s. |
 | **UAT-34-04** | Credit Exhaustion / Quota Classification | Accurately identifies and classifies credit exhaustion without mock substitution | **PASS** | Initial 25 credits consumed, balance reached -95 credits. Subsequent calls return HTTP 402; correctly classified as **CREDITS BLOCKED**. |
 | **UAT-34-05** | Media Pipeline & Regression Tests | All audio provider unit tests and payload normalization pass without regressions | **PASS** | `pytest backend/tests/test_audio_generation.py`: 17 passed in 19.96s. |
+| **UAT-34-06** | Curated CC0 Soundscape Library | Zero-cost ambient soundscape synthesis (wind, rain, bells, forest, drones); honest labeling as composed soundscape with CC0 license | **PASS** | Synthesized 16-bit PCM WAV (441,044 bytes), persisted to Supabase Storage and PostgreSQL, labeled `Composed Soundscape (Curated Library)` with `CC0 1.0 Universal`. |
 
 ---
 
 ## Status
 **Phase 34 VERIFIED & APPROVED.**
-- Live API integration validated.
+- Live Stability AI API integration validated.
 - Implementation defect in multipart parameter encoding fixed.
-- External provider status: **CREDITS BLOCKED** (-95 credits balance).
+- External generative providers status: **CREDITS BLOCKED** (-95 credits balance).
+- Zero-cost ambient soundscapes delivered via **Curated CC0 Soundscape Library** with 100% legal public domain licensing and persistent storage.
+

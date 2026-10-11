@@ -85,8 +85,8 @@ The application's workflow stages are practical implementation steps demonstrati
 | **Text Generation** | Google Gemini (`gemini-3.1-flash-lite`, `gemini-flash-latest`) |
 | **Image Generation** | Pollinations.ai (Flux / Sana models) with FLUX.1 schnell fallback |
 | **Speech & Voice** | Edge-TTS (online neural speech with 6 curated archetypes) |
-| **Atmospheric Audio** | Stability AI Stable Audio & Hugging Face MusicGen Router *(requires funded API tokens)* |
-| **Video Generation** | Pyramid Flow & Wan2.1 Router *(requires funded API tokens)* |
+| **Atmospheric Audio** | Curated CC0 Ambient Library (Wind, Rain, Temple Bells, Forest, Drones) · Stability AI & Pixazo Tracks *(requires funded API tokens)* |
+| **Video Generation** | Composed Cinematic Previews (JSON2Video) · Wan 2.1 / Pyramid Flow / Pixazo *(requires funded API tokens)* |
 | **Deployment** | Docker, Docker Compose, Nginx Alpine, HTTPS/TLS reverse proxy |
 
 ## Architecture

@@ -1170,7 +1170,7 @@ export const UniverseCodexCanvas: React.FC = () => {
                         entityId={scene.id}
                         entityTitle={`Scene ${scene.scene_number}${scene.title ? `: ${scene.title}` : ''}`}
                         defaultPrompt={scene.visual_prompt || `${scene.title} in ${scene.location_setting}: ${scene.conflict_narrative}`}
-                        availableModalities={['image', 'voice', 'audio']}
+                        availableModalities={['image', 'voice', 'audio', 'video']}
                       />
 
                     </div>

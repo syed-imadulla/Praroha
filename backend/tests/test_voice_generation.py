@@ -308,21 +308,18 @@ async def test_voice_metadata_persistence():
         )
         service = MediaService(repo=repo, storage=LocalStorageProvider(upload_dir="./uploads"), media_provider=media_provider)
 
+        req = MediaGenerationRequest(
+            entity_type="character",
+            entity_id="char-999",
+            media_type="voice",
+            prompt="We venture into the unknown.",
+            voice_id="inquiring-youth",
+        )
         job = await service.dispatch_job(
             project_id=project.id,
-            request=MediaGenerationRequest(
-                entity_type="character",
-                entity_id="char-999",
-                media_type="voice",
-                prompt="We venture into the unknown.",
-                voice_id="inquiring-youth",
-            ),
+            request=req,
         )
-        for _ in range(50):
-            await asyncio.sleep(0.05)
-            asset = await service.get_job(job.job_id)
-            if asset and asset.status == "completed":
-                break
+        asset = await service.process_job_now(job.job_id, req)
 
         assert asset is not None
         assert asset.status == "completed"

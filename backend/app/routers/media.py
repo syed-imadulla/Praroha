@@ -3,17 +3,27 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import json
+from pydantic import BaseModel
+
 from backend.app.core.auth import AuthenticatedUser, get_current_user
 from backend.app.core.response import APIResponse, api_success
+from backend.app.models.job import GenerationJob
 from backend.app.models.media import (
     MediaAssetRead,
+    MediaAssetRecord,
     MediaGenerationRequest,
     MediaJobResponse,
+    get_utc_now,
 )
 from backend.app.providers.factory import get_storage_provider
 from backend.app.providers.media.factory import get_media_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session
 from backend.app.services.media_service import MediaService
+from backend.app.services.soundscape_library import (
+    CURATED_SOUNDSCAPE_LAYERS,
+    SoundscapeComposer,
+)
 
 logger = logging.getLogger("seed_unfold.router.media")
 
@@ -145,3 +155,132 @@ async def get_media_providers_health(
     """
     health = await service.get_providers_health()
     return api_success(health)
+
+
+class SoundscapeComposePayload(BaseModel):
+    entity_id: str
+    entity_type: str = "scene"
+    layers: List[Dict[str, Any]]
+    duration_sec: int = 15
+    title: Optional[str] = None
+
+
+@router.get(
+    "/projects/{project_id}/media/soundscapes/library",
+    response_model=APIResponse[List[Dict[str, Any]]],
+)
+async def list_soundscape_library(
+    project_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    service: MediaService = Depends(get_media_service),
+) -> APIResponse[List[Dict[str, Any]]]:
+    """
+    Returns curated, legally verified CC0 ambient audio soundscape layers.
+    """
+    await verify_project_owner(project_id, current_user.id, service.repo)
+    layers_data = [layer.model_dump() for layer in CURATED_SOUNDSCAPE_LAYERS]
+    return api_success(layers_data)
+
+
+@router.post(
+    "/projects/{project_id}/media/soundscapes/compose",
+    response_model=APIResponse[MediaJobResponse],
+)
+async def compose_soundscape(
+    project_id: str,
+    payload: SoundscapeComposePayload,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    service: MediaService = Depends(get_media_service),
+) -> APIResponse[MediaJobResponse]:
+    """
+    Combines verified CC0 ambient audio layers, persists the composition through
+    the project media pipeline, associates it with the entity, and labels it
+    honestly as a Composed Soundscape (never AI-generated).
+    """
+    await verify_project_owner(project_id, current_user.id, service.repo)
+    if not payload.layers:
+        raise HTTPException(status_code=400, detail="Must select at least one soundscape layer to compose.")
+
+    layer_ids = [l.get("id") for l in payload.layers if l.get("id")]
+    known_ids = {l.id for l in CURATED_SOUNDSCAPE_LAYERS}
+    invalid_ids = [lid for lid in layer_ids if lid not in known_ids]
+    if invalid_ids:
+        raise HTTPException(status_code=400, detail=f"Unknown soundscape layer(s): {invalid_ids}")
+
+    # Synthesize blended PCM WAV audio
+    wav_bytes = SoundscapeComposer.compose_soundscape(
+        layers=payload.layers,
+        duration_sec=float(payload.duration_sec),
+    )
+
+    # Create Asset Record in PostgreSQL
+    layer_names = [l.name for l in CURATED_SOUNDSCAPE_LAYERS if l.id in layer_ids]
+    prompt_desc = payload.title or f"Composed Soundscape: {', '.join(layer_names)}"
+
+    asset_record = MediaAssetRecord(
+        project_id=project_id,
+        entity_type=payload.entity_type,
+        entity_id=payload.entity_id,
+        media_type="audio",
+        status="processing",
+        prompt=prompt_desc,
+        provider_name="curated-soundscape-library",
+    )
+    created_asset = await service.repo.create_media_asset(asset_record)
+
+    # Upload to storage
+    storage_key = f"projects/{project_id}/media/audio/{created_asset.id}.wav"
+    uploaded_url = await service.storage.upload(
+        file_data=wav_bytes,
+        key=storage_key,
+        mime_type="audio/wav",
+    )
+
+    metadata = {
+        "resolved_provider": "curated-soundscape-library",
+        "provider_label": "Composed Soundscape (Curated Library)",
+        "is_synthetic": True,
+        "is_ambient_music": False,
+        "is_environmental_foley": True,
+        "is_ai_generated": False,
+        "license": "CC0 1.0 Universal (Public Domain)",
+        "layers": payload.layers,
+        "layer_ids": layer_ids,
+        "duration_sec": payload.duration_sec,
+        "notes": "Composed from verified CC0 public domain acoustic layers; not generative AI audio.",
+    }
+
+    # Mark as completed
+    await service.repo.update_media_asset(
+        asset_id=created_asset.id,
+        updates={
+            "status": "completed",
+            "asset_url": uploaded_url,
+            "mime_type": "audio/wav",
+            "metadata_json": json.dumps(metadata),
+            "completed_at": get_utc_now(),
+        },
+    )
+
+    # Create lockstep completed GenerationJob
+    job_record = GenerationJob(
+        id=created_asset.id,
+        project_id=project_id,
+        job_type="media_audio",
+        status="completed",
+        progress=100,
+        result_json=json.dumps({"asset_id": created_asset.id, "asset_url": uploaded_url}),
+    )
+    await service.repo.create_generation_job(job_record)
+
+    return api_success(
+        MediaJobResponse(
+            job_id=created_asset.id,
+            status="completed",
+            media_type="audio",
+            entity_type=payload.entity_type,
+            entity_id=payload.entity_id,
+            asset_url=uploaded_url,
+            error_message=None,
+        )
+    )
