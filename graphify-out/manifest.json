@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791711060.8984642,
-    "seen": 1791711082.2622144,
-    "ast_hash": "08831a93a922034a5d180b012e7b2eb1",
+    "mtime": 1791713721.2659175,
+    "seen": 1791714418.3882973,
+    "ast_hash": "c1e7c4b89d797b009dc7370af06c87e9",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -972,9 +972,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1791651948.9458513,
-    "seen": 1791651967.5858972,
-    "ast_hash": "629531a89a16bd8c58396d1ca1cc1825",
+    "mtime": 1791714373.6650991,
+    "seen": 1791714418.3884966,
+    "ast_hash": "330da55faab55b26cf6bbd029891ceef",
     "semantic_hash": ""
   },
   "docs/architecture/AI_PIPELINE.md": {
@@ -2706,9 +2706,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/34-atmospheric-audio/34-VERIFICATION.md": {
-    "mtime": 1791711459.5064812,
-    "seen": 1791711557.0249712,
-    "ast_hash": "62cbab02b264154cbfedb989577a7c17",
+    "mtime": 1791713741.243805,
+    "seen": 1791714418.3884747,
+    "ast_hash": "83c61a43e1649758480febed9d03c2cb",
     "semantic_hash": ""
   },
   ".planning/phases/35-real-video/35-01-PLAN.md": {
@@ -2778,9 +2778,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/38-production-deployment/38-VERIFICATION.md": {
-    "mtime": 1791651361.862762,
-    "seen": 1791651967.585893,
-    "ast_hash": "e41b4e3238b28f4453c11490fc828e6c",
+    "mtime": 1791714387.2700064,
+    "seen": 1791714418.3884902,
+    "ast_hash": "d31b35a47d7de113e3c793650783e192",
     "semantic_hash": ""
   },
   ".planning/phases/39-system-verification/39-01-PLAN.md": {
@@ -2796,9 +2796,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/39-system-verification/39-VERIFICATION.md": {
-    "mtime": 1791651814.7854307,
-    "seen": 1791651967.585895,
-    "ast_hash": "bc405db94299d6ba0bdf085b92be4f7b",
+    "mtime": 1791714404.803887,
+    "seen": 1791714418.3884945,
+    "ast_hash": "815c8ff26b8e11290c29e2d0ae84d81f",
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
@@ -2808,9 +2808,9 @@
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT.md": {
-    "mtime": 1791651279.049737,
-    "seen": 1791651967.585903,
-    "ast_hash": "5333194efd5cf334472e7e3b254eb64a",
+    "mtime": 1791714353.4472368,
+    "seen": 1791714418.3885028,
+    "ast_hash": "397f5f4a4d47ba5c84069ba371e5319e",
     "semantic_hash": ""
   },
   "docs/assets/brand-dark.svg": {
@@ -2886,15 +2886,15 @@
     "semantic_hash": ""
   },
   ".planning/phases/34-atmospheric-audio/34-UAT.md": {
-    "mtime": 1791707914.5478983,
-    "seen": 1791709646.7992103,
-    "ast_hash": "a56d8b8c97d9c48df4ef50397e04c047",
+    "mtime": 1791713885.6329906,
+    "seen": 1791714418.388473,
+    "ast_hash": "4bb9a341998465f7d8cf3710d84c822b",
     "semantic_hash": ""
   },
   ".planning/phases/35-real-video/35-UAT.md": {
-    "mtime": 1791707924.054816,
-    "seen": 1791709646.7992144,
-    "ast_hash": "044e1d93761de1454873f315cace62d4",
+    "mtime": 1791713895.9529324,
+    "seen": 1791714418.3884778,
+    "ast_hash": "7ec759b619c8322db9f300342359330a",
     "semantic_hash": ""
   },
   "backend/app/providers/media/rewind_audio.py": {
@@ -2927,24 +2927,6 @@
     "ast_hash": "09da1f1641cbeb20b831530032b9badf",
     "semantic_hash": ""
   },
-  "frontend/dev-dist/registerSW.js": {
-    "mtime": 1791712938.0721295,
-    "seen": 1791713593.1262498,
-    "ast_hash": "3ca0b8505b4bec776b69afdba2768812",
-    "semantic_hash": ""
-  },
-  "frontend/dev-dist/sw.js": {
-    "mtime": 1791712941.5598629,
-    "seen": 1791713593.1262517,
-    "ast_hash": "faceb4a7e66cfd577a4121dbf0b7eb7e",
-    "semantic_hash": ""
-  },
-  "frontend/dev-dist/workbox-afac4cd2.js": {
-    "mtime": 1791712941.560754,
-    "seen": 1791713593.1262538,
-    "ast_hash": "e937e9f67658fd4a4d1d52edb2884eb2",
-    "semantic_hash": ""
-  },
   "frontend/e2e/test_release_media_and_isolation.mjs": {
     "mtime": 1791713178.4839487,
     "seen": 1791713593.1263373,
@@ -2955,6 +2937,18 @@
     "mtime": 1791712772.1269445,
     "seen": 1791713593.1264,
     "ast_hash": "879b307b8de5974f8931ca0582978cd8",
+    "semantic_hash": ""
+  },
+  ".planning/phases/38-production-deployment/38-UAT.md": {
+    "mtime": 1791713906.811871,
+    "seen": 1791714418.3884892,
+    "ast_hash": "9eb6fcdadff441188f90988020147ac9",
+    "semantic_hash": ""
+  },
+  ".planning/phases/39-system-verification/39-UAT.md": {
+    "mtime": 1791713919.3458004,
+    "seen": 1791714418.3884935,
+    "ast_hash": "712e65ee9a70eeb9c6e87892864a46de",
     "semantic_hash": ""
   }
 }

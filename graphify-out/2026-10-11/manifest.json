@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791648340.1783175,
-    "seen": 1791651967.5856519,
-    "ast_hash": "bcb6ee8ccabddf6ebb116315f53dc954",
+    "mtime": 1791712418.4329634,
+    "seen": 1791713593.1263523,
+    "ast_hash": "7293a4716eadd22ab44965697883d0f9",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "frontend/vite.config.ts": {
-    "mtime": 1791650857.9705126,
-    "seen": 1791651967.585709,
-    "ast_hash": "1fc0c81cca7273806500ad3f93e8b0de",
+    "mtime": 1791712934.4691472,
+    "seen": 1791713593.126488,
+    "ast_hash": "109bedd6270da3ace3243b19ab643701",
     "semantic_hash": ""
   },
   "package.json": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/UniverseCodexCanvas.tsx": {
-    "mtime": 1791514425.7980294,
-    "seen": 1791514502.1281168,
-    "ast_hash": "2152fa4cd1eefcb60e50c10afa68baed",
+    "mtime": 1791712545.3387675,
+    "seen": 1791713593.1264093,
+    "ast_hash": "0c9195f4851940fd7c8c79377885d09b",
     "semantic_hash": ""
   },
   ".planning/phases/05-progressive-world-unfolding/05-SUMMARY.md": {
@@ -1266,15 +1266,15 @@
     "semantic_hash": ""
   },
   "backend/app/routers/media.py": {
-    "mtime": 1791492046.0482614,
-    "seen": 1791493004.1367793,
-    "ast_hash": "f8b9a49781d1932bce8015a9589aa0c6",
+    "mtime": 1791712063.3448646,
+    "seen": 1791713593.12612,
+    "ast_hash": "963a0f54fb2875eaa744864e9243bba6",
     "semantic_hash": ""
   },
   "backend/app/services/media_service.py": {
-    "mtime": 1791498790.860142,
-    "seen": 1791512735.2457685,
-    "ast_hash": "32c671511b5fe3ab19277f261dae3462",
+    "mtime": 1791713252.7595599,
+    "seen": 1791713593.1261487,
+    "ast_hash": "18a9cb189a13863b490a2639752d4a04",
     "semantic_hash": ""
   },
   "backend/tests/test_media_provider.py": {
@@ -1290,9 +1290,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/EntityMediaSection.tsx": {
-    "mtime": 1791512306.5997555,
-    "seen": 1791512735.2458553,
-    "ast_hash": "c68b4f782ab770196f258f0ef163f6c1",
+    "mtime": 1791712692.1313844,
+    "seen": 1791713593.1263604,
+    "ast_hash": "20814347a4376d614a6e639066661fb8",
     "semantic_hash": ""
   },
   "frontend/src/components/MediaPreviewCard.tsx": {
@@ -1404,9 +1404,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_voice_generation.py": {
-    "mtime": 1791407398.6685014,
-    "seen": 1791408312.2621062,
-    "ast_hash": "19ed112109f27194c1f67b1a091d98db",
+    "mtime": 1791713476.6692972,
+    "seen": 1791713593.1262448,
+    "ast_hash": "37d8481f000575d05b88a23d49603a7c",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase15_voice_generation.cjs": {
@@ -2634,9 +2634,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase37_pwa.mjs": {
-    "mtime": 1791651026.2156198,
-    "seen": 1791651967.5856373,
-    "ast_hash": "897c0ed8626dec18995111275e7e2403",
+    "mtime": 1791712982.187913,
+    "seen": 1791713593.1263154,
+    "ast_hash": "8f243eb67459f3b4378c61d2de65894f",
     "semantic_hash": ""
   },
   "frontend/scripts/generate_pwa_icons.mjs": {
@@ -2802,9 +2802,9 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1791651246.5351195,
-    "seen": 1791651967.5859,
-    "ast_hash": "bf04d500d2f2a5ccfef17450f54ce14d",
+    "mtime": 1791712859.7235143,
+    "seen": 1791713593.1267226,
+    "ast_hash": "a5f6f2dd9763c7ab340e4ce90ce4915c",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT.md": {
@@ -2913,6 +2913,48 @@
     "mtime": 1791710844.1929197,
     "seen": 1791711082.2619693,
     "ast_hash": "3a04f9058ff51d42ada3b8a0961aac17",
+    "semantic_hash": ""
+  },
+  "backend/app/services/soundscape_library.py": {
+    "mtime": 1791712019.4314723,
+    "seen": 1791713593.1261573,
+    "ast_hash": "fdb3ab40313a7ae2570bfebc3d8934a1",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_soundscape_library.py": {
+    "mtime": 1791712082.5905986,
+    "seen": 1791713593.1262345,
+    "ast_hash": "09da1f1641cbeb20b831530032b9badf",
+    "semantic_hash": ""
+  },
+  "frontend/dev-dist/registerSW.js": {
+    "mtime": 1791712938.0721295,
+    "seen": 1791713593.1262498,
+    "ast_hash": "3ca0b8505b4bec776b69afdba2768812",
+    "semantic_hash": ""
+  },
+  "frontend/dev-dist/sw.js": {
+    "mtime": 1791712941.5598629,
+    "seen": 1791713593.1262517,
+    "ast_hash": "faceb4a7e66cfd577a4121dbf0b7eb7e",
+    "semantic_hash": ""
+  },
+  "frontend/dev-dist/workbox-afac4cd2.js": {
+    "mtime": 1791712941.560754,
+    "seen": 1791713593.1262538,
+    "ast_hash": "e937e9f67658fd4a4d1d52edb2884eb2",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_release_media_and_isolation.mjs": {
+    "mtime": 1791713178.4839487,
+    "seen": 1791713593.1263373,
+    "ast_hash": "e3fe5f119c34e58df80bd559b995603f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/SoundscapeComposerModal.tsx": {
+    "mtime": 1791712772.1269445,
+    "seen": 1791713593.1264,
+    "ast_hash": "879b307b8de5974f8931ca0582978cd8",
     "semantic_hash": ""
   }
 }

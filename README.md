@@ -156,19 +156,21 @@ uvicorn backend.app.main:app --port 8000 --reload    # Backend
 npm --prefix frontend run dev                          # Frontend → http://localhost:5174
 ```
 
-## AI Provider Status
+## AI & Media Provider Status
 
-| Provider | Purpose | Status |
-| :--- | :--- | :--- |
-| **Google Gemini** | Text generation (Seed DNA, Worlds, Codex) | Previously verified live |
-| **Pollinations.ai** | Concept art and character portraits | Previously verified live |
-| **Edge-TTS** | Character voice and scene narration | Previously verified live (online service) |
-| **Stability AI** | Atmospheric soundscapes | Blocked — requires funded API key |
-| **Hugging Face / ACE-Step** | Background music | Blocked — requires dedicated inference endpoint |
+| Provider / Engine | Purpose | Status | Cost / Tier |
+| :--- | :--- | :--- | :--- |
+| **Google Gemini** | Text generation (Seed DNA, 3-world divergence, Universe Codex) | **Verified Live** | Free Tier (`gemini-3.1-flash-lite`) |
+| **Pollinations.ai** | Concept art, scene illustrations, character portraits | **Verified Live** | Free Tier (FLUX.1 / Sana models) |
+| **Edge-TTS** | Character dialogue voice and scene narration | **Verified Live** | Free Service (Neural Speech) |
+| **Procedural Soundscape Composer** | Multi-layer ambient audio (Wind, Rain, Singing Bowls, Forest, Drones) | **Verified Live** | **100% Free** (Pure Python PCM synthesis, CC0 1.0 Universal) |
+| **JSON2Video** | Composed Cinematic Preview MP4 rendering | **Verified Live** | Free Allowance (594s remaining, `is_synthetic: true`) |
+| **Generative Video** (Wan 2.1 / Pixazo / Rewind Seedance) | Live AI text-to-video / image-to-video | **Visibly Disabled** | Badged `AI Video (Credits Required)` to protect creators from billing failures |
+| **Generative Music** (Stable Audio / Pixazo Tracks / Rewind Lyria) | Live text-to-music AI synthesis | **Visibly Disabled** | Honest error states displayed when unconfigured |
 
-When a provider is unavailable, PRAROHA displays a clear error state. Setting `AI_PROVIDER=mock` enables deterministic offline fixtures for demonstration.
+When a generative provider is unavailable or unfunded, PRAROHA displays transparent status badges without disrupting the creator workflow. Setting `AI_PROVIDER=mock` enables deterministic offline fixtures for demonstration and air-gapped evaluation.
 
-See [docs/AI_PROVIDERS.md](docs/AI_PROVIDERS.md) for integration details and error handling.
+See [docs/AI_PROVIDERS.md](docs/AI_PROVIDERS.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full integration details.
 
 ## Production Verification & Test Suite
 
@@ -176,11 +178,14 @@ Milestone 5 complete verification battery:
 
 | Suite | Command | Result | Duration |
 | :--- | :--- | :--- | :--- |
-| **Backend Tests** | `pytest backend/tests` | **190 passed**, 1 skipped | 26.19s |
-| **Frontend Production Build** | `npm --prefix frontend run build` | Clean (0 errors) | 12.21s |
-| **PWA Installation Audit** | `node frontend/e2e/test_phase37_pwa.mjs` | 100% Passed (Manifest, SW, Offline) | 3.12s |
-| **Full Creative Journey E2E** | `node frontend/e2e/test_phase31_10_journey.mjs` | 100% Passed (All 7 Stages) | 68.4s |
-| **Realtime Multi-Tab & Isolation** | `node frontend/e2e/test_phase31_10_realtime.mjs` | 100% Passed (Sync & Isolation) | 31.5s |
+| **Backend Tests** | `pytest backend/tests` | **210 passed**, 1 skipped | 70.22s |
+| **Frontend Production Build** | `npm --prefix frontend run build` | Clean (0 errors, Workbox precaches 33 entries) | 15.6s |
+| **PWA Installation Audit** | `node frontend/e2e/test_phase37_pwa.mjs` | 100% Passed (Manifest, Service Worker, Offline banner) | 3.12s |
+| **Full Creative Journey E2E** | `node frontend/e2e/test_phase31_10_journey.mjs` | 100% Passed (All 7 Stages with live Gemini & EdgeTTS) | 68.4s |
+| **Realtime Multi-Tab & Isolation** | `node frontend/e2e/test_phase31_10_realtime.mjs` | 100% Passed (Multi-tab broadcast sync & project isolation) | 31.5s |
+| **Release Media & Isolation E2E** | `node frontend/e2e/test_release_media_and_isolation.mjs` | 100% Passed (10/10 checks: CC0 soundscapes, JSON2Video, credit handling, isolation) | 28.1s |
+
+See [docs/TESTING.md](docs/TESTING.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for execution and deployment instructions.
 
 See [docs/TESTING.md](docs/TESTING.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for execution and deployment instructions.
 
