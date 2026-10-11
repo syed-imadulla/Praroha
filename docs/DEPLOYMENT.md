@@ -10,7 +10,7 @@ PRAROHA is actively deployed and verified live in production on a decoupled serv
 
 | Component | Cloud Platform | Live Production URL | Health / Verification |
 | :--- | :--- | :--- | :--- |
-| **Frontend (PWA)** | **Vercel Edge** | [`https://frontend-iota-green-73.vercel.app`](https://frontend-iota-green-73.vercel.app) | **Live & Verified** (HTTPS, Service Worker active) |
+| **Frontend (PWA)** | **Vercel Edge** | [`https://praroha-ai.vercel.app`](https://praroha-ai.vercel.app) *(Alias: `https://frontend-iota-green-73.vercel.app`)* | **Live & Verified** (HTTPS, Service Worker active) |
 | **Backend API** | **Azure Container Apps** | [`https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io`](https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io) | **Live & Verified** (`/api/health` 200 OK) |
 | **Database** | **Supabase PostgreSQL** | `https://stxnxkzaftmwcbtvgzbm.supabase.co` | **Live & Connected** (Session Pooler) |
 | **Authentication** | **Supabase Auth** | `https://stxnxkzaftmwcbtvgzbm.supabase.co` | **Live & Configured** (Email Auth & JWT) |
@@ -21,7 +21,7 @@ PRAROHA is actively deployed and verified live in production on a decoupled serv
 
 ```mermaid
 graph TD
-    User([Browser / Mobile PWA]) -->|HTTPS: frontend-iota-green-73.vercel.app| Vercel[Vercel Edge CDN - Frontend SPA / PWA]
+    User([Browser / Mobile PWA]) -->|HTTPS: praroha-ai.vercel.app| Vercel[Vercel Edge CDN - Frontend SPA / PWA]
     User -->|Supabase JWT / Auth| SupaAuth[Supabase Auth Service]
     User -->|WebSockets: Realtime Events| SupaRT[Supabase Realtime Engine]
     Vercel -->|REST API: /api/*| AzureACA[Azure Container Apps - FastAPI Backend]

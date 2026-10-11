@@ -44638,7 +44638,7 @@
       "node_kind": "heading",
       "norm_label": "ai & media provider status",
       "source_file": "README.md",
-      "source_location": "L161"
+      "source_location": "L163"
     },
     {
       "id": "readme_architecture",
@@ -44650,7 +44650,7 @@
       "node_kind": "heading",
       "norm_label": "architecture",
       "source_file": "README.md",
-      "source_location": "L94"
+      "source_location": "L96"
     },
     {
       "id": "readme_documentation",
@@ -44662,7 +44662,7 @@
       "node_kind": "heading",
       "norm_label": "documentation",
       "source_file": "README.md",
-      "source_location": "L192"
+      "source_location": "L194"
     },
     {
       "id": "readme_example_a_village_where_nobody_can_lie",
@@ -44674,7 +44674,7 @@
       "node_kind": "heading",
       "norm_label": "example: \"a village where nobody can lie\"",
       "source_file": "README.md",
-      "source_location": "L65"
+      "source_location": "L67"
     },
     {
       "id": "readme_hackathon",
@@ -44686,7 +44686,7 @@
       "node_kind": "heading",
       "norm_label": "hackathon",
       "source_file": "README.md",
-      "source_location": "L212"
+      "source_location": "L214"
     },
     {
       "id": "readme_how_it_works",
@@ -44698,7 +44698,7 @@
       "node_kind": "heading",
       "norm_label": "how it works",
       "source_file": "README.md",
-      "source_location": "L39"
+      "source_location": "L41"
     },
     {
       "id": "readme_introduction",
@@ -44710,7 +44710,7 @@
       "node_kind": "heading",
       "norm_label": "introduction",
       "source_file": "README.md",
-      "source_location": "L17"
+      "source_location": "L19"
     },
     {
       "id": "readme_key_features",
@@ -44722,7 +44722,7 @@
       "node_kind": "heading",
       "norm_label": "key features",
       "source_file": "README.md",
-      "source_location": "L50"
+      "source_location": "L52"
     },
     {
       "id": "readme_philosophical_foundation_tatva_2",
@@ -44734,7 +44734,7 @@
       "node_kind": "heading",
       "norm_label": "philosophical foundation: tatva 2",
       "source_file": "README.md",
-      "source_location": "L31"
+      "source_location": "L33"
     },
     {
       "id": "readme_production_verification_test_suite",
@@ -44746,7 +44746,7 @@
       "node_kind": "heading",
       "norm_label": "production verification & test suite",
       "source_file": "README.md",
-      "source_location": "L177"
+      "source_location": "L179"
     },
     {
       "id": "readme_quick_start",
@@ -44758,7 +44758,7 @@
       "node_kind": "heading",
       "norm_label": "quick start",
       "source_file": "README.md",
-      "source_location": "L134"
+      "source_location": "L136"
     },
     {
       "id": "readme_team",
@@ -44770,7 +44770,7 @@
       "node_kind": "heading",
       "norm_label": "team",
       "source_file": "README.md",
-      "source_location": "L201"
+      "source_location": "L203"
     },
     {
       "id": "readme_technology_stack",
@@ -44782,7 +44782,7 @@
       "node_kind": "heading",
       "norm_label": "technology stack",
       "source_file": "README.md",
-      "source_location": "L76"
+      "source_location": "L78"
     },
     {
       "id": "readme_the_problem",
@@ -44794,7 +44794,7 @@
       "node_kind": "heading",
       "norm_label": "the problem",
       "source_file": "README.md",
-      "source_location": "L25"
+      "source_location": "L27"
     },
     {
       "id": "verify_final_pass",
@@ -118644,7 +118644,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L134",
+      "source_location": "L136",
       "weight": 1.0
     },
     {
@@ -118655,18 +118655,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L161",
-      "weight": 1.0
-    },
-    {
-      "source": "readme",
-      "target": "readme_introduction",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": "L17",
+      "source_location": "L163",
       "weight": 1.0
     },
     {
@@ -118677,7 +118666,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L177",
+      "source_location": "L179",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_introduction",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -118688,7 +118688,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L192",
+      "source_location": "L194",
       "weight": 1.0
     },
     {
@@ -118699,7 +118699,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L201",
+      "source_location": "L203",
       "weight": 1.0
     },
     {
@@ -118710,7 +118710,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L212",
+      "source_location": "L214",
       "weight": 1.0
     },
     {
@@ -118721,7 +118721,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -118732,7 +118732,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L31",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -118743,7 +118743,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L39",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -118754,7 +118754,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L50",
+      "source_location": "L52",
       "weight": 1.0
     },
     {
@@ -118765,7 +118765,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L65",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -118776,7 +118776,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L76",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -118787,7 +118787,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L94",
+      "source_location": "L96",
       "weight": 1.0
     },
     {
@@ -127662,7 +127662,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L132",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -127673,7 +127673,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L175",
+      "source_location": "L177",
       "weight": 1.0
     },
     {
@@ -127684,7 +127684,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L175",
+      "source_location": "L177",
       "weight": 1.0
     },
     {
@@ -127695,7 +127695,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L190",
+      "source_location": "L192",
       "weight": 1.0
     },
     {
@@ -127706,7 +127706,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L194",
+      "source_location": "L196",
       "weight": 1.0
     },
     {
@@ -127717,7 +127717,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": "L198",
+      "source_location": "L200",
       "weight": 1.0
     },
     {
@@ -150205,5 +150205,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "cd0a81b372a406a5b304465fac74fdf75c8f786f"
+  "built_at_commit": "9cf0e014ff9fb71855a4e2fb7bcc393fb61239f6"
 }

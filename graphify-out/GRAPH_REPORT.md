@@ -1,7 +1,7 @@
 # Graph Report - Praroha  (2026-10-11)
 
 ## Corpus Check
-- 416 files · ~745,180 words
+- 416 files · ~745,189 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 3, .example 2, .zip 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `cd0a81b3`
+- Built from commit: `9cf0e014`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1424,7 +1424,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `playwright` connect `playwright` to `frontend/package.json`, `test_phase20_human_only_zones.cjs`, `ref_path`, `test_phase11_decision_dna.cjs`, `run_uat.cjs`, `test_phase15_voice_generation.cjs`, `test_phase10_divergence.cjs`, `test_phase18_mutation_lab.cjs`, `generate_pwa_icons.mjs`, `test_phase4_selection.cjs`, `test_phase5_unfold.cjs`, `test_phase9_potential.cjs`, `test_phase16_video_generation.cjs`, `test_phase8_demo.cjs`, `test_phase28_botanical_workspace.cjs`, `test_phase29_ui_polish.cjs`, `test_phase17_audio_atmosphere.cjs`, `ref_assert`, `test_phase6_traceability.cjs`, `test_phase_31_9_5.mjs`, `run`, `run`, `test_phase13_media_provider.cjs`, `test_phase14_image_generation.cjs`?**
   _High betweenness centrality (0.089) - this node is a cross-community bridge._
 - **Why does `MockProvider` connect `MockProvider` to `project_repo.py`, `Part 16 — Dual Seed Live Execution Trace`, `Phase 1: Foundation / Project Shell - Research`, `asyncio`, `WorldSelectionRecord`, `.extract_dna`, `AIProviderError`, `Proposed Changes`, `Implementation Decisions`, `Milestone 4: Real Product Hardening + True Realtime`, `3. Architecture & Code Changes`, `test_unfold.py`, `SeedInputCanvas.tsx`, `providers/factory.py`, `pytest`, `models/potential.py`, `Plan: Phase 8 Wave 1 — Backend Reliability, Fast Canonical Demo Seeding & Provider Fallback`, `.save_world_candidates`, `.generate_worlds`, `Phase 8: Polish / Reliability / Demo — Research & Technical Spikes`, `30-04-TEST-AUDIT.md: Test Quality, False Positive & Coverage Gap Audit`, `Praroha: Comprehensive Judge Explanation`, `LocalStorageProvider`, `What Was Built`, `ProjectRepository`, `Milestone 4: Real Product Hardening + True Realtime Requirements (Active)`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
+  _High betweenness centrality (0.057) - this node is a cross-community bridge._
 - **Are the 95 inferred relationships involving `ProjectRepository` (e.g. with `lifespan()` and `SeedDNA`) actually correct?**
   _`ProjectRepository` has 95 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 64 inferred relationships involving `ProviderUnavailableError` (e.g. with `ACEStepAudioProvider` and `CompositeAudioProvider`) actually correct?**

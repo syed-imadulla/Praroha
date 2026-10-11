@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "backend/app/config.py": {
-    "mtime": 1791710428.2372253,
-    "seen": 1791711082.2617218,
-    "ast_hash": "39d32764355be9955bcf19a550e8409e",
+    "mtime": 1791735960.4393096,
+    "seen": 1791737730.65068,
+    "ast_hash": "0637c964bb1a84fb86f0d18379f722fa",
     "semantic_hash": ""
   },
   "backend/app/core/response.py": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/base.py": {
-    "mtime": 1791368456.3371828,
-    "seen": 1791369155.276205,
-    "ast_hash": "2dc642b9a1d8a0b14d3c9237333b9a43",
+    "mtime": 1791735206.8382635,
+    "seen": 1791737730.650716,
+    "ast_hash": "6ccb7ea74dfa4a35880957c757e46c1c",
     "semantic_hash": ""
   },
   "backend/app/providers/factory.py": {
@@ -54,15 +54,15 @@
     "semantic_hash": ""
   },
   "backend/app/providers/mock_provider.py": {
-    "mtime": 1791368713.3171718,
-    "seen": 1791369155.2762094,
-    "ast_hash": "676662567ba09e247648cfa0437b6c77",
+    "mtime": 1791735273.108743,
+    "seen": 1791737730.6507545,
+    "ast_hash": "b9ddaa082242f5e4d9488ae1fc0d7f58",
     "semantic_hash": ""
   },
   "backend/app/providers/storage.py": {
-    "mtime": 1791112981.6490803,
-    "seen": 1791113214.8190794,
-    "ast_hash": "79d98adeb13b4018772a479e6c30d642",
+    "mtime": 1791735331.0072825,
+    "seen": 1791737730.650756,
+    "ast_hash": "50de38008f930216599c5e29d4b93870",
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791733600.3562043,
-    "seen": 1791733682.568109,
-    "ast_hash": "62cae32abc6bbf9963c8825c8641dd35",
+    "mtime": 1791737617.3531065,
+    "seen": 1791737730.65108,
+    "ast_hash": "9c72f3cc77f24d77bb63fbef08e306e8",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "backend/requirements.txt": {
-    "mtime": 1791385016.7136874,
-    "seen": 1791386908.0396738,
-    "ast_hash": "c5e9f653ed43e92fc91a32fe0159c61b",
+    "mtime": 1791735404.065601,
+    "seen": 1791737730.651393,
+    "ast_hash": "f56e394c577636a1339cba1a4b82c189",
     "semantic_hash": ""
   },
   "docs/architecture/DEMO_FIXTURES.md": {
@@ -972,9 +972,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1791714373.6650991,
-    "seen": 1791714418.3884966,
-    "ast_hash": "330da55faab55b26cf6bbd029891ceef",
+    "mtime": 1791737699.032494,
+    "seen": 1791737730.6513913,
+    "ast_hash": "b78869b2f2b3d1ae786b5f1f9dc5d93b",
     "semantic_hash": ""
   },
   "docs/architecture/AI_PIPELINE.md": {
@@ -2544,15 +2544,15 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase31_10_journey.mjs": {
-    "mtime": 1791651602.7439265,
-    "seen": 1791651967.5856357,
-    "ast_hash": "72db2bc892d0d6ca820bc23a8e026a57",
+    "mtime": 1791737042.7295985,
+    "seen": 1791737730.6509237,
+    "ast_hash": "5b6a2c286da7e57fe96b486dd2d5098b",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase31_10_realtime.mjs": {
-    "mtime": 1791521479.7747517,
-    "seen": 1791523050.296414,
-    "ast_hash": "6a52e00d69196025ab191fd82824caf2",
+    "mtime": 1791736797.2916017,
+    "seen": 1791737730.6509254,
+    "ast_hash": "f7d5ae94f22b6d7c9208c5a76744301e",
     "semantic_hash": ""
   },
   "frontend/src/components/profile/ProfileSettingsView.tsx": {
@@ -2808,9 +2808,9 @@
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT.md": {
-    "mtime": 1791733631.5530124,
-    "seen": 1791733682.568458,
-    "ast_hash": "a0ef834fc2529d478cdae0ad1bbf2088",
+    "mtime": 1791737658.9577944,
+    "seen": 1791737730.6514018,
+    "ast_hash": "d57589cf5604813b82c4e664c929e21c",
     "semantic_hash": ""
   },
   "docs/assets/brand-dark.svg": {
@@ -2928,9 +2928,9 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_release_media_and_isolation.mjs": {
-    "mtime": 1791713178.4839487,
-    "seen": 1791713593.1263373,
-    "ast_hash": "e3fe5f119c34e58df80bd559b995603f",
+    "mtime": 1791736783.514715,
+    "seen": 1791737730.6509423,
+    "ast_hash": "5f2b3a745cc105d23291656901fd55aa",
     "semantic_hash": ""
   },
   "frontend/src/components/SoundscapeComposerModal.tsx": {
@@ -2958,15 +2958,21 @@
     "semantic_hash": ""
   },
   ".planning/phases/40-production-cloud-deployment/40-01-PLAN.md": {
-    "mtime": 1791733548.7035065,
-    "seen": 1791733682.5684454,
-    "ast_hash": "af3b2c6d3489c5b00c0435d13c36f3b6",
+    "mtime": 1791737564.2525046,
+    "seen": 1791737730.6513839,
+    "ast_hash": "4a0508496fb243f94260618e3b6af5e5",
     "semantic_hash": ""
   },
   ".planning/phases/40-production-cloud-deployment/40-CONTEXT.md": {
     "mtime": 1791733559.5204477,
     "seen": 1791733682.5684462,
     "ast_hash": "15831b4e33f4dd61897888c176dd2542",
+    "semantic_hash": ""
+  },
+  ".planning/phases/40-production-cloud-deployment/40-01-SUMMARY.md": {
+    "mtime": 1791737602.2322197,
+    "seen": 1791737730.6513858,
+    "ast_hash": "075679c389996d6e757f629f3f827656",
     "semantic_hash": ""
   }
 }

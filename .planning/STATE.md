@@ -39,7 +39,7 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
-  - Frontend: `https://frontend-iota-green-73.vercel.app`
+  - Frontend: `https://praroha-ai.vercel.app` (Alias: `https://frontend-iota-green-73.vercel.app`)
   - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io`
 - **Backend Test Battery**: 211 passed, 1 skipped in 76s (`pytest backend/tests`). Includes 48 specialized media and soundscape tests across CC0 Soundscapes, Stable Audio, Hugging Face, Pixazo Video, Pixazo Tracks, JSON2Video, and Rewind.ai.
 - **Frontend Production Bundle**: Compiled in 12.8s with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries.

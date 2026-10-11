@@ -10,7 +10,9 @@
 
 An AI-powered creative worldbuilding platform built for the **Vedanta Makeathon** by **Team Supreme**.
 
-**[Live Web App & PWA](https://frontend-iota-green-73.vercel.app)** · **[Live API Health](https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health)**
+**[Live Web App & PWA](https://praroha-ai.vercel.app)** · **[Live API Health](https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health)**
+
+*(Working alias: `https://frontend-iota-green-73.vercel.app`)*
 
 </div>
 

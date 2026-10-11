@@ -9,7 +9,7 @@ Phase 40 successfully transitioned PRAROHA from local container testing to a liv
 
 | Component | Provider / Platform | Production URL | Operational Status |
 | :--- | :--- | :--- | :--- |
-| **Frontend Application** | Vercel Edge CDN | `https://frontend-iota-green-73.vercel.app` | **Live & Verified** (HTTPS, PWA Active) |
+| **Frontend Application** | Vercel Edge CDN | `https://praroha-ai.vercel.app` *(Alias: `https://frontend-iota-green-73.vercel.app`)* | **Live & Verified** (HTTPS, PWA Active) |
 | **Backend API** | Azure Container Apps | `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io` | **Live & Verified** (`/api/health` 200 OK) |
 | **Database & Auth** | Supabase Cloud | `https://stxnxkzaftmwcbtvgzbm.supabase.co` | **Live & Connected** (PostgreSQL + JWT) |
 | **Media Storage** | Supabase Object Storage | Bucket: `seed-unfold-assets` | **Live & Connected** (Persistent assets) |
