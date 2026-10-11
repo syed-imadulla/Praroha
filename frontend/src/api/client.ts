@@ -38,7 +38,11 @@ import { supabase } from '../realtime/supabaseRealtime';
 import { useAuthStore } from '../store/authStore';
 
 class ApiClient {
-  private baseUrl = (import.meta.env.VITE_API_URL as string)?.replace(/\/+$/, '') || '/api';
+  private baseUrl = (() => {
+    const raw = (import.meta.env.VITE_API_URL as string)?.trim()?.replace(/\/+$/, '');
+    if (!raw) return '/api';
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  })();
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<APIResponse<T>> {
     try {

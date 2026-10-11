@@ -1659,6 +1659,31 @@ class ProjectRepository:
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
+    async def recover_orphaned_jobs(self) -> int:
+        """Find jobs left in 'queued' or 'processing' across restarts and transition them cleanly to 'failed' with actionable message."""
+        from backend.app.models.job import GenerationJob
+        from backend.app.models.media import MediaAssetRecord
+        stmt = select(GenerationJob).where(GenerationJob.status.in_(["queued", "processing"]))
+        res = await self.session.execute(stmt)
+        orphaned_jobs = list(res.scalars().all())
+        count = 0
+        for job in orphaned_jobs:
+            job.status = "failed"
+            job.error_message = "Generation task interrupted by server restart. Please retry generation."
+            job.updated_at = get_utc_now()
+            self.session.add(job)
+            stmt_asset = select(MediaAssetRecord).where(MediaAssetRecord.id == job.id)
+            res_asset = await self.session.execute(stmt_asset)
+            asset = res_asset.scalar_one_or_none()
+            if asset and asset.status in ("queued", "processing"):
+                asset.status = "failed"
+                asset.error_message = job.error_message
+                self.session.add(asset)
+            count += 1
+        if count > 0:
+            await self.session.commit()
+        return count
+
     async def get_project_bundle(self, project_id: str) -> Optional["ProjectBundleRead"]:
         from backend.app.models.project import ProjectBundleRead
         from backend.app.models.job import GenerationJob

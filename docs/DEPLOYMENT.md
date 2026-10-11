@@ -212,6 +212,105 @@ If single-host deployment is not viable, deploy using decoupled managed services
 
 ---
 
+### Option C: Cloud Production Architecture — Azure Container Apps + Vercel + Supabase
+
+This is the standard managed cloud architecture for PRAROHA, decoupling edge static assets (Vercel) from containerized compute (Azure Container Apps) and managed persistence (Supabase).
+
+```mermaid
+graph TD
+    Client[Browser / Installed PWA] -->|HTTPS: app.vercel.app| Vercel[Vercel Edge CDN - Frontend SPA]
+    Client -->|JWT Auth Tokens| SupabaseAuth[Supabase Auth Engine]
+    Client -->|WebSockets Realtime| SupabaseRT[Supabase Realtime Engine]
+    Vercel -->|REST API Calls: /api/*| ACA[Azure Container Apps - FastAPI Backend]
+    ACA -->|Async SQLModel| SupabaseDB[(Supabase PostgreSQL Session Pooler)]
+    ACA -->|Asset Uploads: WAV/MP4/JPEG| SupabaseStorage[Supabase Object Storage]
+    ACA -->|Generative Text & Codex| Gemini[Google Gemini 3.1 Flash]
+    ACA -->|Character Dialogue Audio| EdgeTTS[Edge-TTS Neural Voice Engine]
+    ACA -->|Concept Art Visuals| Pollinations[Pollinations.ai Free Tier]
+    ACA -->|Composed Cinematic Preview| JSON2Video[JSON2Video Composition Engine]
+```
+
+#### 1. Backend on Azure Container Apps (ACA)
+
+##### Build & Container Image Registry
+Using Azure Container Registry (ACR):
+```bash
+# Build backend image directly in cloud ACR (no local Docker daemon required)
+az acr build \
+  --registry <YOUR_ACR_NAME> \
+  --image praroha-backend:latest \
+  --file Dockerfile.backend .
+```
+
+##### Deploy Container App
+```bash
+az containerapp create \
+  --name praroha-backend \
+  --resource-group <YOUR_RESOURCE_GROUP> \
+  --environment <YOUR_CONTAINERAPP_ENV> \
+  --image <YOUR_ACR_NAME>.azurecr.io/praroha-backend:latest \
+  --target-port 8000 \
+  --ingress external \
+  --min-replicas 1 \
+  --max-replicas 3 \
+  --cpu 0.5 \
+  --memory 1.0Gi \
+  --env-vars \
+    PROJECT_NAME="PRAROHA — Seed to Universe" \
+    ENVIRONMENT="production" \
+    AI_PROVIDER="gemini" \
+    STORAGE_PROVIDER="supabase" \
+    SUPABASE_BUCKET="seed-unfold-assets" \
+    DEV_AUTO_CONFIRM_EMAILS="false" \
+    CORS_ORIGINS="https://your-app.vercel.app,https://praroha.vercel.app" \
+  --secrets \
+    gemini-key="<YOUR_GEMINI_KEY>" \
+    database-url="<YOUR_SUPABASE_DATABASE_URL>" \
+    supabase-url="<YOUR_SUPABASE_URL>" \
+    supabase-key="<YOUR_SUPABASE_SERVICE_ROLE_OR_ANON_KEY>" \
+    json2video-key="<YOUR_JSON2VIDEO_KEY>" \
+    pixazo-key="<YOUR_PIXAZO_KEY>" \
+    rewind-key="<YOUR_REWIND_KEY>" \
+  --secret-env-vars \
+    GEMINI_API_KEY=secretref:gemini-key \
+    DATABASE_URL=secretref:database-url \
+    SUPABASE_URL=secretref:supabase-url \
+    SUPABASE_KEY=secretref:supabase-key \
+    JSON2VIDEO_API_KEY=secretref:json2video-key \
+    PIXAZO_API_KEY=secretref:pixazo-key \
+    REWIND_API_KEY=secretref:rewind-key
+```
+
+##### Background Job Recovery & Scale Configuration
+- **Preventing Scale-to-Zero Interruption**: Configured with `--min-replicas 1` so in-flight `asyncio.create_task` operations (cinematic video renders, multi-layer audio synthesis) are never terminated by container scale-in.
+- **Crash Recovery**: `backend/app/main.py` incorporates an automated startup recovery handler (`ProjectRepository.recover_orphaned_jobs`). If an ACA instance restarts or scales, any jobs interrupted in `queued` or `processing` states are automatically caught and transitioned to `failed` with actionable retry prompts so creators are never stuck waiting on dead jobs.
+- **Health Probe**: Configured against `/api/health` on port 8000.
+
+##### Cost & Free Tier Analysis (Azure Container Apps)
+- Azure provides **180,000 vCPU-seconds** and **360,000 GiB-seconds** of free execution every month on the Consumption plan.
+- At 0.5 vCPU and 1.0 GiB RAM with `minReplicas = 1`, the first 100 hours each month are completely covered by the free grant; continuous 24/7 execution costs ~$12–$15/month (or $0 covered by Azure for Students / Azure credits).
+
+#### 2. Frontend on Vercel
+
+##### Project Setup & Build Configuration
+In the Vercel Dashboard or CLI (`npx vercel`):
+- **Framework Preset**: Vite
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **SPA Rewrites & Caching**: Defined in `frontend/vercel.json` (rewriting all requests to `/index.html` and setting `no-cache` on `sw.js` and `manifest.webmanifest`).
+
+##### Frontend Environment Variables (Vercel)
+Configure in Vercel **Project Settings → Environment Variables**:
+```dotenv
+VITE_API_URL=https://praroha-backend.<region>.azurecontainerapps.io/api
+VITE_SUPABASE_URL=https://<your-project-id>.supabase.co
+VITE_SUPABASE_ANON_KEY=<your-public-anon-key>
+```
+*Note: ApiClient in `frontend/src/api/client.ts` automatically normalizes `VITE_API_URL` to guarantee consistent `/api` routing regardless of trailing slashes.*
+
+---
+
 ## 4. Supabase Setup Checklist
 
 ### A. Authentication & Redirects

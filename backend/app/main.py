@@ -30,6 +30,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Startup and shutdown lifecycle handler."""
     # Initialize SQLModel database tables on startup
     await init_db()
+    # Recover any orphaned generation jobs interrupted by previous container restarts
+    try:
+        from backend.app.repositories.project_repo import async_session, ProjectRepository
+        async with async_session() as session:
+            repo = ProjectRepository(session)
+            recovered = await repo.recover_orphaned_jobs()
+            if recovered > 0:
+                import logging
+                logging.getLogger("backend.app").info(
+                    f"Recovered {recovered} orphaned generation job(s) from previous container restart."
+                )
+    except Exception as exc:
+        import logging
+        logging.getLogger("backend.app").warning(
+            f"Failed to recover orphaned generation jobs: {exc}"
+        )
     yield
 
 

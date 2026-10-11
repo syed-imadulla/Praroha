@@ -118,3 +118,32 @@ async def test_generation_job_failure(clean_client: AsyncClient):
         assert failed_job["error_message"] == "Mock forced failure"
         assert failed_job["error_code"] == "MOCK_FAIL"
 
+
+@pytest.mark.asyncio
+async def test_recover_orphaned_jobs(clean_client: AsyncClient):
+    """Verify that jobs stuck in queued or processing are recovered across container restarts."""
+    from backend.app.repositories.project_repo import async_session, ProjectRepository
+    from backend.app.models.job import GenerationJob
+
+    async with async_session() as session:
+        repo = ProjectRepository(session)
+        # Create an orphaned job
+        orphaned_job = GenerationJob(
+            project_id="test-orphan-project",
+            job_type="media_video",
+            status="processing",
+            progress=50,
+        )
+        saved = await repo.create_generation_job(orphaned_job)
+        job_id = saved.id
+
+        # Execute recovery
+        recovered_count = await repo.recover_orphaned_jobs()
+        assert recovered_count >= 1
+
+        # Check job status is now cleanly transitioned to failed with retry guidance
+        recovered_job = await repo.get_generation_job(job_id)
+        assert recovered_job is not None
+        assert recovered_job.status == "failed"
+        assert "interrupted by server restart" in recovered_job.error_message
+

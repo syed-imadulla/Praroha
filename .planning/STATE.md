@@ -35,6 +35,7 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
   - Phase 37: PWA Installation & Offline Behaviour (Completed & Verified)
   - Phase 38: Production Deployment & Operational Readiness (Completed & Verified — Docker, Nginx, Compose, Health Checks, Supabase Auth & Storage verified)
   - Phase 39: Full-System Verification & Release Documentation (Completed & Verified — 100% full user journey, PWA, and release isolation verified)
+  - Phase 40: Production Cloud Deployment (Azure + Vercel + Supabase) (In Progress — ACA backend configuration, Vercel SPA rewrites, API decoupling, restart recovery engine verified)
 
 ## Verification Evidence & Quality Gates
 - **Backend Test Battery**: 210 passed, 1 skipped in 70.2s (`pytest backend/tests`). Includes 48 specialized media and soundscape tests across CC0 Soundscapes, Stable Audio, Hugging Face, Pixazo Video, Pixazo Tracks, JSON2Video, and Rewind.ai.

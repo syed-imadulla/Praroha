@@ -659,3 +659,17 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   3. Comprehensive release documentation, API guides, and architecture references updated and verified.  
 **Plans**: 1 plan (completed)
 - [x] **39-01-PLAN.md**: Complete regression test execution (190 backend tests, clean PWA build, PWA audit, full creative journey E2E, multi-tab realtime isolation E2E), documentation updates (`README.md`, `PROJECT_RULES.md`, `.planning/`), and final release reporting.
+
+---
+
+### Phase 40: Production Cloud Deployment (Azure + Vercel + Supabase)
+**Goal**: Deploy PRAROHA as a live, publicly accessible production application utilizing Azure Container Apps (backend), Vercel (frontend), and Supabase (Postgres, Storage, Auth, Realtime).  
+**Depends on**: Phase 38, Phase 39  
+**Requirements**: CLOUD-DEP-01, CLOUD-DEP-02, CLOUD-DEP-03, CLOUD-DEP-04  
+**Success Criteria**:
+  1. Azure Container Apps runs the FastAPI backend with health checks, persistent Supabase connections, and restart job recovery.
+  2. Vercel hosts the React/Vite/PWA frontend with client-side routing rewrites and PWA cache-control headers.
+  3. Supabase Auth and CORS whitelists the live production Vercel domain.
+  4. End-to-end verification confirms user registration, creative world unfolding, audio/video preview generation, and project persistence over HTTPS.  
+**Plans**: 1 plan (in progress)
+- [/] **40-01-PLAN.md**: Azure Container Apps specification, Vercel SPA rewrites (`frontend/vercel.json`), API client base URL normalization, background job restart recovery, and cloud deployment runbooks.
