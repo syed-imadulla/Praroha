@@ -89,11 +89,15 @@ class CompositeVideoProvider(VideoProvider):
                 tier2_err,
             )
 
-        # --- Tier 3: Guaranteed Safe Mock Fallback ---
+        # --- Tier 3: Guaranteed Safe Mock Fallback (Demo/Dev Only) ---
         import os
-        if os.getenv("ENVIRONMENT") != "demo" and os.getenv("PRAROHA_ENV") != "demo":
-            logger.error("Real mode: Providers failed. Refusing to fallback to MockProvider.")
-            raise ProviderUnavailableError("Real providers failed and mock fallback is disabled in real mode.")
+        is_demo_mode = os.getenv("ENVIRONMENT") == "demo" or os.getenv("PRAROHA_ENV") == "demo"
+        if not is_demo_mode:
+            logger.error("Real mode: Live video providers failed. Refusing silent fallback to mock.")
+            raise ProviderUnavailableError(
+                "Live video generation requires active provider credentials (PYRAMID_FLOW_ENDPOINT or HF_TOKEN for Pyramid Flow, or WAN_ENDPOINT for Wan 2.1). "
+                "Please configure a video provider in .env to generate live cinematic videos."
+            )
 
         logger.info("Delivering Tier 3 (MockVideoProvider) deterministic fallback video asset.")
         try:
@@ -103,6 +107,8 @@ class CompositeVideoProvider(VideoProvider):
                 context=ctx,
             )
             payload.metadata["resolved_provider"] = "mock"
+            payload.metadata["provider_label"] = "Synthetic Preview"
+            payload.metadata["is_synthetic"] = True
             payload.metadata["duration_sec"] = duration_sec
             payload.metadata["aspect_ratio"] = aspect_ratio
             payload.metadata["resolution"] = "720p"
@@ -116,6 +122,8 @@ class CompositeVideoProvider(VideoProvider):
                 filename="emergency_fallback.mp4",
                 metadata={
                     "resolved_provider": "mock",
+                    "provider_label": "Synthetic Preview",
+                    "is_synthetic": True,
                     "duration_sec": duration_sec,
                     "aspect_ratio": aspect_ratio,
                     "resolution": "720p",

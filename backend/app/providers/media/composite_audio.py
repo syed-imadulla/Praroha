@@ -88,11 +88,15 @@ class CompositeAudioProvider(AudioProvider):
                 tier2_err,
             )
 
-        # --- Tier 3: Guaranteed Safe Mock Fallback ---
+        # --- Tier 3: Guaranteed Safe Mock Fallback (Demo/Dev Only) ---
         import os
-        if os.getenv("ENVIRONMENT") != "demo" and os.getenv("PRAROHA_ENV") != "demo":
-            logger.error("Real mode: Providers failed. Refusing to fallback to MockProvider.")
-            raise ProviderUnavailableError("Real providers failed and mock fallback is disabled in real mode.")
+        is_demo_mode = os.getenv("ENVIRONMENT") == "demo" or os.getenv("PRAROHA_ENV") == "demo"
+        if not is_demo_mode:
+            logger.error("Real mode: Live audio providers failed. Refusing silent fallback to mock.")
+            raise ProviderUnavailableError(
+                "Live atmospheric audio generation requires active provider credentials (STABILITY_API_KEY for Stable Audio 2 or HF_TOKEN for ACE-Step 1.5). "
+                "Please configure STABILITY_API_KEY or HF_TOKEN in .env to generate live soundscapes."
+            )
 
         logger.info("Delivering Tier 3 (MockAudioProvider) deterministic fallback audio soundscape.")
         try:
@@ -103,6 +107,8 @@ class CompositeAudioProvider(AudioProvider):
                 context=ctx,
             )
             payload.metadata["resolved_provider"] = "mock"
+            payload.metadata["provider_label"] = "Synthetic Preview"
+            payload.metadata["is_synthetic"] = True
             payload.metadata["mood"] = mood
             payload.metadata["duration_sec"] = duration_sec
             return payload
@@ -115,6 +121,8 @@ class CompositeAudioProvider(AudioProvider):
                 filename="emergency_fallback.wav",
                 metadata={
                     "resolved_provider": "mock",
+                    "provider_label": "Synthetic Preview",
+                    "is_synthetic": True,
                     "mood": mood,
                     "duration_sec": duration_sec,
                     "mock": True,

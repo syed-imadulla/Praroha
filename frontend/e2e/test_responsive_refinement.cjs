@@ -25,6 +25,18 @@ async function runResponsiveSmokeTest() {
 
       await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
 
+      // Authenticate test session in Zustand store
+      await page.evaluate(() => {
+        if (window.__authStore) {
+          window.__authStore.setState({
+            authStatus: 'AUTHENTICATED',
+            user: { id: 'test-user-id', email: 'test@praroha.local', email_confirmed_at: new Date().toISOString() },
+            session: { access_token: 'fake-jwt-token' },
+          });
+        }
+      });
+      await page.waitForTimeout(500);
+
       // 1. Check for Zero Horizontal Page Overflow
       const overflow = await page.evaluate(() => {
         const docWidth = document.documentElement.scrollWidth;
@@ -75,6 +87,18 @@ async function runResponsiveSmokeTest() {
     const fullContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const fullPage = await fullContext.newPage();
     await fullPage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+
+    // Authenticate test session in Zustand store
+    await fullPage.evaluate(() => {
+      if (window.__authStore) {
+        window.__authStore.setState({
+          authStatus: 'AUTHENTICATED',
+          user: { id: 'test-user-id', email: 'test@praroha.local', email_confirmed_at: new Date().toISOString() },
+          session: { access_token: 'fake-jwt-token' },
+        });
+      }
+    });
+    await fullPage.waitForTimeout(500);
 
     // Ensure clean workspace state
     await fullPage.evaluate(() => {

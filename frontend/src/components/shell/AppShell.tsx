@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Sidebar, NavView } from './Sidebar';
+import { OfflineBanner } from '../OfflineBanner';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { projectSubscription } from '../../realtime/projectSubscription';
 
@@ -86,6 +87,9 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       {/* Main Content Layout */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10 min-w-0">
+        {/* PWA Offline Awareness Banner */}
+        <OfflineBanner />
+
         {/* Mobile / Tablet Top Bar (Only when not on Home, which renders its own unified TopBar) */}
         {activeNav !== 'home' && (
           <header className="lg:hidden h-14 bg-[#F4EEDF] border-b border-[#D8CCB7] px-4 flex items-center justify-between shrink-0 z-30">

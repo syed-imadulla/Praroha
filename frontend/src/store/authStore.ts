@@ -3,7 +3,6 @@ import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from '../realtime/supabaseRealtime';
 import { useWorkspaceStore } from './workspaceStore';
 import { projectSubscription } from '../realtime/projectSubscription';
-import { apiClient } from '../api/client';
 
 export type AuthStatus = 'AUTH_LOADING' | 'AUTHENTICATED' | 'UNAUTHENTICATED';
 
@@ -13,17 +12,26 @@ interface AuthState {
   session: Session | null;
   error: string | null;
   sessionExpiredMessage: string | null;
+  isPasswordRecovery: boolean;
 
   initAuth: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signUp: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string; unconfirmedEmail?: boolean }>;
+  signUp: (email: string, password: string) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean }>;
   signOut: () => Promise<void>;
+  resendVerificationEmail: (email: string) => Promise<{ success: boolean; error?: string }>;
+  resetPasswordForEmail: (email: string) => Promise<{ success: boolean; error?: string }>;
+  updateUserPassword: (password: string) => Promise<{ success: boolean; error?: string }>;
   handleSessionExpired: () => void;
+  continueAsGuest: () => void;
   clearError: () => void;
+  clearPasswordRecovery: () => void;
 }
 
 function formatAuthError(errMessage: string): string {
   const lower = errMessage.toLowerCase();
+  if (lower.includes('email not confirmed') || lower.includes('not confirmed')) {
+    return 'Please verify your email address before signing in. Check your inbox for the confirmation link.';
+  }
   if (lower.includes('invalid login credentials') || lower.includes('invalid credentials')) {
     return 'Email or password is incorrect.';
   }
@@ -31,23 +39,24 @@ function formatAuthError(errMessage: string): string {
     return 'An account with this email already exists.';
   }
   if (lower.includes('password') && (lower.includes('least') || lower.includes('weak') || lower.includes('short'))) {
-    return 'Please choose a stronger password.';
+    return 'Please choose a password with at least 6 characters.';
   }
   if (lower.includes('rate limit') || lower.includes('email limit') || lower.includes('too many requests')) {
-    return 'Too many sign-up attempts. Please wait a moment and try again.';
+    return 'Too many attempts. Please wait a moment and try again.';
   }
   if (lower.includes('network') || lower.includes('fetch') || lower.includes('timeout')) {
-    return 'Something went wrong. Please try again.';
+    return 'Connection error. Please check your network and try again.';
   }
   return errMessage || 'Something went wrong. Please try again.';
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   authStatus: 'AUTH_LOADING',
   user: null,
   session: null,
   error: null,
   sessionExpiredMessage: null,
+  isPasswordRecovery: false,
 
   initAuth: async () => {
     if (!supabase) {
@@ -57,17 +66,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     try {
+      // Check if URL has recovery hash
+      if (typeof window !== 'undefined' && window.location.hash.includes('type=recovery')) {
+        set({ isPasswordRecovery: true });
+      }
+
+      if (useAuthStore.getState().authStatus === 'AUTHENTICATED') {
+        return;
+      }
+
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error('[Auth] Error getting initial session:', error);
         set({ authStatus: 'UNAUTHENTICATED', user: null, session: null });
       } else if (session?.user) {
-        set({
-          authStatus: 'AUTHENTICATED',
-          user: session.user,
-          session,
-          sessionExpiredMessage: null,
-        });
+        // Enforce email verification check: if user has unconfirmed email, treat as unauthenticated
+        const isEmailConfirmed = Boolean(
+          session.user.email_confirmed_at || session.user.confirmed_at
+        );
+        if (!isEmailConfirmed && session.user.app_metadata?.provider === 'email') {
+          console.warn('[Auth] User email not yet confirmed.');
+          set({
+            authStatus: 'UNAUTHENTICATED',
+            user: session.user,
+            session: null,
+            error: 'Please verify your email before accessing your workspace.',
+          });
+        } else {
+          set({
+            authStatus: 'AUTHENTICATED',
+            user: session.user,
+            session,
+            sessionExpiredMessage: null,
+          });
+        }
       } else {
         set({ authStatus: 'UNAUTHENTICATED', user: null, session: null });
       }
@@ -75,7 +107,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Listen for all auth state changes
       supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
         console.log(`[Auth] State change event: ${event}`);
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        if (event === 'PASSWORD_RECOVERY') {
+          set({ isPasswordRecovery: true });
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           if (session?.user) {
             set({
               authStatus: 'AUTHENTICATED',
@@ -95,6 +129,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             user: null,
             session: null,
             error: null,
+            isPasswordRecovery: false,
           });
         }
       });
@@ -117,8 +152,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (error) {
         const friendlyMsg = formatAuthError(error.message);
+        const isUnconfirmed = error.message.toLowerCase().includes('not confirmed');
         set({ error: friendlyMsg });
-        return { success: false, error: friendlyMsg };
+        return { success: false, error: friendlyMsg, unconfirmedEmail: isUnconfirmed };
+      }
+
+      // Check if email confirmed
+      const isConfirmed = Boolean(
+        data.user?.email_confirmed_at || data.user?.confirmed_at
+      );
+      if (!isConfirmed && data.user?.app_metadata?.provider === 'email') {
+        await supabase.auth.signOut();
+        const msg = 'Please verify your email address before signing in.';
+        set({ error: msg, authStatus: 'UNAUTHENTICATED' });
+        return { success: false, error: msg, unconfirmedEmail: true };
       }
 
       set({
@@ -144,29 +191,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const trimmedEmail = email.trim();
 
     try {
-      // 1. Server-side pre-confirmed creation to bypass Supabase public SMTP email rate limit
-      const apiRes = await apiClient.signUp(trimmedEmail, password);
-      if (apiRes.success) {
-        // Automatically sign in the user now that the account is pre-confirmed
-        const loginRes = await get().signIn(trimmedEmail, password);
-        return loginRes;
-      }
-
-      // If backend returned a specific error (e.g. account already exists)
-      if (apiRes.error?.message) {
-        const friendlyMsg = formatAuthError(apiRes.error.message);
-        set({ error: friendlyMsg });
-        return { success: false, error: friendlyMsg };
-      }
-    } catch (apiErr) {
-      console.warn('[Auth] Server-side signup attempt failed, falling back to direct client signup:', apiErr);
-    }
-
-    // 2. Direct client fallback
-    try {
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
         password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
       });
 
       if (error) {
@@ -175,24 +206,89 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { success: false, error: friendlyMsg };
       }
 
-      if (data.session) {
-        set({
-          authStatus: 'AUTHENTICATED',
-          user: data.user,
-          session: data.session,
-          error: null,
-        });
-      } else {
+      // If user signed up and email is not yet confirmed, require verification
+      const isConfirmed = Boolean(
+        data.user?.email_confirmed_at || data.user?.confirmed_at
+      );
+
+      if (!isConfirmed || !data.session) {
         return {
           success: true,
-          error: 'Account created! Please sign in with your credentials.',
+          requiresVerification: true,
         };
       }
-      return { success: true };
+
+      // If already confirmed (or auto-confirm configured on provider)
+      set({
+        authStatus: 'AUTHENTICATED',
+        user: data.user,
+        session: data.session,
+        error: null,
+      });
+      return { success: true, requiresVerification: false };
     } catch (err: any) {
       const msg = formatAuthError(err?.message || 'Sign up failed.');
       set({ error: msg });
       return { success: false, error: msg };
+    }
+  },
+
+  resendVerificationEmail: async (email: string) => {
+    if (!supabase) {
+      return { success: false, error: 'Authentication service not available.' };
+    }
+    try {
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim(),
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      });
+      if (error) {
+        return { success: false, error: formatAuthError(error.message) };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: formatAuthError(err?.message || 'Failed to resend verification email.') };
+    }
+  },
+
+  resetPasswordForEmail: async (email: string) => {
+    if (!supabase) {
+      return { success: false, error: 'Authentication service not available.' };
+    }
+    try {
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/#type=recovery` : undefined;
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: redirectUrl,
+      });
+      if (error) {
+        return { success: false, error: formatAuthError(error.message) };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: formatAuthError(err?.message || 'Failed to send password reset email.') };
+    }
+  },
+
+  updateUserPassword: async (password: string) => {
+    if (!supabase) {
+      return { success: false, error: 'Authentication service not available.' };
+    }
+    try {
+      const { data, error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        return { success: false, error: formatAuthError(error.message) };
+      }
+      set({ isPasswordRecovery: false, error: null });
+      if (data.user) {
+        set({ user: data.user, authStatus: 'AUTHENTICATED' });
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: formatAuthError(err?.message || 'Failed to update password.') };
     }
   },
 
@@ -204,7 +300,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (err) {
       console.warn('[Auth] Error during Supabase signOut:', err);
     } finally {
-      // Complete cleanup of protected workspace and realtime state
       projectSubscription.disconnectAll();
       useWorkspaceStore.getState().resetWorkspace();
       if (typeof window !== 'undefined' && window.location.pathname !== '/') {
@@ -215,6 +310,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         session: null,
         error: null,
+        isPasswordRecovery: false,
       });
     }
   },
@@ -231,8 +327,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       session: null,
       error: null,
       sessionExpiredMessage: 'Your session has expired. Please sign in again.',
+      isPasswordRecovery: false,
+    });
+  },
+
+  continueAsGuest: () => {
+    set({
+      authStatus: 'AUTHENTICATED',
+      user: {
+        id: 'guest-creator',
+        email: 'guest@praroha.local',
+        email_confirmed_at: new Date().toISOString(),
+        app_metadata: { provider: 'guest' },
+        user_metadata: { is_guest: true },
+      } as any,
+      session: null,
+      error: null,
+      sessionExpiredMessage: null,
+      isPasswordRecovery: false,
     });
   },
 
   clearError: () => set({ error: null }),
+  clearPasswordRecovery: () => set({ isPasswordRecovery: false }),
 }));
+
+if (typeof window !== 'undefined') {
+  (window as any).__authStore = useAuthStore;
+}
+

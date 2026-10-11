@@ -100,10 +100,24 @@ class ApiClient {
     }
   }
 
-  async signUp(email: string, password: string): Promise<APIResponse<{ id: string; email: string }>> {
-    return this.request<{ id: string; email: string }>('/auth/signup', {
+  async signUp(email: string, password: string): Promise<APIResponse<{ id: string; email: string; requires_verification?: boolean }>> {
+    return this.request<{ id: string; email: string; requires_verification?: boolean }>('/auth/signup', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
+    });
+  }
+
+  async resendVerification(email: string): Promise<APIResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async recoverPassword(email: string): Promise<APIResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/auth/recover-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
     });
   }
 

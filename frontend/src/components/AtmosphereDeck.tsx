@@ -45,10 +45,18 @@ export const AtmosphereDeck: React.FC = () => {
 
   // Parse metadata if available
   let mood = 'ambient';
+  let isSynthetic = true;
+  let providerLabel = 'Synthetic Preview';
   try {
     if (activeAsset.metadata_json) {
       const parsed = JSON.parse(activeAsset.metadata_json);
       if (parsed.mood) mood = parsed.mood;
+      if (parsed.is_synthetic !== undefined) {
+        isSynthetic = parsed.is_synthetic;
+      } else {
+        isSynthetic = parsed.resolved_provider === 'mock';
+      }
+      providerLabel = parsed.provider_label || (isSynthetic ? 'Synthetic Preview' : (parsed.resolved_provider || 'Live Audio'));
     }
   } catch {
     // ignore
@@ -84,6 +92,16 @@ export const AtmosphereDeck: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#E2EBE2] text-[#294B3A] border border-[#BACBB8] min-h-[26px] inline-flex items-center">
                 Atmosphere Deck
+              </span>
+              <span
+                data-testid="atmosphere-deck-provider-badge"
+                className={`text-xs font-semibold px-2.5 py-1 rounded-full border min-h-[26px] inline-flex items-center ${
+                  isSynthetic
+                    ? 'bg-[#F2EBDD] border-[#D8CCB7] text-[#6E5D4F]'
+                    : 'bg-[#E2EBE2] border-[#BACBB8] text-[#294B3A]'
+                }`}
+              >
+                {providerLabel}
               </span>
               <span className="text-xs text-[#394840] font-semibold capitalize px-2.5 py-1 rounded-full bg-[#F2EBDD] border border-[#D8CCB7] min-h-[26px] inline-flex items-center">
                 {mood}

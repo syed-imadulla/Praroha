@@ -552,3 +552,110 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. Empirical proof of Seed A vs Seed B divergent outputs documented.
   2. 23-item Final Acceptance Criteria verified 100%.
   3. Production build succeeds and all regression suites pass.
+
+---
+
+## Milestone 5: PRAROHA — Production Product Completion
+
+### Phase 32: Product Audit & Production Foundation
+**Goal**: Perform a comprehensive forensic code and provider audit, resolve discrepancies between prototype records and physical source files, establish production configuration baselines, and enforce strict dependency ordering for Milestone 5.  
+**Depends on**: Milestone 4  
+**Requirements**: PROD-AUDIT-01, PROD-AUDIT-02  
+**Success Criteria**:
+  1. Full physical source code and test suite audit completed across all backend providers, services, models, and frontend stores.
+  2. Inconsistencies between prototype claims and real provider execution cataloged with clear separation of live vs mocked functionality.
+  3. Milestone 5 GSD tracking records established with clean dependency boundaries.  
+**Plans**: 1 plan (completed)
+- [x] **32-01-PLAN.md**: Forensic audit of existing source code, provider capabilities, auth screens, database persistence, and establishment of Milestone 5 foundation.
+
+---
+
+### Phase 33: Email Authentication & Account Security
+**Goal**: Implement a production-grade, secure email authentication lifecycle eliminating auto-confirm bypasses, with email verification, password reset, session persistence, and server-side project ownership.  
+**Depends on**: Phase 32  
+**Requirements**: PROD-AUTH-01, PROD-AUTH-02, PROD-AUTH-03, PROD-AUTH-04  
+**Success Criteria**:
+  1. New users register with email/password and must verify email before accessing protected creator features.
+  2. Forgot password and password reset flows work cleanly with secure redirect handling.
+  3. Session persistence survives page reloads and browser restarts; expired sessions trigger graceful re-authentication.
+  4. Server-side ownership prevents cross-user access; signing out purges workspace and realtime subscriptions cleanly.  
+**Plans**: 1 plan (completed)
+- [x] **33-01-PLAN.md**: Supabase email auth lifecycle, email verification enforcement, password reset modal flow, project ownership checks, and backend security test suite (`test_auth_security.py`).
+
+---
+
+### Phase 34: Atmospheric Audio Generation
+**Goal**: Audit and repair atmospheric soundscape generation to deliver genuine playable audio, validate external provider credentials, eliminate silent mock fallback in production, and ensure durable scene association.  
+**Depends on**: Phase 32  
+**Requirements**: PROD-AUDIO-01, PROD-AUDIO-02  
+**Success Criteria**:
+  1. Live provider generation requests produce valid audio with genuine MIME types (MP3/WAV) without silent synthetic tone fallback.
+  2. If credentials/credits are unavailable, UI explicitly displays honest unavailable status rather than masquerading mocks as AI output.
+  3. Generated audio persists to storage, associates to scene entities, and plays seamlessly across project reloads.  
+**Plans**: 1 plan (completed)
+- [x] **34-01-PLAN.md**: Modernize Hugging Face MusicGen router endpoint, official Stability AI text-to-audio integration, eliminate silent mock fallback in real mode, add UI provider status badges, and comprehensive test suite (`test_audio_generation.py`).
+
+---
+
+### Phase 35: Real Video Generation
+**Goal**: Establish a viable, genuine video generation route with background jobs, progress tracking, cost/duration guards, durable media storage, and playable video playback.  
+**Depends on**: Phase 32, Phase 34  
+**Requirements**: PROD-VIDEO-01, PROD-VIDEO-02  
+**Success Criteria**:
+  1. At least one genuinely accessible video generation integration produces valid, playable video content.
+  2. Long-running generations execute as background jobs with polling/realtime updates, timeouts, and failure reporting.
+  3. Clear distinction between real AI-generated video and static/composed previews; generated videos persist and reload cleanly.  
+**Plans**: 1 plan (completed)
+- [x] **35-01-PLAN.md**: Wan2.1 and Pyramid Flow router endpoints, timeout and retry handling, refuse silent mock fallback when unconfigured, add `[Synthetic Preview]` badge, and video test suite (`test_video_generation.py`).
+
+---
+
+### Phase 36: UI Reliability, Accessibility & Responsive Polish
+**Goal**: Deliver a polished, defect-free user experience across desktop, tablet, and mobile, preserving the PRAROHA botanical aesthetic while fixing interactive and navigational bugs.  
+**Depends on**: Phase 33, Phase 34, Phase 35  
+**Requirements**: PROD-UI-01, PROD-UI-02, PROD-UI-03  
+**Success Criteria**:
+  1. All 7 creative stages, modals, drawers, and menus operate without dead clicks, clipped text, or stale loading states.
+  2. Full responsive layouts verified across desktop, tablet, and mobile breakpoints with zero horizontal overflow and 44px min touch targets.
+  3. Keyboard navigation, focus states, and semantic accessibility verified across core creator flows.  
+**Plans**: 1 plan (completed)
+- [x] **36-01-PLAN.md**: Multi-viewport responsiveness audit (390px, 1024px, 1440px), E2E user journey automation (`test_phase31_10_journey.mjs`), and realtime multi-tab synchronization (`test_phase31_10_realtime.mjs`).
+
+---
+
+### Phase 37: PWA Installation & Offline Behaviour
+**Goal**: Implement Progressive Web App (PWA) capabilities including web app manifest, installable branding, service worker lifecycle, and honest offline app shell.  
+**Depends on**: Phase 36  
+**Requirements**: PROD-PWA-01, PROD-PWA-02, PROD-PWA-03  
+**Success Criteria**:
+  1. PRAROHA installs as a PWA on supported browsers with valid icons, theme colors, and standalone display.
+  2. Service worker caches app shell assets safely without caching authenticated user data or sensitive API requests.
+  3. Offline status is clearly communicated, explicitly explaining that generative AI and cloud persistence require an active connection.  
+**Plans**: 1 plan (completed)
+- [x] **37-01-PLAN.md**: `vite-plugin-pwa` integration, brand leaf icons (192x192, 512x512, maskable, apple-touch-icon), Workbox caching configuration, `OfflineBanner.tsx` component, and Playwright PWA verification (`test_phase37_pwa.mjs`).
+
+---
+
+### Phase 38: Production Deployment & Operational Readiness
+**Goal**: Create reproducible staging and production deployment configurations for frontend, backend, database, and persistent media storage with health checks and runbooks.  
+**Depends on**: Phase 33, Phase 34, Phase 35, Phase 37  
+**Requirements**: PROD-DEPLOY-01, PROD-DEPLOY-02, PROD-DEPLOY-03  
+**Success Criteria**:
+  1. Fully documented and tested deployment configurations for frontend, FastAPI backend, PostgreSQL, and media storage.
+  2. CORS, HTTPS, environment variables, health checks (`/api/health`), and rate limits configured and validated.
+  3. Operational runbooks created covering deployment, secret management, backups, and recovery procedures.  
+**Plans**: 1 plan (completed)
+- [x] **38-01-PLAN.md**: Multi-stage `Dockerfile.backend` and `Dockerfile.frontend`, production `docker-compose.prod.yml`, Nginx reverse proxy `deployment/nginx.conf`, environment template `.env.production.example`, runbook `docs/DEPLOYMENT.md`, and test suite (`test_production_config.py`).
+
+---
+
+### Phase 39: Full-System Verification & Release Documentation
+**Goal**: Execute comprehensive end-to-end verification across the entire production lifecycle and deliver final release documentation.  
+**Depends on**: Phases 32–38  
+**Requirements**: PROD-SYS-01, PROD-SYS-02, PROD-SYS-03  
+**Success Criteria**:
+  1. Complete automated test suite passes (backend pytest, frontend build, Playwright journeys).
+  2. Live user lifecycle verified from registration through world creation, media generation, and reload.
+  3. Comprehensive release documentation, API guides, and architecture references updated and verified.  
+**Plans**: 1 plan (completed)
+- [x] **39-01-PLAN.md**: Complete regression test execution (190 backend tests, clean PWA build, PWA audit, full creative journey E2E, multi-tab realtime isolation E2E), documentation updates (`README.md`, `PROJECT_RULES.md`, `.planning/`), and final release reporting.

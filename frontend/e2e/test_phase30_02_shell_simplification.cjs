@@ -14,6 +14,13 @@ const assert = require('assert');
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle');
 
+    // If AuthScreen is displayed, enter demo workspace
+    const guestBtn = page.locator('[data-testid="auth-guest-demo-btn"]');
+    if (await guestBtn.isVisible()) {
+      await guestBtn.click();
+      await page.waitForTimeout(500);
+    }
+
     // Load Canonical Demo universe
     await page.evaluate(async () => {
       if (window.__workspaceStore) {

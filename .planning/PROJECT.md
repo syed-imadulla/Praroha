@@ -72,6 +72,16 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [x] **Phase 31.10: Production E2E & Two-Tab Realtime Tests** — Automated Playwright tests with arbitrary non-canonical seeds and dual-browser-context realtime synchronization.
 - [x] **Phase 31.11: Final Full-System Audit & Live Verification** — Live dual-seed test (Seed A vs Seed B proof), multi-tab realtime proof, and milestone sign-off.
 
+### Milestone 5: PRAROHA — Production Product Completion (Active)
+- [ ] **Phase 32: Product Audit & Production Foundation** — Forensic audit, production environment baseline, and dependency ordering.
+- [ ] **Phase 33: Email Authentication & Account Security** — Real email registration, confirmation lifecycle, password reset, session recovery, and strict server-side ownership.
+- [ ] **Phase 34: Atmospheric Audio Generation** — Live playable atmospheric soundscapes, provider credential validation, honest status reporting, and scene persistence.
+- [ ] **Phase 35: Real Video Generation** — Genuinely accessible video generation route, background jobs, duration/cost controls, storage persistence, and playback.
+- [ ] **Phase 36: UI Reliability, Accessibility & Responsive Polish** — Comprehensive UI bug elimination, interactive flow validation across 6 viewports, touch target & focus compliance.
+- [ ] **Phase 37: PWA Installation & Offline Behaviour** — Valid web app manifest, service worker lifecycle, installation support, and honest offline app shell.
+- [ ] **Phase 38: Production Deployment & Operational Readiness** — Reproducible staging & production configuration, persistent storage, health checks, rate limiting, and runbooks.
+- [ ] **Phase 39: Full-System Verification & Release Documentation** — End-to-end user lifecycle verification, updated documentation, and deployment audit.
+
 ### Out of Scope (Milestone 2)
 - Autonomous multi-agent swarms (preserves human agency and single-creator focus).
 - Mandatory media generation (all media is progressive enhancement; core universe never fails on media error).

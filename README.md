@@ -75,15 +75,19 @@ The application's workflow stages are practical implementation steps demonstrati
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, Zustand, Framer Motion |
-| **Backend** | Python 3.10+, FastAPI, SQLModel, Pydantic v2 |
-| **Database** | SQLite / aiosqlite (local), Supabase PostgreSQL (cloud) |
+| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, Zustand, Framer Motion, `vite-plugin-pwa` |
+| **PWA** | Installable Web App Manifest, Service Worker (Workbox precache), Offline banner |
+| **Backend** | Python 3.11+, FastAPI, SQLModel, Pydantic v2, Uvicorn |
+| **Database** | SQLite / aiosqlite (local), Supabase / PostgreSQL (production cloud) |
+| **Object Storage** | Local filesystem (`./uploads`), Supabase Cloud Storage (`STORAGE_PROVIDER=supabase`) |
 | **Realtime** | Supabase Realtime broadcast channels |
+| **Authentication** | Supabase Auth (Email/Password, Email Verification, Password Reset, Guest Demo) |
 | **Text Generation** | Google Gemini (`gemini-3.1-flash-lite`, `gemini-flash-latest`) |
-| **Image Generation** | Pollinations.ai (Flux / Sana models) |
-| **Speech** | Edge-TTS (online neural speech) |
-| **Soundscape** | Stability AI Stable Audio 2 *(blocked — requires funded key)* |
-| **Music** | Hugging Face MusicGen *(blocked — requires dedicated endpoint)* |
+| **Image Generation** | Pollinations.ai (Flux / Sana models) with FLUX.1 schnell fallback |
+| **Speech & Voice** | Edge-TTS (online neural speech with 6 curated archetypes) |
+| **Atmospheric Audio** | Stability AI Stable Audio & Hugging Face MusicGen Router *(requires funded API tokens)* |
+| **Video Generation** | Pyramid Flow & Wan2.1 Router *(requires funded API tokens)* |
+| **Deployment** | Docker, Docker Compose, Nginx Alpine, HTTPS/TLS reverse proxy |
 
 ## Architecture
 
@@ -166,24 +170,25 @@ When a provider is unavailable, PRAROHA displays a clear error state. Setting `A
 
 See [docs/AI_PROVIDERS.md](docs/AI_PROVIDERS.md) for integration details and error handling.
 
-## Testing
+## Production Verification & Test Suite
 
-Historical regression results from the final hackathon audit:
+Milestone 5 complete verification battery:
 
-| Suite | Command | Result |
-| :--- | :--- | :--- |
-| Backend tests | `pytest backend/tests` | 182 passed, 1 skipped |
-| Frontend build | `npm --prefix frontend run build` | Clean (0 errors) |
-| Provider smoke test | `PYTHONPATH=. python3 backend/tests/smoke_test_providers.py` | Gemini, Pollinations, Edge-TTS verified |
-| E2E journey | `node frontend/e2e/test_phase31_10_journey.mjs` | All stages passed |
-| Realtime sync | `node frontend/e2e/test_phase31_10_realtime.mjs` | Multi-tab sync verified |
+| Suite | Command | Result | Duration |
+| :--- | :--- | :--- | :--- |
+| **Backend Tests** | `pytest backend/tests` | **190 passed**, 1 skipped | 26.19s |
+| **Frontend Production Build** | `npm --prefix frontend run build` | Clean (0 errors) | 12.21s |
+| **PWA Installation Audit** | `node frontend/e2e/test_phase37_pwa.mjs` | 100% Passed (Manifest, SW, Offline) | 3.12s |
+| **Full Creative Journey E2E** | `node frontend/e2e/test_phase31_10_journey.mjs` | 100% Passed (All 7 Stages) | 68.4s |
+| **Realtime Multi-Tab & Isolation** | `node frontend/e2e/test_phase31_10_realtime.mjs` | 100% Passed (Sync & Isolation) | 31.5s |
 
-See [docs/TESTING.md](docs/TESTING.md) for the full test ledger and instructions.
+See [docs/TESTING.md](docs/TESTING.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for execution and deployment instructions.
 
 ## Documentation
 
 - [Project Overview](docs/PROJECT_OVERVIEW.md) — Purpose, philosophy, workflow, and a detailed example.
 - [Architecture](docs/ARCHITECTURE.md) — System design, data model, request flow, and security.
+- [Production Deployment](docs/DEPLOYMENT.md) — Comprehensive runbooks, Docker Compose, Supabase setup, and backups.
 - [AI Providers](docs/AI_PROVIDERS.md) — Provider contracts, authentication, and limitations.
 - [Setup Guide](docs/SETUP.md) — Installation, configuration, and troubleshooting.
 - [Testing Report](docs/TESTING.md) — Test strategy, results, and execution instructions.

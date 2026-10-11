@@ -128,7 +128,7 @@ class ACEStepAudioProvider(AudioProvider):
             },
         }
 
-        url = self.endpoint or "https://router.huggingface.co/hf-inference/models/facebook/musicgen-small"
+        url = self.endpoint or "https://router.huggingface.co/models/facebook/musicgen-small"
 
         last_error: Optional[Exception] = None
         max_attempts = 3
@@ -147,6 +147,19 @@ class ACEStepAudioProvider(AudioProvider):
                         logger.info("ACE-Step model loading (503). Waiting %.1fs before attempt %d...", wait_time, attempt + 1)
                         await asyncio.sleep(wait_time)
                         continue
+
+                    if response.status_code == 401:
+                        raise ProviderUnavailableError(
+                            "Hugging Face API returned 401 Unauthorized: Valid HF_TOKEN required for serverless model inference"
+                        )
+                    if response.status_code == 403:
+                        raise ProviderUnavailableError(
+                            "Hugging Face API returned 403 Forbidden: Account lacks access permissions for this model"
+                        )
+                    if response.status_code == 429:
+                        raise ProviderUnavailableError(
+                            "Hugging Face API returned 429 Rate Limit Exceeded: Serverless quota reached"
+                        )
 
                     if response.status_code != 200:
                         raise ProviderUnavailableError(
@@ -201,6 +214,8 @@ class ACEStepAudioProvider(AudioProvider):
                         filename=f"acestep_{file_hash}{ext}",
                         metadata={
                             "resolved_provider": "ace-step",
+                            "provider_label": "ACE-Step 1.5",
+                            "is_synthetic": False,
                             "mood": mood,
                             "duration_sec": duration_sec,
                             "prompt": prompt,

@@ -123,9 +123,9 @@ async def test_stable_audio_provider_parameters():
 
         mock_post.assert_called_once()
         call_kwargs = mock_post.call_args.kwargs
-        assert call_kwargs["data"]["prompt"] == "Dramatic orchestral strings"
-        assert call_kwargs["data"]["duration"] == "20"
-        assert call_kwargs["data"]["output_format"] == "mp3"
+        assert call_kwargs["files"]["prompt"][1] == "Dramatic orchestral strings"
+        assert call_kwargs["files"]["duration"][1] == "20"
+        assert call_kwargs["files"]["output_format"][1] == "mp3"
         assert call_kwargs["headers"]["Authorization"] == "Bearer sk-stability-test"
 
         assert payload.metadata["resolved_provider"] == "stable-audio"

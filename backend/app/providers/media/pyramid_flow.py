@@ -69,31 +69,87 @@ class PyramidFlowProvider(VideoProvider):
             },
         }
 
-        url = self.endpoint or "https://api-inference.huggingface.co/models/pyr-flow/pyramid-flow"
-
-        try:
-            async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
-                response = await client.post(url, json=payload, headers=headers)
-                if response.status_code != 200:
-                    raise ProviderUnavailableError(
-                        f"Pyramid Flow API returned HTTP {response.status_code}: {response.text[:200]}"
-                    )
-                # Provider normalization: normalize binary or json response strictly to MediaPayload
-                content_type = response.headers.get("content-type", "")
-                if "video" in content_type or "octet-stream" in content_type:
-                    video_bytes = response.content
-                else:
-                    data = response.json()
-                    if isinstance(data, dict) and "video_base64" in data:
-                        video_bytes = base64.b64decode(data["video_base64"])
-                    elif isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict) and "blob" in data[0]:
-                        video_bytes = base64.b64decode(data[0]["blob"])
-                    else:
+        if self.endpoint:
+            url = self.endpoint
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
+                    response = await client.post(url, json=payload, headers=headers)
+                    if response.status_code == 401:
+                        raise ProviderUnavailableError(
+                            "Hugging Face API returned 401 Unauthorized: Valid HF_TOKEN required for video inference"
+                        )
+                    if response.status_code == 402:
+                        raise ProviderUnavailableError(
+                            "Hugging Face Inference Providers requires prepaid credits (HTTP 402): Account has no remaining inference credits"
+                        )
+                    if response.status_code == 403:
+                        raise ProviderUnavailableError(
+                            "Hugging Face API returned 403 Forbidden: Account lacks access permissions for video inference"
+                        )
+                    if response.status_code == 429:
+                        raise ProviderUnavailableError(
+                            "Hugging Face API returned 429 Rate Limit Exceeded: Serverless quota reached"
+                        )
+                    if response.status_code != 200:
+                        raise ProviderUnavailableError(
+                            f"Pyramid Flow API returned HTTP {response.status_code}: {response.text[:200]}"
+                        )
+                    # Provider normalization: normalize binary or json response strictly to MediaPayload
+                    content_type = response.headers.get("content-type", "")
+                    if "video" in content_type or "octet-stream" in content_type:
                         video_bytes = response.content
+                    else:
+                        data = response.json()
+                        if isinstance(data, dict) and "video_base64" in data:
+                            video_bytes = base64.b64decode(data["video_base64"])
+                        elif isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict) and "blob" in data[0]:
+                            video_bytes = base64.b64decode(data[0]["blob"])
+                        else:
+                            video_bytes = response.content
 
-        except (httpx.TimeoutException, httpx.RequestError) as net_err:
-            logger.warning("Pyramid Flow network error: %s (%s). Cascading to Tier 2.", type(net_err).__name__, net_err)
-            raise ProviderUnavailableError(f"Pyramid Flow network error: {net_err}") from net_err
+            except (httpx.TimeoutException, httpx.RequestError) as net_err:
+                logger.warning("Pyramid Flow network error: %s (%s). Cascading to Tier 2.", type(net_err).__name__, net_err)
+                raise ProviderUnavailableError(f"Pyramid Flow network error: {net_err}") from net_err
+        else:
+            # Modern official Hugging Face Inference Providers route
+            try:
+                from huggingface_hub import AsyncInferenceClient
+                from huggingface_hub.errors import HfHubHTTPError
+                client = AsyncInferenceClient(token=self.hf_token, timeout=self.timeout_sec)
+                video_bytes = await client.text_to_video(
+                    prompt=prompt,
+                    model="Wan-AI/Wan2.1-T2V-1.3B",
+                    num_frames=16,
+                )
+            except HfHubHTTPError as hf_err:
+                status = (
+                    hf_err.response.status_code
+                    if hasattr(hf_err, "response") and hf_err.response is not None
+                    else None
+                )
+                if status == 401:
+                    raise ProviderUnavailableError(
+                        "Hugging Face API returned 401 Unauthorized: Valid HF_TOKEN required for video inference"
+                    )
+                elif status == 402:
+                    raise ProviderUnavailableError(
+                        "Hugging Face account has insufficient inference credits (HTTP 402): Purchase pre-paid credits to continue using Inference Providers."
+                    )
+                elif status == 403:
+                    raise ProviderUnavailableError(
+                        "Hugging Face API returned 403 Forbidden: Account lacks permissions for video inference"
+                    )
+                elif status == 429:
+                    raise ProviderUnavailableError("Hugging Face API returned 429 Rate Limit Exceeded")
+                else:
+                    raise ProviderUnavailableError(
+                        f"Hugging Face Inference Provider error (HTTP {status}): {hf_err}"
+                    ) from hf_err
+            except (ProviderUnavailableError, Exception) as gen_err:
+                if isinstance(gen_err, ProviderUnavailableError):
+                    raise
+                logger.warning("Hugging Face video generation error: %s (%s). Cascading to Tier 2.", type(gen_err).__name__, gen_err)
+                raise ProviderUnavailableError(f"Hugging Face video inference failed: {gen_err}") from gen_err
 
         file_hash = hashlib.md5(f"{prompt}_{duration_sec}".encode("utf-8")).hexdigest()[:10]
         return MediaPayload(
@@ -102,6 +158,8 @@ class PyramidFlowProvider(VideoProvider):
             filename=f"pyramid_{file_hash}.mp4",
             metadata={
                 "resolved_provider": "pyramid-flow",
+                "provider_label": "Pyramid Flow",
+                "is_synthetic": False,
                 "duration_sec": duration_sec,
                 "aspect_ratio": aspect_ratio,
                 "resolution": "720p",

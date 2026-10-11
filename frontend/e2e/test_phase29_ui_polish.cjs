@@ -16,8 +16,18 @@ async function runPhase29PolishAudit() {
     console.log('1. Navigating to application & initializing Canonical Demo...');
     await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
 
+    // Authenticate test session into the application
+    const guestBtn = page.locator('[data-testid="auth-guest-demo-btn"]');
+    if (await guestBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await guestBtn.click();
+      await page.waitForTimeout(500);
+    }
+
     // Atomically load canonical demo via store
     await page.evaluate(async () => {
+      if (window.__authStore) {
+        window.__authStore.getState().continueAsGuest();
+      }
       if (window.__workspaceStore) {
         await window.__workspaceStore.getState().loadCanonicalDemoUniverse();
       }

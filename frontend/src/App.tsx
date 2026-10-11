@@ -10,6 +10,7 @@ import { CreationCard, CreationItem } from './components/creation';
 import { useAuthStore } from './store/authStore';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { ProfileSettingsView } from './components/profile/ProfileSettingsView';
+import { OfflineBanner } from './components/OfflineBanner';
 
 export const App: React.FC = () => {
   const [selectedCreationToast, setSelectedCreationToast] = useState<string | null>(null);
@@ -159,7 +160,14 @@ export const App: React.FC = () => {
   }
 
   if (authStatus === 'UNAUTHENTICATED') {
-    return <AuthScreen />;
+    return (
+      <div className="flex flex-col h-screen w-screen overflow-hidden">
+        <OfflineBanner />
+        <div className="flex-1 overflow-auto">
+          <AuthScreen />
+        </div>
+      </div>
+    );
   }
 
   if (isHydrating) {

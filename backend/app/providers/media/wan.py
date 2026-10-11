@@ -93,6 +93,8 @@ class WanVideoProvider(VideoProvider):
             filename=f"wan_{file_hash}.mp4",
             metadata={
                 "resolved_provider": "wan2.1",
+                "provider_label": "Wan 2.1",
+                "is_synthetic": False,
                 "duration_sec": duration_sec,
                 "aspect_ratio": aspect_ratio,
                 "resolution": "720p",

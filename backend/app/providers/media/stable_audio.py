@@ -83,17 +83,17 @@ class StableAudioOpenProvider(AudioProvider):
 
         # Clamped to documented bounds: 5s to 190s
         clamped_duration = str(min(max(duration_sec, 5), 190))
-        form_data = {
-            "prompt": prompt,
-            "duration": clamped_duration,
-            "output_format": "mp3",
-        }
 
         try:
             async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
                 if is_official_api:
-                    # Official Stability AI v2beta Stable Audio 2 API uses multipart/form-data
-                    response = await client.post(url, data=form_data, headers=headers)
+                    # Official Stability AI v2beta Stable Audio 2 API requires multipart/form-data
+                    multipart_fields = {
+                        "prompt": (None, prompt),
+                        "duration": (None, clamped_duration),
+                        "output_format": (None, "mp3"),
+                    }
+                    response = await client.post(url, files=multipart_fields, headers=headers)
                 else:
                     # Self-hosted / custom endpoints may accept JSON
                     response = await client.post(
@@ -160,6 +160,8 @@ class StableAudioOpenProvider(AudioProvider):
                     filename=f"stable_audio_{file_hash}{ext}",
                     metadata={
                         "resolved_provider": "stable-audio",
+                        "provider_label": "Stable Audio 2",
+                        "is_synthetic": False,
                         "mood": mood,
                         "duration_sec": int(clamped_duration),
                         "prompt": prompt,
