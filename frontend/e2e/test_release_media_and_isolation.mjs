@@ -4,7 +4,7 @@ import assert from 'assert';
 
 const SUPABASE_URL = 'https://stxnxkzaftmwcbtvgzbm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Bds6tNvkx3jLLAuG7OhSeg_HS60imCp';
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = process.env.API_BASE || 'http://localhost:8000/api';
 
 const USER_A_EMAIL = 'user_a@praroha.local';
 const USER_A_PASSWORD = 'Password123!';

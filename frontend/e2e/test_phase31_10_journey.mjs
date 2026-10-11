@@ -6,7 +6,7 @@ import pathModule from 'node:path';
 const ARTIFACT_DIR = '/home/syed-imadulla/.gemini/antigravity-ide/brain/bb18073e-cdbd-41bf-8ba3-4ed3deaaaaa4';
 const SUPABASE_URL = 'https://stxnxkzaftmwcbtvgzbm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Bds6tNvkx3jLLAuG7OhSeg_HS60imCp';
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = process.env.API_BASE || 'http://localhost:8000/api';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5174';
 
 const TEST_EMAIL = 'user_a@praroha.local';
@@ -116,6 +116,13 @@ async function run() {
   page.on('console', msg => {
     if (msg.type() === 'error') console.log('   [CONSOLE ERROR]:', msg.text());
   });
+
+  // Pre-seed authenticated Supabase session into browser localStorage
+  const supaHost = new URL(SUPABASE_URL).hostname.split('.')[0];
+  const storageKey = `sb-${supaHost}-auth-token`;
+  await page.addInitScript(({ key, session }) => {
+    window.localStorage.setItem(key, JSON.stringify(session));
+  }, { key: storageKey, session: auth.session });
 
   // Navigate to project workspace
   await page.goto(`${FRONTEND_URL}/projects/${projectId}`);

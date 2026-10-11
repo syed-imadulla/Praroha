@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     STORAGE_PROVIDER: str = "local"  # options: local, supabase
     DATABASE_URL: str = "sqlite+aiosqlite:///./seed_unfold.db"
     UPLOAD_DIR: str = "./uploads"
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS: Any = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5174",

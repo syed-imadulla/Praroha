@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1791485162.643951,
-    "seen": 1791485944.7536385,
-    "ast_hash": "44553f93d1b2e6af5f5084c6e8e28eaf",
+    "mtime": 1791733364.7646446,
+    "seen": 1791733682.567498,
+    "ast_hash": "b6bf0a9f85e45a6d75c5880d1474d866",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1791513949.065251,
-    "seen": 1791514502.1279852,
-    "ast_hash": "198428ad882dbe6b933a7b05451a199c",
+    "mtime": 1791733350.0987291,
+    "seen": 1791733682.5676322,
+    "ast_hash": "789b1f216ee48a0f131910d891adc4cb",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791714841.3949127,
-    "seen": 1791714938.6118257,
-    "ast_hash": "ea4e8476f00aa17d9ec991035cbad8ad",
+    "mtime": 1791733334.566819,
+    "seen": 1791733682.5679324,
+    "ast_hash": "e018b5665e12b653e4c1d50f10be68bd",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -222,15 +222,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791651866.9288168,
-    "seen": 1791651967.5857182,
-    "ast_hash": "d664ada97354fdb9890f805ce0a22bc8",
+    "mtime": 1791733586.5362892,
+    "seen": 1791733682.5681067,
+    "ast_hash": "c47540f961321ebbe2f70bb86084e73e",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791713721.2659175,
-    "seen": 1791714418.3882973,
-    "ast_hash": "c1e7c4b89d797b009dc7370af06c87e9",
+    "mtime": 1791733600.3562043,
+    "seen": 1791733682.568109,
+    "ast_hash": "62cae32abc6bbf9963c8825c8641dd35",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -2400,9 +2400,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_generation_jobs.py": {
-    "mtime": 1791470225.7657473,
-    "seen": 1791481179.786666,
-    "ast_hash": "023ae9b0a9310e9ec0f67946c84fe46d",
+    "mtime": 1791733386.7895174,
+    "seen": 1791733682.5677316,
+    "ast_hash": "7b1786c98fd13203ff2ddad60907bf04",
     "semantic_hash": ""
   },
   "backend/tests/test_projects_lifecycle.py": {
@@ -2808,9 +2808,9 @@
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT.md": {
-    "mtime": 1791714916.6783998,
-    "seen": 1791714938.6121893,
-    "ast_hash": "e57fbfc9f9c1eb00e2ac1c372dd4afe6",
+    "mtime": 1791733631.5530124,
+    "seen": 1791733682.568458,
+    "ast_hash": "a0ef834fc2529d478cdae0ad1bbf2088",
     "semantic_hash": ""
   },
   "docs/assets/brand-dark.svg": {
@@ -2949,6 +2949,24 @@
     "mtime": 1791713919.3458004,
     "seen": 1791714418.3884935,
     "ast_hash": "712e65ee9a70eeb9c6e87892864a46de",
+    "semantic_hash": ""
+  },
+  "frontend/vercel.json": {
+    "mtime": 1791733413.587029,
+    "seen": 1791733682.5680804,
+    "ast_hash": "b35edbfa0d9a1fe36a1a855bf05a7a17",
+    "semantic_hash": ""
+  },
+  ".planning/phases/40-production-cloud-deployment/40-01-PLAN.md": {
+    "mtime": 1791733548.7035065,
+    "seen": 1791733682.5684454,
+    "ast_hash": "af3b2c6d3489c5b00c0435d13c36f3b6",
+    "semantic_hash": ""
+  },
+  ".planning/phases/40-production-cloud-deployment/40-CONTEXT.md": {
+    "mtime": 1791733559.5204477,
+    "seen": 1791733682.5684462,
+    "ast_hash": "15831b4e33f4dd61897888c176dd2542",
     "semantic_hash": ""
   }
 }

@@ -1,0 +1,10 @@
+node_modules
+.git
+.pytest_cache
+.venv
+__pycache__
+*.pyc
+*.pyo
+dist
+build
+.planning

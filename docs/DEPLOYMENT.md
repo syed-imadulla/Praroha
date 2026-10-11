@@ -4,6 +4,37 @@ This guide covers deploying PRAROHA as a scalable, reliable production product w
 
 ---
 
+## Live Cloud Production Deployment (Active)
+
+PRAROHA is actively deployed and verified live in production on a decoupled serverless/containerized cloud architecture:
+
+| Component | Cloud Platform | Live Production URL | Health / Verification |
+| :--- | :--- | :--- | :--- |
+| **Frontend (PWA)** | **Vercel Edge** | [`https://frontend-iota-green-73.vercel.app`](https://frontend-iota-green-73.vercel.app) | **Live & Verified** (HTTPS, Service Worker active) |
+| **Backend API** | **Azure Container Apps** | [`https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io`](https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io) | **Live & Verified** (`/api/health` 200 OK) |
+| **Database** | **Supabase PostgreSQL** | `https://stxnxkzaftmwcbtvgzbm.supabase.co` | **Live & Connected** (Session Pooler) |
+| **Authentication** | **Supabase Auth** | `https://stxnxkzaftmwcbtvgzbm.supabase.co` | **Live & Configured** (Email Auth & JWT) |
+| **Media Storage** | **Supabase Storage** | Bucket: `seed-unfold-assets` | **Live & Connected** (Persistent storage) |
+| **Realtime Sync** | **Supabase Realtime** | `wss://stxnxkzaftmwcbtvgzbm.supabase.co/realtime/v1` | **Live & Connected** (WebSockets) |
+
+### Active Cloud Architecture
+
+```mermaid
+graph TD
+    User([Browser / Mobile PWA]) -->|HTTPS: frontend-iota-green-73.vercel.app| Vercel[Vercel Edge CDN - Frontend SPA / PWA]
+    User -->|Supabase JWT / Auth| SupaAuth[Supabase Auth Service]
+    User -->|WebSockets: Realtime Events| SupaRT[Supabase Realtime Engine]
+    Vercel -->|REST API: /api/*| AzureACA[Azure Container Apps - FastAPI Backend]
+    AzureACA -->|Async SQLModel / asyncpg| SupaDB[(Supabase PostgreSQL Session Pooler)]
+    AzureACA -->|Asset Persistence: WAV/MP4/JPEG| SupaStorage[Supabase Object Storage: seed-unfold-assets]
+    AzureACA -->|Seed DNA & Worlds| Gemini[Google Gemini 3.1 Flash]
+    AzureACA -->|Character Dialogue Voice| EdgeTTS[Edge-TTS Neural Voice]
+    AzureACA -->|Concept Art Visuals| Pollinations[Pollinations.ai Free Tier]
+    AzureACA -->|Cinematic Video Preview| JSON2Video[JSON2Video Preview Engine]
+```
+
+---
+
 ## 1. System Architecture
 
 ```mermaid

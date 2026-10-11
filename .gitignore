@@ -57,6 +57,9 @@ frontend/dev-dist/
 .env
 .env.local
 .env.*.local
+.env.production
+.env*.production
+.vercel/
 
 # IDE
 .vscode/

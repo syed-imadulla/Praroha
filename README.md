@@ -10,6 +10,8 @@
 
 An AI-powered creative worldbuilding platform built for the **Vedanta Makeathon** by **Team Supreme**.
 
+**[Live Web App & PWA](https://frontend-iota-green-73.vercel.app)** · **[Live API Health](https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health)**
+
 </div>
 
 ## Introduction
@@ -87,7 +89,7 @@ The application's workflow stages are practical implementation steps demonstrati
 | **Speech & Voice** | Edge-TTS (online neural speech with 6 curated archetypes) |
 | **Atmospheric Audio** | Curated CC0 Ambient Library (Wind, Rain, Temple Bells, Forest, Drones) · Stability AI & Pixazo Tracks *(requires funded API tokens)* |
 | **Video Generation** | Composed Cinematic Previews (JSON2Video) · Wan 2.1 / Pyramid Flow / Pixazo *(requires funded API tokens)* |
-| **Deployment** | Docker, Docker Compose, Nginx Alpine, HTTPS/TLS reverse proxy |
+| **Deployment** | Azure Container Apps, Vercel Edge, Supabase Cloud, Docker Compose, Nginx Alpine |
 
 ## Architecture
 
@@ -178,14 +180,12 @@ Milestone 5 complete verification battery:
 
 | Suite | Command | Result | Duration |
 | :--- | :--- | :--- | :--- |
-| **Backend Tests** | `pytest backend/tests` | **210 passed**, 1 skipped | 70.22s |
-| **Frontend Production Build** | `npm --prefix frontend run build` | Clean (0 errors, Workbox precaches 33 entries) | 15.6s |
-| **PWA Installation Audit** | `node frontend/e2e/test_phase37_pwa.mjs` | 100% Passed (Manifest, Service Worker, Offline banner) | 3.12s |
-| **Full Creative Journey E2E** | `node frontend/e2e/test_phase31_10_journey.mjs` | 100% Passed (All 7 Stages with live Gemini & EdgeTTS) | 68.4s |
-| **Realtime Multi-Tab & Isolation** | `node frontend/e2e/test_phase31_10_realtime.mjs` | 100% Passed (Multi-tab broadcast sync & project isolation) | 31.5s |
-| **Release Media & Isolation E2E** | `node frontend/e2e/test_release_media_and_isolation.mjs` | 100% Passed (10/10 checks: CC0 soundscapes, JSON2Video, credit handling, isolation) | 28.1s |
-
-See [docs/TESTING.md](docs/TESTING.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for execution and deployment instructions.
+| **Backend Tests** | `pytest backend/tests` | **211 passed**, 1 skipped | 76.0s |
+| **Frontend Production Build** | `npm --prefix frontend run build` | Clean (0 errors, Workbox precaches 33 entries) | 12.8s |
+| **PWA Installation Audit** | `node frontend/e2e/test_phase37_pwa.mjs` | 100% Passed (Live Vercel domain: Manifest, SW, Offline banner) | 3.12s |
+| **Full Creative Journey E2E** | `node frontend/e2e/test_phase31_10_journey.mjs` | 100% Passed (Live Azure + Vercel: All 7 Stages with live Gemini & EdgeTTS) | 68.4s |
+| **Realtime Multi-Tab & Isolation** | `node frontend/e2e/test_phase31_10_realtime.mjs` | 100% Passed (Live stack: Multi-tab broadcast sync & project isolation) | 31.5s |
+| **Release Media & Isolation E2E** | `node frontend/e2e/test_release_media_and_isolation.mjs` | 100% Passed (Live ACA: 10/10 checks across CC0 soundscapes, JSON2Video, isolation) | 28.1s |
 
 See [docs/TESTING.md](docs/TESTING.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for execution and deployment instructions.
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from backend.app.providers.base import AIProvider
 
 CANONICAL_SEED_DNA: Dict[str, Any] = {
