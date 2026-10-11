@@ -1,6 +1,6 @@
 # Phase 38 Verification: Production Deployment Configuration & Operational Readiness
 
-## Verification Status: PASSED
+## Verification Status: LOCAL CONTAINER AUDIT PASSED (Awaiting Cloud VM Provisioning for Public URL)
 
 ### 1. Requirements Checklist
 - [x] **PROD-DEP-01**: Reproducible containerization configurations provided for frontend (`Dockerfile.frontend`) and backend (`Dockerfile.backend`) with health checks and non-root execution. (Verified)
@@ -24,3 +24,9 @@
   - Evaluated Single-Host Docker Compose vs. Decoupled PaaS in `docs/DEPLOYMENT.md`.
   - Documented free-tier operational risks: Render sleeping after 15m (50s cold start), 100s HTTP timeout ceiling, background media job aborts on sleep, and memory limits (512MB RAM).
   - Recommended Unified Docker Compose on persistent VM (e.g. Oracle Cloud Always Free 4 OCPU/24GB RAM or low-cost VPS) for 24/7 background worker safety and unified-origin routing.
+
+### 3. Cloud Provisioning Gate (Release Condition)
+- **Status**: Local/staging container architecture is verified and production-ready.
+- **Rule**: Per release gating rules, production deployment is NOT marked complete for public release until deployed to a live cloud host and verified over HTTPS.
+- **Next Step**: Awaiting user authorisation / provisioning of cloud VM (or Cloudflare Tunnel ingress) to execute remote deploy, HTTPS termination, and live browser sign-off.
+

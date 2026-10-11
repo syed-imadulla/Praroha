@@ -58,11 +58,60 @@ Choosing the appropriate hosting architecture requires balancing infrastructure 
 
 Recommended for reliable production deployments on Ubuntu 22.04+ (Hetzner, DigitalOcean Droplet, AWS EC2, Linode, or Oracle Cloud Always Free).
 
-#### 1. Server Provisioning & Prerequisites
-Install Docker Engine and Docker Compose V2 on the host:
+#### 1. Free Cloud VM Provisioning & Hardware Architecture
+
+##### Eligible Free Cloud Tiers
+| Cloud Provider | Instance Shape | Architecture | CPU & RAM | Disk | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Oracle Cloud Always Free (Recommended)** | `VM.Standard.A1.Flex` | **ARM64 (aarch64)** | 4 OCPU, 24 GB RAM | 200 GB | Highest free headroom. Zero cold starts, handles PCM audio & image encoding effortlessly. |
+| **Oracle Cloud Always Free (AMD)** | `VM.Standard.E2.1.Micro` | **x86_64 (amd64)** | 1 OCPU, 1 GB RAM | 50 GB | Requires 2GB swap file setup. |
+| **Google Cloud Free Tier** | `e2-micro` | **x86_64 (amd64)** | 0.25–2 vCPU, 1 GB RAM | 30 GB | Eligible in us-central1, us-west1, or us-east1. |
+| **AWS Free Tier (12-Mo Trial)** | `t2.micro` / `t4g.small` | x86_64 / arm64 | 1–2 vCPU, 1–2 GB RAM | 30 GB EBS | Requires 2GB swap file. |
+
+##### Container Architecture Compatibility
+- **AMD64 (`x86_64`)**: Native build on standard Intel/AMD VMs. No modifications needed.
+- **ARM64 (`aarch64`)**: Fully compatible.
+  - `python:3.11-slim`, `node:20-alpine`, and `nginx:1.25-alpine` provide official multi-arch images.
+  - Python dependencies in `backend/requirements.txt` (`asyncpg`, `uvloop`, `pydantic-core`) publish pre-compiled `manylinux_aarch64` wheels on PyPI.
+  - If building directly on an ARM64 host, run standard `docker compose up -d --build`.
+  - If cross-building on x86 for an ARM64 VM, use Docker Buildx:
+    ```bash
+    docker buildx build --platform linux/arm64 -f Dockerfile.backend -t praroha-backend:arm64 .
+    docker buildx build --platform linux/arm64 -f Dockerfile.frontend -t praroha-frontend:arm64 .
+    ```
+
+##### Network & Firewall Ingress Rules
+Configure cloud security lists and OS-level firewall rules:
+- **Port 22 (SSH)**: Allow from administrator IP only (or zero-trust access via Cloudflare Access).
+- **Port 80 (HTTP)**: Allow `0.0.0.0/0` (required for ACME Let's Encrypt challenges and HTTP $\rightarrow$ HTTPS redirects).
+- **Port 443 (HTTPS)**: Allow `0.0.0.0/0` (public encrypted application traffic).
+- **Port 8000 (Backend API)**: **DENY / CLOSED to public internet** (internal Docker network only).
+- **Port 5432 (Postgres DB)**: **DENY / CLOSED to public internet** (internal Docker network only).
+
+On Ubuntu/Debian hosts, enforce with UFW:
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+```
+
+##### Host Swap Memory Configuration (for 1GB–2GB RAM VMs)
+```bash
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+##### Prerequisites Installation
 ```bash
 sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2 git jq
 sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
 ```
 
 #### 2. Clone the Repository & Workspace Setup

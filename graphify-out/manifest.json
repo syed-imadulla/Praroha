@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1791712418.4329634,
-    "seen": 1791713593.1263523,
-    "ast_hash": "7293a4716eadd22ab44965697883d0f9",
+    "mtime": 1791714841.3949127,
+    "seen": 1791714938.6118257,
+    "ast_hash": "ea4e8476f00aa17d9ec991035cbad8ad",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -2778,9 +2778,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/38-production-deployment/38-VERIFICATION.md": {
-    "mtime": 1791714387.2700064,
-    "seen": 1791714418.3884902,
-    "ast_hash": "d31b35a47d7de113e3c793650783e192",
+    "mtime": 1791714898.2545252,
+    "seen": 1791714938.6121747,
+    "ast_hash": "e9fcd4890a91d747eaaf05c12352c4b5",
     "semantic_hash": ""
   },
   ".planning/phases/39-system-verification/39-01-PLAN.md": {
@@ -2808,9 +2808,9 @@
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT.md": {
-    "mtime": 1791714353.4472368,
-    "seen": 1791714418.3885028,
-    "ast_hash": "397f5f4a4d47ba5c84069ba371e5319e",
+    "mtime": 1791714916.6783998,
+    "seen": 1791714938.6121893,
+    "ast_hash": "e57fbfc9f9c1eb00e2ac1c372dd4afe6",
     "semantic_hash": ""
   },
   "docs/assets/brand-dark.svg": {
