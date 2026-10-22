@@ -80,9 +80,15 @@ class CinematicPreviewComposer:
     Assembles concept art, voiceover, and procedural ambient audio into an MP4.
     """
 
-    def __init__(self, ffmpeg_path: Optional[str] = None, output_dir: Optional[str] = None):
+    def __init__(
+        self,
+        ffmpeg_path: Optional[str] = None,
+        output_dir: Optional[str] = None,
+        worker_url: Optional[str] = None,
+    ):
         self.ffmpeg_path = ffmpeg_path or shutil.which("ffmpeg")
         self.output_dir = output_dir or os.path.join(os.getcwd(), "scratch", "previews")
+        self.worker_url = worker_url or os.getenv("CINEMATIC_WORKER_URL")
         os.makedirs(self.output_dir, exist_ok=True)
 
     def is_ffmpeg_available(self) -> bool:
@@ -309,3 +315,83 @@ class CinematicPreviewComposer:
                     "error": str(exc),
                 },
             )
+
+    async def compose_async(
+        self,
+        spec: CinematicPreviewSpec,
+        timeout_sec: float = 120.0,
+    ) -> CinematicPreviewResult:
+        """
+        Compose a cinematic preview.
+        If CINEMATIC_WORKER_URL is configured, delegates the compute-heavy FFmpeg
+        work to the isolated worker container with mutual service-to-service authentication.
+        Otherwise, falls back safely to local composition or static manifest.
+        """
+        # 1. Validate spec
+        validation_issues = spec.validate()
+        if validation_issues:
+            return CinematicPreviewResult(
+                status="failed",
+                error_message=f"Invalid preview specification: {', '.join(validation_issues)}",
+                render_duration_sec=0.0,
+                metadata={
+                    "is_synthetic": True,
+                    "provider_label": "Cinematic Preview",
+                    "reason": "validation_failed",
+                },
+            )
+
+        # 2. Check worker delegation
+        if self.worker_url and self.worker_url.strip():
+            worker_target = self.worker_url.strip().rstrip("/")
+            try:
+                import hashlib
+                from dataclasses import asdict
+                import httpx
+
+                # Derive service-to-service auth token
+                auth_token = os.getenv("WORKER_AUTH_TOKEN")
+                if not auth_token:
+                    supa_key = os.getenv("SUPABASE_KEY")
+                    if supa_key and supa_key.strip():
+                        auth_token = hashlib.sha256(f"praroha-worker:{supa_key.strip()}".encode()).hexdigest()
+                    else:
+                        auth_token = "dev-worker-insecure-secret"
+
+                headers = {
+                    "Authorization": f"Bearer {auth_token}",
+                    "Content-Type": "application/json",
+                }
+                payload = {
+                    "spec": asdict(spec),
+                    "storage_provider": os.getenv("STORAGE_PROVIDER", "supabase"),
+                    "timeout": timeout_sec,
+                }
+
+                logger.info(
+                    "Delegating cinematic preview render for %s to isolated worker at %s...",
+                    spec.entity_id,
+                    worker_target,
+                )
+                async with httpx.AsyncClient(timeout=timeout_sec + 10.0) as client:
+                    resp = await client.post(f"{worker_target}/render", json=payload, headers=headers)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        return CinematicPreviewResult(
+                            status=data.get("status", "completed"),
+                            video_path=data.get("video_path"),
+                            render_duration_sec=data.get("metrics", {}).get("render_elapsed_sec", 0.0),
+                            metadata=data.get("metadata", {}),
+                        )
+                    else:
+                        logger.warning(
+                            "Worker delegation failed with HTTP %d: %s. Falling back.",
+                            resp.status_code,
+                            resp.text,
+                        )
+            except Exception as exc:
+                logger.warning("Error during worker delegation: %s. Falling back to local/static.", exc)
+
+        # 3. Fallback to local compose
+        return await asyncio.to_thread(self.compose, spec, timeout_sec)
+

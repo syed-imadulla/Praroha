@@ -63,7 +63,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 46: Cinematic Preview Proof of Concept (Milestone 6)**
 - [x] **Phase 47: Product Evaluation & Release Gate (Milestone 6)**
 - [x] **Phase 48: Dedicated Worker Architecture & Local Prototype (Milestone 7)**
-- [ ] **Phase 49: Azure Container Apps Job Pilot & Cloud Benchmarking (Milestone 7)**
+- [x] **Phase 49: Azure Scale-to-Zero Worker Pilot & Cloud Benchmarking (Milestone 7)**
 - [ ] **Phase 50: HyperFrames Comparative Evaluation & Decision Gate (Milestone 7)**
 - [ ] **Phase 51: Production Dispatch, UI Enablement & Release Gate (Milestone 7)**
 
@@ -810,17 +810,17 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 
 ---
 
-### Phase 49: Azure Container Apps Job Pilot & Cloud Benchmarking (Milestone 7)
-**Goal**: Provision an on-demand Azure Container Apps Job (1.0 vCPU, 2.0 GiB RAM, scale-to-zero, max concurrency 1, 120s timeout), execute bounded cloud pilot renders (< 30 runs) against real universe assets, and empirically measure real cloud duration, memory RSS, and Azure consumption billing against the ₹500 test budget.  
+### Phase 49: Azure Scale-to-Zero Worker Pilot & Cloud Benchmarking (Milestone 7)
+**Goal**: Deploy and verify an isolated native cinematic rendering worker in Azure Container Apps (`praroha-cinematic-worker`) configured for scale-to-zero operation (1.0 vCPU, 2.0 GiB RAM, minReplicas=0, maxReplicas=1, internal ingress), execute bounded cloud pilot renders (< 30 runs) against real universe assets, and empirically measure real cloud duration, memory RSS, and Azure consumption billing against the ₹500 test budget.  
 **Depends on**: Phase 48  
 **Requirements**: CLOUD-01, CLOUD-02, CLOUD-03, CLOUD-04  
 **Success Criteria**:
-  1. Azure Container Apps Job created and tested via `az containerapp job start`.
+  1. Azure Container App `praroha-cinematic-worker` created and verified with internal-only ingress, Bearer token auth, and scale-to-zero economics.
   2. Genuine 720p H.264 MP4 rendered on Azure compute and verified in Supabase Storage `seed-unfold-assets`.
   3. Real Azure billing tracked in Azure Cost Management, confirming per-render cost < ₹0.05 and total pilot spend < ₹50.00.
-  4. Deduplication via `request_hash`, 120s hard timeout, and crash recovery verified with zero impact on primary web app.  
-**Plans**: 1 plan
-- [ ] **49-01-PLAN.md**: Azure Container Apps Job provisioning, cloud execution benchmarking, cost tracking audit, and fault recovery verification.
+  4. Path traversal/SSRF protection, 120s hard timeout, and crash recovery verified with zero impact on primary web app.  
+**Plans**: 1 plan (all completed)
+- [x] **49-01-PLAN.md**: Azure Scale-to-Zero Worker provisioning, cloud execution benchmarking, cost tracking audit, and fault recovery verification.
 
 ---
 

@@ -18,9 +18,11 @@ All generated outputs strictly enforce:
 
 import argparse
 import asyncio
+import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -53,13 +55,25 @@ def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+import urllib.parse
+
 def build_worker_engine(database_url: str):
     """Build async engine for worker database updates."""
     url_str = str(database_url).strip()
-    if url_str.startswith("postgres://"):
-        url_str = "postgresql+asyncpg://" + url_str[len("postgres://"):]
-    elif url_str.startswith("postgresql://"):
-        url_str = "postgresql+asyncpg://" + url_str[len("postgresql://"):]
+    if "://" in url_str:
+        scheme, remainder = url_str.split("://", 1)
+        if remainder.count("@") > 1 and ":" in remainder:
+            last_at = remainder.rfind("@")
+            credentials = remainder[:last_at]
+            host_and_db = remainder[last_at + 1:]
+            if ":" in credentials:
+                user, pwd = credentials.split(":", 1)
+                encoded_pwd = urllib.parse.quote_plus(pwd)
+                remainder = f"{user}:{encoded_pwd}@{host_and_db}"
+        if scheme in ("postgres", "postgresql"):
+            url_str = f"postgresql+asyncpg://{remainder}"
+        else:
+            url_str = f"{scheme}://{remainder}"
     if url_str.startswith("sqlite"):
         return create_async_engine(
             url_str,
@@ -76,6 +90,17 @@ def build_worker_engine(database_url: str):
     )
 
 
+def get_expected_auth_token() -> str:
+    """Return expected service-to-service authentication token."""
+    token = os.getenv("WORKER_AUTH_TOKEN")
+    if token and token.strip():
+        return token.strip()
+    supa_key = os.getenv("SUPABASE_KEY")
+    if supa_key and supa_key.strip():
+        return hashlib.sha256(f"praroha-worker:{supa_key.strip()}".encode()).hexdigest()
+    return "dev-worker-insecure-secret"
+
+
 def resolve_asset_to_local_path(
     asset_ref: Optional[str],
     scratch_dir: str,
@@ -84,19 +109,37 @@ def resolve_asset_to_local_path(
     """
     Resolve asset reference (local path or HTTP URL) to a verified local file path.
     Downloads remote assets safely into scratch_dir.
+    Rejects path traversal and cloud metadata SSRF attempts.
     """
     if not asset_ref or not str(asset_ref).strip():
         return None
 
     ref = str(asset_ref).strip()
 
+    # Reject path traversal and null bytes
+    if ".." in ref or "\x00" in ref:
+        logger.warning("Rejected suspicious asset reference with path traversal: %s", ref)
+        return None
+
+    # Block SSRF to cloud metadata IPs
+    if "169.254.169.254" in ref or "metadata.google" in ref:
+        logger.warning("Blocked SSRF attempt to metadata service: %s", ref)
+        return None
+
     # 1. Local path check
     if os.path.exists(ref):
-        return os.path.abspath(ref)
+        abs_path = os.path.abspath(ref)
+        # Verify it is within an allowed directory
+        allowed_dirs = (scratch_dir, os.getcwd(), tempfile.gettempdir(), "/app/scratch", "/app/uploads")
+        if any(abs_path.startswith(os.path.abspath(d)) for d in allowed_dirs):
+            return abs_path
+        logger.warning("Rejected local asset path outside allowed directories: %s", abs_path)
+        return None
 
     # Check relative to uploads / workspace
-    if os.path.exists(os.path.join(os.getcwd(), ref)):
-        return os.path.abspath(os.path.join(os.getcwd(), ref))
+    rel_path = os.path.abspath(os.path.join(os.getcwd(), ref))
+    if os.path.exists(rel_path):
+        return rel_path
 
     # 2. Remote URL download check
     if ref.startswith("http://") or ref.startswith("https://"):
@@ -428,17 +471,86 @@ class WorkerHTTPHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path in ("/render", "/api/render"):
             try:
+                # 1. Service-to-Service Authentication
+                auth_header = self.headers.get("Authorization", "").strip()
+                expected_token = get_expected_auth_token()
+                if not auth_header or auth_header != f"Bearer {expected_token}":
+                    logger.warning("Rejected unauthenticated render request from %s", self.address_string())
+                    self.send_response(401)
+                    self.send_header("Content-Type", "application/json")
+                    err_body = json.dumps({"status": "unauthorized", "error": "Invalid or missing Bearer token"}).encode("utf-8")
+                    self.send_header("Content-Length", str(len(err_body)))
+                    self.end_headers()
+                    self.wfile.write(err_body)
+                    return
+
+                # 2. Parse JSON Payload
                 content_len = int(self.headers.get("Content-Length", 0))
                 post_data = self.rfile.read(content_len)
                 payload = json.loads(post_data.decode("utf-8")) if post_data else {}
 
                 job_id = payload.get("job_id")
                 spec_dict = payload.get("spec_dict") or payload.get("spec")
+                if not spec_dict or not isinstance(spec_dict, dict):
+                    self.send_response(400)
+                    self.send_header("Content-Type", "application/json")
+                    err_body = json.dumps({"status": "invalid_request", "error": "Missing or invalid spec dictionary"}).encode("utf-8")
+                    self.send_header("Content-Length", str(len(err_body)))
+                    self.end_headers()
+                    self.wfile.write(err_body)
+                    return
+
+                # 3. Validate Project and Entity IDs (alphanumeric/hyphen/underscore only)
+                project_id = str(spec_dict.get("project_id", "")).strip()
+                entity_id = str(spec_dict.get("entity_id", "")).strip()
+                if not project_id or not re.match(r"^[a-zA-Z0-9_\-]+$", project_id):
+                    self.send_response(400)
+                    self.send_header("Content-Type", "application/json")
+                    err_body = json.dumps({"status": "invalid_request", "error": "Invalid project_id format"}).encode("utf-8")
+                    self.send_header("Content-Length", str(len(err_body)))
+                    self.end_headers()
+                    self.wfile.write(err_body)
+                    return
+
+                if not entity_id or not re.match(r"^[a-zA-Z0-9_\-]+$", entity_id):
+                    self.send_response(400)
+                    self.send_header("Content-Type", "application/json")
+                    err_body = json.dumps({"status": "invalid_request", "error": "Invalid entity_id format"}).encode("utf-8")
+                    self.send_header("Content-Length", str(len(err_body)))
+                    self.end_headers()
+                    self.wfile.write(err_body)
+                    return
+
+                # 4. Validate Asset Paths against Traversal & SSRF
+                for field in ("image_path", "voice_path", "ambient_path"):
+                    val = spec_dict.get(field)
+                    if val and isinstance(val, str):
+                        v_str = val.strip()
+                        if ".." in v_str or "\x00" in v_str:
+                            self.send_response(400)
+                            self.send_header("Content-Type", "application/json")
+                            err_body = json.dumps({"status": "invalid_request", "error": f"Path traversal rejected in {field}"}).encode("utf-8")
+                            self.send_header("Content-Length", str(len(err_body)))
+                            self.end_headers()
+                            self.wfile.write(err_body)
+                            return
+                        if v_str.startswith("http://") or v_str.startswith("https://"):
+                            if "169.254.169.254" in v_str or "metadata.google" in v_str:
+                                self.send_response(400)
+                                self.send_header("Content-Type", "application/json")
+                                err_body = json.dumps({"status": "invalid_request", "error": f"Metadata endpoint blocked in {field}"}).encode("utf-8")
+                                self.send_header("Content-Length", str(len(err_body)))
+                                self.end_headers()
+                                self.wfile.write(err_body)
+                                return
+
                 db_url = payload.get("database_url")
                 storage_type = payload.get("storage_provider", "supabase")
-                timeout_sec = float(payload.get("timeout", 120.0))
+                # 5. Bound execution timeout (5s to 120s max)
+                raw_timeout = float(payload.get("timeout", 120.0))
+                timeout_sec = min(max(raw_timeout, 5.0), 120.0)
 
-                logger.info("Received render request for job_id=%s, storage=%s", job_id, storage_type)
+                logger.info("Received authenticated render request for job_id=%s, storage=%s, timeout=%ss", job_id, storage_type, timeout_sec)
                 exit_code = asyncio.run(
                     run_worker(
                         job_id=job_id,
