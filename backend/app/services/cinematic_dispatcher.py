@@ -321,13 +321,11 @@ class CinematicDispatcherService:
             "Content-Type": "application/json",
         }
 
-        database_url = os.getenv("DATABASE_URL")
         storage_provider = os.getenv("STORAGE_PROVIDER", "supabase")
 
         worker_payload = {
             "job_id": job_id,
             "spec": spec_dict,
-            "database_url": database_url,
             "storage_provider": storage_provider,
             "timeout": 120.0,
         }

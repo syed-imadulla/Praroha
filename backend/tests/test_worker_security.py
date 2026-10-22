@@ -160,3 +160,43 @@ def test_resolve_asset_blocks_ssrf_and_traversal(tmp_path):
     assert resolve_asset_to_local_path("../../etc/passwd", str(tmp_path), "img") is None
     assert resolve_asset_to_local_path("http://169.254.169.254/secret", str(tmp_path), "img") is None
     assert resolve_asset_to_local_path("path/with/\x00/null", str(tmp_path), "img") is None
+
+
+def test_worker_ignores_payload_database_url(monkeypatch):
+    """
+    Security verification: Worker must strictly read database credentials from server-side
+    environment secrets (DATABASE_URL) and ignore any payload-injected connection strings.
+    """
+    from unittest.mock import patch
+
+    server_db = "postgresql+asyncpg://server_user:server_pass@server_host:5432/server_db"
+    monkeypatch.setenv("DATABASE_URL", server_db)
+
+    token = get_expected_auth_token()
+    handler = MockWorkerHandler(
+        method="POST",
+        path="/render",
+        headers={"Authorization": f"Bearer {token}"},
+        body={
+            "job_id": "job-test-sec",
+            "spec": {
+                "project_id": "test_proj",
+                "entity_id": "test_ent",
+            },
+            "database_url": "postgresql+asyncpg://attacker:rogue_pass@attacker_host:5432/rogue_db",
+            "storage_provider": "local",
+        },
+    )
+
+    with patch("backend.app.workers.cinematic_worker.run_worker") as mock_run_worker, \
+         patch("asyncio.run") as mock_asyncio_run:
+        mock_run_worker.return_value = None
+        mock_asyncio_run.return_value = 0
+        WorkerHTTPHandler.do_POST(handler)
+        assert handler.status_code == 200
+
+        # Verify run_worker was called with server-side DATABASE_URL, NOT the payload's attacker DB
+        assert mock_run_worker.called
+        call_kwargs = mock_run_worker.call_args[1]
+        assert call_kwargs.get("database_url") == server_db
+        assert "attacker" not in str(call_kwargs.get("database_url"))

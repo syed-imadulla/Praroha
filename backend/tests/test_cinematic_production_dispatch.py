@@ -332,3 +332,40 @@ async def test_no_ffmpeg_execution_inside_primary_api(client, setup_project):
             for call in mock_run.call_args_list:
                 args = call[0][0] if call[0] else []
                 assert "ffmpeg" not in str(args).lower()
+
+
+@pytest.mark.asyncio
+async def test_worker_payload_excludes_credentials(client, setup_project):
+    """
+    Security verification: The dispatched HTTP payload to the worker must NEVER
+    contain database credentials (DATABASE_URL), API secrets, or storage credentials.
+    """
+    proj, world, _ = setup_project
+
+    with patch("backend.app.services.cinematic_dispatcher.httpx.AsyncClient") as mock_client_cls:
+        mock_instance = AsyncMock()
+        mock_instance.post.return_value = MagicMock(status_code=200, json=lambda: {"status": "completed"})
+        mock_client_cls.return_value.__aenter__.return_value = mock_instance
+
+        resp = await client.post(
+            f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
+            json={"entity_type": "world", "entity_id": world.id, "force_regenerate": True},
+        )
+        assert resp.status_code == 202
+
+        await asyncio.sleep(0.05)
+
+        # Inspect the payload passed to mock_instance.post
+        assert mock_instance.post.called
+        call_kwargs = mock_instance.post.call_args[1]
+        payload = call_kwargs.get("json", {})
+
+        # Assert no credential fields present
+        assert "database_url" not in payload
+        assert "supabase_key" not in payload
+        assert "password" not in str(payload).lower()
+        # Assert expected identifiers only
+        assert "job_id" in payload
+        assert "spec" in payload
+        assert "storage_provider" in payload
+        assert "timeout" in payload

@@ -544,8 +544,9 @@ class WorkerHTTPHandler(http.server.BaseHTTPRequestHandler):
                                 self.wfile.write(err_body)
                                 return
 
-                db_url = payload.get("database_url")
-                storage_type = payload.get("storage_provider", "supabase")
+                # Enforce server-side secret configuration: do not accept or read database credentials from request payload
+                db_url = os.getenv("DATABASE_URL")
+                storage_type = payload.get("storage_provider", os.getenv("STORAGE_PROVIDER", "supabase"))
                 # 5. Bound execution timeout (5s to 120s max)
                 raw_timeout = float(payload.get("timeout", 120.0))
                 timeout_sec = min(max(raw_timeout, 5.0), 120.0)
