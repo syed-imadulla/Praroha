@@ -1,24 +1,24 @@
 ---
 gsd_state_version: '1.0'
-milestone: 'Milestone 5: PRAROHA — Production Product Completion'
-status: complete
-current_phase: 40
+milestone: 'Milestone 6: Core Product Intelligence & Media Reliability'
+status: in_progress
+current_phase: 41
 progress:
-  total_phases: 50
+  total_phases: 57
   completed_phases: 50
-  total_plans: 76
+  total_plans: 83
   completed_plans: 76
-  percent: 100.0
+  percent: 87.7
 ---
 
 # Project State: PRAROHA (Seed Unfold)
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-10)
+See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/PROJECT.md) (updated 2026-10-22)
 
 **Core value:** One incomplete seed becomes structured intent, reveals inferred possibilities, branches into three divergent worlds, empowers human decision, and progressively unfolds into a coherent, persistent, and traceable mini-universe with generative media, counterfactual mutation, creator-locked human-only zones, installable PWA capabilities, and Supabase Realtime synchronization.  
-**Current focus:** Milestone 5 — Production Product Completion (100% Completed & Verified)
+**Current focus:** Milestone 6 — Core Product Intelligence & Media Reliability (Active)
 
 ## Current Position
 
@@ -26,16 +26,15 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
 - **Milestone 2 (Phases 9–20)**: 100% Completed & Verified (Semantic intelligence, divergence engine, origin ledger, and media providers).
 - **Milestone 3 (Phases 21–30)**: 100% Completed & Verified (Botanical design system, editorial app shell, and typography polish).
 - **Milestone 4 (Phase 31: 31.1–31.11)**: 100% Completed & Verified (Supabase Realtime multi-tab synchronization and project isolation).
-- **Milestone 5 (Phases 32–40: Production Product Completion)**: 100% Completed & Verified.
-  - Phase 32: Product Audit & Production Foundation (Completed & Verified)
-  - Phase 33: Email Authentication & Account Security (Completed & Verified)
-  - Phase 34: Atmospheric Audio Generation (Completed & Verified — Curated CC0 Ambient Library verified and active for zero-cost soundscapes; Stable Audio 2, Pixazo Tracks, and Rewind Lyria adapters integrated with credit/error transparency)
-  - Phase 35: Real Video Generation (Completed & Verified — JSON2Video composition preview engine verified and live with `is_synthetic: true`; Generative AI video visibly disabled with "Credits Required" pill to prevent repeated failed calls; Wan 2.1, Pyramid Flow, Pixazo, and Rewind Seedance integrated)
-  - Phase 36: UI Reliability, Accessibility & Responsive Polish (Completed & Verified)
-  - Phase 37: PWA Installation & Offline Behaviour (Completed & Verified)
-  - Phase 38: Production Deployment & Operational Readiness (Completed & Verified — Docker, Nginx, Compose, Health Checks, Supabase Auth & Storage verified)
-  - Phase 39: Full-System Verification & Release Documentation (Completed & Verified — 100% full user journey, PWA, and release isolation verified)
-  - Phase 40: Production Cloud Deployment (Azure + Vercel + Supabase) (Completed & Verified — Live ACA backend, Vercel PWA frontend, Supabase DB/Storage/Realtime, 100% live cloud E2E verified)
+- **Milestone 5 (Phases 32–40: Production Product Completion)**: 100% Completed & Verified (ACA cloud backend, Vercel PWA frontend, Supabase DB/Storage/Realtime).
+- **Milestone 6 (Phases 41–47: Core Product Intelligence & Media Reliability)**: In Progress (Planning Complete).
+  - Phase 41: Product Alignment & Technical Audit (Planned — Ready to Execute)
+  - Phase 42: Pollinations & Media Capability Audit (Planned)
+  - Phase 43: Media Reliability & Credit Protection (Planned)
+  - Phase 44: Universe Consistency & Creative Memory (Planned)
+  - Phase 45: Origin Trail & Controlled Regeneration (Planned)
+  - Phase 46: Cinematic Preview Proof of Concept (Planned)
+  - Phase 47: Product Evaluation & Release Gate (Planned)
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:

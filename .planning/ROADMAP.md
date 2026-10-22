@@ -46,7 +46,22 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   - [x] **Phase 31.8**: Media Realtime Pipeline (Realtime generation events, browser reload resilience).
   - [x] **Phase 31.9**: Production Error Semantics & Demo Isolation (Explicit errors, retry states, strict separation of Demo vs Real Mode).
   - [x] **Phase 31.10**: Production E2E & Two-Tab Realtime Tests (Non-canonical seed validation, multi-tab real-time sync tests).
-  - [x] **Phase 31.11**: Final Full-System Audit & Verification (Empirical Seed A vs Seed B proof, live multi-tab proof).
+- [x] **Phase 32: Product Audit & Production Foundation (Milestone 5)**
+- [x] **Phase 33: Email Authentication & Account Security (Milestone 5)**
+- [x] **Phase 34: Atmospheric Audio Generation (Milestone 5)**
+- [x] **Phase 35: Real Video Generation (Milestone 5)**
+- [x] **Phase 36: UI Reliability, Accessibility & Responsive Polish (Milestone 5)**
+- [x] **Phase 37: PWA Installation & Offline Behaviour (Milestone 5)**
+- [x] **Phase 38: Production Deployment & Operational Readiness (Milestone 5)**
+- [x] **Phase 39: Full-System Verification & Release Documentation (Milestone 5)**
+- [x] **Phase 40: Production Cloud Deployment (Azure + Vercel + Supabase) (Milestone 5)**
+- [ ] **Phase 41: Product Alignment & Technical Audit (Milestone 6)**
+- [ ] **Phase 42: Pollinations & Media Capability Audit (Milestone 6)**
+- [ ] **Phase 43: Media Reliability & Credit Protection (Milestone 6)**
+- [ ] **Phase 44: Universe Consistency & Creative Memory (Milestone 6)**
+- [ ] **Phase 45: Origin Trail & Controlled Regeneration (Milestone 6)**
+- [ ] **Phase 46: Cinematic Preview Proof of Concept (Milestone 6)**
+- [ ] **Phase 47: Product Evaluation & Release Gate (Milestone 6)**
 
 ---
 
@@ -671,5 +686,106 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   2. Vercel hosts the React/Vite/PWA frontend with client-side routing rewrites and PWA cache-control headers.
   3. Supabase Auth and CORS whitelists the live production Vercel domain.
   4. End-to-end verification confirms user registration, creative world unfolding, audio/video preview generation, and project persistence over HTTPS.  
-**Plans**: 1 plan (in progress)
-- [/] **40-01-PLAN.md**: Azure Container Apps specification, Vercel SPA rewrites (`frontend/vercel.json`), API client base URL normalization, background job restart recovery, and cloud deployment runbooks.
+**Plans**: 1 plan (completed)
+- [x] **40-01-PLAN.md**: Azure Container Apps specification, Vercel SPA rewrites (`frontend/vercel.json`), API client base URL normalization, background job restart recovery, and cloud deployment runbooks.
+
+---
+
+## Milestone 6: Core Product Intelligence & Media Reliability
+
+### Phase 41: Product Alignment & Technical Audit
+**Goal**: Establish an empirical baseline for seed interpretation quality, 3-world semantic divergence, character/scene consistency, origin trail accuracy, redundant generation overhead, and live provider credit restrictions.  
+**Depends on**: Milestone 5 (Phase 40)  
+**Requirements**: AUDIT-01, AUDIT-02  
+**Success Criteria**:
+  1. Quantitative divergence baseline recorded across 3 arbitrary creative seeds (measuring genre, tone, conflict, and aesthetic contrast).
+  2. Causal consistency audit completed for World Bible rules, character motivations, relationships, and dramatic scene progression.
+  3. Provenance accuracy audit of the Origin Ledger and Causal Lineage DAG documenting any orphaned or misclassified nodes.
+  4. Forensic audit of media request pipelines cataloging failure modes, credit exhaustion responses (HTTP 402/429), and redundant generation loops.  
+**Plans**: 1 plan
+- [ ] **41-01-PLAN.md**: Product alignment baseline audit, universe consistency benchmark, origin trail provenance audit, and provider failure & credit restriction catalog.
+
+---
+
+### Phase 42: Pollinations & Media Capability Audit
+**Goal**: Inspect live official Pollinations documentation and model catalog (`gen.pollinations.ai/openapi.json`), establish exact request schemas, pricing (pollen units), quotas, and authentication boundaries across image, audio, and video modalities without blind spending.  
+**Depends on**: Phase 41  
+**Requirements**: POLLI-01, POLLI-02  
+**Success Criteria**:
+  1. Complete live model catalog and parameter specification documented for image (`/image`), audio (`/audio`, `/v1/audio/speech`), and video (`/video`) endpoints.
+  2. Free/public default model boundaries (e.g. `sana`) clearly separated from credit-required models (Flux, Seedance).
+  3. Token/pollen account balance checking (`/account/balance`) and quota error semantics formalized.
+  4. Cost-effective routing rules established with zero wasted credits on blind testing.  
+**Plans**: 1 plan
+- [ ] **42-01-PLAN.md**: Pollinations API catalog audit, model ID and endpoint schema mapping, account balance & quota protocol, and zero-cost vs credit routing specification.
+
+---
+
+### Phase 43: Media Reliability & Credit Protection
+**Goal**: Implement strict cost-safe composite provider routing, request deduplication, content-hash asset caching, and background job recovery, preventing accidental spend or runaway cascading upon 402/403/429 errors.  
+**Depends on**: Phase 42  
+**Requirements**: RELI-01, RELI-02, RELI-03  
+**Success Criteria**:
+  1. Composite audio and video providers immediately abort cascading to paid tiers upon encountering HTTP 402 (Payment Required), 403 (Forbidden), or 429 (Rate/Quota Limit) without approved budget override.
+  2. `MediaService` implements prompt and target hash deduplication; identical in-flight or existing asset requests return cached records without re-disagreeing or re-billing.
+  3. Bounded exponential backoff with jitter handles transient 5xx network glitches without exceeding retry limits.
+  4. UI surfaces clear, real-time credit status badges and transparent failure explanations.  
+**Plans**: 1 plan
+- [ ] **43-01-PLAN.md**: Cost-safe composite provider circuit breakers, MediaService request deduplication and content hashing, bounded retry policy, and credit observability status indicators.
+
+---
+
+### Phase 44: Universe Consistency & Creative Memory
+**Goal**: Establish a canonical creative memory schema and context construction engine that ensures progressive world unfolding and subsequent generations respect established world rules, character traits, timelines, visual references, and creator decisions without lore drift.  
+**Depends on**: Phase 41  
+**Requirements**: MEM-01, MEM-02, MEM-03  
+**Success Criteria**:
+  1. Canonical `CreativeMemory` schema captures active canon facts, character traits, relationship tensions, visual style anchors, and timeline constraints.
+  2. Context assembly engine injects prioritized, token-efficient memory summaries into LLM generation prompts.
+  3. Deterministic post-generation consistency validator flags or reconciles any generated entity violating established World Bible physics or Human-Only Zone locks before database persistence.  
+**Plans**: 1 plan
+- [ ] **44-01-PLAN.md**: Creative memory data model, prioritized context construction engine, prompt token budgeting, and deterministic canon consistency validation guards.
+
+---
+
+### Phase 45: Origin Trail & Controlled Regeneration
+**Goal**: Enhance the Origin Trail with dependency-aware change impact preview (`AFFECTED`, `CONDITIONAL`, `PRESERVED`), stale entity detection, and selective subtree regeneration that preserves approved creator work while updating the lineage DAG.  
+**Depends on**: Phase 44  
+**Requirements**: REGEN-01, REGEN-02, REGEN-03  
+**Success Criteria**:
+  1. Modifying an upstream seed premise, world candidate, or rule generates an interactive change impact preview highlighting affected downstream nodes.
+  2. Stale entity detection identifies characters, relationships, scenes, or media assets orphaned or invalidated by upstream changes.
+  3. Selective regeneration re-synthesizes only marked stale entities while preserving approved and creator-locked items.
+  4. The Causal Lineage DAG accurately reflects revised ancestry, diff versions, and regeneration timestamps.  
+**Plans**: 1 plan
+- [ ] **45-01-PLAN.md**: Dependency graph blast radius analyzer, stale node identification service, selective subtree regeneration workflow, and lineage DAG revision tracking.
+
+---
+
+### Phase 46: Cinematic Preview Proof of Concept
+**Goal**: Evaluate HyperFrames programmatic video rendering against Azure Container Apps resource limits (0.5 vCPU, 1.0 GiB RAM), pilot an isolated preview worker, and maintain JSON2Video as the verified operational baseline with clear synthetic preview watermarking.  
+**Depends on**: Phase 43  
+**Requirements**: CINE-01, CINE-02  
+**Success Criteria**:
+  1. HyperFrames licensing, Node.js/Chromium/FFmpeg system dependencies, and memory footprint benchmarked against ACA constraints.
+  2. Prototype preview worker tested for rendering cinematic scene motion graphics from World Bible visuals, audio, and character dialogue.
+  3. JSON2Video remains fully operational as the primary working video preview baseline.
+  4. Composed preview footage is explicitly labeled with synthetic badges and never mislabeled as generative AI diffusion video.  
+**Plans**: 1 plan
+- [ ] **46-01-PLAN.md**: HyperFrames technical feasibility assessment, isolated preview worker pilot specification, resource footprint benchmarks, and synthetic preview labeling standards.
+
+---
+
+### Phase 47: Product Evaluation & Release Gate
+**Goal**: Execute comprehensive end-to-end acceptance testing across arbitrary seeds, 3-world divergence, creative memory consistency, change impact preview, credit protection circuit breakers, and cloud deployment resilience.  
+**Depends on**: Phases 41, 42, 43, 44, 45, 46  
+**Requirements**: GATE-01, GATE-02  
+**Success Criteria**:
+  1. End-to-end test suite passes cleanly with arbitrary, non-canonical seeds demonstrating genuine semantic divergence.
+  2. Multi-scene universe unfolding preserves character motivations and world rules without lore drift.
+  3. Controlled regeneration successfully updates downstream entities while preserving locked creator decisions.
+  4. Credit protection circuit breakers block unauthorized paid provider requests during simulated 402/429 failures.
+  5. Live provider evidence documented with strict separation of live vs mocked verification tests.
+  6. Zero-downtime production deployment verified across ACA backend, Vercel frontend, and Supabase cloud.  
+**Plans**: 1 plan
+- [ ] **47-01-PLAN.md**: End-to-end acceptance test battery, creative consistency verification, credit protection stress tests, live provider verification documentation, and Milestone 6 release gate sign-off.

@@ -197,40 +197,28 @@
     "ast_hash": "7f3637860dec5aa9df445f14090a9340",
     "semantic_hash": ""
   },
-  ".agents/rules/graphify.md": {
-    "mtime": 1791076683.5180635,
-    "seen": 1791082976.2541409,
-    "ast_hash": "f1e53ecc9194573d3c28fc116c743a2e",
-    "semantic_hash": ""
-  },
-  ".agents/workflows/graphify.md": {
-    "mtime": 1791076683.5182064,
-    "seen": 1791082976.2541428,
-    "ast_hash": "6d73634a678cf1e1c71930adf80bd1f0",
-    "semantic_hash": ""
-  },
   ".planning/PROJECT.md": {
-    "mtime": 1791647912.4140005,
-    "seen": 1791651967.5857165,
-    "ast_hash": "a1b5d4ede3620922548981c5d207d651",
+    "mtime": 1792645207.8292837,
+    "seen": 1792645531.791737,
+    "ast_hash": "83e7edb319fb41635e27aded517de822",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
-    "mtime": 1791651892.1995194,
-    "seen": 1791651967.5857174,
-    "ast_hash": "95f9ec99dbc23cad6a86c2ffdd2ae0e7",
+    "mtime": 1792645265.3929229,
+    "seen": 1792645531.7917397,
+    "ast_hash": "260b05f818455943e47a292a38b467f7",
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1791733586.5362892,
-    "seen": 1791733682.5681067,
-    "ast_hash": "c47540f961321ebbe2f70bb86084e73e",
+    "mtime": 1792645340.7534432,
+    "seen": 1792645531.7917418,
+    "ast_hash": "688333c255e258934bfb26c9efe04b51",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1791739122.322175,
-    "seen": 1791739157.4199004,
-    "ast_hash": "7c95d7fc29577599dc4f02e92ebfe227",
+    "mtime": 1792645280.903824,
+    "seen": 1792645531.7917438,
+    "ast_hash": "6965a3fbf3aebd8e9ad6d9ecbbcca451",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -2973,6 +2961,90 @@
     "mtime": 1791739137.2090786,
     "seen": 1791739157.4201107,
     "ast_hash": "566f41b655e06037a33010ce7a709451",
+    "semantic_hash": ""
+  },
+  ".planning/phases/41-product-alignment-audit/41-01-PLAN.md": {
+    "mtime": 1792645366.1562817,
+    "seen": 1792645531.7921054,
+    "ast_hash": "4e965665c1d367abf243a869beaee0bf",
+    "semantic_hash": ""
+  },
+  ".planning/phases/41-product-alignment-audit/41-CONTEXT.md": {
+    "mtime": 1792645353.4873621,
+    "seen": 1792645531.792107,
+    "ast_hash": "8575eb0805d94fbaf6b1913046790071",
+    "semantic_hash": ""
+  },
+  ".planning/phases/42-pollinations-media-capability/42-01-PLAN.md": {
+    "mtime": 1792645393.921105,
+    "seen": 1792645531.7921083,
+    "ast_hash": "6198ec7a88a15b34c8e5781f5993692f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/42-pollinations-media-capability/42-CONTEXT.md": {
+    "mtime": 1792645381.9581811,
+    "seen": 1792645531.7921093,
+    "ast_hash": "47bcb167b27a1333c7f9cf08e3c1b432",
+    "semantic_hash": ""
+  },
+  ".planning/phases/43-media-reliability-credit-protection/43-01-PLAN.md": {
+    "mtime": 1792645419.4879422,
+    "seen": 1792645531.7921107,
+    "ast_hash": "ff1f47819962be9b0b11399414aff9f4",
+    "semantic_hash": ""
+  },
+  ".planning/phases/43-media-reliability-credit-protection/43-CONTEXT.md": {
+    "mtime": 1792645405.880029,
+    "seen": 1792645531.7921119,
+    "ast_hash": "a91db89cd4e1910cd05906b9c7b1d16a",
+    "semantic_hash": ""
+  },
+  ".planning/phases/44-universe-consistency-creative-memory/44-01-PLAN.md": {
+    "mtime": 1792645443.8707871,
+    "seen": 1792645531.7921128,
+    "ast_hash": "34ec1315a2a036d375d9ce6ce86c77aa",
+    "semantic_hash": ""
+  },
+  ".planning/phases/44-universe-consistency-creative-memory/44-CONTEXT.md": {
+    "mtime": 1792645432.0668623,
+    "seen": 1792645531.7921145,
+    "ast_hash": "71848875ce8b2130035e896092f3ffe9",
+    "semantic_hash": ""
+  },
+  ".planning/phases/45-origin-trail-controlled-regeneration/45-01-PLAN.md": {
+    "mtime": 1792645467.2106385,
+    "seen": 1792645531.7921154,
+    "ast_hash": "9eafd988c5fc9be11fe5f6dd0d69d761",
+    "semantic_hash": ""
+  },
+  ".planning/phases/45-origin-trail-controlled-regeneration/45-CONTEXT.md": {
+    "mtime": 1792645454.4627197,
+    "seen": 1792645531.7921166,
+    "ast_hash": "185fb0b3717549a4dc37d98da94df952",
+    "semantic_hash": ""
+  },
+  ".planning/phases/46-cinematic-preview-poc/46-01-PLAN.md": {
+    "mtime": 1792645489.6824956,
+    "seen": 1792645531.7921178,
+    "ast_hash": "6e9cabccd4582f1a8864d3b9d3975c2a",
+    "semantic_hash": ""
+  },
+  ".planning/phases/46-cinematic-preview-poc/46-CONTEXT.md": {
+    "mtime": 1792645477.195575,
+    "seen": 1792645531.792119,
+    "ast_hash": "e8e4e9b907ec70676850b944dde95f19",
+    "semantic_hash": ""
+  },
+  ".planning/phases/47-product-evaluation-release-gate/47-01-PLAN.md": {
+    "mtime": 1792645513.1133466,
+    "seen": 1792645531.79212,
+    "ast_hash": "91705fa42f0aa0cfc472f9bdbd8ced4f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/47-product-evaluation-release-gate/47-CONTEXT.md": {
+    "mtime": 1792645499.9594302,
+    "seen": 1792645531.7921212,
+    "ast_hash": "b1b72ad4a4928d7f32f2aa103617551b",
     "semantic_hash": ""
   }
 }

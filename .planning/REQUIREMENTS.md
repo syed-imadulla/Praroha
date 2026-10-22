@@ -1,6 +1,6 @@
 # Requirements: Seed Unfold (Praroha)
 
-**Current Milestone:** Milestone 2: Semantic Intelligence + Generative Media  
+**Current Milestone:** Milestone 6: Core Product Intelligence & Media Reliability  
 **Core Value:** One incomplete seed reveals structured intent and possibilities, branches into 3 divergent worlds, empowers human decision, unfolds into an auditable universe codex, generates optional non-blocking media, and allows counterfactual exploration and seed mutation.
 
 ---
@@ -140,7 +140,23 @@
 | MUT-01 – MUT-04 | Phase 18 | Complete |
 | CNTR-01 – CNTR-02 | Phase 19 | Complete |
 | HOZ-01 – HOZ-02 | Phase 20 | Complete |
-| REAL-01 – REAL-20 | Phase 31 | Active |
+| REAL-01 – REAL-10 | Phase 31 | Complete |
+| PROD-AUDIT-01 – PROD-AUDIT-02 | Phase 32 | Complete |
+| PROD-AUTH-01 – PROD-AUTH-04 | Phase 33 | Complete |
+| PROD-AUDIO-01 – PROD-AUDIO-02 | Phase 34 | Complete |
+| PROD-VIDEO-01 – PROD-VIDEO-02 | Phase 35 | Complete |
+| PROD-UI-01 – PROD-UI-03 | Phase 36 | Complete |
+| PROD-PWA-01 – PROD-PWA-02 | Phase 37 | Complete |
+| PROD-DEPLOY-01 – PROD-DEPLOY-02 | Phase 38 | Complete |
+| PROD-VERIF-01 – PROD-VERIF-02 | Phase 39 | Complete |
+| CLOUD-DEP-01 – CLOUD-DEP-04 | Phase 40 | Complete |
+| AUDIT-01 – AUDIT-02 | Phase 41 | Planned |
+| POLLI-01 – POLLI-02 | Phase 42 | Planned |
+| RELI-01 – RELI-03 | Phase 43 | Planned |
+| MEM-01 – MEM-03 | Phase 44 | Planned |
+| REGEN-01 – REGEN-03 | Phase 45 | Planned |
+| CINE-01 – CINE-02 | Phase 46 | Planned |
+| GATE-01 – GATE-02 | Phase 47 | Planned |
 
 ---
 
@@ -229,5 +245,40 @@
 - [x] **PROD-VERIF-02**: Live user lifecycle verification from registration through world creation and reload; updated architecture and release documentation. (Verified)
 
 ---
-*Last updated: 2026-10-10 for Milestone 5: PRAROHA — Production Product Completion (100% COMPLETE)*
+
+## Milestone 6: Core Product Intelligence & Media Reliability Requirements (Active)
+
+### Product Alignment & Technical Audit (AUDIT) — Phase 41
+- [ ] **AUDIT-01**: Benchmark seed interpretation quality and semantic divergence across the three world candidates for arbitrary seeds, establishing quantitative divergence metrics.
+- [ ] **AUDIT-02**: Baseline universe entity consistency across world rules, characters, relationships, and scenes; audit origin trail accuracy; catalogue existing generation failure modes and credit restrictions.
+
+### Pollinations & Media Capability Audit (POLLI) — Phase 42
+- [ ] **POLLI-01**: Document live model catalog, request schemas, pricing (pollen units), quota, and authentication requirements for `gen.pollinations.ai` across image, audio, and video modalities without spending credits.
+- [ ] **POLLI-02**: Specify zero-cost vs credit-funded routing rules, ensuring public access defaults (e.g. Sana) function reliably while paid models (e.g. Flux, Seedance) require valid funded keys.
+
+### Media Reliability & Credit Protection (RELI) — Phase 43
+- [ ] **RELI-01**: Implement strict cost-safe composite provider routing; prevent cascading to paid providers on HTTP 402, 403, or 429 errors unless an approved budget policy explicitly authorizes it.
+- [ ] **RELI-02**: Request deduplication and content-hash asset caching in `MediaService`, eliminating duplicate in-flight jobs and redundant generation costs for identical prompts and entity targets.
+- [ ] **RELI-03**: Bounded retries, exponential backoff with jitter for transient 5xx errors, persistent job recovery across container restarts, and real-time provider observability badges.
+
+### Universe Consistency & Creative Memory (MEM) — Phase 44
+- [ ] **MEM-01**: Define canonical creative memory schema capturing world rules, character traits, relationship dynamics, visual references, timelines, and creator decisions.
+- [ ] **MEM-02**: Context construction engine assembling prioritized memory tokens into generation prompts, preventing lore contradictions and character drift during progressive unfolding.
+- [ ] **MEM-03**: Deterministic consistency validator verifying generated entities against established World Bible rules and Human-Only Zone constraints before database commit.
+
+### Origin Trail & Controlled Regeneration (REGEN) — Phase 45
+- [ ] **REGEN-01**: Dependency-aware change impact engine computing downstream blast radius (`AFFECTED`, `CONDITIONAL`, `PRESERVED`) when upstream seed, world, or rules are modified.
+- [ ] **REGEN-02**: Stale entity detection flagging outdated characters, relationships, or scenes that reference mutated parent nodes.
+- [ ] **REGEN-03**: Selective regeneration pipeline allowing creators to update only targeted subtrees while immutably preserving approved human decisions and updating the lineage DAG.
+
+### Cinematic Preview Proof of Concept (CINE) — Phase 46
+- [ ] **CINE-01**: Architectural and resource evaluation of HyperFrames (licensing, Node/Chromium/FFmpeg footprint, memory envelope vs 1.0 GiB ACA container limit, render latency).
+- [ ] **CINE-02**: Isolated renderer pilot specification preserving JSON2Video as the primary working preview baseline, with clear synthetic preview watermarking and zero mislabeling of composed footage as raw generative video.
+
+### Product Evaluation & Release Gate (GATE) — Phase 47
+- [ ] **GATE-01**: Automated E2E verification across arbitrary seeds, 3-world divergence, character consistency, change impact preview, and credit protection circuit breakers.
+- [ ] **GATE-02**: Empirical release gate requiring live provider evidence, distinct mocked test segregation, durable job recovery, and zero-downtime PWA cloud deployment validation.
+
+---
+*Last updated: 2026-10-22 for Milestone 6: Core Product Intelligence & Media Reliability (Active)*
 
