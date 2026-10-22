@@ -198,9 +198,9 @@
     "semantic_hash": ""
   },
   ".planning/PROJECT.md": {
-    "mtime": 1792678640.4853637,
-    "seen": 1792678669.2681422,
-    "ast_hash": "9a6f86a15433b0caeb7d9b2157050041",
+    "mtime": 1792691734.7235024,
+    "seen": 1792695357.0912502,
+    "ast_hash": "e20be651c46709607f05d172d5b94e5a",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
@@ -210,15 +210,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1792685708.0615065,
-    "seen": 1792687829.4933245,
-    "ast_hash": "679bd802ae97b450d021a1f0c3999c73",
+    "mtime": 1792691747.8193882,
+    "seen": 1792695357.0912561,
+    "ast_hash": "ced040f24eec1ab878dfd92936e7ab62",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792685734.7192833,
-    "seen": 1792687829.4933257,
-    "ast_hash": "4624fbe8e28d58606eb8e86a7751daa9",
+    "mtime": 1792695271.0272436,
+    "seen": 1792695357.0912588,
+    "ast_hash": "0c1673f96e6b9b1146da3f3459c9cf53",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -276,9 +276,9 @@
     "semantic_hash": ""
   },
   "backend/requirements.txt": {
-    "mtime": 1791735404.065601,
-    "seen": 1791737730.651393,
-    "ast_hash": "f56e394c577636a1339cba1a4b82c189",
+    "mtime": 1792694098.8115683,
+    "seen": 1792695357.0918224,
+    "ast_hash": "66d755599d59e7c0d83252098fe48f01",
     "semantic_hash": ""
   },
   "docs/architecture/DEMO_FIXTURES.md": {
@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "backend/app/workers/cinematic_worker.py": {
-    "mtime": 1792680072.1559284,
-    "seen": 1792687829.4931087,
-    "ast_hash": "9ea4ee54b733602956ac53f55ee0442b",
+    "mtime": 1792694474.626242,
+    "seen": 1792695357.090821,
+    "ast_hash": "3c818ecdbfe4b2e21e1df01f70dac109",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_worker.py": {
@@ -3204,21 +3204,21 @@
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-01-PLAN.md": {
-    "mtime": 1792678502.5724654,
-    "seen": 1792678669.2689288,
-    "ast_hash": "c8efbe81e2171640afd64f4a2bf499ef",
+    "mtime": 1792691693.2528636,
+    "seen": 1792695357.0917962,
+    "ast_hash": "84e4f084a76fb73775fe1ce96b408e0a",
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-CONTEXT.md": {
-    "mtime": 1792664879.2842777,
-    "seen": 1792666577.2210426,
-    "ast_hash": "b085da9e010a42a2b7a00cbdf3076e74",
+    "mtime": 1792691708.6277297,
+    "seen": 1792695357.0917997,
+    "ast_hash": "2b1e35f06dd24860c13db4272ad7b539",
     "semantic_hash": ""
   },
   "backend/requirements-worker.txt": {
-    "mtime": 1792665763.5577526,
-    "seen": 1792666577.2210522,
-    "ast_hash": "cd8bd07744bb2262a49907ea20447a73",
+    "mtime": 1792694092.064628,
+    "seen": 1792695357.0918212,
+    "ast_hash": "64714ae8458311b4ad5bd1e60984a467",
     "semantic_hash": ""
   },
   "docs/decisions/ADR-004-cinematic-rendering-worker-architecture.md": {
@@ -3246,9 +3246,9 @@
     "semantic_hash": ""
   },
   "docs/HYPERFRAMES_VS_NATIVE_EVALUATION.md": {
-    "mtime": 1792677320.0868092,
-    "seen": 1792678669.2689705,
-    "ast_hash": "2b1e003d696d5b66c6552f11261d3431",
+    "mtime": 1792691756.4013135,
+    "seen": 1792695357.0918334,
+    "ast_hash": "66d1bb0fed0586122f1cc91d0521c49d",
     "semantic_hash": ""
   },
   "backend/app/services/cinematic_dispatcher.py": {
@@ -3264,9 +3264,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-01-SUMMARY.md": {
-    "mtime": 1792678538.8821754,
-    "seen": 1792678669.2689316,
-    "ast_hash": "a7307a800a136d8245bbf139dbc90fc1",
+    "mtime": 1792691676.5220094,
+    "seen": 1792695357.0917978,
+    "ast_hash": "c707302ff80b8ae736dc9aa4c4d85915",
     "semantic_hash": ""
   },
   "backend/tests/test_security_remediation.py": {
@@ -3276,9 +3276,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md": {
-    "mtime": 1792687551.7552621,
-    "seen": 1792687829.4936168,
-    "ast_hash": "8a4319d54e5dcbe4d8244fe523b1f8d2",
+    "mtime": 1792695209.6467829,
+    "seen": 1792695357.0918012,
+    "ast_hash": "d802ec631ec180c091fd227ce7cbf451",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-CONTEXT.md": {
@@ -3294,9 +3294,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/AZURE_RESOURCE_INVENTORY.md": {
-    "mtime": 1792688731.9305317,
-    "seen": 1792688923.4393694,
-    "ast_hash": "092c6935b39d19e49cd7caf575d466e7",
+    "mtime": 1792695185.0119994,
+    "seen": 1792695357.0918107,
+    "ast_hash": "9dc8c8ec2fc01bc11f601f696fe8f77b",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/COST_MODEL_AND_BUDGET.md": {
@@ -3327,6 +3327,36 @@
     "mtime": 1792688841.8946238,
     "seen": 1792688923.4385312,
     "ast_hash": "fcbf1defd1d3546371fea319b2135600",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_queue_worker.py": {
+    "mtime": 1792694592.0222104,
+    "seen": 1792695357.0908482,
+    "ast_hash": "f3af68f968f806887c02be0cb05940b3",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-01-SUMMARY.md": {
+    "mtime": 1792692580.8310764,
+    "seen": 1792695357.0918021,
+    "ast_hash": "0c7c72223fd0e0e898d0b3b8acfc7d0c",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-03-SUMMARY.md": {
+    "mtime": 1792693092.534507,
+    "seen": 1792695357.0918033,
+    "ast_hash": "be0c6a312ca1914f10aacc4f43013768",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-04-SUMMARY.md": {
+    "mtime": 1792693591.971062,
+    "seen": 1792695357.0918047,
+    "ast_hash": "a3da7b98fc210a40a5766a2710e6c938",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-05-SUMMARY.md": {
+    "mtime": 1792695237.0905418,
+    "seen": 1792695357.0918057,
+    "ast_hash": "5fb6126ce4730dbe733e0c45416e2694",
     "semantic_hash": ""
   }
 }

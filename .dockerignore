@@ -20,3 +20,4 @@ backend/*.db*
 *.db
 *.db-shm
 *.db-wal
+backend/tests

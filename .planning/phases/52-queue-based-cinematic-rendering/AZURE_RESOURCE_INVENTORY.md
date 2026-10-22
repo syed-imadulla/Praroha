@@ -16,6 +16,7 @@ All existing resources reside in Resource Group `rg-tendersaathi` in region **Ce
 | **`cinematic-render-poison`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Dead-letter poison queue (>3 retries). *(Provisioned 2026-10-22)* |
 | **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `ConsumptionOnly` mode (Central India) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. *(Provisioned 2026-10-22)* |
 | **`queue-publish-url`** | `Microsoft.App/containerApps/secrets` | Stored in `praroha-backend` | Scoped SAS: `sp=a` (Add only) on `cinematic-render-jobs`, HTTPS-only, expires 2026-11-21T18:24Z (30 days). Not yet bound to env var. *(Stored 2026-10-22)* |
+| **`praroha-worker:v5`** | `Microsoft.ContainerRegistry/registries/repositories/tags` | Image in `tendersaathiacr.azurecr.io/praroha-worker:v5` | Queue-capable release image (digest `sha256:747160cf60fc2c7c72f77e659a714321771fba5d5eb135712122fb8bd0ce6e04`). Includes `--queue` consumer mode, schema validation, atomic CAS claiming, and FFmpeg composition. *(Built, tested & pushed 2026-10-22)* |
 
 ---
 
@@ -241,7 +242,7 @@ az containerapp job create \
 | **`Microsoft.App/jobs` in `centralindia`** | **TRUE (Verified)**. Central India is confirmed in Azure resource provider locations. | Job can be hosted locally in `centralindia` with zero cross-region data transfer fees. |
 | **Consumption Environment Base Fee** | **TRUE (Verified)**. ₹0.00 / month idle base fee on Consumption profile. | Zero recurring idle charges. |
 | **Worker Ingress Disabled** | **TRUE (Verified)**. Container Apps Jobs have no ingress listeners or open ports. | Complete network isolation from inbound attacks. |
-| **ACR Repository & Image Tag** | **`praroha-worker` (Verified)**. `v1-v4` exist. `v5` is unbuilt. | Tag `v5` will only be registered in ACA after explicit build, local test, and ACR push. |
+| **ACR Repository & Image Tag** | **`praroha-worker:v5` (Verified & Pushed)**. Tags `v1-v5` exist. Tag `v5` digest is `sha256:747160cf60fc2c7c72f77e659a714321771fba5d5eb135712122fb8bd0ce6e04`. | Validated locally, passed all 14 queue unit tests, and verified in ACR before job registration. |
 | **Worker CLI Argument Contract** | **`--args "--queue"` Required (Verified)**. Default CMD is `--server`. | Passing `--args "--queue"` guarantees finite batch execution and exit code 0 on completion. |
 | **Worker Environment Completeness** | **`DATABASE_URL`, `SUPABASE_KEY`, `STORAGE_PROVIDER` (Verified)**. | All required secrets and runtime variables explicitly provided in Job spec. |
 | **Free-Tier Compute Available** | **UNVERIFIED / TREATED AS ZERO**. Subscription already has active workloads. | 100% of compute cost is modeled as billable retail, yet remains < ₹5.05 for 100 runs. |
