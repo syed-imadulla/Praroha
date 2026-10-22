@@ -26,6 +26,7 @@ import { OriginBadge } from './OriginBadge';
 import { WhyIsThisHereModal, WhyIsThisHereData } from './WhyIsThisHereModal';
 import { EntityMediaSection } from './EntityMediaSection';
 import { AtmosphereDeck } from './AtmosphereDeck';
+import { ChangeImpactModal } from './ChangeImpactModal';
 import type { OriginType } from '../types';
 
 export const UniverseCodexCanvas: React.FC = () => {
@@ -53,6 +54,7 @@ export const UniverseCodexCanvas: React.FC = () => {
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isImpactModalOpen, setIsImpactModalOpen] = useState(false);
   const [selectedOriginFilter, setSelectedOriginFilter] = useState<OriginType | 'ALL'>('ALL');
   const [whyModalData, setWhyModalData] = useState<WhyIsThisHereData | null>(null);
 
@@ -591,9 +593,20 @@ export const UniverseCodexCanvas: React.FC = () => {
                   </div>
 
                   <div className="p-5 rounded-[20px] bg-[#F8F4E8] border border-[#D8CCB7] space-y-2 shadow-xs">
-                    <div className="flex items-center gap-2 text-[#355A46] text-xs font-bold font-serif uppercase tracking-wider">
-                      <Shield className="w-4 h-4" />
-                      <span>Physical Laws & Constraints</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-[#355A46] text-xs font-bold font-serif uppercase tracking-wider">
+                        <Shield className="w-4 h-4" />
+                        <span>Physical Laws & Constraints</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsImpactModalOpen(true)}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold font-mono uppercase bg-[#294B3A] text-[#FDFBF7] hover:bg-[#355A46] transition-colors shadow-2xs cursor-pointer"
+                        title="Analyze downstream impact and execute controlled regeneration"
+                      >
+                        <Edit3 className="w-3 h-3 text-[#88B04B]" />
+                        <span>Evolve Law & Blast Radius</span>
+                      </button>
                     </div>
                     <p className="text-[#394840] text-xs md:text-sm leading-relaxed">
                       {unfoldedUniverse.world_bible.physics_rules}
@@ -1215,6 +1228,20 @@ export const UniverseCodexCanvas: React.FC = () => {
 
       {/* Persistent Atmosphere Deck (D-04) */}
       <AtmosphereDeck />
+
+      {/* Controlled Regeneration & Blast Radius Impact Modal (Phase 45) */}
+      {unfoldedUniverse?.world_bible && (
+        <ChangeImpactModal
+          isOpen={isImpactModalOpen}
+          onClose={() => setIsImpactModalOpen(false)}
+          upstreamEntityType="world_bible"
+          upstreamEntityId={unfoldedUniverse.world_bible.id}
+          upstreamTitle="World Bible Physical Laws"
+          currentValue={unfoldedUniverse.world_bible.physics_rules}
+          fieldName="physics_rules"
+          onRegenerationComplete={() => setIsImpactModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

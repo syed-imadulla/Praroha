@@ -112,6 +112,15 @@ from backend.app.models.job import (
     GenerationJobBase,
     GenerationJobRead,
 )
+from backend.app.models.dependency import (
+    ImpactClassification,
+    DependencyLinkType,
+    ImpactedNodeRead,
+    ImpactPreviewRequest,
+    ImpactPreviewResponse,
+    SelectiveRegenerateRequest,
+    SelectiveRegenerateResponse,
+)
 
 __all__ = [
     "Project",
@@ -205,6 +214,13 @@ __all__ = [
     "CreativeMemoryBase",
     "CreativeMemoryRecord",
     "CreativeMemoryRead",
+    "ImpactClassification",
+    "DependencyLinkType",
+    "ImpactedNodeRead",
+    "ImpactPreviewRequest",
+    "ImpactPreviewResponse",
+    "SelectiveRegenerateRequest",
+    "SelectiveRegenerateResponse",
 ]
 
 

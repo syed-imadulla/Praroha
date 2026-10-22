@@ -21,10 +21,10 @@ PRAROHA decouples all artificial intelligence generation behind clean, modular p
 | Provider | Modality & Purpose | Integration Status | Automated Test Status | Live Execution Result | Output Validation | Production Limitation |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Google Gemini** | Text: Seed DNA, 3 Worlds, Codex Unfolding | **Fully Implemented** | Passed (42 tests) | **VERIFIED LIVE** (~1.9s) | Structured JSON validated against Pydantic models | Standard Google AI Studio rate limits and quotas. |
-| **Pollinations.ai** | Image: Concept Art & Character Portraits | **Fully Implemented** | Passed (24 tests) | **VERIFIED LIVE** (~450ms) | Valid 1024×1024 JPEG (`\xff\xd8` magic bytes) | Unauthenticated mode defaults to `sana` model. Requires funded key for paid-only models. |
+| **Pollinations.ai** | Image: Concept Art & Character Portraits | **Fully Implemented** | Passed (24 tests) | **VERIFIED LIVE** (~450ms) | Valid 1024×1024 JPEG (`\xff\xd8` magic bytes) | Unauthenticated mode pins to free Flux tier. Non-free models require authenticated key. |
 | **Microsoft Edge-TTS** | Audio: Character Voice & Scene Narration | **Fully Implemented** | Passed (16 tests) | **VERIFIED LIVE** (~960ms) | Valid MP3 audio (`audio/mpeg`), playable via HTML5 | Online dependency relying on Microsoft Edge online service. |
-| **Stability AI Stable Audio** | Audio: Atmospheric Soundscapes | **Fully Implemented** | Passed (12 tests) | **BLOCKED (HTTP 401/402)** | N/A — live requests fail cleanly without generating fake media | Requires funded `STABILITY_API_KEY` with available generation credits. |
-| **Hugging Face / ACE-Step** | Audio: Atmospheric Music Synthesis | **Fully Implemented** | Passed (8 tests) | **BLOCKED (HTTP 404/410)** | N/A — live requests fail cleanly with error toast | Model `facebook/musicgen-small` requires a dedicated inference endpoint (`ACE_STEP_ENDPOINT`). |
+| **Procedural Soundscape Composer** | Audio: Ambient Soundscapes | **Fully Implemented** | Passed (10 tests) | **VERIFIED LIVE** (<10ms) | 16-bit PCM WAV (`audio/wav`) with valid RIFF headers | Pure procedural synthesis using curated CC0 public domain layers. |
+| **Video Generation** | Scene Motion & Previews | **Retired / Currently Unavailable** | Retired | N/A — actions gracefully disabled | N/A | External APIs (JSON2Video, Pixazo, Pyramid Flow, Rewind) retired due to unreliability. Phase 46 evaluates HyperFrames. |
 
 ---
 

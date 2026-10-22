@@ -60,9 +60,10 @@ graph TD
 | **Core LLM** | Google AI Studio | `GEMINI_API_KEY` | **Yes** (World unfolding, DNA extraction) |
 | **Database** | Supabase Postgres / Neon | `DATABASE_URL` | **Yes** (Persistent project entities) |
 | **Media Storage** | Supabase Storage | `STORAGE_PROVIDER=supabase`, `SUPABASE_URL`, `SUPABASE_KEY` | **Yes** (Avoids ephemeral container data loss) |
-| **Authentication** | Supabase Auth | `SUPABASE_URL`, `SUPABASE_KEY` | **Yes** (User registration & email verification) |
-| **Atmospheric Audio** | Hugging Face Router or Stability AI | `HF_TOKEN` or `STABILITY_API_KEY` | Optional (Required for live audio generation) |
-| **Video Generation** | Hugging Face Router | `HF_TOKEN` | Optional (Required for live video generation) |
+| **Visual Art (Images)** | Pollinations (Flux) | `POLLINATIONS_API_KEY` | Optional (Free tier default) |
+| **Narration Voice** | Microsoft Edge-TTS | None | Built-in (Free, high-fidelity neural voices) |
+| **Atmospheric Audio** | Procedural Soundscape Composer | None | Built-in (Free, CC0 multi-track synthesis) |
+| **Video Generation** | Retired / Phase 46 Preview Engine | N/A | Retired due to unreliability / Currently Unavailable |
 
 ---
 
@@ -299,17 +300,11 @@ az containerapp create \
     database-url="<YOUR_SUPABASE_DATABASE_URL>" \
     supabase-url="<YOUR_SUPABASE_URL>" \
     supabase-key="<YOUR_SUPABASE_SERVICE_ROLE_OR_ANON_KEY>" \
-    json2video-key="<YOUR_JSON2VIDEO_KEY>" \
-    pixazo-key="<YOUR_PIXAZO_KEY>" \
-    rewind-key="<YOUR_REWIND_KEY>" \
   --secret-env-vars \
     GEMINI_API_KEY=secretref:gemini-key \
     DATABASE_URL=secretref:database-url \
     SUPABASE_URL=secretref:supabase-url \
-    SUPABASE_KEY=secretref:supabase-key \
-    JSON2VIDEO_API_KEY=secretref:json2video-key \
-    PIXAZO_API_KEY=secretref:pixazo-key \
-    REWIND_API_KEY=secretref:rewind-key
+    SUPABASE_KEY=secretref:supabase-key
 ```
 
 ##### Background Job Recovery & Scale Configuration

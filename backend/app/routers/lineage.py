@@ -4,10 +4,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.auth import require_project_owner
 from backend.app.core.response import APIResponse, api_success
+from backend.app.models.dependency import (
+    ImpactPreviewRequest,
+    ImpactPreviewResponse,
+    SelectiveRegenerateRequest,
+    SelectiveRegenerateResponse,
+)
 from backend.app.models.lineage import AncestorPathRead, TraceGraphRead
 from backend.app.models.project import Project
 from backend.app.repositories.project_repo import ProjectRepository, get_session
+from backend.app.services.dependency_service import DependencyGraphService
 from backend.app.services.lineage_service import LineageService
+from backend.app.services.regeneration_service import SelectiveRegenerationService
 
 logger = logging.getLogger("seed_unfold.router.lineage")
 
@@ -68,3 +76,78 @@ async def get_node_ancestor_path(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to trace node ancestors: {str(exc)}",
         )
+
+
+@router.post("/lineage/impact-preview", response_model=APIResponse[ImpactPreviewResponse])
+async def preview_change_impact(
+    project_id: str,
+    request: ImpactPreviewRequest,
+    project: Project = Depends(require_project_owner),
+    session: AsyncSession = Depends(get_session),
+) -> APIResponse[ImpactPreviewResponse]:
+    """
+    Compute dependency blast radius and preview the impact of a proposed upstream mutation.
+    Returns categorized nodes (AFFECTED, CONDITIONAL, PRESERVED) with causal rationales.
+    Zero persistent database side-effects.
+    """
+    repo = ProjectRepository(session)
+    service = DependencyGraphService(repo)
+    try:
+        response = await service.analyze_impact(project_id, request)
+        return api_success(response)
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        logger.error(f"Failed to preview impact for project {project_id}: {exc}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to analyze change impact: {str(exc)}",
+        )
+
+
+@router.post("/lineage/regenerate-selective", response_model=APIResponse[SelectiveRegenerateResponse])
+async def regenerate_selective(
+    project_id: str,
+    request: SelectiveRegenerateRequest,
+    project: Project = Depends(require_project_owner),
+    session: AsyncSession = Depends(get_session),
+) -> APIResponse[SelectiveRegenerateResponse]:
+    """
+    Selectively regenerate authorized downstream entities while preserving unaffected nodes and creator locks.
+    Archives prior revisions, validates concurrency, and synchronizes Creative Memory.
+    """
+    repo = ProjectRepository(session)
+    service = SelectiveRegenerationService(repo)
+    try:
+        response = await service.execute_selective_regeneration(project_id, request)
+        return api_success(response)
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        logger.error(f"Failed selective regeneration for project {project_id}: {exc}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to execute selective regeneration: {str(exc)}",
+        )
+

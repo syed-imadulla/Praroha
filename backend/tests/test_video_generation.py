@@ -1,7 +1,7 @@
 import asyncio
 import io
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 import httpx
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -10,15 +10,14 @@ from backend.app.main import app
 from backend.app.models.dna import SeedDNA
 from backend.app.models.world import WorldCandidateRecord
 from backend.app.models.unfold import SceneRecord
-from backend.app.models.media import MediaAssetRecord, MediaGenerationRequest
+from backend.app.models.media import MediaGenerationRequest
 from backend.app.models.project import ProjectCreate
 from backend.app.providers.media.base import (
     MediaPayload,
     ProviderUnavailableError,
 )
 from backend.app.providers.media.composite_video import CompositeVideoProvider
-from backend.app.providers.media.mock import MockVideoProvider, _generate_minimal_mp4_bytes
-from backend.app.providers.media.pyramid_flow import PyramidFlowProvider
+from backend.app.providers.media.mock import MockVideoProvider
 from backend.app.providers.media.wan import WanVideoProvider
 from backend.app.repositories.project_repo import ProjectRepository, async_session
 from backend.app.services.media_service import MediaService
@@ -47,45 +46,6 @@ async def test_mock_mp4_container_structure():
 
 
 @pytest.mark.asyncio
-async def test_pyramid_flow_parameters_and_url():
-    """Validates Pyramid Flow request payload formatting and bearer authentication."""
-    provider = PyramidFlowProvider(endpoint="https://api.mock.test/pyramid", hf_token="hf_secret123", timeout_sec=45.0)
-
-    mock_response = httpx.Response(
-        200,
-        content=b"\x00\x00\x00\x20ftypisom" + b"\x00" * 200,
-        headers={"content-type": "video/mp4"},
-    )
-
-    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
-        mock_post.return_value = mock_response
-        payload = await provider.generate_video(prompt="A mystical floating island", duration_sec=5, context={"aspect_ratio": "16:9"})
-
-        mock_post.assert_called_once()
-        call_kwargs = mock_post.call_args.kwargs
-        assert call_kwargs["json"]["inputs"] == "A mystical floating island"
-        assert call_kwargs["json"]["parameters"]["aspect_ratio"] == "16:9"
-        assert call_kwargs["json"]["parameters"]["duration_sec"] == 5
-        assert call_kwargs["headers"]["Authorization"] == "Bearer hf_secret123"
-
-        assert payload.metadata["resolved_provider"] == "pyramid-flow"
-        assert payload.metadata["duration_sec"] == 5
-        assert payload.metadata["aspect_ratio"] == "16:9"
-        assert payload.metadata["resolution"] == "720p"
-
-
-@pytest.mark.asyncio
-async def test_pyramid_flow_retry_and_timeout():
-    """Validates timeout handling cascades gracefully by raising ProviderUnavailableError."""
-    provider = PyramidFlowProvider(endpoint="https://api.mock.test/pyramid", timeout_sec=1.0)
-
-    with patch("httpx.AsyncClient.post", side_effect=httpx.TimeoutException("Connection timed out")):
-        with pytest.raises(ProviderUnavailableError) as exc_info:
-            await provider.generate_video(prompt="Expansive canyon")
-        assert "network error" in str(exc_info.value).lower()
-
-
-@pytest.mark.asyncio
 async def test_wan_video_provider_parameters_and_execution():
     """Validates Wan2.1 microservice invocation and payload normalization."""
     provider = WanVideoProvider(endpoint="http://localhost:8890/v1/video/generate", timeout_sec=30.0)
@@ -109,44 +69,13 @@ async def test_wan_video_provider_parameters_and_execution():
 
 
 @pytest.mark.asyncio
-async def test_3_tier_fallback_pyramid_fail_wan_success():
-    """Verifies: Tier 1 (Pyramid Flow) fails -> Tier 2 (Wan2.1) succeeds -> resolved_provider is 'wan2.1'."""
-    pyramid_mock = AsyncMock(spec=PyramidFlowProvider)
-    pyramid_mock.generate_video.side_effect = ProviderUnavailableError("Pyramid Flow 503 service unavailable")
-
-    wan_mock = AsyncMock(spec=WanVideoProvider)
-    wan_mock.generate_video.return_value = MediaPayload(
-        data=b"mock_wan_mp4_bytes",
-        mime_type="video/mp4",
-        filename="wan_clip.mp4",
-        metadata={
-            "resolved_provider": "wan2.1",
-            "duration_sec": 5,
-            "aspect_ratio": "16:9",
-            "resolution": "720p",
-        },
-    )
-
-    composite = CompositeVideoProvider(pyramid=pyramid_mock, wan=wan_mock, mock=MockVideoProvider())
-    payload = await composite.generate_video(prompt="Dramatic reveal")
-
-    assert payload.metadata["resolved_provider"] == "wan2.1"
-    assert payload.metadata["duration_sec"] == 5
-    assert payload.metadata["aspect_ratio"] == "16:9"
-    assert payload.metadata["resolution"] == "720p"
-    wan_mock.generate_video.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_3_tier_fallback_pyramid_and_wan_fail_mock_success():
-    """Verifies: Tier 1 & Tier 2 fail -> Tier 3 (Mock) succeeds with 0 unhandled errors and resolved_provider='mock'."""
-    pyramid_mock = AsyncMock(spec=PyramidFlowProvider)
-    pyramid_mock.generate_video.side_effect = ProviderUnavailableError("Pyramid Flow quota exceeded")
-
+async def test_composite_video_fallback_wan_fail_mock_success():
+    """Verifies: Wan2.1 fails -> Mock succeeds in test/demo mode with resolved_provider='mock'."""
     wan_mock = AsyncMock(spec=WanVideoProvider)
     wan_mock.generate_video.side_effect = ProviderUnavailableError("Wan2.1 GPU microservice offline")
+    wan_mock.endpoint = "http://localhost:8890"
 
-    composite = CompositeVideoProvider(pyramid=pyramid_mock, wan=wan_mock, mock=MockVideoProvider())
+    composite = CompositeVideoProvider(wan=wan_mock, mock=MockVideoProvider())
     payload = await composite.generate_video(prompt="Ancient monolith awaken")
 
     assert payload.metadata["resolved_provider"] == "mock"
@@ -158,12 +87,12 @@ async def test_3_tier_fallback_pyramid_and_wan_fail_mock_success():
 
 
 @pytest.mark.asyncio
-async def test_3_tier_fallback_via_context_outage_simulation():
-    """Verifies contextual outage simulation triggers seamless cascade down to MockVideoProvider."""
+async def test_composite_video_outage_simulation():
+    """Verifies contextual outage simulation triggers non-blocking cascade down to MockVideoProvider."""
     composite = CompositeVideoProvider()
     payload = await composite.generate_video(
         prompt="Simulated fallback scene",
-        context={"simulate_pyramid_unavailable": True, "simulate_wan_unavailable": True},
+        context={"simulate_wan_unavailable": True},
     )
     assert payload.metadata["resolved_provider"] == "mock"
     assert payload.metadata["duration_sec"] == 5
@@ -172,7 +101,7 @@ async def test_3_tier_fallback_via_context_outage_simulation():
 @pytest.mark.asyncio
 async def test_provider_response_isolation():
     """D-06: Verifies that vendor response payloads are normalized into MediaPayload without leaking vendor structures."""
-    provider = PyramidFlowProvider(endpoint="https://api.mock.test/pyramid")
+    provider = WanVideoProvider(endpoint="http://localhost:8890/v1/video/generate")
     mock_response = httpx.Response(
         200,
         json={"video_base64": "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDE=", "vendor_extra_id": 9999},
@@ -182,7 +111,6 @@ async def test_provider_response_isolation():
         mock_post.return_value = mock_response
         payload = await provider.generate_video(prompt="Canyon river")
         assert isinstance(payload, MediaPayload)
-        # Ensure only canonical keys are exposed
         assert "resolved_provider" in payload.metadata
         assert "duration_sec" in payload.metadata
         assert "vendor_extra_id" not in payload.metadata
@@ -308,7 +236,7 @@ async def test_video_metadata_persistence():
         assert asset.asset_url is not None
 
         meta = json.loads(asset.metadata_json)
-        assert meta["resolved_provider"] in ["pyramid-flow", "wan2.1", "mock"]
+        assert meta["resolved_provider"] in ["wan2.1", "mock"]
         assert meta["duration_sec"] == 5
         assert meta["aspect_ratio"] == "16:9"
         assert meta["resolution"] == "720p"

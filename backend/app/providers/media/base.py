@@ -172,3 +172,17 @@ class MediaProvider(ABC):
     async def health_check(self) -> Dict[str, Any]:
         """Verify availability and health of all configured media sub-providers."""
         pass
+
+
+def detect_audio_mime_type(content_type: str, data: bytes) -> tuple[str, str]:
+    """Detect audio MIME type and file extension based on magic bytes and headers."""
+    if data.startswith(b"RIFF") and b"WAVE" in data[:12]:
+        return "audio/wav", ".wav"
+    if data.startswith(b"ID3") or data.startswith(b"\xff\xfb") or data.startswith(b"\xff\xf3"):
+        return "audio/mpeg", ".mp3"
+    if "wav" in content_type.lower():
+        return "audio/wav", ".wav"
+    if "mpeg" in content_type.lower() or "mp3" in content_type.lower():
+        return "audio/mpeg", ".mp3"
+    return "audio/wav", ".wav"
+

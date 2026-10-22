@@ -124,7 +124,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
       voice_id: mediaType === 'voice' ? selectedVoicePersona : undefined,
       duration_sec: mediaType === 'video' ? 5 : (mediaType === 'audio' ? 15 : undefined),
       mood: mediaType === 'audio' ? selectedAudioMood : undefined,
-      context: mediaType === 'video' ? { provider: 'json2video' } : undefined,
+      context: undefined,
     });
   };
 
@@ -281,49 +281,17 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
 
           {availableModalities.map((modality) => {
             if (modality === 'video') {
-              const isVideoGenerating = !!isGeneratingMedia[`${entityId}_video`];
-              const existingVideo = assets.find((a) => a.media_type === 'video');
-
               return (
                 <div key="video" className="flex items-center gap-2 flex-wrap">
-                  {/* Real Generative AI Video - Visibly disabled without free cloud allowance */}
+                  {/* Video Generation - Retired / Currently Unavailable */}
                   <div
                     data-testid={`generate-video-disabled-${entityId}`}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#EAE4D4] text-[#718875] border border-[#D8CCB7] cursor-not-allowed opacity-80 min-h-[32px]"
-                    title="Real generative AI video requires cloud credits. Composed cinematic preview available via JSON2Video."
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#EAE4D4] text-[#8C7A6B] border border-[#D8CCB7] cursor-not-allowed opacity-80 min-h-[32px]"
+                    title="Video generation is currently unavailable. Generative video services have been retired due to poor reliability."
                   >
-                    <Video className="w-3.5 h-3.5 text-[#718875]" />
-                    <span>AI Video (Credits Required)</span>
+                    <Video className="w-3.5 h-3.5 text-[#8C7A6B]" />
+                    <span>Video Generation Unavailable</span>
                   </div>
-
-                  {/* Composed Cinematic Preview (JSON2Video) */}
-                  {entityType === 'scene' && (
-                    <button
-                      type="button"
-                      onClick={() => handleGenerate('video')}
-                      disabled={isVideoGenerating}
-                      data-testid={`generate-cinematic-preview-${entityId}`}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#6A4B67] ${
-                        isVideoGenerating
-                          ? 'bg-[#EBD8EB] border-[#D4C3D2] text-[#6A4B67] cursor-not-allowed opacity-80'
-                          : 'bg-[#F5EDF5] hover:bg-[#EBD8EB] text-[#6A4B67] border-[#D4C3D2] hover:border-[#BFA8BD] shadow-2xs'
-                      }`}
-                      title="Render composed cinematic preview combining concept art and voice narration via JSON2Video"
-                    >
-                      {isVideoGenerating ? (
-                        <RotateCw className="w-3.5 h-3.5 animate-spin text-[#6A4B67]" />
-                      ) : (
-                        <Video className="w-3.5 h-3.5 text-[#6A4B67]" />
-                      )}
-                      <span>
-                        {isVideoGenerating
-                          ? 'Composing Preview...'
-                          : existingVideo
-                          ? 'Re-compose Preview'
-                          : 'Cinematic Preview (JSON2Video)'}
-                      </span>
-                    </button>
-                  )}
                 </div>
               );
             }

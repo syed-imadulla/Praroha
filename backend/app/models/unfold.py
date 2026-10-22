@@ -53,6 +53,11 @@ class WorldBibleBase(SQLModel):
     canon_facts_json: str = Field(default="[]")
     key_locations_json: str = Field(default="[]")
     visual_style_prompt: str
+    version: int = Field(default=1)
+    revision_notes: Optional[str] = Field(default=None, nullable=True)
+    is_stale: bool = Field(default=False)
+    stale_reason: Optional[str] = Field(default=None, nullable=True)
+    is_locked: bool = Field(default=False)
 
 
 class WorldBibleRecord(WorldBibleBase, table=True):
@@ -129,6 +134,11 @@ class WorldBibleRecord(WorldBibleBase, table=True):
             canon_facts=canon_facts,
             key_locations=key_locations,
             visual_style_prompt=self.visual_style_prompt,
+            version=self.version,
+            revision_notes=self.revision_notes,
+            is_stale=self.is_stale,
+            stale_reason=self.stale_reason,
+            is_locked=self.is_locked,
             created_at=self.created_at,
         )
 
@@ -144,6 +154,11 @@ class WorldBibleRead(BaseModel):
     canon_facts: List[str]
     key_locations: List[LocationItem]
     visual_style_prompt: str
+    version: int = 1
+    revision_notes: Optional[str] = None
+    is_stale: bool = False
+    stale_reason: Optional[str] = None
+    is_locked: bool = False
     created_at: datetime
 
 
@@ -164,6 +179,10 @@ class CharacterBase(SQLModel):
     revision_notes: Optional[str] = Field(default=None, nullable=True)
     origin_type: str = Field(default="AI_INTRODUCED")
     origin_source: Optional[str] = Field(default=None, nullable=True)
+    is_stale: bool = Field(default=False)
+    stale_reason: Optional[str] = Field(default=None, nullable=True)
+    is_approved: bool = Field(default=False)
+    is_locked: bool = Field(default=False)
 
 
 class CharacterRecord(CharacterBase, table=True):
@@ -191,6 +210,10 @@ class CharacterRecord(CharacterBase, table=True):
             revision_notes=self.revision_notes,
             origin_type=self.origin_type,
             origin_source=self.origin_source,
+            is_stale=self.is_stale,
+            stale_reason=self.stale_reason,
+            is_approved=self.is_approved,
+            is_locked=self.is_locked,
             created_at=self.created_at,
         )
 
@@ -209,6 +232,10 @@ class CharacterRead(BaseModel):
     revision_notes: Optional[str] = None
     origin_type: str = "AI_INTRODUCED"
     origin_source: Optional[str] = None
+    is_stale: bool = False
+    stale_reason: Optional[str] = None
+    is_approved: bool = False
+    is_locked: bool = False
     created_at: datetime
 
 
@@ -286,6 +313,10 @@ class SceneBase(SQLModel):
     revision_notes: Optional[str] = Field(default=None, nullable=True)
     origin_type: str = Field(default="AI_INTRODUCED")
     origin_source: Optional[str] = Field(default=None, nullable=True)
+    is_stale: bool = Field(default=False)
+    stale_reason: Optional[str] = Field(default=None, nullable=True)
+    is_approved: bool = Field(default=False)
+    is_locked: bool = Field(default=False)
 
 
 class SceneRecord(SceneBase, table=True):
@@ -322,6 +353,10 @@ class SceneRecord(SceneBase, table=True):
             revision_notes=self.revision_notes,
             origin_type=self.origin_type,
             origin_source=self.origin_source,
+            is_stale=self.is_stale,
+            stale_reason=self.stale_reason,
+            is_approved=self.is_approved,
+            is_locked=self.is_locked,
             created_at=self.created_at,
         )
 
@@ -342,6 +377,10 @@ class SceneRead(BaseModel):
     revision_notes: Optional[str] = None
     origin_type: str = "AI_INTRODUCED"
     origin_source: Optional[str] = None
+    is_stale: bool = False
+    stale_reason: Optional[str] = None
+    is_approved: bool = False
+    is_locked: bool = False
     created_at: datetime
 
 

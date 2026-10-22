@@ -141,6 +141,26 @@ def _migrate_columns(connection):
                 connection.execute(text("ALTER TABLE characters ADD COLUMN origin_source TEXT"))
             except Exception:
                 pass
+        if "is_stale" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN is_stale BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
+        if "stale_reason" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN stale_reason TEXT"))
+            except Exception:
+                pass
+        if "is_approved" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN is_approved BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
+        if "is_locked" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE characters ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
 
     if "scenes" in table_names:
         cols = [c["name"] for c in inspector.get_columns("scenes")]
@@ -162,6 +182,54 @@ def _migrate_columns(connection):
         if "origin_source" not in cols:
             try:
                 connection.execute(text("ALTER TABLE scenes ADD COLUMN origin_source TEXT"))
+            except Exception:
+                pass
+        if "is_stale" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN is_stale BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
+        if "stale_reason" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN stale_reason TEXT"))
+            except Exception:
+                pass
+        if "is_approved" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN is_approved BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
+        if "is_locked" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE scenes ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
+
+    if "world_bibles" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("world_bibles")]
+        if "version" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN version INTEGER DEFAULT 1"))
+            except Exception:
+                pass
+        if "revision_notes" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN revision_notes VARCHAR"))
+            except Exception:
+                pass
+        if "is_stale" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN is_stale BOOLEAN DEFAULT 0"))
+            except Exception:
+                pass
+        if "stale_reason" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN stale_reason TEXT"))
+            except Exception:
+                pass
+        if "is_locked" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
             except Exception:
                 pass
 

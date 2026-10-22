@@ -239,6 +239,11 @@ export interface WorldBibleRead {
   canon_facts: string[];
   key_locations: LocationItem[];
   visual_style_prompt: string;
+  version?: number;
+  revision_notes?: string | null;
+  is_stale?: boolean;
+  stale_reason?: string | null;
+  is_locked?: boolean;
   created_at: string;
 }
 
@@ -256,6 +261,10 @@ export interface CharacterRead {
   revision_notes?: string | null;
   origin_type?: OriginType;
   origin_source?: string | null;
+  is_stale?: boolean;
+  stale_reason?: string | null;
+  is_approved?: boolean;
+  is_locked?: boolean;
   created_at: string;
 }
 
@@ -288,6 +297,10 @@ export interface SceneRead {
   revision_notes?: string | null;
   origin_type?: OriginType;
   origin_source?: string | null;
+  is_stale?: boolean;
+  stale_reason?: string | null;
+  is_approved?: boolean;
+  is_locked?: boolean;
   created_at: string;
 }
 
@@ -777,6 +790,68 @@ export interface CreativeMemoryRead {
   updated_at: string;
 }
 
+// ==========================================
+// Phase 45: Dependency & Controlled Regeneration Types
+// ==========================================
 
+export type ImpactClassification = 'AFFECTED' | 'CONDITIONAL' | 'PRESERVED';
 
+export type DependencyLinkType =
+  | 'CAUSAL_DIRECT'
+  | 'CAUSAL_TRANSITIVE'
+  | 'CANON_RULE'
+  | 'RELATIONSHIP'
+  | 'HEURISTIC_AMBIGUOUS';
 
+export interface ImpactedNodeRead {
+  entity_id: string;
+  entity_type: string;
+  name_or_title: string;
+  classification: ImpactClassification;
+  reason: string;
+  link_type: DependencyLinkType;
+  is_locked: boolean;
+  is_approved: boolean;
+  confidence: number;
+  current_version: number;
+  provenance_summary?: string | null;
+}
+
+export interface ImpactPreviewRequest {
+  upstream_entity_type: string;
+  upstream_entity_id: string;
+  proposed_change: Record<string, any>;
+  change_summary?: string | null;
+}
+
+export interface ImpactPreviewResponse {
+  project_id: string;
+  upstream_entity_type: string;
+  upstream_entity_id: string;
+  change_summary: string;
+  affected_nodes: ImpactedNodeRead[];
+  conditional_nodes: ImpactedNodeRead[];
+  preserved_nodes: ImpactedNodeRead[];
+  locked_node_count: number;
+  has_ambiguous_provenance: boolean;
+  ambiguity_warnings: string[];
+}
+
+export interface SelectiveRegenerateRequest {
+  upstream_entity_type: string;
+  upstream_entity_id: string;
+  proposed_change: Record<string, any>;
+  selected_entity_ids: string[];
+  force_unlock_entity_ids?: string[];
+  expected_versions?: Record<string, number>;
+  change_summary?: string | null;
+}
+
+export interface SelectiveRegenerateResponse {
+  project_id: string;
+  regenerated_entities: Array<Record<string, any>>;
+  preserved_entities: Array<Record<string, any>>;
+  revisions_created: Array<Record<string, any>>;
+  updated_creative_memory_version: number;
+  message: string;
+}

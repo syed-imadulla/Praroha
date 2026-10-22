@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1792655873.6566486,
-    "seen": 1792656129.2127352,
-    "ast_hash": "3ff455f617c920452c9cb83834caed09",
+    "mtime": 1792658559.539926,
+    "seen": 1792659799.5175357,
+    "ast_hash": "ff8a5fd0570a31c44604bcd5103d12e3",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1792655558.3210545,
-    "seen": 1792656129.2129025,
-    "ast_hash": "489989343be8799cc49026436fb78f16",
+    "mtime": 1792659084.500366,
+    "seen": 1792659799.5177839,
+    "ast_hash": "15df9187aea3470f0ec16d56138a3c0b",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1792655521.2473464,
-    "seen": 1792656129.2129893,
-    "ast_hash": "708e99f13fb46b0c60619b564fddf57d",
+    "mtime": 1792659051.697647,
+    "seen": 1792659799.5178862,
+    "ast_hash": "3ae75e3a28690584d0c8312b474acf13",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1792654994.2846518,
-    "seen": 1792656129.2126691,
-    "ast_hash": "4277c4500005965dee4f73f5330aea59",
+    "mtime": 1792658611.0354784,
+    "seen": 1792659799.5173914,
+    "ast_hash": "bc4773d814ff694d7ba268831dc7b2a6",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -684,15 +684,15 @@
     "semantic_hash": ""
   },
   "backend/app/models/unfold.py": {
-    "mtime": 1791491080.6959262,
-    "seen": 1791493004.1366875,
-    "ast_hash": "58c912e22d6dd6b8ed8e3e3418051e56",
+    "mtime": 1792658531.4951699,
+    "seen": 1792659799.517442,
+    "ast_hash": "ee8a3c15ffc65aded25fddf5da516890",
     "semantic_hash": ""
   },
   "backend/app/routers/unfold.py": {
-    "mtime": 1792655461.0378206,
-    "seen": 1792656129.212756,
-    "ast_hash": "e56eaef947f5f5cc0c43983b97b7db4e",
+    "mtime": 1792657764.5097058,
+    "seen": 1792658009.0099845,
+    "ast_hash": "2531cbdd654890f21620afacbdb063ea",
     "semantic_hash": ""
   },
   "backend/tests/test_unfold.py": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/UniverseCodexCanvas.tsx": {
-    "mtime": 1791712545.3387675,
-    "seen": 1791713593.1264093,
-    "ast_hash": "0c9195f4851940fd7c8c79377885d09b",
+    "mtime": 1792659207.5703373,
+    "seen": 1792659799.5178246,
+    "ast_hash": "09dfe8b5b77a9d65e947004bd9216a67",
     "semantic_hash": ""
   },
   ".planning/phases/05-progressive-world-unfolding/05-SUMMARY.md": {
@@ -720,21 +720,21 @@
     "semantic_hash": ""
   },
   "backend/app/models/lineage.py": {
-    "mtime": 1791373969.8296773,
-    "seen": 1791375803.291866,
-    "ast_hash": "5439967068276e8216c8d6d877654e3d",
+    "mtime": 1792658681.8758626,
+    "seen": 1792659799.517412,
+    "ast_hash": "594acec2b26af7b8a12419922603cfaf",
     "semantic_hash": ""
   },
   "backend/app/routers/lineage.py": {
-    "mtime": 1791483161.356609,
-    "seen": 1791484196.6686335,
-    "ast_hash": "0fe31722892c9d6d1a330430cda83001",
+    "mtime": 1792658998.9941053,
+    "seen": 1792659799.5175548,
+    "ast_hash": "3e0580fade8d8611181cd13a37663002",
     "semantic_hash": ""
   },
   "backend/app/services/lineage_service.py": {
-    "mtime": 1791409791.6689088,
-    "seen": 1791410824.2418375,
-    "ast_hash": "a219fe1ce382fa07cd0882e3ff7995fd",
+    "mtime": 1792659726.6939983,
+    "seen": 1792659799.5176022,
+    "ast_hash": "78e3dfad28298a72b198cf78383a421d",
     "semantic_hash": ""
   },
   "backend/tests/test_lineage.py": {
@@ -3096,27 +3096,57 @@
     "semantic_hash": ""
   },
   "backend/app/services/consistency_validator.py": {
-    "mtime": 1792655344.3197362,
-    "seen": 1792656129.2127588,
-    "ast_hash": "2b6239f20b6e4c214e1ed70229f5c133",
+    "mtime": 1792657735.4849443,
+    "seen": 1792658009.0099888,
+    "ast_hash": "e864d16e631e445d306587d1c24fb07b",
     "semantic_hash": ""
   },
   "backend/app/services/context_service.py": {
-    "mtime": 1792655301.2940736,
-    "seen": 1792656129.2127597,
-    "ast_hash": "0e1129d21dd231938db711b393ee2007",
+    "mtime": 1792657823.866218,
+    "seen": 1792658009.0099907,
+    "ast_hash": "6e37f5b814867b68664af7259f8dd95c",
     "semantic_hash": ""
   },
   "backend/tests/test_creative_memory.py": {
-    "mtime": 1792655946.7441099,
-    "seen": 1792656129.2127864,
-    "ast_hash": "56d3c4cb4eee818a33cd7587f0a341b4",
+    "mtime": 1792657899.3525975,
+    "seen": 1792658009.0100145,
+    "ast_hash": "fa0bb54ca92cc5dc0898277cd131c01e",
     "semantic_hash": ""
   },
   ".planning/phases/44-universe-consistency-creative-memory/44-01-SUMMARY.md": {
-    "mtime": 1792656088.9210882,
-    "seen": 1792656129.2133205,
-    "ast_hash": "e304ef5b44752c0ea7927263736bd35a",
+    "mtime": 1792658044.182407,
+    "seen": 1792659799.518247,
+    "ast_hash": "fe7685db82b65b7cec33d960409de716",
+    "semantic_hash": ""
+  },
+  "backend/app/models/dependency.py": {
+    "mtime": 1792658581.046739,
+    "seen": 1792659799.517401,
+    "ast_hash": "f5ff91da427bb4fe94f26492da50934f",
+    "semantic_hash": ""
+  },
+  "backend/app/services/dependency_service.py": {
+    "mtime": 1792658668.139982,
+    "seen": 1792659799.5175962,
+    "ast_hash": "23445ca95c036151c7a1d7d50cd8efd4",
+    "semantic_hash": ""
+  },
+  "backend/app/services/regeneration_service.py": {
+    "mtime": 1792659568.2523227,
+    "seen": 1792659799.5176141,
+    "ast_hash": "d7f948e9f01cbb40a7aacdaff955d7df",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_controlled_regeneration.py": {
+    "mtime": 1792659683.9163558,
+    "seen": 1792659799.5176396,
+    "ast_hash": "c160acbe380c3bf4ed2b17fbba519d43",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ChangeImpactModal.tsx": {
+    "mtime": 1792659266.0678484,
+    "seen": 1792659799.5177867,
+    "ast_hash": "f20062422126bea6159be5bb5fd9375b",
     "semantic_hash": ""
   }
 }

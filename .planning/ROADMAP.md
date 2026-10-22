@@ -763,13 +763,13 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 ---
 
 ### Phase 46: Cinematic Preview Proof of Concept
-**Goal**: Evaluate HyperFrames programmatic video rendering against Azure Container Apps resource limits (0.5 vCPU, 1.0 GiB RAM), pilot an isolated preview worker, and maintain JSON2Video as the verified operational baseline with clear synthetic preview watermarking.  
+**Goal**: Following the retirement of JSON2Video and unreliable external video providers, evaluate HyperFrames programmatic video rendering against Azure Container Apps resource limits (0.5 vCPU, 1.0 GiB RAM) and pilot an isolated preview worker to establish a self-contained cinematic preview engine with clear synthetic preview watermarking.  
 **Depends on**: Phase 43  
 **Requirements**: CINE-01, CINE-02  
 **Success Criteria**:
   1. HyperFrames licensing, Node.js/Chromium/FFmpeg system dependencies, and memory footprint benchmarked against ACA constraints.
   2. Prototype preview worker tested for rendering cinematic scene motion graphics from World Bible visuals, audio, and character dialogue.
-  3. JSON2Video remains fully operational as the primary working video preview baseline.
+  3. Video generation actions remain safely disabled or graceful until the self-contained preview worker is proven viable, preventing mock spoofing.
   4. Composed preview footage is explicitly labeled with synthetic badges and never mislabeled as generative AI diffusion video.  
 **Plans**: 1 plan
 - [ ] **46-01-PLAN.md**: HyperFrames technical feasibility assessment, isolated preview worker pilot specification, resource footprint benchmarks, and synthetic preview labeling standards.

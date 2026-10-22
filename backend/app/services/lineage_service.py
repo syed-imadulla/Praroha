@@ -1,10 +1,14 @@
 from typing import Any, Dict, List, Optional, Set
+from sqlmodel import select
+
 from backend.app.models.lineage import (
     AncestorPathRead,
     TraceEdge,
     TraceGraphRead,
     TraceNode,
 )
+from backend.app.models.media import MediaAssetRecord
+from backend.app.models.potential import SeedPotentialItemRecord
 from backend.app.repositories.project_repo import ProjectRepository
 
 
@@ -140,11 +144,70 @@ class LineageService:
             )
 
         # ---------------------------------------------------------
+        # Layer 2b: Seed Potential Map (Stage 2 Extension)
+        # ---------------------------------------------------------
+        if hasattr(self.repo, "get_potential_items"):
+            pot_records = await self.repo.get_potential_items(project_id)
+        elif hasattr(self.repo, "get_seed_potentials"):
+            pot_records = await self.repo.get_seed_potentials(project_id)
+        else:
+            pot_records = []
+        candidate_to_pot_ids: Dict[str, List[str]] = {}
+        for pot in pot_records:
+            # Only include potentials that are explicitly selected or mapped to a candidate
+            is_selected = getattr(pot, "selected", False) or (getattr(pot, "user_status", "") == "accepted")
+            world_cand_id = getattr(pot, "world_candidate_id", None)
+            if is_selected or world_cand_id:
+                pot_node_id = f"node-pot-{pot.id}"
+                if world_cand_id:
+                    candidate_to_pot_ids.setdefault(world_cand_id, []).append(pot_node_id)
+                label_val = getattr(pot, "label", "Potential")
+                desc_val = getattr(pot, "description", getattr(pot, "source_evidence", label_val))
+                cat_val = getattr(pot, "category", "general")
+                pot_node = TraceNode(
+                    id=pot_node_id,
+                    entity_id=pot.id,
+                    entity_type="seed_potential",
+                    label=f"Potential: {label_val}",
+                    title=label_val,
+                    stage=2,
+                    summary=f"[{cat_val.upper()}] {desc_val}",
+                    causal_explanation=(
+                        f"Seed Potential opportunity identified under category '{cat_val}': {desc_val}."
+                    ),
+                    parent_ids=["node-dna"] if seed_dna_record else ["node-seed"],
+                    origin_type="SEED_INFERRED",
+                    origin_source=f"Seed Potential: {cat_val}",
+                    metadata={
+                        "category": cat_val,
+                        "selected": is_selected,
+                        "world_candidate_id": world_cand_id,
+                    },
+                )
+                nodes.append(pot_node)
+                edges.append(
+                    TraceEdge(
+                        id=f"edge-dna-pot-{pot.id}",
+                        source="node-dna" if seed_dna_record else "node-seed",
+                        target=pot_node_id,
+                        relation_type="potential_expanded",
+                        label="Expands Potential",
+                    )
+                )
+
+        # ---------------------------------------------------------
         # Layer 3: Three World Candidates (Stage 3)
         # ---------------------------------------------------------
         candidates = await self.repo.get_latest_world_candidates(project_id)
         for w in candidates:
             cand_node_id = f"node-world-{w.id}"
+            cand_parents = ["node-dna"] if seed_dna_record else ["node-seed"]
+            # If potential items inspired this candidate, include them
+            associated_pots = candidate_to_pot_ids.get(w.id, [])
+            for p_id in associated_pots:
+                if p_id not in cand_parents:
+                    cand_parents.append(p_id)
+
             cand_node = TraceNode(
                 id=cand_node_id,
                 entity_id=w.id,
@@ -157,7 +220,7 @@ class LineageService:
                     f"Formulated as an exploration of the {w.archetype} archetype with aesthetic '{w.aesthetic}', "
                     f"testing the core tension '{w.core_tension}' under Seed DNA constraints."
                 ),
-                parent_ids=["node-dna"] if seed_dna_record else ["node-seed"],
+                parent_ids=cand_parents,
                 origin_type="SEED_INFERRED",
                 origin_source=f"Triad Archetype: {w.archetype}",
                 metadata={
@@ -178,6 +241,16 @@ class LineageService:
                     label="Explores Archetype",
                 )
             )
+            for p_id in associated_pots:
+                edges.append(
+                    TraceEdge(
+                        id=f"edge-pot-world-{p_id}-{w.id}",
+                        source=p_id,
+                        target=cand_node_id,
+                        relation_type="derived_from",
+                        label="Inspires Candidate",
+                    )
+                )
 
         # ---------------------------------------------------------
         # Layer 4: Human World Selection Gate (Stage 4)
@@ -424,7 +497,7 @@ class LineageService:
                         prev_node_id = rev_node_id
 
                     # Current / latest character node
-                    latest_char_orig_source = f"Creator Refinement v{c.version}: {c.revision_notes or 'Refined parameter update'}"
+                    latest_char_orig_source = c.origin_source or f"Creator Refinement v{c.version}: {c.revision_notes or 'Refined parameter update'}"
                     char_node = TraceNode(
                         id=char_node_id,
                         entity_id=c.id,
@@ -652,7 +725,7 @@ class LineageService:
                         prev_scene_id = rev_node_id
 
                     # Current / latest scene node
-                    latest_scene_orig_source = f"Creator Refinement v{s.version}: {s.revision_notes or 'Refined scene outcome'}"
+                    latest_scene_orig_source = s.origin_source or f"Creator Refinement v{s.version}: {s.revision_notes or 'Refined scene outcome'}"
                     scene_node = TraceNode(
                         id=scene_node_id,
                         entity_id=s.id,
@@ -691,6 +764,74 @@ class LineageService:
                             label="Creator Refinement",
                         )
                     )
+
+        # ---------------------------------------------------------
+        # Layer 5f: Media Assets (where records and relationships actually exist)
+        # ---------------------------------------------------------
+        media_stmt = (
+            select(MediaAssetRecord)
+            .where(
+                MediaAssetRecord.project_id == project_id,
+                MediaAssetRecord.status == "completed",
+            )
+            .order_by(MediaAssetRecord.created_at.asc())
+        )
+        media_assets = list((await self.repo.session.execute(media_stmt)).scalars().all())
+        existing_node_ids = {n.id for n in nodes}
+
+        for m in media_assets:
+            parent_node_id: Optional[str] = None
+            parent_label = "Universe Entity"
+
+            if m.entity_type == "character" and m.entity_id:
+                candidate_id = f"node-char-{m.entity_id}"
+                if candidate_id in existing_node_ids:
+                    parent_node_id = candidate_id
+                    parent_label = "Character"
+            elif m.entity_type == "scene" and m.entity_id:
+                candidate_id = f"node-scene-{m.entity_id}"
+                if candidate_id in existing_node_ids:
+                    parent_node_id = candidate_id
+                    parent_label = "Scene"
+            elif m.entity_type == "world_candidate" and m.entity_id:
+                candidate_id = f"node-world-{m.entity_id}"
+                if candidate_id in existing_node_ids:
+                    parent_node_id = candidate_id
+                    parent_label = "World Candidate"
+
+            if parent_node_id:
+                media_node_id = f"node-media-{m.id}"
+                media_node = TraceNode(
+                    id=media_node_id,
+                    entity_id=m.id,
+                    entity_type="media_asset",
+                    label=f"{m.asset_type.capitalize()} Asset",
+                    title=f"{m.asset_type.capitalize()} for {parent_label}",
+                    stage=5,
+                    summary=m.prompt or f"Synthesized {m.asset_type} asset",
+                    causal_explanation=(
+                        f"Media asset ({m.asset_type}) synthesized for {parent_label} using prompt: '{m.prompt or ''}'."
+                    ),
+                    parent_ids=[parent_node_id],
+                    origin_type="DERIVED",
+                    origin_source=f"Synthesized {m.asset_type}",
+                    metadata={
+                        "asset_type": m.asset_type,
+                        "media_url": m.media_url,
+                        "provider": m.provider,
+                        "status": m.status,
+                    },
+                )
+                nodes.append(media_node)
+                edges.append(
+                    TraceEdge(
+                        id=f"edge-media-{m.id}",
+                        source=parent_node_id,
+                        target=media_node_id,
+                        relation_type="visualizes",
+                        label=f"Visualizes {m.asset_type.capitalize()}",
+                    )
+                )
 
         return TraceGraphRead(
             project_id=project_id,

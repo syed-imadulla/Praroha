@@ -42,18 +42,7 @@ class Settings(BaseSettings):
         "gemini-flash-latest",
         "gemini-3.5-flash-lite",
     ]
-    # Optional audio/atmosphere provider keys
-    HF_TOKEN: Optional[str] = None
-    ACE_STEP_ENDPOINT: Optional[str] = None
-    STABILITY_API_KEY: Optional[str] = None
-    STABLE_AUDIO_ENDPOINT: Optional[str] = None
-    PIXAZO_API_KEY: Optional[str] = None
-    PIXAZO_GATEWAY_URL: str = "https://gateway.pixazo.ai"
-    JSON2VIDEO_API_KEY: Optional[str] = None
-    REWIND_API_KEY: Optional[str] = None
-    REWIND_BASE_URL: str = "https://api.rewind.ai"
-    REWIND_VIDEO_MODEL: str = "bytedance/seedance-1-5-pro"
-    REWIND_MUSIC_MODEL: str = "google/lyria-3-clip-preview"
+    # Image provider configuration (Pollinations free tier safe)
     POLLINATIONS_API_KEY: Optional[str] = None
     POLLINATIONS_MODEL: str = "flux"
     SUPABASE_URL: Optional[str] = None

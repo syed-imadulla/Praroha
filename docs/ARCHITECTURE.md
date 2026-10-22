@@ -188,7 +188,7 @@ The lineage engine guarantees topological consistency, allowing the **Causal Ins
 
 ## 6. Security, Ownership, and Secrets Management
 
-1. **Server-Side API Key Storage:** All third-party AI keys (`GEMINI_API_KEY`, `POLLINATIONS_API_KEY`, `STABILITY_API_KEY`, `HF_TOKEN`) reside strictly in server-side environment variables. No external provider keys are bundled into the client-side JavaScript bundle or exposed via client-facing HTTP headers.
+1. **Server-Side API Key Storage:** All third-party AI keys (`GEMINI_API_KEY`, `POLLINATIONS_API_KEY`) reside strictly in server-side environment variables. No external provider keys are bundled into the client-side JavaScript bundle or exposed via client-facing HTTP headers.
 2. **Project Ownership Guards:** Every authenticated request verifies the caller's Supabase JWT. Projects are bound to `owner_id`. Backend endpoints reject unauthorized access with HTTP 404/403.
 3. **Data Sanitization:** Input seeds are sanitized, and LLM outputs are validated against strict Pydantic models before being written to persistent storage.
 4. **Resilient Failure Handling:** In Real Mode, if a third-party provider fails or lacks credits, the system registers a clean error badge and preserves a retry action. It never simulates fake outputs.

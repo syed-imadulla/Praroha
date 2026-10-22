@@ -42,61 +42,50 @@ async def clean_client(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_composite_audio_circuit_breaker_on_billing_and_auth_failures():
-    """Verify CompositeAudioProvider halts immediately on 401, 402, 429 without cascading to paid tiers."""
+    """Verify CompositeAudioProvider halts immediately on 401, 402, 429 without cascading to fallback."""
     tier1_mock = AsyncMock(spec=AudioProvider)
-    tier1_mock.generate_audio.side_effect = PaymentRequiredError("Pixazo insufficient credits (HTTP 402)")
-    
-    tier2_mock = AsyncMock(spec=AudioProvider)
-    tier3_mock = AsyncMock(spec=AudioProvider)
+    tier1_mock.generate_audio.side_effect = PaymentRequiredError("Audio provider insufficient credits (HTTP 402)")
+    mock_tier = AsyncMock(spec=AudioProvider)
 
     composite = CompositeAudioProvider(
-        ace_step=tier1_mock,
-        pixazo_tracks=tier2_mock,
-        stable_audio=tier3_mock,
+        primary=tier1_mock,
+        mock=mock_tier,
     )
 
     with pytest.raises(PaymentRequiredError):
         await composite.generate_audio("ocean waves", mood="ambient", duration_sec=5)
 
-    # Critical Assertion: Cascade was halted immediately. Tier 2 and Tier 3 were NEVER touched.
-    tier2_mock.generate_audio.assert_not_called()
-    tier3_mock.generate_audio.assert_not_called()
+    mock_tier.generate_audio.assert_not_called()
 
     # Verify 401 AuthenticationError halts cascade
     tier1_mock.generate_audio.side_effect = AuthenticationError("Unauthorized (HTTP 401)")
     with pytest.raises(AuthenticationError):
         await composite.generate_audio("ocean waves", mood="ambient", duration_sec=5)
-    tier2_mock.generate_audio.assert_not_called()
+    mock_tier.generate_audio.assert_not_called()
 
     # Verify 429 QuotaExceededError halts cascade
     tier1_mock.generate_audio.side_effect = QuotaExceededError("Rate limit exceeded (HTTP 429)")
     with pytest.raises(QuotaExceededError):
         await composite.generate_audio("ocean waves", mood="ambient", duration_sec=5)
-    tier2_mock.generate_audio.assert_not_called()
+    mock_tier.generate_audio.assert_not_called()
 
 
 @pytest.mark.asyncio
 async def test_composite_video_circuit_breaker_on_billing_and_auth_failures():
     """Verify CompositeVideoProvider halts immediately on 401, 402, 429 without cascading."""
     tier1_mock = AsyncMock(spec=VideoProvider)
-    tier1_mock.generate_video.side_effect = PaymentRequiredError("Pixazo out of credits (HTTP 402)")
-
-    tier2_mock = AsyncMock(spec=VideoProvider)
-    tier3_mock = AsyncMock(spec=VideoProvider)
+    tier1_mock.endpoint = "http://localhost:8890"
+    tier1_mock.generate_video.side_effect = PaymentRequiredError("Video out of credits (HTTP 402)")
     mock_tier = AsyncMock(spec=VideoProvider)
 
     composite = CompositeVideoProvider(
-        pixazo=tier1_mock,
-        pyramid=tier2_mock,
-        wan=tier3_mock,
+        wan=tier1_mock,
         mock=mock_tier,
     )
 
     with pytest.raises(PaymentRequiredError):
         await composite.generate_video("cinematic camera pan", duration_sec=5)
 
-    tier2_mock.generate_video.assert_not_called()
-    tier3_mock.generate_video.assert_not_called()
     mock_tier.generate_video.assert_not_called()
 
 

@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 TraceNodeType = Literal[
     "root_seed",
     "seed_dna",
+    "seed_potential",
     "world_candidate",
     "human_selection",
     "world_bible",
@@ -14,6 +15,7 @@ TraceNodeType = Literal[
     "relationship",
     "scene",
     "scene_revision",
+    "media_asset",
 ]
 
 TraceRelationType = Literal[
@@ -23,6 +25,8 @@ TraceRelationType = Literal[
     "appears_in",
     "generated_for",
     "refined_from",
+    "potential_expanded",
+    "visualizes",
 ]
 
 

@@ -6,15 +6,14 @@ from typing import Dict, Any
 from backend.app.config import settings
 from backend.app.providers.media.pollinations import PollinationsImageProvider
 from backend.app.providers.media.edge_tts import EdgeTTSProvider
-from backend.app.providers.media.stable_audio import StableAudioOpenProvider
-from backend.app.providers.media.ace_step import ACEStepAudioProvider
+from backend.app.services.soundscape_library import SoundscapeComposer
 from backend.app.providers.media.base import ProviderUnavailableError
 from backend.app.providers.gemini_provider import GeminiProvider
 
 
 async def run_smoke_tests():
     print("==================================================================")
-    print("PRAROHA — REAL PROVIDER SMOKE TEST MATRIX")
+    print("PRAROHA — OPERATIONAL PROVIDER SMOKE TEST MATRIX")
     print("==================================================================\n")
 
     results = []
@@ -29,8 +28,6 @@ async def run_smoke_tests():
             dna = await gemini.extract_dna("A migratory city on the backs of giant oceanic turtles.")
             latency = round((time.time() - t0) * 1000)
             premise = dna.get("premise", "") if isinstance(dna, dict) else getattr(dna, "premise", "")
-            tone = dna.get("tone", "") if isinstance(dna, dict) else getattr(dna, "tone", "")
-            keywords = dna.get("domain_keywords", []) if isinstance(dna, dict) else getattr(dna, "domain_keywords", [])
             print(f"   PASS: Seed DNA extracted ({latency}ms). Premise: '{premise[:50]}...'")
             results.append({
                 "provider": "Gemini (Flash)",
@@ -38,7 +35,7 @@ async def run_smoke_tests():
                 "configured": True,
                 "status": "VERIFIED",
                 "latency_ms": latency,
-                "notes": f"Generated premise, tone='{tone}', {len(keywords)} keywords",
+                "notes": f"Premise: {premise[:40]}...",
             })
         except Exception as e:
             latency = round((time.time() - t0) * 1000)
@@ -56,68 +53,60 @@ async def run_smoke_tests():
             "provider": "Gemini (Flash)",
             "modality": "text / reasoning",
             "configured": False,
-            "status": "BLOCKED",
+            "status": "UNCONFIGURED",
             "latency_ms": 0,
-            "notes": "GEMINI_API_KEY missing",
+            "notes": "GEMINI_API_KEY missing from .env",
         })
 
-    # 2. Pollinations (Image Generation)
-    has_pollinations_key = bool(settings.POLLINATIONS_API_KEY)
-    print(f"\n2. Pollinations Image Provider: configured={True} (api_key_set={has_pollinations_key})")
+    # 2. Pollinations Image Generation (Free Tier / Flux)
+    print("\n2. Pollinations Image Generation (Free tier / Flux):")
     t0 = time.time()
     try:
         pollinations = PollinationsImageProvider()
-        img_payload = await pollinations.generate_image("A bioluminescent deep ocean lotus", aspect_ratio="1:1")
+        img_payload = await pollinations.generate_image(
+            "An ethereal temple carved from glowing emerald jade, photorealistic concept art",
+            aspect_ratio="16:9",
+        )
         latency = round((time.time() - t0) * 1000)
-        is_jpeg = img_payload.data.startswith(b"\xff\xd8")
-        print(f"   PASS: Image generated ({latency}ms). Bytes={len(img_payload.data)}, MIME={img_payload.mime_type}, ValidJPEG={is_jpeg}")
+        print(f"   PASS: Pollinations returned image ({latency}ms). Bytes={len(img_payload.data)}")
         results.append({
-            "provider": "Pollinations.ai",
-            "modality": "image",
+            "provider": "Pollinations (Flux)",
+            "modality": "image / concept art",
             "configured": True,
             "status": "VERIFIED",
             "latency_ms": latency,
-            "notes": f"{img_payload.mime_type}, {len(img_payload.data)} bytes, model={img_payload.metadata.get('model')}",
-        })
-    except ProviderUnavailableError as pue:
-        latency = round((time.time() - t0) * 1000)
-        print(f"   BLOCKED: Pollinations unavailable ({latency}ms): {pue}")
-        results.append({
-            "provider": "Pollinations.ai",
-            "modality": "image",
-            "configured": True,
-            "status": "BLOCKED",
-            "latency_ms": latency,
-            "notes": str(pue),
+            "notes": f"Image generated, {len(img_payload.data)} bytes",
         })
     except Exception as e:
         latency = round((time.time() - t0) * 1000)
         print(f"   FAIL: Pollinations error ({latency}ms): {e}")
         results.append({
-            "provider": "Pollinations.ai",
-            "modality": "image",
+            "provider": "Pollinations (Flux)",
+            "modality": "image / concept art",
             "configured": True,
             "status": "FAILED",
             "latency_ms": latency,
             "notes": str(e),
         })
 
-    # 3. Edge-TTS (Voice & Narration)
-    print(f"\n3. Edge-TTS Voice Provider: configured=True (Zero-key neural engine)")
+    # 3. Microsoft Edge-TTS (Voice / Speech)
+    print("\n3. Microsoft Edge-TTS Voice Generation (neural audio):")
     t0 = time.time()
     try:
         edge = EdgeTTSProvider()
-        voice_payload = await edge.generate_voice("Navigation coordinates locked. We enter the trench.", voice_id="protagonist-resolute")
+        voice_payload = await edge.generate_voice(
+            "From the primeval stillness, form arose out of the formless waters.",
+            voice_id="the_chronicler",
+        )
         latency = round((time.time() - t0) * 1000)
-        is_mp3 = voice_payload.data.startswith(b"ID3") or voice_payload.data[:2] in (b"\xff\xfb", b"\xff\xf3", b"\xff\xf2")
-        print(f"   PASS: Speech synthesized ({latency}ms). Bytes={len(voice_payload.data)}, MIME={voice_payload.mime_type}, ValidMP3={is_mp3}")
+        print(f"   PASS: Edge-TTS synthesized voice ({latency}ms). Bytes={len(voice_payload.data)}")
         results.append({
             "provider": "Edge-TTS (Microsoft)",
             "modality": "voice / speech",
             "configured": True,
             "status": "VERIFIED",
             "latency_ms": latency,
-            "notes": f"{voice_payload.metadata.get('voice_id')}, {len(voice_payload.data)} bytes, ~{voice_payload.metadata.get('duration_sec')}s",
+            "notes": f"Audio synthesized, {len(voice_payload.data)} bytes",
         })
     except Exception as e:
         latency = round((time.time() - t0) * 1000)
@@ -131,81 +120,33 @@ async def run_smoke_tests():
             "notes": str(e),
         })
 
-    # 4. Stability AI Stable Audio (Atmosphere soundscapes)
-    has_stability = bool(settings.STABILITY_API_KEY)
-    print(f"\n4. Stability AI Stable Audio: configured={has_stability}")
+    # 4. Procedural Soundscape Composer (Multi-track Ambient Synthesis)
+    print("\n4. Procedural Soundscape Composer (Built-in CC0 Audio):")
     t0 = time.time()
     try:
-        stable_audio = StableAudioOpenProvider()
-        audio_payload = await stable_audio.generate_audio("Deep underwater metallic groan, slow rhythmic current pulse", mood="tense-dramatic", duration_sec=10)
+        composer = SoundscapeComposer()
+        soundscape = composer.compose_soundscape(
+            mood="deep_space",
+            duration_sec=5.0,
+            track_keys=["drone_low", "wind_whistle"],
+        )
         latency = round((time.time() - t0) * 1000)
-        print(f"   PASS: Stable Audio generated ({latency}ms). Bytes={len(audio_payload.data)}")
+        print(f"   PASS: Soundscape synthesized ({latency}ms). Bytes={len(soundscape.wav_bytes)}")
         results.append({
-            "provider": "Stability AI (Stable Audio 2)",
+            "provider": "SoundscapeComposer (Built-in)",
             "modality": "audio / atmosphere",
-            "configured": has_stability,
+            "configured": True,
             "status": "VERIFIED",
             "latency_ms": latency,
-            "notes": f"Audio generated, {len(audio_payload.data)} bytes",
-        })
-    except ProviderUnavailableError as pue:
-        latency = round((time.time() - t0) * 1000)
-        print(f"   BLOCKED: Stable Audio ({latency}ms): {pue}")
-        results.append({
-            "provider": "Stability AI (Stable Audio 2)",
-            "modality": "audio / atmosphere",
-            "configured": has_stability,
-            "status": "BLOCKED",
-            "latency_ms": latency,
-            "notes": str(pue),
+            "notes": f"Soundscape synthesized, {len(soundscape.wav_bytes)} bytes",
         })
     except Exception as e:
         latency = round((time.time() - t0) * 1000)
-        print(f"   FAIL: Stable Audio error ({latency}ms): {e}")
+        print(f"   FAIL: Soundscape Composer error ({latency}ms): {e}")
         results.append({
-            "provider": "Stability AI (Stable Audio 2)",
+            "provider": "SoundscapeComposer (Built-in)",
             "modality": "audio / atmosphere",
-            "configured": has_stability,
-            "status": "FAILED",
-            "latency_ms": latency,
-            "notes": str(e),
-        })
-
-    # 5. Hugging Face ACE-Step / MusicGen
-    has_hf = bool(settings.HF_TOKEN or settings.ACE_STEP_ENDPOINT)
-    print(f"\n5. Hugging Face / ACE-Step Audio: configured={has_hf}")
-    t0 = time.time()
-    try:
-        ace = ACEStepAudioProvider()
-        ace_payload = await ace.generate_audio("Ethereal cavernous echoes", mood="calm-ambient", duration_sec=10)
-        latency = round((time.time() - t0) * 1000)
-        print(f"   PASS: ACE-Step generated ({latency}ms). Bytes={len(ace_payload.data)}")
-        results.append({
-            "provider": "Hugging Face (ACE-Step / MusicGen)",
-            "modality": "audio / atmosphere",
-            "configured": has_hf,
-            "status": "VERIFIED",
-            "latency_ms": latency,
-            "notes": f"Audio generated, {len(ace_payload.data)} bytes",
-        })
-    except ProviderUnavailableError as pue:
-        latency = round((time.time() - t0) * 1000)
-        print(f"   BLOCKED: ACE-Step ({latency}ms): {pue}")
-        results.append({
-            "provider": "Hugging Face (ACE-Step / MusicGen)",
-            "modality": "audio / atmosphere",
-            "configured": has_hf,
-            "status": "BLOCKED",
-            "latency_ms": latency,
-            "notes": str(pue),
-        })
-    except Exception as e:
-        latency = round((time.time() - t0) * 1000)
-        print(f"   FAIL: ACE-Step error ({latency}ms): {e}")
-        results.append({
-            "provider": "Hugging Face (ACE-Step / MusicGen)",
-            "modality": "audio / atmosphere",
-            "configured": has_hf,
+            "configured": True,
             "status": "FAILED",
             "latency_ms": latency,
             "notes": str(e),

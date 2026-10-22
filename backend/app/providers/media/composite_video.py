@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Any, Dict, Optional
 
 from backend.app.providers.media.base import (
@@ -10,43 +11,29 @@ from backend.app.providers.media.base import (
     VideoProvider,
 )
 from backend.app.providers.media.mock import MockVideoProvider, _generate_minimal_mp4_bytes
-from backend.app.providers.media.pixazo_video import PixazoVideoProvider
-from backend.app.providers.media.pyramid_flow import PyramidFlowProvider
 from backend.app.providers.media.wan import WanVideoProvider
 
 logger = logging.getLogger(__name__)
 
 
 class CompositeVideoProvider(VideoProvider):
-    """4-Tier Resilient Composite Video Provider:
+    """Video Provider with Wan2.1 microservice support and honest fallbacks.
 
-    Tier 1 (Cloud): PixazoVideoProvider (Pixazo Gateway / Wan 3.0 / LTX)
-    Tier 2 (Cloud): PyramidFlowProvider (Pyramid Flow API / HF Inference)
-    Tier 3 (Local): WanVideoProvider (Local Wan2.1 T2V-1.3B microservice)
-    Tier 4 (Safe): MockVideoProvider (Deterministic browser-playable ISO BMFF MP4)
+    Generative video cloud services (Pixazo, Pyramid Flow / HF, JSON2Video, Rewind) have been retired.
+    Tier 1 (Optional Local): WanVideoProvider (Local Wan2.1 T2V-1.3B microservice if WAN_ENDPOINT configured)
+    Tier 2 (Test/Demo Only): MockVideoProvider (Synthetic preview MP4)
 
-    Guarantees:
-    1. Client never receives an unhandled 500 for provider failure.
-    2. Mock is the guaranteed final fallback.
-    3. MediaPayload.metadata["resolved_provider"] accurately records which
-       tier actually generated the asset ("pixazo-video", "pyramid-flow", "wan2.1", or "mock").
-    4. Consistent video metadata is preserved across all tiers:
-       resolved_provider, duration_sec, aspect_ratio, resolution.
-    5. Provider responses are strictly normalized within the provider boundary (D-06).
+    In real/production mode: If no local Wan endpoint is configured or operational, video generation
+    honestly raises ProviderUnavailableError explaining that video generation is currently unavailable.
     """
 
     def __init__(
         self,
-        pixazo: Optional[VideoProvider] = None,
-        pyramid: Optional[VideoProvider] = None,
         wan: Optional[VideoProvider] = None,
         mock: Optional[VideoProvider] = None,
+        **kwargs: Any,
     ) -> None:
-        if pixazo is None and (pyramid is not None or wan is not None):
-            self.pixazo = None
-        else:
-            self.pixazo = pixazo or PixazoVideoProvider()
-        self.pyramid = pyramid or PyramidFlowProvider()
+        self.primary = kwargs.get("pixazo") or kwargs.get("pyramid")
         self.wan = wan or WanVideoProvider()
         self.mock = mock or MockVideoProvider()
 
@@ -59,91 +46,60 @@ class CompositeVideoProvider(VideoProvider):
         ctx = dict(context or {})
         aspect_ratio = ctx.get("aspect_ratio") or "16:9"
 
-        # --- Tier 1: Pixazo Video ---
-        if self.pixazo:
+        # If a custom primary provider is injected (e.g. in unit tests)
+        if self.primary:
             try:
-                logger.info("Attempting Tier 1 (Pixazo Video) generation...")
-                payload = await self.pixazo.generate_video(
+                payload = await self.primary.generate_video(
                     prompt=prompt,
                     duration_sec=duration_sec,
                     context=ctx,
                 )
-                payload.metadata["resolved_provider"] = "pixazo-video"
+                return payload
+            except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
+                logger.error("Primary video billing/auth/quota error: %s. Halting cascade.", auth_err)
+                raise
+            except (ProviderUnavailableError, Exception) as p_err:
+                logger.info("Primary video unavailable (%s). Cascading...", p_err)
+
+        # Tier 1: Local Wan2.1 microservice if configured
+        if self.wan and getattr(self.wan, "endpoint", None):
+            try:
+                logger.info("Attempting Wan2.1 video generation...")
+                payload = await self.wan.generate_video(
+                    prompt=prompt,
+                    duration_sec=duration_sec,
+                    context=ctx,
+                )
+                payload.metadata["resolved_provider"] = "wan2.1"
                 payload.metadata["duration_sec"] = duration_sec
                 payload.metadata["aspect_ratio"] = aspect_ratio
                 payload.metadata["resolution"] = "720p"
                 return payload
             except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
-                logger.error("Tier 1 (Pixazo Video) billing/auth/quota error: %s. Halting cascade.", auth_err)
+                logger.error("Wan2.1 billing/auth/quota error: %s. Halting cascade.", auth_err)
                 raise
-            except (ProviderUnavailableError, Exception) as pix_err:
-                logger.info(
-                    "Tier 1 (Pixazo Video) unavailable (%s: %s). Cascading to Tier 2 (Pyramid Flow)...",
-                    type(pix_err).__name__,
-                    pix_err,
-                )
+            except (ProviderUnavailableError, Exception) as wan_err:
+                logger.warning("Wan2.1 failed (%s: %s).", type(wan_err).__name__, wan_err)
 
-        # --- Tier 2: Pyramid Flow / HF ---
-        try:
-            logger.info("Attempting Tier 2 (Pyramid Flow) video generation...")
-            payload = await self.pyramid.generate_video(
-                prompt=prompt,
-                duration_sec=duration_sec,
-                context=ctx,
+        # Fallback handling
+        env = os.getenv("ENVIRONMENT", "").lower()
+        praroha_env = os.getenv("PRAROHA_ENV", "").lower()
+        if env == "production" or praroha_env == "production":
+            is_demo_mode = False
+        else:
+            is_demo_mode = (
+                env in ("demo", "test")
+                or praroha_env in ("demo", "test")
+                or os.getenv("PYTEST_CURRENT_TEST") is not None
             )
-            payload.metadata["resolved_provider"] = "pyramid-flow"
-            payload.metadata["duration_sec"] = duration_sec
-            payload.metadata["aspect_ratio"] = aspect_ratio
-            payload.metadata["resolution"] = "720p"
-            return payload
-        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
-            logger.error("Tier 2 (Pyramid Flow) billing/auth/quota error: %s. Halting cascade.", auth_err)
-            raise
-        except (ProviderUnavailableError, Exception) as tier1_err:
-            logger.warning(
-                "Tier 2 (Pyramid Flow) failed (%s: %s). Cascading to Tier 3 (Wan2.1)...",
-                type(tier1_err).__name__,
-                tier1_err,
-            )
-
-        # --- Tier 3: Wan2.1 T2V-1.3B ---
-        try:
-            logger.info("Attempting Tier 3 (Wan2.1) video generation...")
-            payload = await self.wan.generate_video(
-                prompt=prompt,
-                duration_sec=duration_sec,
-                context=ctx,
-            )
-            payload.metadata["resolved_provider"] = "wan2.1"
-            payload.metadata["duration_sec"] = duration_sec
-            payload.metadata["aspect_ratio"] = aspect_ratio
-            payload.metadata["resolution"] = "720p"
-            return payload
-        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
-            logger.error("Tier 3 (Wan2.1) billing/auth/quota error: %s. Halting cascade.", auth_err)
-            raise
-        except (ProviderUnavailableError, Exception) as tier2_err:
-            logger.warning(
-                "Tier 3 (Wan2.1) failed (%s: %s). Cascading to Tier 4 (Mock)...",
-                type(tier2_err).__name__,
-                tier2_err,
-            )
-
-        # --- Tier 4: Guaranteed Safe Mock Fallback (Demo/Dev/Test) ---
-        import os
-        is_demo_mode = (
-            os.getenv("ENVIRONMENT") in ("demo", "test")
-            or os.getenv("PRAROHA_ENV") in ("demo", "test")
-            or os.getenv("PYTEST_CURRENT_TEST") is not None
-        )
         if not is_demo_mode:
-            logger.error("Real mode: Live video providers failed. Refusing silent fallback to mock.")
+            logger.error("Real mode: Video generation unavailable. Refusing fake mock generation.")
             raise ProviderUnavailableError(
-                "Live video generation requires active provider credentials (PIXAZO_API_KEY for Pixazo, PYRAMID_FLOW_ENDPOINT or HF_TOKEN for Pyramid Flow, or WAN_ENDPOINT for Wan 2.1). "
-                "Please configure a video provider in .env to generate live cinematic videos."
+                "Video generation is currently unavailable. Generative video services (JSON2Video, Pixazo, Pyramid Flow, Rewind) "
+                "have been retired due to unreliability. Cinematic preview engine will be introduced in an upcoming release."
             )
 
-        logger.info("Delivering Tier 3 (MockVideoProvider) deterministic fallback video asset.")
+        logger.info("Delivering MockVideoProvider deterministic fallback video asset.")
         try:
             payload = await self.mock.generate_video(
                 prompt=prompt,
@@ -181,8 +137,7 @@ class CompositeVideoProvider(VideoProvider):
             "status": "healthy",
             "provider": "CompositeVideoProvider",
             "tiers": {
-                "tier1_pyramid": await self.pyramid.health_check(),
-                "tier2_wan": await self.wan.health_check(),
-                "tier3_mock": await self.mock.health_check(),
+                "wan": await self.wan.health_check() if hasattr(self.wan, "health_check") else {"status": "unconfigured"},
+                "mock": await self.mock.health_check() if hasattr(self.mock, "health_check") else {"status": "healthy"},
             },
         }

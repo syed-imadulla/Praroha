@@ -4,6 +4,7 @@ from backend.app.providers.media.base import (
     AudioProvider,
     ImageProvider,
     MediaProvider,
+    ProviderUnavailableError,
     VideoProvider,
     VoiceProvider,
 )
@@ -20,15 +21,7 @@ from backend.app.providers.media.composite_video import CompositeVideoProvider
 from backend.app.providers.media.composite_audio import CompositeAudioProvider
 from backend.app.providers.media.edge_tts import EdgeTTSProvider
 from backend.app.providers.media.kokoro import KokoroVoiceProvider
-from backend.app.providers.media.pyramid_flow import PyramidFlowProvider
 from backend.app.providers.media.wan import WanVideoProvider
-from backend.app.providers.media.ace_step import ACEStepAudioProvider
-from backend.app.providers.media.json2video import JSON2VideoCompositionProvider
-from backend.app.providers.media.pixazo_tracks import PixazoTracksAudioProvider
-from backend.app.providers.media.pixazo_video import PixazoVideoProvider
-from backend.app.providers.media.rewind_audio import RewindMusicAudioProvider
-from backend.app.providers.media.rewind_video import RewindVideoProvider
-from backend.app.providers.media.stable_audio import StableAudioOpenProvider
 
 
 class ConfiguredMediaProvider(MediaProvider):
@@ -81,22 +74,17 @@ class MediaProviderFactory:
             return MockVoiceProvider()
         return CompositeVoiceProvider()
 
-
     @classmethod
     def get_video_provider(cls) -> VideoProvider:
         provider_name = os.getenv("VIDEO_PROVIDER", "composite").lower()
         if provider_name == "mock":
             return MockVideoProvider()
-        if provider_name == "rewind":
-            return RewindVideoProvider()
-        if provider_name == "pixazo":
-            return PixazoVideoProvider()
-        if provider_name in ("json2video", "composition"):
-            return JSON2VideoCompositionProvider()
+        if provider_name in ("rewind", "pixazo", "json2video", "composition", "pyramid_flow"):
+            raise ProviderUnavailableError(
+                f"Video provider '{provider_name}' has been retired due to unreliability. Video generation is currently unavailable."
+            )
         if provider_name == "wan":
             return WanVideoProvider()
-        if provider_name == "pyramid_flow":
-            return PyramidFlowProvider()
         return CompositeVideoProvider()
 
     @classmethod
@@ -104,14 +92,10 @@ class MediaProviderFactory:
         provider_name = os.getenv("AUDIO_PROVIDER", "composite").lower()
         if provider_name == "mock":
             return MockAudioProvider()
-        if provider_name in ("rewind", "rewind_music"):
-            return RewindMusicAudioProvider()
-        if provider_name in ("pixazo", "pixazo_tracks"):
-            return PixazoTracksAudioProvider()
-        if provider_name == "stable_audio":
-            return StableAudioOpenProvider()
-        if provider_name == "ace_step":
-            return ACEStepAudioProvider()
+        if provider_name in ("rewind", "rewind_music", "pixazo", "pixazo_tracks", "stable_audio", "ace_step"):
+            raise ProviderUnavailableError(
+                f"Audio provider '{provider_name}' has been retired due to unreliability. Use the built-in Procedural Soundscape Composer."
+            )
         return CompositeAudioProvider()
 
     @classmethod

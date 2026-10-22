@@ -89,7 +89,7 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [ ] **Phase 43: Media Reliability & Credit Protection** — Cost-safe composite provider routing (no cascading on 402/403/429), request deduplication, content-hash caching, and container job recovery.
 - [ ] **Phase 44: Universe Consistency & Creative Memory** — Canonical creative memory schema, context construction engine, and rule validation preventing lore contradictions.
 - [ ] **Phase 45: Origin Trail & Controlled Regeneration** — Blast radius change-impact preview (`AFFECTED`/`CONDITIONAL`/`PRESERVED`), stale entity detection, selective subtree regeneration, and DAG updates.
-- [ ] **Phase 46: Cinematic Preview Proof of Concept** — HyperFrames feasibility evaluation (licensing, Node/Chromium/FFmpeg footprint vs ACA limits) and separate worker pilot while retaining JSON2Video baseline.
+- [ ] **Phase 46: Cinematic Preview Proof of Concept** — HyperFrames feasibility evaluation (licensing, Node/Chromium/FFmpeg footprint vs ACA limits) and separate worker pilot to establish a reliable self-contained cinematic preview engine.
 - [ ] **Phase 47: Product Evaluation & Release Gate** — Automated E2E verification across arbitrary seeds, character consistency, credit protection, live provider proof, and PWA release gate.
 
 ### Architecture Decisions: Referenced Projects Analysis
@@ -98,7 +98,7 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
    - *Decision*: Audit live models and quotas via catalog inspection (no credit spend during planning). Implement cost-safe routing that respects key limits and prevents 402/403 errors.
 2. **HyperFrames [PILOT AS SEPARATE RENDERER]**:
    - *Analysis*: Code-driven, web-standards (HTML/CSS/Canvas/Chromium/Node/FFmpeg) programmatic video renderer. High visual quality for motion graphics and scene assemblies.
-   - *Decision*: Evaluate licensing (open source) and resource demands against Azure Container Apps limits (0.5 vCPU, 1.0 GiB RAM). Scope as a separate isolated preview worker proof-of-concept without destabilizing the existing JSON2Video baseline. Never label composed footage as generative AI video.
+   - *Decision*: Evaluate licensing (open source) and resource demands against Azure Container Apps limits (0.5 vCPU, 1.0 GiB RAM). Scope as a separate isolated preview worker proof-of-concept to replace retired external video APIs. Never label composed footage as generative AI video.
 3. **DramaClaw [ADAPT PATTERNS ONLY]**:
    - *Analysis*: Provides concepts for reusable asset libraries, storyboarding workflows, and production checkpoint management.
    - *Decision*: Adapt architectural patterns (asset banks, state checkpoints) into PRAROHA's existing SQLModel/PostgreSQL schema. Do not import hosted-service dependencies or unverified third-party code.

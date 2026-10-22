@@ -273,7 +273,7 @@
 
 ### Cinematic Preview Proof of Concept (CINE) — Phase 46
 - [ ] **CINE-01**: Architectural and resource evaluation of HyperFrames (licensing, Node/Chromium/FFmpeg footprint, memory envelope vs 1.0 GiB ACA container limit, render latency).
-- [ ] **CINE-02**: Isolated renderer pilot specification preserving JSON2Video as the primary working preview baseline, with clear synthetic preview watermarking and zero mislabeling of composed footage as raw generative video.
+- [ ] **CINE-02**: Isolated renderer pilot specification establishing a self-contained preview alternative to retired video APIs, with clear synthetic preview watermarking and zero mislabeling of composed footage as raw generative video.
 
 ### Product Evaluation & Release Gate (GATE) — Phase 47
 - [ ] **GATE-01**: Automated E2E verification across arbitrary seeds, 3-world divergence, character consistency, change impact preview, and credit protection circuit breakers.

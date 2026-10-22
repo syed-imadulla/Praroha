@@ -33,6 +33,10 @@ import {
   ForkCounterfactualRequest,
   GenerationJobRead,
   CreativeMemoryRead,
+  ImpactPreviewRequest,
+  ImpactPreviewResponse,
+  SelectiveRegenerateRequest,
+  SelectiveRegenerateResponse,
 } from '../types';
 
 import { supabase } from '../realtime/supabaseRealtime';
@@ -298,6 +302,26 @@ class ApiClient {
 
   async getNodeAncestors(projectId: string, nodeId: string): Promise<APIResponse<AncestorPathRead>> {
     return this.request<AncestorPathRead>(`/projects/${projectId}/lineage/node/${nodeId}/ancestors`);
+  }
+
+  async previewChangeImpact(
+    projectId: string,
+    request: ImpactPreviewRequest
+  ): Promise<APIResponse<ImpactPreviewResponse>> {
+    return this.request<ImpactPreviewResponse>(`/projects/${projectId}/lineage/impact-preview`, {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async regenerateSelective(
+    projectId: string,
+    request: SelectiveRegenerateRequest
+  ): Promise<APIResponse<SelectiveRegenerateResponse>> {
+    return this.request<SelectiveRegenerateResponse>(`/projects/${projectId}/lineage/regenerate-selective`, {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
   }
 
   async branchProject(
