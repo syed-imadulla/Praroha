@@ -27,9 +27,9 @@ No HyperFrames container images or Chromium dependencies were built or deployed,
 
 1. **Zero Aesthetic Justification**: HyperFrames' primary value proposition is rendering dynamic HTML/CSS DOM elements (e.g., flexbox cards, web CSS animations). PRAROHA's worldbuilding previews require cinematic camera movement across generated concept art with spoken narration and atmospheric soundscapes—capabilities that FFmpeg executes natively with superior fidelity.
 2. **Extreme Resource Disparity**:
-   - Native FFmpeg: **380 MB** image, **~75 MB** memory RSS, **1.8s–2.05s** render time.
-   - HyperFrames: **~1,850 MB** image, **1,200–1,800 MB** memory RSS, **25s–45s** render time.
-3. **Financial Prudence**: Native FFmpeg runs within Azure Container Apps' free monthly compute allowance (₹0.00 billable). HyperFrames would require 2.0 vCPU / 4.0 GiB RAM instances costing ~₹0.30 per render, risking rapid depletion of the project budget.
+   - Native FFmpeg *(Measured empirical evidence)*: **380 MB** image, **~75 MB** memory RSS, **1.8s–2.05s** render time.
+   - HyperFrames *(Projected architectural estimate)*: **~1,850 MB** image, **1,200–1,800 MB** memory RSS, **25s–45s** render time.
+3. **Financial Prudence**: Native FFmpeg runs within Azure Container Apps' free monthly compute allowance (₹0.00 billable measured). HyperFrames would require 2.0 vCPU / 4.0 GiB RAM instances estimated to cost ~₹0.30 per render, risking rapid depletion of the project budget.
 4. **Maintenance & Security Footprint**: Headless Chromium introduces frequent security CVE updates, IPC deadlock risks, and complex Puppeteer protocol versioning. Native FFmpeg is a single statically linked binary with near-zero attack surface.
 
 ---
