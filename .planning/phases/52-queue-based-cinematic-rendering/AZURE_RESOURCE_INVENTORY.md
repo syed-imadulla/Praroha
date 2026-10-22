@@ -14,6 +14,7 @@ All existing resources reside in Resource Group `rg-tendersaathi` in region **Ce
 | **`stpraroharender`** | `Microsoft.Storage/storageAccounts` | `Standard_LRS`, TLS 1.2, HTTPS-only, no public blob | Dedicated storage account for queues. *(Provisioned 2026-10-22)* |
 | **`cinematic-render-jobs`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Primary rendering work queue. *(Provisioned 2026-10-22)* |
 | **`cinematic-render-poison`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Dead-letter poison queue (>3 retries). *(Provisioned 2026-10-22)* |
+| **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `ConsumptionOnly` mode (Central India) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. *(Provisioned 2026-10-22)* |
 
 ---
 
@@ -23,7 +24,6 @@ To support Container Apps Jobs without altering or compromising the Express envi
 
 | Resource Name | Azure Resource Type | Region / SKU | Role & Configuration | Monthly Base Cost |
 | :--- | :--- | :--- | :--- | :--- |
-| **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `centralindia`<br>**ConsumptionOnly** (`--environment-mode ConsumptionOnly`) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. **Supports Container Apps Jobs**. | **₹0.00** (Serverless, ₹0 idle) |
 | **`praroha-render-job`** | `Microsoft.App/jobs` | `centralindia`<br>1.0 vCPU, 2.0 GiB RAM | Event-driven rendering job. Triggers via KEDA `azure-queue` scaler when `queueLength >= 1`. **Zero Ingress**. | **₹0.00 idle** (Charges only when running) |
 
 ---
