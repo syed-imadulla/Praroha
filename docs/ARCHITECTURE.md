@@ -44,18 +44,16 @@ graph TD
         MediaService --> Bucket
     end
 
-    subgraph AIProviders ["AI Provider Abstraction Layer"]
+    subgraph AIProviders ["AI & Media Provider Layer"]
         Gemini[GeminiProvider: Flash Models]
         Pollinations[PollinationsProvider: Flux / Sana]
         EdgeTTS[EdgeTTSProvider: Online Speech]
-        StableAudio[StableAudioOpenProvider: Stable Audio 2]
-        ACEStep[ACEStepAudioProvider / HF]
+        Soundscapes[Procedural Soundscape Composer: CC0 Multi-layer PCM]
 
         UniService --> Gemini
         MediaService --> Pollinations
         MediaService --> EdgeTTS
-        MediaService -.-> StableAudio
-        MediaService -.-> ACEStep
+        MediaService --> Soundscapes
     end
 
     Client -- REST API (Port 8000) --> Router

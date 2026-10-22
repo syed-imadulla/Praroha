@@ -403,20 +403,11 @@ class MediaService:
                     else:
                         generation_prompt = f"Cinematic video for {request.entity_type} {request.entity_id}."
 
-                if (context.get("provider") == "json2video") or (os.getenv("VIDEO_PROVIDER", "").lower() in ("json2video", "composition")):
-                    from backend.app.providers.media.json2video import JSON2VideoCompositionProvider
-                    j2v_provider = JSON2VideoCompositionProvider()
-                    payload = await j2v_provider.generate_video(
-                        prompt=generation_prompt,
-                        duration_sec=request.duration_sec or 5,
-                        context=context,
-                    )
-                else:
-                    payload = await self.media_provider.generate_video(
-                        prompt=generation_prompt,
-                        duration_sec=request.duration_sec or 5,
-                        context=context,
-                    )
+                payload = await self.media_provider.generate_video(
+                    prompt=generation_prompt,
+                    duration_sec=request.duration_sec or 5,
+                    context=context,
+                )
             elif request.media_type == "audio":
                 # Deterministic Acoustic Prompt Derivation Rule:
                 # 1. If creator explicitly supplies prompt text, preserve it exactly without alteration.

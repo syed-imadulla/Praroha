@@ -49,7 +49,7 @@ The following results reflect the verified final audit pass:
 
 ### 3.1 Backend Test Modules (`backend/tests/`)
 - `test_journey.py`: Tests the sequential flow from project initialization, Seed DNA extraction, world synthesis, selection locking, universe unfolding, to snapshotting.
-- `test_audio_generation.py`: Verifies the Stable Audio 2 protocol, Edge-TTS neural voice synthesis, error mapping (401/402/429), and composite audio cascade.
+- `test_audio_generation.py`: Verifies Edge-TTS neural voice synthesis, Procedural Soundscape Composer (CC0 ambient audio synthesis), error mapping, and composite media reliability.
 - `test_media_provider.py`: Validates image generation contracts, Pollinations.ai model selection, and JPEG binary magic-byte assertions.
 - `test_lineage_service.py`: Tests Directed Acyclic Graph assembly, topological sorting, circular dependency detection, and causal ancestor tracing.
 - `test_providers.py`: Validates Google Gemini structured JSON mode, schema enforcement, and bounded exponential backoff.

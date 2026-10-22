@@ -30,7 +30,7 @@ graph TD
     AzureACA -->|Seed DNA & Worlds| Gemini[Google Gemini 3.1 Flash]
     AzureACA -->|Character Dialogue Voice| EdgeTTS[Edge-TTS Neural Voice]
     AzureACA -->|Concept Art Visuals| Pollinations[Pollinations.ai Free Tier]
-    AzureACA -->|Cinematic Video Preview| JSON2Video[JSON2Video Preview Engine]
+    AzureACA -->|Ambient Audio Synthesis| Soundscapes[Procedural Soundscape Composer CC0]
 ```
 
 ---
@@ -259,7 +259,7 @@ graph TD
     ACA -->|Generative Text & Codex| Gemini[Google Gemini 3.1 Flash]
     ACA -->|Character Dialogue Audio| EdgeTTS[Edge-TTS Neural Voice Engine]
     ACA -->|Concept Art Visuals| Pollinations[Pollinations.ai Free Tier]
-    ACA -->|Composed Cinematic Preview| JSON2Video[JSON2Video Composition Engine]
+    ACA -->|Ambient Audio Synthesis| Soundscapes[Procedural Soundscape Composer CC0]
 ```
 
 #### 1. Backend on Azure Container Apps (ACA)

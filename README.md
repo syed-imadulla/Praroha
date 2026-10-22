@@ -89,8 +89,8 @@ The application's workflow stages are practical implementation steps demonstrati
 | **Text Generation** | Google Gemini (`gemini-3.1-flash-lite`, `gemini-flash-latest`) |
 | **Image Generation** | Pollinations.ai (Flux / Sana models) with FLUX.1 schnell fallback |
 | **Speech & Voice** | Edge-TTS (online neural speech with 6 curated archetypes) |
-| **Atmospheric Audio** | Curated CC0 Ambient Library (Wind, Rain, Temple Bells, Forest, Drones) · Stability AI & Pixazo Tracks *(requires funded API tokens)* |
-| **Video Generation** | Composed Cinematic Previews (JSON2Video) · Wan 2.1 / Pyramid Flow / Pixazo *(requires funded API tokens)* |
+| **Atmospheric Audio** | Procedural Soundscape Composer (multi-layer pure Python PCM synthesis: Wind, Rain, Singing Bowls, Forest, Drones; 100% CC0) |
+| **Video Generation** | Currently unavailable for new generations (unreliable external providers retired; existing video assets viewable; HyperFrames experimental candidate under evaluation) |
 | **Deployment** | Azure Container Apps, Vercel Edge, Supabase Cloud, Docker Compose, Nginx Alpine |
 
 ## Architecture
@@ -168,11 +168,10 @@ npm --prefix frontend run dev                          # Frontend → http://loc
 | **Pollinations.ai** | Concept art, scene illustrations, character portraits | **Verified Live** | Free Tier (FLUX.1 / Sana models) |
 | **Edge-TTS** | Character dialogue voice and scene narration | **Verified Live** | Free Service (Neural Speech) |
 | **Procedural Soundscape Composer** | Multi-layer ambient audio (Wind, Rain, Singing Bowls, Forest, Drones) | **Verified Live** | **100% Free** (Pure Python PCM synthesis, CC0 1.0 Universal) |
-| **JSON2Video** | Composed Cinematic Preview MP4 rendering | **Verified Live** | Free Allowance (594s remaining, `is_synthetic: true`) |
-| **Generative Video** (Wan 2.1 / Pixazo / Rewind Seedance) | Live AI text-to-video / image-to-video | **Visibly Disabled** | Badged `AI Video (Credits Required)` to protect creators from billing failures |
-| **Generative Music** (Stable Audio / Pixazo Tracks / Rewind Lyria) | Live text-to-music AI synthesis | **Visibly Disabled** | Honest error states displayed when unconfigured |
+| **Video Generation** | Scene motion & cinematic previews | **Unavailable / Retired** | Unreliable external APIs (JSON2Video, Pixazo, Hugging Face, Rewind) retired. Existing video assets remain viewable. |
+| **HyperFrames** | Programmatic cinematic preview engine | **Experimental Candidate** | Under isolated evaluation (Phase 46); not an integrated production feature. |
 
-When a generative provider is unavailable or unfunded, PRAROHA displays transparent status badges without disrupting the creator workflow. Setting `AI_PROVIDER=mock` enables deterministic offline fixtures for demonstration and air-gapped evaluation.
+When video generation is requested, PRAROHA displays transparent status badges without disrupting the creator workflow. Setting `AI_PROVIDER=mock` enables deterministic offline fixtures for demonstration and testing.
 
 See [docs/AI_PROVIDERS.md](docs/AI_PROVIDERS.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full integration details.
 
@@ -182,12 +181,12 @@ Milestone 5 complete verification battery:
 
 | Suite | Command | Result | Duration |
 | :--- | :--- | :--- | :--- |
-| **Backend Tests** | `pytest backend/tests` | **211 passed**, 1 skipped | 76.0s |
+| **Backend Tests** | `pytest backend/tests` | **223 passed**, 1 skipped | 76.0s |
 | **Frontend Production Build** | `npm --prefix frontend run build` | Clean (0 errors, Workbox precaches 33 entries) | 12.8s |
 | **PWA Installation Audit** | `node frontend/e2e/test_phase37_pwa.mjs` | 100% Passed (Live Vercel domain: Manifest, SW, Offline banner) | 3.12s |
 | **Full Creative Journey E2E** | `node frontend/e2e/test_phase31_10_journey.mjs` | 100% Passed (Live Azure + Vercel: All 7 Stages with live Gemini & EdgeTTS) | 68.4s |
 | **Realtime Multi-Tab & Isolation** | `node frontend/e2e/test_phase31_10_realtime.mjs` | 100% Passed (Live stack: Multi-tab broadcast sync & project isolation) | 31.5s |
-| **Release Media & Isolation E2E** | `node frontend/e2e/test_release_media_and_isolation.mjs` | 100% Passed (Live ACA: 10/10 checks across CC0 soundscapes, JSON2Video, isolation) | 28.1s |
+| **Release Media & Isolation E2E** | `node frontend/e2e/test_release_media_and_isolation.mjs` | 100% Passed (Live ACA: checks across CC0 soundscapes, media endpoints, isolation) | 28.1s |
 
 See [docs/TESTING.md](docs/TESTING.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for execution and deployment instructions.
 

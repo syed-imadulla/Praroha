@@ -58,19 +58,19 @@ PRAROHA decouples all artificial intelligence generation behind clean, modular p
 - **Fallback Behavior:** Invalid or deprecated voice strings automatically fall back to the default narrator persona.
 - **Important Note:** Edge-TTS is an online cloud dependency and requires active Internet connectivity; it is not an embedded offline model.
 
-### 3.4 Stability AI Stable Audio 2
-- **Role:** Text-to-audio environmental atmosphere and soundscape generation.
-- **Endpoint:** `POST https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio`.
-- **Payload:** Multipart form data containing `prompt`, clamped `duration` (5–190 seconds), and `output_format="mp3"`.
-- **Protocol Handling:** Implemented for direct synchronous HTTP 200 binary response handling.
-- **Live Status:** **BLOCKED**. During evaluation, requests return HTTP 401/402 due to lack of a funded credit balance in the test environment.
-- **UX Behavior:** The UI registers a clean error badge and preserves a working "Try Again" button. No simulated or mock audio is injected into Real Mode.
+### 3.4 Procedural Soundscape Composer
+- **Role:** Procedural environmental atmosphere and multi-layer soundscapes.
+- **Engine:** Pure Python PCM synthesis with curated CC0 public domain textures.
+- **Layers Supported:** Wind turbulence, rain precipitation, singing bowl drones, deep space resonance, and forest acoustic textures.
+- **Status:** **Fully Implemented & Verified Live** (<10ms synthesis time, 0 external API cost).
+- **UX Behavior:** Produces valid 16-bit PCM WAV assets attached to scenes and worlds.
 
-### 3.5 Hugging Face / ACE-Step
-- **Role:** Generative ambient background music.
-- **Target Model:** `facebook/musicgen-small`.
-- **Live Status:** **BLOCKED**. Hugging Face free Serverless Inference no longer hosts MusicGen. Live generation requires an active, paid Dedicated Inference Endpoint (`ACE_STEP_ENDPOINT`).
-- **UX Behavior:** Fails gracefully with a clear message explaining that a dedicated endpoint is required.
+### 3.5 Video Status & HyperFrames Evaluation
+- **Role:** Programmatic cinematic preview composition (Phase 46).
+- **Status:** **Under Evaluation (Experimental Candidate)**.
+- **Context:** Generative video APIs (JSON2Video, Pixazo, Hugging Face / Pyramid Flow, Rewind) were retired due to unreliability and cost.
+- **Current Architecture:** Existing video assets remain viewable. New video generation is unavailable in production until a safe, isolated preview worker is fully proven. HyperFrames is evaluated as an isolated external candidate.
+- **Honest Labeling:** All preview assets must carry `is_synthetic: true` and `provider_label: "Cinematic Preview"`.
 
 ---
 

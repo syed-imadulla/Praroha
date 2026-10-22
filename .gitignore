@@ -69,3 +69,7 @@ frontend/dev-dist/
 
 # Knowledge Graph cache
 graphify-out/cache/
+
+# Scratch & temporary renders
+scratch/
+

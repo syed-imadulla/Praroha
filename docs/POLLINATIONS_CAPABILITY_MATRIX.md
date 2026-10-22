@@ -162,7 +162,7 @@ Authorization: Bearer <API_KEY>
 | `minimax/minimax-h3-max` | MiniMax | **True** | Per second | **BLOCKED (HTTP 401/402)** |
 
 > **Architectural Decision for Video:**  
-> Because **0 of 23 video models are free**, PRAROHA's video pipeline must never attempt unauthenticated video requests against `gen.pollinations.ai`. The JSON2Video programmatic motion composition engine (`is_synthetic: true`) remains the authoritative baseline for preview rendering when no funded video API key is present.
+> Because **0 of 23 video models are free**, PRAROHA's video pipeline must never attempt unauthenticated video requests against `gen.pollinations.ai`. Furthermore, external generative video APIs (JSON2Video, Pixazo, Hugging Face / Pyramid Flow, Rewind) have been retired due to unreliability. New video generation is currently unavailable while HyperFrames is evaluated as an isolated cinematic preview engine. Existing video assets remain viewable.
 
 ---
 
@@ -205,7 +205,7 @@ graph TD
     ImgCheck -- Image --> PinFree[Pin model='sana' or 'z-image' on image.pollinations.ai]
     ImgCheck -- Audio (Voice) --> EdgeTTS[Route to Microsoft Edge-TTS]
     ImgCheck -- Audio (Music) --> LocalCC0[Route to CC0 Ambient Soundscapes]
-    ImgCheck -- Video --> J2V[Route to JSON2Video Synthetic Engine]
+    ImgCheck -- Video --> VideoDisabled[Video Generation Unavailable / Action Disabled]
     
     CheckAuth -- Yes (Key Present) --> Preflight[Pre-Flight GET /account/balance]
     Preflight --> Solvency{Balance > Minimum Threshold?}
@@ -216,7 +216,7 @@ graph TD
 ### 7.1 Free-Tier Invariant Rules
 1. **Image:** If `POLLINATIONS_API_KEY` is empty, restrict `model` parameter strictly to verified free models (`sana` / `lykon/dreamshaper-8-lcm` or `tongyi-mai/z-image-turbo`). Never pass `model=flux-pro` or unverified community models.
 2. **Audio:** Bypass Pollinations audio endpoints in unauthenticated mode; Microsoft Edge-TTS provides higher reliability, lower latency (~960ms), 6 neural voices, and 0 API cost.
-3. **Video:** Bypass Pollinations video endpoints entirely in unauthenticated mode; route directly to JSON2Video synthetic preview to avoid guaranteed HTTP 401/402 failures.
+3. **Video:** Bypass Pollinations video endpoints entirely; external video APIs have been retired and new video generation is unavailable until an isolated cinematic preview engine is deployed.
 4. **Idempotency Hashing:** Wrap all calls in a SHA-256 cache layer (`entity_id:modality:prompt_hash`) to eliminate duplicate invocations.
 
 ---
