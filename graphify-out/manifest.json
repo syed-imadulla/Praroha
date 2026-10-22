@@ -198,27 +198,27 @@
     "semantic_hash": ""
   },
   ".planning/PROJECT.md": {
-    "mtime": 1792661310.6940246,
-    "seen": 1792661480.1006272,
-    "ast_hash": "a265f34c33d691b8fe41895d673352d5",
+    "mtime": 1792664984.1273994,
+    "seen": 1792666577.220483,
+    "ast_hash": "da0a79cdf0a155c5e347d1dfb6822ca7",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
-    "mtime": 1792661338.9637918,
-    "seen": 1792661480.100629,
-    "ast_hash": "e968a16ef16535d768fd2b1268bfd8cd",
+    "mtime": 1792666500.459657,
+    "seen": 1792666577.2204862,
+    "ast_hash": "25164eeac053785050e6a14f23ab865b",
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1792661293.5621655,
-    "seen": 1792661480.100631,
-    "ast_hash": "8f580ea7e201c3bbb744fcb9d0a6e5cd",
+    "mtime": 1792666527.5154362,
+    "seen": 1792666577.2204895,
+    "ast_hash": "16a5e4cb86a0f03e1e56ff561cbfb6d1",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792663592.157305,
-    "seen": 1792663617.9864087,
-    "ast_hash": "a81a5ebc1c399925ca09ee29d3ce89fc",
+    "mtime": 1792666550.078252,
+    "seen": 1792666577.2204921,
+    "ast_hash": "0cb6dff5466e5685e1e723fd4cd94e77",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -3132,15 +3132,99 @@
     "semantic_hash": ""
   },
   ".planning/phases/47-product-evaluation-release-gate/47-01-SUMMARY.md": {
-    "mtime": 1792663561.1995757,
-    "seen": 1792663617.9867187,
-    "ast_hash": "1d662d17e3f965fe77760dba7d7c28c6",
+    "mtime": 1792664093.61392,
+    "seen": 1792666577.2210186,
+    "ast_hash": "96df70631e3144b9b2695a3698847ad9",
     "semantic_hash": ""
   },
   "docs/EVAL_REVIEW.md": {
-    "mtime": 1792663526.159882,
-    "seen": 1792663617.9867356,
-    "ast_hash": "67c3ebc6619074c49494973e7d6bcb61",
+    "mtime": 1792664216.4718456,
+    "seen": 1792666577.2210732,
+    "ast_hash": "955227b89a8615dcb118441cc623a5a1",
+    "semantic_hash": ""
+  },
+  "backend/app/workers/__init__.py": {
+    "mtime": 1792665709.0242057,
+    "seen": 1792666577.2200387,
+    "ast_hash": "cd84124194012784fe879a2d53fabdc2",
+    "semantic_hash": ""
+  },
+  "backend/app/workers/cinematic_worker.py": {
+    "mtime": 1792666374.494685,
+    "seen": 1792666577.2200425,
+    "ast_hash": "7fc06cba56249ab902a0123dd2c2a19e",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_worker.py": {
+    "mtime": 1792665821.1222746,
+    "seen": 1792666577.220065,
+    "ast_hash": "b31072b51309888b4909c2ef3a37356f",
+    "semantic_hash": ""
+  },
+  ".planning/phases/48-worker-architecture-local-prototype/48-01-PLAN.md": {
+    "mtime": 1792666482.4668038,
+    "seen": 1792666577.2210248,
+    "ast_hash": "29b63f53a8ae01c30d8af1dd4dd94cab",
+    "semantic_hash": ""
+  },
+  ".planning/phases/48-worker-architecture-local-prototype/48-01-SUMMARY.md": {
+    "mtime": 1792666466.1959364,
+    "seen": 1792666577.221027,
+    "ast_hash": "306d098506a020d4470042db8bb8d441",
+    "semantic_hash": ""
+  },
+  ".planning/phases/48-worker-architecture-local-prototype/48-CONTEXT.md": {
+    "mtime": 1792664805.706894,
+    "seen": 1792666577.2210288,
+    "ast_hash": "43fcd8fee91b6856778f65df6ec06977",
+    "semantic_hash": ""
+  },
+  ".planning/phases/49-azure-job-pilot-cloud-benchmark/49-01-PLAN.md": {
+    "mtime": 1792664844.1695719,
+    "seen": 1792666577.2210312,
+    "ast_hash": "64cbfc206ad3b824ea4f749c232c8c76",
+    "semantic_hash": ""
+  },
+  ".planning/phases/49-azure-job-pilot-cloud-benchmark/49-CONTEXT.md": {
+    "mtime": 1792664830.4956863,
+    "seen": 1792666577.2210329,
+    "ast_hash": "27300a515487025598e39f9b77cdc50a",
+    "semantic_hash": ""
+  },
+  ".planning/phases/50-hyperframes-comparative-evaluation/50-01-PLAN.md": {
+    "mtime": 1792664868.7793655,
+    "seen": 1792666577.2210352,
+    "ast_hash": "b4ce53779504c1f59ebdcffad677835e",
+    "semantic_hash": ""
+  },
+  ".planning/phases/50-hyperframes-comparative-evaluation/50-CONTEXT.md": {
+    "mtime": 1792664855.1934795,
+    "seen": 1792666577.2210374,
+    "ast_hash": "5bde6814c2658583de1a150ff00b1ac1",
+    "semantic_hash": ""
+  },
+  ".planning/phases/51-production-dispatch-release-gate/51-01-PLAN.md": {
+    "mtime": 1792664896.1151366,
+    "seen": 1792666577.22104,
+    "ast_hash": "4e712e79c1817403c92c1690fb98ac19",
+    "semantic_hash": ""
+  },
+  ".planning/phases/51-production-dispatch-release-gate/51-CONTEXT.md": {
+    "mtime": 1792664879.2842777,
+    "seen": 1792666577.2210426,
+    "ast_hash": "b085da9e010a42a2b7a00cbdf3076e74",
+    "semantic_hash": ""
+  },
+  "backend/requirements-worker.txt": {
+    "mtime": 1792665763.5577526,
+    "seen": 1792666577.2210522,
+    "ast_hash": "cd8bd07744bb2262a49907ea20447a73",
+    "semantic_hash": ""
+  },
+  "docs/decisions/ADR-004-cinematic-rendering-worker-architecture.md": {
+    "mtime": 1792664777.4181309,
+    "seen": 1792666577.2211077,
+    "ast_hash": "f69b5b14663e721de1ea967951c4d000",
     "semantic_hash": ""
   }
 }

@@ -62,6 +62,10 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 45: Origin Trail & Controlled Regeneration (Milestone 6)**
 - [x] **Phase 46: Cinematic Preview Proof of Concept (Milestone 6)**
 - [x] **Phase 47: Product Evaluation & Release Gate (Milestone 6)**
+- [x] **Phase 48: Dedicated Worker Architecture & Local Prototype (Milestone 7)**
+- [ ] **Phase 49: Azure Container Apps Job Pilot & Cloud Benchmarking (Milestone 7)**
+- [ ] **Phase 50: HyperFrames Comparative Evaluation & Decision Gate (Milestone 7)**
+- [ ] **Phase 51: Production Dispatch, UI Enablement & Release Gate (Milestone 7)**
 
 ---
 
@@ -788,4 +792,60 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   5. Live provider evidence documented with strict separation of live vs mocked verification tests.
   6. Zero-downtime production deployment verified across ACA backend, Vercel frontend, and Supabase cloud.  
 **Plans**: 1 plan
-- [ ] **47-01-PLAN.md**: End-to-end acceptance test battery, creative consistency verification, credit protection stress tests, live provider verification documentation, and Milestone 6 release gate sign-off.
+- [x] **47-01-PLAN.md**: End-to-end acceptance test battery, creative consistency verification, credit protection stress tests, live provider verification documentation, and Milestone 6 release gate sign-off.
+
+---
+
+### Phase 48: Dedicated Worker Architecture & Local Prototype (Milestone 7)
+**Goal**: Audit existing media job models and dispatch interfaces, package the native FFmpeg composer into an isolated, standalone worker container (`Dockerfile.worker`), implement a CLI entrypoint (`cinematic_worker.py`), and verify end-to-end local rendering and Supabase Storage upload with zero web process overhead.  
+**Depends on**: Phase 47  
+**Requirements**: WORK-01, WORK-02, WORK-03  
+**Success Criteria**:
+  1. Standalone `Dockerfile.worker` built with `python:3.11-slim` and static `ffmpeg` (< 400 MB image size, 0 web framework).
+  2. Worker CLI entrypoint successfully parses job payloads, retrieves local/remote assets, renders 720p H.264 MP4, and writes to Supabase Storage.
+  3. Local execution benchmark demonstrates deterministic composition in < 5 seconds without external generative AI calls.
+  4. Outputs strictly enforce honest metadata: `is_synthetic: true` and `provider_label: "Cinematic Preview"`.  
+**Plans**: 1 plan
+- [x] **48-01-PLAN.md**: Standalone worker container definition, CLI runner implementation, local benchmark battery, and storage handshake verification.
+
+---
+
+### Phase 49: Azure Container Apps Job Pilot & Cloud Benchmarking (Milestone 7)
+**Goal**: Provision an on-demand Azure Container Apps Job (1.0 vCPU, 2.0 GiB RAM, scale-to-zero, max concurrency 1, 120s timeout), execute bounded cloud pilot renders (< 30 runs) against real universe assets, and empirically measure real cloud duration, memory RSS, and Azure consumption billing against the ₹500 test budget.  
+**Depends on**: Phase 48  
+**Requirements**: CLOUD-01, CLOUD-02, CLOUD-03, CLOUD-04  
+**Success Criteria**:
+  1. Azure Container Apps Job created and tested via `az containerapp job start`.
+  2. Genuine 720p H.264 MP4 rendered on Azure compute and verified in Supabase Storage `seed-unfold-assets`.
+  3. Real Azure billing tracked in Azure Cost Management, confirming per-render cost < ₹0.05 and total pilot spend < ₹50.00.
+  4. Deduplication via `request_hash`, 120s hard timeout, and crash recovery verified with zero impact on primary web app.  
+**Plans**: 1 plan
+- [ ] **49-01-PLAN.md**: Azure Container Apps Job provisioning, cloud execution benchmarking, cost tracking audit, and fault recovery verification.
+
+---
+
+### Phase 50: HyperFrames Comparative Evaluation & Decision Gate (Milestone 7)
+**Goal**: Measure HyperFrames (Node 22 + Chromium headless shell + static FFmpeg) in an isolated prototype container, record memory footprint (2.0 vCPU, 4.0 GiB RAM), cold start, and render duration, and execute a formal comparative decision gate against the native FFmpeg composer.  
+**Depends on**: Phase 49  
+**Requirements**: HYPER-01, HYPER-02  
+**Success Criteria**:
+  1. Isolated `Dockerfile.hyperframes` prototype benchmarked for container image weight, memory peak, and cold-start latency.
+  2. Side-by-side comparative matrix published in `docs/HYPERFRAMES_VS_NATIVE_EVALUATION.md`.
+  3. Formal Decision Gate executed recommending adoption of Native FFmpeg or HyperFrames based on project simplicity and budget guardrails.  
+**Plans**: 1 plan
+- [ ] **50-01-PLAN.md**: HyperFrames container benchmarking, side-by-side comparative matrix, and formal renderer decision gate.
+
+---
+
+### Phase 51: Production Dispatch, UI Enablement & Release Gate (Milestone 7)
+**Goal**: Connect the verified on-demand cinematic rendering worker to the PRAROHA web application via non-blocking API dispatch, safely enable the frontend preview generation UI with honest synthetic badges, execute full end-to-end user lifecycle verification, and approve the Milestone 7 release gate.  
+**Depends on**: Phase 50  
+**Requirements**: PROD-01, PROD-02, PROD-03  
+**Success Criteria**:
+  1. `/api/media/cinematic-preview/jobs` non-blocking endpoint operational in primary FastAPI web service.
+  2. Frontend UI `MediaPreviewCard.tsx` enabled with interactive generation, status updates, in-app video playback, and honest `Cinematic Preview` badges.
+  3. Zero regressions across all 230 existing tests, PWA build, and creative memory consistency.
+  4. Milestone 7 Release Gate certified with total pilot spend verified < ₹500.  
+**Plans**: 1 plan
+- [ ] **51-01-PLAN.md**: Non-blocking dispatch API, frontend UI enablement, end-to-end acceptance testing, and Milestone 7 release gate sign-off.
+

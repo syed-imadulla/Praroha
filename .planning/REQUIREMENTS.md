@@ -246,39 +246,63 @@
 
 ---
 
-## Milestone 6: Core Product Intelligence & Media Reliability Requirements (Active)
+## Milestone 6: Core Product Intelligence & Media Reliability Requirements (Completed & Verified)
 
 ### Product Alignment & Technical Audit (AUDIT) — Phase 41
-- [ ] **AUDIT-01**: Benchmark seed interpretation quality and semantic divergence across the three world candidates for arbitrary seeds, establishing quantitative divergence metrics.
-- [ ] **AUDIT-02**: Baseline universe entity consistency across world rules, characters, relationships, and scenes; audit origin trail accuracy; catalogue existing generation failure modes and credit restrictions.
+- [x] **AUDIT-01**: Benchmark seed interpretation quality and semantic divergence across the three world candidates for arbitrary seeds, establishing quantitative divergence metrics.
+- [x] **AUDIT-02**: Baseline universe entity consistency across world rules, characters, relationships, and scenes; audit origin trail accuracy; catalogue existing generation failure modes and credit restrictions.
 
 ### Pollinations & Media Capability Audit (POLLI) — Phase 42
-- [ ] **POLLI-01**: Document live model catalog, request schemas, pricing (pollen units), quota, and authentication requirements for `gen.pollinations.ai` across image, audio, and video modalities without spending credits.
-- [ ] **POLLI-02**: Specify zero-cost vs credit-funded routing rules, ensuring public access defaults (e.g. Sana) function reliably while paid models (e.g. Flux, Seedance) require valid funded keys.
+- [x] **POLLI-01**: Document live model catalog, request schemas, pricing (pollen units), quota, and authentication requirements for `gen.pollinations.ai` across image, audio, and video modalities without spending credits.
+- [x] **POLLI-02**: Specify zero-cost vs credit-funded routing rules, ensuring public access defaults (e.g. Sana) function reliably while paid models (e.g. Flux, Seedance) require valid funded keys.
 
 ### Media Reliability & Credit Protection (RELI) — Phase 43
-- [ ] **RELI-01**: Implement strict cost-safe composite provider routing; prevent cascading to paid providers on HTTP 402, 403, or 429 errors unless an approved budget policy explicitly authorizes it.
-- [ ] **RELI-02**: Request deduplication and content-hash asset caching in `MediaService`, eliminating duplicate in-flight jobs and redundant generation costs for identical prompts and entity targets.
-- [ ] **RELI-03**: Bounded retries, exponential backoff with jitter for transient 5xx errors, persistent job recovery across container restarts, and real-time provider observability badges.
+- [x] **RELI-01**: Implement strict cost-safe composite provider routing; prevent cascading to paid providers on HTTP 402, 403, or 429 errors unless an approved budget policy explicitly authorizes it.
+- [x] **RELI-02**: Request deduplication and content-hash asset caching in `MediaService`, eliminating duplicate in-flight jobs and redundant generation costs for identical prompts and entity targets.
+- [x] **RELI-03**: Bounded retries, exponential backoff with jitter for transient 5xx errors, persistent job recovery across container restarts, and real-time provider observability badges.
 
 ### Universe Consistency & Creative Memory (MEM) — Phase 44
-- [ ] **MEM-01**: Define canonical creative memory schema capturing world rules, character traits, relationship dynamics, visual references, timelines, and creator decisions.
-- [ ] **MEM-02**: Context construction engine assembling prioritized memory tokens into generation prompts, preventing lore contradictions and character drift during progressive unfolding.
-- [ ] **MEM-03**: Deterministic consistency validator verifying generated entities against established World Bible rules and Human-Only Zone constraints before database commit.
+- [x] **MEM-01**: Define canonical creative memory schema capturing world rules, character traits, relationship dynamics, visual references, timelines, and creator decisions.
+- [x] **MEM-02**: Context construction engine assembling prioritized memory tokens into generation prompts, preventing lore contradictions and character drift during progressive unfolding.
+- [x] **MEM-03**: Deterministic consistency validator verifying generated entities against established World Bible rules and Human-Only Zone constraints before database commit.
 
 ### Origin Trail & Controlled Regeneration (REGEN) — Phase 45
-- [ ] **REGEN-01**: Dependency-aware change impact engine computing downstream blast radius (`AFFECTED`, `CONDITIONAL`, `PRESERVED`) when upstream seed, world, or rules are modified.
-- [ ] **REGEN-02**: Stale entity detection flagging outdated characters, relationships, or scenes that reference mutated parent nodes.
-- [ ] **REGEN-03**: Selective regeneration pipeline allowing creators to update only targeted subtrees while immutably preserving approved human decisions and updating the lineage DAG.
+- [x] **REGEN-01**: Dependency-aware change impact engine computing downstream blast radius (`AFFECTED`, `CONDITIONAL`, `PRESERVED`) when upstream seed, world, or rules are modified.
+- [x] **REGEN-02**: Stale entity detection flagging outdated characters, relationships, or scenes that reference mutated parent nodes.
+- [x] **REGEN-03**: Selective regeneration pipeline allowing creators to update only targeted subtrees while immutably preserving approved human decisions and updating the lineage DAG.
 
 ### Cinematic Preview Proof of Concept (CINE) — Phase 46
-- [ ] **CINE-01**: Architectural and resource evaluation of HyperFrames (licensing, Node/Chromium/FFmpeg footprint, memory envelope vs 1.0 GiB ACA container limit, render latency).
-- [ ] **CINE-02**: Isolated renderer pilot specification establishing a self-contained preview alternative to retired video APIs, with clear synthetic preview watermarking and zero mislabeling of composed footage as raw generative video.
+- [x] **CINE-01**: Architectural and resource evaluation of HyperFrames (licensing, Node/Chromium/FFmpeg footprint, memory envelope vs 1.0 GiB ACA container limit, render latency).
+- [x] **CINE-02**: Isolated renderer pilot specification establishing a self-contained preview alternative to retired video APIs, with clear synthetic preview watermarking and zero mislabeling of composed footage as raw generative video.
 
 ### Product Evaluation & Release Gate (GATE) — Phase 47
-- [ ] **GATE-01**: Automated E2E verification across arbitrary seeds, 3-world divergence, character consistency, change impact preview, and credit protection circuit breakers.
-- [ ] **GATE-02**: Empirical release gate requiring live provider evidence, distinct mocked test segregation, durable job recovery, and zero-downtime PWA cloud deployment validation.
+- [x] **GATE-01**: Automated E2E verification across arbitrary seeds, 3-world divergence, character consistency, change impact preview, and credit protection circuit breakers.
+- [x] **GATE-02**: Empirical release gate requiring live provider evidence, distinct mocked test segregation, durable job recovery, and zero-downtime PWA cloud deployment validation.
 
 ---
-*Last updated: 2026-10-22 for Milestone 6: Core Product Intelligence & Media Reliability (Active)*
+
+## Milestone 7: Dedicated Cinematic Rendering Worker Requirements (Active)
+
+### Dedicated Worker Architecture & Local Prototype (WORK) — Phase 48
+- [x] **WORK-01**: Minimal standalone worker container definition (`Dockerfile.worker`) based on `python:3.11-slim` with pinned `ffmpeg` and zero web server dependencies (image size < 400 MB).
+- [x] **WORK-02**: Standalone worker CLI runner (`backend/app/workers/cinematic_worker.py`) accepting `--job-id` or `--spec-json`, orchestrating asset retrieval, rendering via `CinematicPreviewComposer`, and durable Supabase Storage upload.
+- [x] **WORK-03**: Local benchmark verification executing against existing assets with zero external generative AI spend; enforcing `is_synthetic: true` and `provider_label: "Cinematic Preview"`.
+
+### Azure Container Apps Job Pilot & Cloud Benchmarking (CLOUD) — Phase 49
+- [ ] **CLOUD-01**: On-demand Azure Container Apps Job specification (1.0 vCPU, 2.0 GiB RAM, on-demand scale-to-zero, max concurrency 1, 120s timeout) deployed to Azure Container Registry.
+- [ ] **CLOUD-02**: Cloud execution benchmarking measuring real cold-start delay, render duration, memory RSS, and verified upload to Supabase Storage `seed-unfold-assets`.
+- [ ] **CLOUD-03**: Budget and cost audit in Azure Cost Management verifying total pilot test spend remains strictly below the ₹500 target budget with bounded test volume (≤ 30 runs).
+- [ ] **CLOUD-04**: Fault tolerance and crash recovery verification: request deduplication via `request_hash`, clean termination on error, and stale job recovery.
+
+### HyperFrames Comparative Evaluation & Decision Gate (HYPER) — Phase 50
+- [ ] **HYPER-01**: Standalone HyperFrames container prototype (`Dockerfile.hyperframes` with Node 22, Chromium headless shell, system libraries, and FFmpeg) measuring image size, cold start, and memory overhead (2.0 vCPU, 4.0 GiB RAM).
+- [ ] **HYPER-02**: Side-by-side comparative evaluation matrix and formal Decision Gate documenting whether HyperFrames justifies its operational complexity over the native FFmpeg composer.
+
+### Production Dispatch, UI Enablement & Release Gate (PROD) — Phase 51
+- [ ] **PROD-01**: Non-blocking dispatch endpoint (`/api/media/cinematic-preview/jobs`) in primary FastAPI web service creating a `generation_jobs` record and triggering the ACA Job without importing rendering libraries into the web app.
+- [ ] **PROD-02**: Frontend UI enablement in `MediaPreviewCard.tsx` transitioning from disabled/offline state to active generation with loading states, in-app video playback, and honest `Cinematic Preview` badges.
+- [ ] **PROD-03**: Full end-to-end user lifecycle verification and Milestone 7 release gate sign-off.
+
+---
+*Last updated: 2026-10-22 for Milestone 7: Dedicated Cinematic Rendering Worker (Active)*
 

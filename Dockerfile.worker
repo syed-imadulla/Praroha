@@ -1,0 +1,31 @@
+# Multi-stage minimal Dockerfile for PRAROHA Dedicated Cinematic Rendering Worker (Phase 48)
+FROM python:3.11-slim AS base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /app
+
+# Install system utilities and FFmpeg (minimal dependencies, no Chromium, no X11)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python worker dependencies (no FastAPI, no Uvicorn)
+COPY backend/requirements-worker.txt /app/backend/requirements-worker.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements-worker.txt
+
+# Copy backend application source
+COPY backend /app/backend
+
+# Create scratch directory and non-root user
+RUN mkdir -p /app/scratch /app/uploads && \
+    useradd -u 1001 -m -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
+# Run as standalone CLI batch worker (NO EXPOSE, NO HTTP SERVER)
+ENTRYPOINT ["python", "-m", "backend.app.workers.cinematic_worker"]

@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792662997.2135575,
-    "seen": 1792663058.0791152,
-    "ast_hash": "3a5c68e4cce1147650d8052e333129ef",
+    "mtime": 1792663592.157305,
+    "seen": 1792663617.9864087,
+    "ast_hash": "a81a5ebc1c399925ca09ee29d3ce89fc",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -2976,9 +2976,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/47-product-evaluation-release-gate/47-01-PLAN.md": {
-    "mtime": 1792645513.1133466,
-    "seen": 1792645531.79212,
-    "ast_hash": "91705fa42f0aa0cfc472f9bdbd8ced4f",
+    "mtime": 1792663546.1717072,
+    "seen": 1792663617.9867172,
+    "ast_hash": "2c8a4ab476581c66285fe0cd2a7c4464",
     "semantic_hash": ""
   },
   ".planning/phases/47-product-evaluation-release-gate/47-CONTEXT.md": {
@@ -3129,6 +3129,18 @@
     "mtime": 1792662931.9491422,
     "seen": 1792663058.0794432,
     "ast_hash": "e87ca090d52b3901ffb7d853c85317c8",
+    "semantic_hash": ""
+  },
+  ".planning/phases/47-product-evaluation-release-gate/47-01-SUMMARY.md": {
+    "mtime": 1792663561.1995757,
+    "seen": 1792663617.9867187,
+    "ast_hash": "1d662d17e3f965fe77760dba7d7c28c6",
+    "semantic_hash": ""
+  },
+  "docs/EVAL_REVIEW.md": {
+    "mtime": 1792663526.159882,
+    "seen": 1792663617.9867356,
+    "ast_hash": "67c3ebc6619074c49494973e7d6bcb61",
     "semantic_hash": ""
   }
 }
