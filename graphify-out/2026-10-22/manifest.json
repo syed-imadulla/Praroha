@@ -210,15 +210,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1792666527.5154362,
-    "seen": 1792666577.2204895,
-    "ast_hash": "16a5e4cb86a0f03e1e56ff561cbfb6d1",
+    "mtime": 1792675601.93404,
+    "seen": 1792675648.9925122,
+    "ast_hash": "8fcf8f324b4a3d564853051e84ad2136",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792666550.078252,
-    "seen": 1792666577.2204921,
-    "ast_hash": "0cb6dff5466e5685e1e723fd4cd94e77",
+    "mtime": 1792675624.3898861,
+    "seen": 1792675648.9925158,
+    "ast_hash": "8eaa7e11662744c72c73d5559a89991c",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -3102,9 +3102,9 @@
     "semantic_hash": ""
   },
   "backend/app/services/cinematic_preview.py": {
-    "mtime": 1792662817.7941651,
-    "seen": 1792663058.078873,
-    "ast_hash": "e8c1b8f00c5b05ea0782376b3ef67393",
+    "mtime": 1792674895.1758842,
+    "seen": 1792675648.9919817,
+    "ast_hash": "912c6fd0ea40841b89365c223f003c06",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_preview.py": {
@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "backend/app/workers/cinematic_worker.py": {
-    "mtime": 1792673404.564521,
-    "seen": 1792674332.4148214,
-    "ast_hash": "13b663a337fc9a7e19f16f687eb9ca00",
+    "mtime": 1792675268.0413284,
+    "seen": 1792675648.9920287,
+    "ast_hash": "0ed48dcdf3d76662d1a78ffc6917180e",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_worker.py": {
@@ -3180,9 +3180,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/49-azure-job-pilot-cloud-benchmark/49-01-PLAN.md": {
-    "mtime": 1792664844.1695719,
-    "seen": 1792666577.2210312,
-    "ast_hash": "64cbfc206ad3b824ea4f749c232c8c76",
+    "mtime": 1792675523.6885762,
+    "seen": 1792675648.9931588,
+    "ast_hash": "8dbb198b8f55cb3000ca96b16f82dbad",
     "semantic_hash": ""
   },
   ".planning/phases/49-azure-job-pilot-cloud-benchmark/49-CONTEXT.md": {
@@ -3225,6 +3225,18 @@
     "mtime": 1792664777.4181309,
     "seen": 1792666577.2211077,
     "ast_hash": "f69b5b14663e721de1ea967951c4d000",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_worker_security.py": {
+    "mtime": 1792674944.533546,
+    "seen": 1792675648.9921556,
+    "ast_hash": "2e146a916d9ebc734cb72851e1fe4b7d",
+    "semantic_hash": ""
+  },
+  ".planning/phases/49-azure-job-pilot-cloud-benchmark/49-01-SUMMARY.md": {
+    "mtime": 1792675552.1023815,
+    "seen": 1792675648.9931717,
+    "ast_hash": "e91ea5bbe7e80d21353382740f51709d",
     "semantic_hash": ""
   }
 }
