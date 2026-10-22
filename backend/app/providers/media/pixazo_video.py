@@ -7,8 +7,11 @@ from typing import Any, Dict, Optional, Set
 import httpx
 
 from backend.app.providers.media.base import (
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
     VideoProvider,
 )
 
@@ -67,9 +70,11 @@ class PixazoVideoProvider(VideoProvider):
         ctx = context or {}
 
         # Outage simulation for testing
-        if ctx.get("simulate_pixazo_unavailable") or os.getenv(
-            "PIXAZO_FORCE_UNAVAILABLE", "0"
-        ) in ("1", "true", "True"):
+        if (
+            ctx.get("simulate_pixazo_unavailable")
+            or ctx.get("simulate_pyramid_unavailable")
+            or os.getenv("PIXAZO_FORCE_UNAVAILABLE", "0") in ("1", "true", "True")
+        ):
             logger.info("PixazoVideoProvider simulated outage triggered.")
             raise ProviderUnavailableError("Simulated Pixazo Video outage")
 
@@ -124,16 +129,16 @@ class PixazoVideoProvider(VideoProvider):
                 raise ProviderUnavailableError(f"Pixazo network connection failed: {req_err}") from req_err
 
             if submit_res.status_code == 401:
-                raise ProviderUnavailableError("Pixazo API Key is invalid or unauthorized (HTTP 401)")
+                raise AuthenticationError("Pixazo API Key is invalid or unauthorized (HTTP 401)")
             if submit_res.status_code == 402:
-                raise ProviderUnavailableError(
+                raise PaymentRequiredError(
                     "Pixazo account has insufficient credits or no free tier allowance (HTTP 402): "
                     "Cannot generate video without active credits."
                 )
             if submit_res.status_code == 403:
-                raise ProviderUnavailableError("Pixazo API access forbidden (HTTP 403)")
+                raise AuthenticationError("Pixazo API access forbidden (HTTP 403)")
             if submit_res.status_code == 429:
-                raise ProviderUnavailableError("Pixazo rate limit exceeded (HTTP 429)")
+                raise QuotaExceededError("Pixazo rate limit exceeded (HTTP 429)")
             if submit_res.status_code not in (200, 201, 202):
                 raise ProviderUnavailableError(
                     f"Pixazo submission failed with HTTP {submit_res.status_code}: {submit_res.text[:200]}"
@@ -208,7 +213,7 @@ class PixazoVideoProvider(VideoProvider):
                 continue
 
             if status_res.status_code == 402:
-                raise ProviderUnavailableError("Pixazo account quota exhausted during video rendering (HTTP 402)")
+                raise PaymentRequiredError("Pixazo account quota exhausted during video rendering (HTTP 402)")
             if status_res.status_code != 200:
                 logger.warning("Pixazo polling returned HTTP %d: %s", status_res.status_code, status_res.text[:100])
                 continue

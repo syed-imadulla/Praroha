@@ -10,6 +10,10 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_seed_unfold.db"
 os.environ["STORAGE_PROVIDER"] = "local"
 os.environ["AI_PROVIDER"] = "mock"
 os.environ["ENVIRONMENT"] = "demo"
+os.environ.setdefault("IMAGE_PROVIDER", "mock")
+os.environ.setdefault("VOICE_PROVIDER", "mock")
+os.environ.setdefault("VIDEO_PROVIDER", "mock")
+os.environ.setdefault("AUDIO_PROVIDER", "mock")
 
 from backend.app.config import settings
 settings.DATABASE_URL = "sqlite+aiosqlite:///./test_seed_unfold.db"

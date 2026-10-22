@@ -9,8 +9,11 @@ import httpx
 from backend.app.providers.media.ace_step import detect_audio_mime_type
 from backend.app.providers.media.base import (
     AudioProvider,
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
 )
 
 logger = logging.getLogger(__name__)
@@ -108,11 +111,11 @@ class StableAudioOpenProvider(AudioProvider):
                     )
 
                 if response.status_code == 401:
-                    raise ProviderUnavailableError("Stability AI API Key is invalid or unauthorized (HTTP 401)")
+                    raise AuthenticationError("Stability AI API Key is invalid or unauthorized (HTTP 401)")
                 if response.status_code == 402:
-                    raise ProviderUnavailableError("Stability AI account has insufficient credits (HTTP 402)")
+                    raise PaymentRequiredError("Stability AI account has insufficient credits (HTTP 402)")
                 if response.status_code == 429:
-                    raise ProviderUnavailableError("Stability AI rate limit exceeded (HTTP 429)")
+                    raise QuotaExceededError("Stability AI rate limit exceeded (HTTP 429)")
                 if response.status_code != 200:
                     raise ProviderUnavailableError(
                         f"Stable Audio API returned HTTP {response.status_code}: {response.text[:200]}"

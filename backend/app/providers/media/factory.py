@@ -47,14 +47,19 @@ class ConfiguredMediaProvider(MediaProvider):
         self.audio = audio
 
     async def health_check(self) -> Dict[str, Any]:
+        image_h = await self.image.health_check() if hasattr(self.image, "health_check") else {"status": "healthy", "type": type(self.image).__name__}
+        voice_h = await self.voice.health_check() if hasattr(self.voice, "health_check") else {"status": "healthy", "type": type(self.voice).__name__}
+        video_h = await self.video.health_check() if hasattr(self.video, "health_check") else {"status": "healthy", "type": type(self.video).__name__}
+        audio_h = await self.audio.health_check() if hasattr(self.audio, "health_check") else {"status": "healthy", "type": type(self.audio).__name__}
+
         return {
             "status": "healthy",
             "provider": "ConfiguredMediaProvider",
             "modalities": {
-                "image": type(self.image).__name__,
-                "voice": type(self.voice).__name__,
-                "video": type(self.video).__name__,
-                "audio": type(self.audio).__name__,
+                "image": image_h,
+                "voice": voice_h,
+                "video": video_h,
+                "audio": audio_h,
             },
         }
 

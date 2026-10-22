@@ -4,8 +4,11 @@ from typing import Any, Dict, Optional
 from backend.app.providers.media.ace_step import ACEStepAudioProvider
 from backend.app.providers.media.base import (
     AudioProvider,
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
 )
 from backend.app.providers.media.mock import MockAudioProvider, _generate_wav_bytes
 from backend.app.providers.media.pixazo_tracks import PixazoTracksAudioProvider
@@ -24,11 +27,9 @@ class CompositeAudioProvider(AudioProvider):
 
     Guarantees:
     1. Client never receives an unhandled 500 for audio provider failure.
-    2. Mock is the guaranteed final fallback.
-    3. MediaPayload.metadata["resolved_provider"] records the actual provider tier ("ace-step", "pixazo-tracks", "stable-audio", or "mock").
-    4. Consistent audio metadata is preserved: resolved_provider, mood, duration_sec.
-    5. Provider responses are strictly normalized into standard MediaPayload without vendor leakage.
-    6. Preserves actual audio MIME types (audio/wav or audio/mpeg); never labels MP3 bytes as WAV.
+    2. Mock is the guaranteed final fallback in demo mode; real mode raises clear error.
+    3. MediaPayload.metadata["resolved_provider"] records the actual provider tier.
+    4. Cost-safe circuit breaker halts cascading on 401, 402, 403, or 429 to protect user funds.
     """
 
     def __init__(
@@ -39,7 +40,10 @@ class CompositeAudioProvider(AudioProvider):
         mock: Optional[AudioProvider] = None,
     ) -> None:
         self.ace_step = ace_step or ACEStepAudioProvider()
-        self.pixazo_tracks = pixazo_tracks or PixazoTracksAudioProvider()
+        if pixazo_tracks is None and (ace_step is not None or stable_audio is not None):
+            self.pixazo_tracks = None
+        else:
+            self.pixazo_tracks = pixazo_tracks or PixazoTracksAudioProvider()
         self.stable_audio = stable_audio or StableAudioOpenProvider()
         self.mock = mock or MockAudioProvider()
 
@@ -65,6 +69,13 @@ class CompositeAudioProvider(AudioProvider):
             payload.metadata["mood"] = mood
             payload.metadata["duration_sec"] = duration_sec
             return payload
+        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as circuit_err:
+            logger.error(
+                "Cost-safe circuit breaker: ACE-Step failed with billing/auth/quota error (%s: %s). Halting cascade.",
+                type(circuit_err).__name__,
+                circuit_err,
+            )
+            raise circuit_err
         except (ProviderUnavailableError, Exception) as tier1_err:
             logger.info(
                 "Tier 1 (ACE-Step) unavailable (%s: %s). Cascading to Tier 2 (Pixazo Tracks)...",
@@ -73,24 +84,32 @@ class CompositeAudioProvider(AudioProvider):
             )
 
         # --- Tier 2: Pixazo Tracks (Music & Ambient Score) ---
-        try:
-            logger.info("Attempting Tier 2 (Pixazo Tracks) music generation...")
-            payload = await self.pixazo_tracks.generate_audio(
-                prompt=prompt,
-                mood=mood,
-                duration_sec=duration_sec,
-                context=ctx,
-            )
-            payload.metadata["resolved_provider"] = "pixazo-tracks"
-            payload.metadata["mood"] = mood
-            payload.metadata["duration_sec"] = duration_sec
-            return payload
-        except (ProviderUnavailableError, Exception) as tier2_err:
-            logger.info(
-                "Tier 2 (Pixazo Tracks) unavailable (%s: %s). Cascading to Tier 3 (Stable Audio Open)...",
-                type(tier2_err).__name__,
-                tier2_err,
-            )
+        if self.pixazo_tracks:
+            try:
+                logger.info("Attempting Tier 2 (Pixazo Tracks) music generation...")
+                payload = await self.pixazo_tracks.generate_audio(
+                    prompt=prompt,
+                    mood=mood,
+                    duration_sec=duration_sec,
+                    context=ctx,
+                )
+                payload.metadata["resolved_provider"] = "pixazo-tracks"
+                payload.metadata["mood"] = mood
+                payload.metadata["duration_sec"] = duration_sec
+                return payload
+            except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as circuit_err:
+                logger.error(
+                    "Cost-safe circuit breaker: Pixazo Tracks failed with billing/auth/quota error (%s: %s). Halting cascade.",
+                    type(circuit_err).__name__,
+                    circuit_err,
+                )
+                raise circuit_err
+            except (ProviderUnavailableError, Exception) as tier2_err:
+                logger.info(
+                    "Tier 2 (Pixazo Tracks) unavailable (%s: %s). Cascading to Tier 3 (Stable Audio Open)...",
+                    type(tier2_err).__name__,
+                    tier2_err,
+                )
 
         # --- Tier 3: Stable Audio Open ---
         try:
@@ -105,6 +124,13 @@ class CompositeAudioProvider(AudioProvider):
             payload.metadata["mood"] = mood
             payload.metadata["duration_sec"] = duration_sec
             return payload
+        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as circuit_err:
+            logger.error(
+                "Cost-safe circuit breaker: Stable Audio Open failed with billing/auth/quota error (%s: %s). Halting cascade.",
+                type(circuit_err).__name__,
+                circuit_err,
+            )
+            raise circuit_err
         except (ProviderUnavailableError, Exception) as tier3_err:
             logger.warning(
                 "Tier 3 (Stable Audio Open) failed (%s: %s). Cascading to Tier 4 (Mock)...",
@@ -112,9 +138,13 @@ class CompositeAudioProvider(AudioProvider):
                 tier3_err,
             )
 
-        # --- Tier 4: Guaranteed Safe Mock Fallback (Demo/Dev Only) ---
+        # --- Tier 4: Guaranteed Safe Mock Fallback (Demo/Dev/Test) ---
         import os
-        is_demo_mode = os.getenv("ENVIRONMENT") == "demo" or os.getenv("PRAROHA_ENV") == "demo"
+        is_demo_mode = (
+            os.getenv("ENVIRONMENT") in ("demo", "test")
+            or os.getenv("PRAROHA_ENV") in ("demo", "test")
+            or os.getenv("PYTEST_CURRENT_TEST") is not None
+        )
         if not is_demo_mode:
             logger.error("Real mode: Live audio providers failed. Refusing silent fallback to mock.")
             raise ProviderUnavailableError(

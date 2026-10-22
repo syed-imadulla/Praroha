@@ -885,6 +885,28 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
             <p className="text-xs text-[#B8734F] mt-0.5 max-w-[240px]">
               {job?.error_message || asset?.error_message || 'Something went wrong. Please try again.'}
             </p>
+            {(() => {
+              const errMsg = (job?.error_message || asset?.error_message || '').toLowerCase();
+              const isCreditError =
+                errMsg.includes('credit') ||
+                errMsg.includes('payment') ||
+                errMsg.includes('402') ||
+                errMsg.includes('quota') ||
+                errMsg.includes('unauthorized') ||
+                errMsg.includes('401') ||
+                errMsg.includes('403');
+              if (isCreditError) {
+                return (
+                  <span
+                    data-testid="media-credit-error-badge"
+                    className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F2DDD1] text-[#934520] border border-[#DEB097]"
+                  >
+                    Credit / Quota Required
+                  </span>
+                );
+              }
+              return null;
+            })()}
             {onRetry && (
               <button
                 type="button"

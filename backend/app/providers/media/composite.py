@@ -2,9 +2,12 @@ import logging
 from typing import Any, Dict, Optional
 
 from backend.app.providers.media.base import (
+    AuthenticationError,
     ImageProvider,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
 )
 from backend.app.providers.media.flux import FluxSchnellProvider
 from backend.app.providers.media.mock import MockImageProvider
@@ -25,6 +28,7 @@ class CompositeImageProvider(ImageProvider):
     2. Mock is the guaranteed final fallback.
     3. MediaPayload.metadata["resolved_provider"] accurately records which
        tier actually generated the asset.
+    4. Cost-safe circuit breaker halts cascading on 401/402/403/429 errors.
     """
 
     def __init__(
@@ -53,6 +57,13 @@ class CompositeImageProvider(ImageProvider):
             )
             payload.metadata["resolved_provider"] = "pollinations"
             return payload
+        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as circuit_err:
+            logger.error(
+                "Cost-safe circuit breaker: Pollinations failed (%s: %s). Halting cascade.",
+                type(circuit_err).__name__,
+                circuit_err,
+            )
+            raise circuit_err
         except (ProviderUnavailableError, Exception) as tier1_err:
             logger.warning(
                 "Tier 1 (Pollinations) failed (%s: %s). Cascading to Tier 2 (FLUX)...",

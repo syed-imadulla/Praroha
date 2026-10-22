@@ -7,8 +7,11 @@ from typing import Any, Dict, Optional
 import httpx
 
 from backend.app.providers.media.base import (
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
     VideoProvider,
 )
 
@@ -65,6 +68,14 @@ class WanVideoProvider(VideoProvider):
         try:
             async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
                 response = await client.post(self.endpoint, json=payload, headers=headers)
+                if response.status_code == 401:
+                    raise AuthenticationError("Wan2.1 API returned 401 Unauthorized")
+                if response.status_code == 402:
+                    raise PaymentRequiredError("Wan2.1 API returned 402 Payment Required")
+                if response.status_code == 403:
+                    raise AuthenticationError("Wan2.1 API returned 403 Forbidden")
+                if response.status_code == 429:
+                    raise QuotaExceededError("Wan2.1 API returned 429 Rate Limit Exceeded")
                 if response.status_code != 200:
                     raise ProviderUnavailableError(
                         f"Wan2.1 API returned HTTP {response.status_code}: {response.text[:200]}"

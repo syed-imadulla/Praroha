@@ -1,8 +1,14 @@
 from backend.app.providers.media.base import (
     AudioProvider,
+    AuthenticationError,
     ImageProvider,
     MediaPayload,
     MediaProvider,
+    MediaProviderError,
+    PaymentRequiredError,
+    ProviderUnavailableError,
+    QuotaExceededError,
+    TransientProviderError,
     VideoProvider,
     VoiceProvider,
 )

@@ -9,8 +9,11 @@ import httpx
 
 from backend.app.providers.media.base import (
     AudioProvider,
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
 )
 
 logger = logging.getLogger(__name__)
@@ -149,15 +152,19 @@ class ACEStepAudioProvider(AudioProvider):
                         continue
 
                     if response.status_code == 401:
-                        raise ProviderUnavailableError(
+                        raise AuthenticationError(
                             "Hugging Face API returned 401 Unauthorized: Valid HF_TOKEN required for serverless model inference"
                         )
+                    if response.status_code == 402:
+                        raise PaymentRequiredError(
+                            "Hugging Face API returned 402 Payment Required: Serverless inference requires prepaid credits"
+                        )
                     if response.status_code == 403:
-                        raise ProviderUnavailableError(
+                        raise AuthenticationError(
                             "Hugging Face API returned 403 Forbidden: Account lacks access permissions for this model"
                         )
                     if response.status_code == 429:
-                        raise ProviderUnavailableError(
+                        raise QuotaExceededError(
                             "Hugging Face API returned 429 Rate Limit Exceeded: Serverless quota reached"
                         )
 

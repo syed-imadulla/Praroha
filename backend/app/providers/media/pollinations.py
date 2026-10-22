@@ -8,10 +8,39 @@ from typing import Any, Dict, Optional
 import httpx
 
 from backend.app.providers.media.base import (
+    AuthenticationError,
     ImageProvider,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
+    TransientProviderError,
 )
+
+# Models supported via the legacy anonymous compatibility route on https://image.pollinations.ai/prompt.
+# ARCHITECTURAL NOTICE:
+# 1. In Pollinations' official OpenAPI catalog (https://gen.pollinations.ai), models marked `paid_only: false`
+#    carry pollen unit pricing (e.g. flux: 0.002, z-image-turbo: 0.004, sana: 0.0001) when an authenticated key is used.
+#    `paid_only: false` does NOT prove guaranteed zero-cost generation across all access methods.
+# 2. This unauthenticated route is maintained strictly as a legacy, best-effort compatibility path.
+#    It does NOT have guaranteed future availability or rate-limit invariance.
+# 3. Any model not explicitly in this compatibility set is treated as cost-ambiguous / paid-only
+#    and blocked from unauthenticated automatic routing with an AuthenticationError.
+# 4. If an authenticated key with 0 pollen balance is used, Pollinations returns HTTP 402,
+#    which triggers the cost-safe circuit breaker immediately without secondary paid cascading.
+PUBLIC_UNAUTHENTICATED_MODELS = {
+    "flux",
+    "black-forest-labs/flux.1-schnell",
+    "sana",
+    "dreamshaper",
+    "lykon/dreamshaper-8-lcm",
+    "z-image",
+    "zimage",
+    "z-image-turbo",
+    "tongyi-mai/z-image-turbo",
+}
+# Backward compatibility alias
+VERIFIED_FREE_MODELS = PUBLIC_UNAUTHENTICATED_MODELS
 
 logger = logging.getLogger(__name__)
 
@@ -93,8 +122,14 @@ class PollinationsImageProvider(ImageProvider):
             "seed": str(seed),
             "nologo": "true",
         }
-        if self.default_model:
-            params["model"] = self.default_model
+        effective_model = (context.get("model") if context else None) or self.default_model
+        if not self.api_key and effective_model and effective_model.lower() not in VERIFIED_FREE_MODELS:
+            raise AuthenticationError(
+                f"Model '{effective_model}' is not in the confirmed zero-cost catalog and requires an authenticated API key (POLLINATIONS_API_KEY)."
+            )
+
+        if effective_model:
+            params["model"] = effective_model
 
         query_string = urllib.parse.urlencode(params)
         url = f"{self.base_url}/{encoded_prompt}?{query_string}"
@@ -133,18 +168,24 @@ class PollinationsImageProvider(ImageProvider):
                 ) as client:
                     response = await client.get(url, headers=headers)
 
-                    # 1. Non-retryable payment and authorization errors
+                    # 1. Non-retryable payment, quota, and authorization errors
                     if response.status_code == 401:
                         logger.error("Pollinations returned 401 Unauthorized (Invalid API Key). Halting.")
-                        raise ProviderUnavailableError("Pollinations API Key is invalid or unauthorized (HTTP 401)")
+                        raise AuthenticationError("Pollinations API Key is invalid or unauthorized (HTTP 401)")
                     if response.status_code == 402:
                         logger.error("Pollinations returned 402 Payment Required (Insufficient credits). Halting.")
-                        raise ProviderUnavailableError(
+                        raise PaymentRequiredError(
                             "Pollinations account has insufficient credits or requires payment (HTTP 402)"
                         )
+                    if response.status_code == 403:
+                        logger.error("Pollinations returned 403 Forbidden. Halting.")
+                        raise AuthenticationError("Pollinations API access forbidden (HTTP 403)")
+                    if response.status_code == 429:
+                        logger.error("Pollinations returned 429 Rate Limit Exceeded. Halting cascade.")
+                        raise QuotaExceededError("Pollinations rate limit exceeded (HTTP 429)")
 
-                    # 2. Transient retryable status codes (429 Rate Limit, 5xx server errors)
-                    if response.status_code in (429, 500, 502, 503, 504):
+                    # 2. Transient retryable status codes (5xx server errors)
+                    if response.status_code in (500, 502, 503, 504):
                         error_msg = f"HTTP {response.status_code} received from Pollinations"
                         jitter = random.uniform(0.1, 0.4)
                         logger.warning(
@@ -153,12 +194,12 @@ class PollinationsImageProvider(ImageProvider):
                             error_msg,
                             current_backoff + jitter,
                         )
-                        last_exception = ProviderUnavailableError(error_msg)
+                        last_exception = TransientProviderError(error_msg)
                         if attempt < self.max_retries:
                             await asyncio.sleep(current_backoff + jitter)
                             current_backoff *= self.backoff_multiplier
                             continue
-                        raise ProviderUnavailableError(f"Pollinations retry exhaustion: {error_msg}")
+                        raise TransientProviderError(f"Pollinations retry exhaustion: {error_msg}")
 
                     response.raise_for_status()
 

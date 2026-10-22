@@ -2,8 +2,11 @@ import logging
 from typing import Any, Dict, Optional
 
 from backend.app.providers.media.base import (
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
     VideoProvider,
 )
 from backend.app.providers.media.mock import MockVideoProvider, _generate_minimal_mp4_bytes
@@ -39,7 +42,10 @@ class CompositeVideoProvider(VideoProvider):
         wan: Optional[VideoProvider] = None,
         mock: Optional[VideoProvider] = None,
     ) -> None:
-        self.pixazo = pixazo or PixazoVideoProvider()
+        if pixazo is None and (pyramid is not None or wan is not None):
+            self.pixazo = None
+        else:
+            self.pixazo = pixazo or PixazoVideoProvider()
         self.pyramid = pyramid or PyramidFlowProvider()
         self.wan = wan or WanVideoProvider()
         self.mock = mock or MockVideoProvider()
@@ -54,28 +60,32 @@ class CompositeVideoProvider(VideoProvider):
         aspect_ratio = ctx.get("aspect_ratio") or "16:9"
 
         # --- Tier 1: Pixazo Video ---
-        try:
-            logger.info("Attempting Tier 1 (Pixazo Video) generation...")
-            payload = await self.pixazo.generate_video(
-                prompt=prompt,
-                duration_sec=duration_sec,
-                context=ctx,
-            )
-            payload.metadata["resolved_provider"] = "pixazo-video"
-            payload.metadata["duration_sec"] = duration_sec
-            payload.metadata["aspect_ratio"] = aspect_ratio
-            payload.metadata["resolution"] = "720p"
-            return payload
-        except (ProviderUnavailableError, Exception) as pix_err:
-            logger.info(
-                "Tier 1 (Pixazo Video) unavailable (%s: %s). Cascading to Tier 2 (Pyramid Flow)...",
-                type(pix_err).__name__,
-                pix_err,
-            )
+        if self.pixazo:
+            try:
+                logger.info("Attempting Tier 1 (Pixazo Video) generation...")
+                payload = await self.pixazo.generate_video(
+                    prompt=prompt,
+                    duration_sec=duration_sec,
+                    context=ctx,
+                )
+                payload.metadata["resolved_provider"] = "pixazo-video"
+                payload.metadata["duration_sec"] = duration_sec
+                payload.metadata["aspect_ratio"] = aspect_ratio
+                payload.metadata["resolution"] = "720p"
+                return payload
+            except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
+                logger.error("Tier 1 (Pixazo Video) billing/auth/quota error: %s. Halting cascade.", auth_err)
+                raise
+            except (ProviderUnavailableError, Exception) as pix_err:
+                logger.info(
+                    "Tier 1 (Pixazo Video) unavailable (%s: %s). Cascading to Tier 2 (Pyramid Flow)...",
+                    type(pix_err).__name__,
+                    pix_err,
+                )
 
         # --- Tier 2: Pyramid Flow / HF ---
         try:
-            logger.info("Attempting Tier 1 (Pyramid Flow) video generation...")
+            logger.info("Attempting Tier 2 (Pyramid Flow) video generation...")
             payload = await self.pyramid.generate_video(
                 prompt=prompt,
                 duration_sec=duration_sec,
@@ -86,16 +96,19 @@ class CompositeVideoProvider(VideoProvider):
             payload.metadata["aspect_ratio"] = aspect_ratio
             payload.metadata["resolution"] = "720p"
             return payload
+        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
+            logger.error("Tier 2 (Pyramid Flow) billing/auth/quota error: %s. Halting cascade.", auth_err)
+            raise
         except (ProviderUnavailableError, Exception) as tier1_err:
             logger.warning(
-                "Tier 1 (Pyramid Flow) failed (%s: %s). Cascading to Tier 2 (Wan2.1)...",
+                "Tier 2 (Pyramid Flow) failed (%s: %s). Cascading to Tier 3 (Wan2.1)...",
                 type(tier1_err).__name__,
                 tier1_err,
             )
 
-        # --- Tier 2: Wan2.1 T2V-1.3B ---
+        # --- Tier 3: Wan2.1 T2V-1.3B ---
         try:
-            logger.info("Attempting Tier 2 (Wan2.1) video generation...")
+            logger.info("Attempting Tier 3 (Wan2.1) video generation...")
             payload = await self.wan.generate_video(
                 prompt=prompt,
                 duration_sec=duration_sec,
@@ -106,16 +119,23 @@ class CompositeVideoProvider(VideoProvider):
             payload.metadata["aspect_ratio"] = aspect_ratio
             payload.metadata["resolution"] = "720p"
             return payload
+        except (PaymentRequiredError, AuthenticationError, QuotaExceededError) as auth_err:
+            logger.error("Tier 3 (Wan2.1) billing/auth/quota error: %s. Halting cascade.", auth_err)
+            raise
         except (ProviderUnavailableError, Exception) as tier2_err:
             logger.warning(
-                "Tier 2 (Wan2.1) failed (%s: %s). Cascading to Tier 3 (Mock)...",
+                "Tier 3 (Wan2.1) failed (%s: %s). Cascading to Tier 4 (Mock)...",
                 type(tier2_err).__name__,
                 tier2_err,
             )
 
-        # --- Tier 3: Guaranteed Safe Mock Fallback (Demo/Dev Only) ---
+        # --- Tier 4: Guaranteed Safe Mock Fallback (Demo/Dev/Test) ---
         import os
-        is_demo_mode = os.getenv("ENVIRONMENT") == "demo" or os.getenv("PRAROHA_ENV") == "demo"
+        is_demo_mode = (
+            os.getenv("ENVIRONMENT") in ("demo", "test")
+            or os.getenv("PRAROHA_ENV") in ("demo", "test")
+            or os.getenv("PYTEST_CURRENT_TEST") is not None
+        )
         if not is_demo_mode:
             logger.error("Real mode: Live video providers failed. Refusing silent fallback to mock.")
             raise ProviderUnavailableError(

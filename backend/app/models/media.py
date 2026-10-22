@@ -27,6 +27,7 @@ class MediaAssetBase(SQLModel):
     height: Optional[int] = Field(default=None, nullable=True)
     aspect_ratio: Optional[str] = Field(default="1:1", nullable=True)
     metadata_json: Optional[str] = Field(default="{}", nullable=True)
+    request_hash: Optional[str] = Field(default=None, index=True, nullable=True)
 
 
 class MediaAssetRecord(MediaAssetBase, table=True):
@@ -53,6 +54,7 @@ class MediaGenerationRequest(SQLModel):
     voice_id: Optional[str] = "default"
     duration_sec: Optional[int] = 5
     mood: Optional[str] = "ambient"
+    force_regenerate: Optional[bool] = False
     context: Optional[Dict[str, Any]] = None
 
 

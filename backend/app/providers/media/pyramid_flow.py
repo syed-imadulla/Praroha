@@ -7,8 +7,11 @@ from typing import Any, Dict, Optional
 import httpx
 
 from backend.app.providers.media.base import (
+    AuthenticationError,
     MediaPayload,
+    PaymentRequiredError,
     ProviderUnavailableError,
+    QuotaExceededError,
     VideoProvider,
 )
 
@@ -75,19 +78,19 @@ class PyramidFlowProvider(VideoProvider):
                 async with httpx.AsyncClient(timeout=self.timeout_sec) as client:
                     response = await client.post(url, json=payload, headers=headers)
                     if response.status_code == 401:
-                        raise ProviderUnavailableError(
+                        raise AuthenticationError(
                             "Hugging Face API returned 401 Unauthorized: Valid HF_TOKEN required for video inference"
                         )
                     if response.status_code == 402:
-                        raise ProviderUnavailableError(
+                        raise PaymentRequiredError(
                             "Hugging Face Inference Providers requires prepaid credits (HTTP 402): Account has no remaining inference credits"
                         )
                     if response.status_code == 403:
-                        raise ProviderUnavailableError(
+                        raise AuthenticationError(
                             "Hugging Face API returned 403 Forbidden: Account lacks access permissions for video inference"
                         )
                     if response.status_code == 429:
-                        raise ProviderUnavailableError(
+                        raise QuotaExceededError(
                             "Hugging Face API returned 429 Rate Limit Exceeded: Serverless quota reached"
                         )
                     if response.status_code != 200:
@@ -128,19 +131,19 @@ class PyramidFlowProvider(VideoProvider):
                     else None
                 )
                 if status == 401:
-                    raise ProviderUnavailableError(
+                    raise AuthenticationError(
                         "Hugging Face API returned 401 Unauthorized: Valid HF_TOKEN required for video inference"
                     )
                 elif status == 402:
-                    raise ProviderUnavailableError(
+                    raise PaymentRequiredError(
                         "Hugging Face account has insufficient inference credits (HTTP 402): Purchase pre-paid credits to continue using Inference Providers."
                     )
                 elif status == 403:
-                    raise ProviderUnavailableError(
+                    raise AuthenticationError(
                         "Hugging Face API returned 403 Forbidden: Account lacks permissions for video inference"
                     )
                 elif status == 429:
-                    raise ProviderUnavailableError("Hugging Face API returned 429 Rate Limit Exceeded")
+                    raise QuotaExceededError("Hugging Face API returned 429 Rate Limit Exceeded")
                 else:
                     raise ProviderUnavailableError(
                         f"Hugging Face Inference Provider error (HTTP {status}): {hf_err}"

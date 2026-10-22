@@ -8,6 +8,7 @@ from backend.app.models.media import MediaGenerationRequest, MediaAssetRecord
 from backend.app.models.project import ProjectCreate
 from backend.app.providers.media.mock import MockImageProvider, MockMediaProvider
 from backend.app.repositories.project_repo import ProjectRepository, async_session
+from unittest.mock import patch
 from backend.app.services.media_service import MediaService
 
 
@@ -193,15 +194,21 @@ async def test_retry_creates_new_job_attempt():
             prompt="Sun champion warrior",
         )
 
-        # First attempt
-        job1 = await service.dispatch_job(project.id, req)
-        # Second attempt (Retry)
-        job2 = await service.dispatch_job(project.id, req)
+        # Prevent background task from racing and mutating status back to processing
+        with patch.object(service, "_execute_job_in_background", return_value=None):
+            # First attempt
+            job1 = await service.dispatch_job(project.id, req)
+            # Mark first attempt as failed (simulating failed job needing retry)
+            await repo.update_media_asset(job1.job_id, {"status": "failed", "error_message": "Transient failure"})
+            await repo.update_generation_job(job1.job_id, {"status": "failed", "error_message": "Transient failure"})
 
-        assert job1.job_id != job2.job_id
-        # Both records exist separately in database
-        asset1 = await repo.get_media_asset(job1.job_id)
-        asset2 = await repo.get_media_asset(job2.job_id)
-        assert asset1 is not None
-        assert asset2 is not None
-        assert asset1.id != asset2.id
+            # Second attempt (Retry)
+            job2 = await service.dispatch_job(project.id, req)
+
+            assert job1.job_id != job2.job_id
+            # Both records exist separately in database
+            asset1 = await repo.get_media_asset(job1.job_id)
+            asset2 = await repo.get_media_asset(job2.job_id)
+            assert asset1 is not None
+            assert asset2 is not None
+            assert asset1.id != asset2.id

@@ -224,6 +224,20 @@ def _migrate_columns(connection):
                 connection.execute(text("ALTER TABLE media_assets ADD COLUMN metadata_json TEXT DEFAULT '{}'"))
             except Exception:
                 pass
+        if "request_hash" not in cols:
+            try:
+                connection.execute(text("ALTER TABLE media_assets ADD COLUMN request_hash VARCHAR"))
+            except Exception:
+                pass
+        try:
+            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_media_assets_request_hash ON media_assets (request_hash)"))
+            connection.execute(text("""
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_media_active_request
+                ON media_assets (project_id, request_hash)
+                WHERE request_hash IS NOT NULL AND status IN ('queued', 'processing')
+            """))
+        except Exception:
+            pass
     else:
         try:
             connection.execute(text("""
@@ -243,10 +257,17 @@ def _migrate_columns(connection):
                     height INTEGER,
                     aspect_ratio VARCHAR DEFAULT '1:1',
                     metadata_json TEXT DEFAULT '{}',
+                    request_hash VARCHAR,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     completed_at TIMESTAMP,
                     FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
                 )
+            """))
+            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_media_assets_request_hash ON media_assets (request_hash)"))
+            connection.execute(text("""
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_media_active_request
+                ON media_assets (project_id, request_hash)
+                WHERE request_hash IS NOT NULL AND status IN ('queued', 'processing')
             """))
         except Exception:
             pass
@@ -1610,6 +1631,33 @@ class ProjectRepository:
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
+    async def find_media_asset_by_hash(
+        self, project_id: str, request_hash: str
+    ) -> Optional[MediaAssetRecord]:
+        """Find an existing media asset by its deterministic request hash."""
+        stmt = (
+            select(MediaAssetRecord)
+            .where(
+                MediaAssetRecord.project_id == project_id,
+                MediaAssetRecord.request_hash == request_hash,
+            )
+            .order_by(MediaAssetRecord.created_at.desc())
+        )
+        res = await self.session.execute(stmt)
+        return res.scalars().first()
+
+    async def clear_active_media_request_hash(
+        self, project_id: str, request_hash: str
+    ) -> None:
+        """Clear request_hash on existing active (queued/processing) assets to allow clean force regeneration."""
+        stmt = text(
+            "UPDATE media_assets SET request_hash = NULL "
+            "WHERE project_id = :project_id AND request_hash = :request_hash "
+            "AND status IN ('queued', 'processing')"
+        )
+        await self.session.execute(stmt, {"project_id": project_id, "request_hash": request_hash})
+        await self.session.commit()
+
     async def list_media_assets(
         self,
         project_id: str,
@@ -1667,6 +1715,7 @@ class ProjectRepository:
         res = await self.session.execute(stmt)
         orphaned_jobs = list(res.scalars().all())
         count = 0
+        handled_asset_ids = set()
         for job in orphaned_jobs:
             job.status = "failed"
             job.error_message = "Generation task interrupted by server restart. Please retry generation."
@@ -1679,7 +1728,19 @@ class ProjectRepository:
                 asset.status = "failed"
                 asset.error_message = job.error_message
                 self.session.add(asset)
+                handled_asset_ids.add(asset.id)
             count += 1
+
+        # Also catch any stray MediaAssetRecord left in queued/processing without an active GenerationJob
+        stmt_assets = select(MediaAssetRecord).where(MediaAssetRecord.status.in_(["queued", "processing"]))
+        res_assets = await self.session.execute(stmt_assets)
+        for stray_asset in res_assets.scalars().all():
+            if stray_asset.id not in handled_asset_ids:
+                stray_asset.status = "failed"
+                stray_asset.error_message = "Generation task interrupted by server restart. Please retry generation."
+                self.session.add(stray_asset)
+                count += 1
+
         if count > 0:
             await self.session.commit()
         return count

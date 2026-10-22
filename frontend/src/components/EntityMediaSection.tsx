@@ -7,11 +7,13 @@ import {
   Sparkles,
   RotateCw,
   Volume2,
+  AlertCircle,
 } from 'lucide-react';
+import { apiClient } from '../api/client';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { MediaPreviewCard } from './MediaPreviewCard';
 import { SoundscapeComposerModal } from './SoundscapeComposerModal';
-import { MediaType, CURATED_VOICE_PERSONAS, CURATED_AUDIO_MOODS } from '../types';
+import { MediaType, MediaProviderHealth, CURATED_VOICE_PERSONAS, CURATED_AUDIO_MOODS } from '../types';
 
 interface EntityMediaSectionProps {
   entityType: 'world' | 'character' | 'location' | 'scene';
@@ -70,11 +72,47 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
     entityType === 'scene' ? 'tense-dramatic' : 'serene-ambient'
   );
 
+  const [providerHealth, setProviderHealth] = useState<MediaProviderHealth | null>(null);
+
   useEffect(() => {
     fetchEntityMedia(entityId);
+    let isMounted = true;
+    apiClient.getMediaProvidersHealth().then((res) => {
+      if (isMounted && res.data) {
+        setProviderHealth(res.data);
+      }
+    }).catch(() => {});
+    return () => {
+      isMounted = false;
+    };
   }, [entityId, fetchEntityMedia]);
 
   const assets = mediaAssets[entityId] || [];
+
+  // Detect any credit or quota exhaustion errors across active jobs or entity assets
+  const creditErrorMsg = React.useMemo(() => {
+    const allErrors: string[] = [];
+    assets.forEach((a) => {
+      if (a.error_message) allErrors.push(a.error_message);
+    });
+    Object.values(activeMediaJobs).forEach((j) => {
+      if (j.error_message) allErrors.push(j.error_message);
+    });
+    const found = allErrors.find((msg) => {
+      const lower = msg.toLowerCase();
+      return (
+        lower.includes('credit') ||
+        lower.includes('payment') ||
+        lower.includes('402') ||
+        lower.includes('quota') ||
+        lower.includes('429') ||
+        lower.includes('unauthorized') ||
+        lower.includes('401') ||
+        lower.includes('403')
+      );
+    });
+    return found || null;
+  }, [assets, activeMediaJobs]);
 
   const handleGenerate = async (mediaType: MediaType) => {
     await generateMediaAction({
@@ -121,11 +159,33 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
       data-testid={`entity-media-section-${entityId}`}
       className="mt-3 pt-3 border-t border-[#D8CCB7] space-y-3"
     >
+      {/* Credit/Billing Alert Banner if active */}
+      {creditErrorMsg && (
+        <div
+          data-testid="provider-credit-alert"
+          className="flex items-start gap-2 p-2.5 rounded-xl bg-[#F5E6DC] border border-[#E2BFAC] text-xs text-[#934520] animate-fadeIn"
+        >
+          <AlertCircle className="w-4 h-4 shrink-0 text-[#B8734F] mt-0.5" />
+          <div className="flex-1">
+            <span className="font-bold">Provider Credit / Authorization Limit: </span>
+            <span>{creditErrorMsg}</span>
+          </div>
+        </div>
+      )}
+
       {/* Action Header & Modality Buttons */}
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2 text-[13px] font-bold text-[#294B3A]">
           <Sparkles className="w-4 h-4 text-[#355A46]" />
           <span>Multimodal Sensory Assets</span>
+          <span
+            data-testid="provider-health-badge"
+            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#EBF0E8] text-[#294B3A] border border-[#BACBB8]"
+            title={`Spend protection active (${providerHealth?.status || 'healthy'}). Protects against runaway spend and credit exhaustion. Does not guarantee all configured providers are free.`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#466A55] animate-pulse"></span>
+            Credit-Safe Routing
+          </span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">

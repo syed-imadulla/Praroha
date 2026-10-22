@@ -20,6 +20,7 @@ from backend.app.repositories.project_repo import (
     ProjectRepository,
     async_session,
 )
+from sqlalchemy.exc import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,44 @@ def _resolve_extension(mime_type: str) -> str:
     if "jpeg" in mime_type or "jpg" in mime_type:
         return "jpg"
     return "bin"
+
+
+import hashlib
+
+
+def compute_request_hash(project_id: str, request: MediaGenerationRequest) -> str:
+    """Compute a deterministic SHA-256 fingerprint identifying the media generation request.
+
+    Includes all parameters that affect output:
+    - project_id, entity_type, entity_id, media_type
+    - normalized prompt
+    - aspect_ratio
+    - voice_id, duration_sec, mood
+    - relevant context keys
+    """
+    normalized_prompt = " ".join((request.prompt or "").strip().split()).lower()
+    payload = {
+        "project_id": project_id,
+        "entity_type": request.entity_type,
+        "entity_id": request.entity_id,
+        "media_type": request.media_type,
+        "prompt": normalized_prompt,
+        "aspect_ratio": request.aspect_ratio or "1:1",
+        "voice_id": request.voice_id or "default",
+        "duration_sec": request.duration_sec or 5,
+        "mood": request.mood or "ambient",
+    }
+    if request.context:
+        ctx_subset = {
+            k: v
+            for k, v in request.context.items()
+            if k in ("provider", "image_url", "audio_url", "model", "aspect_ratio")
+        }
+        if ctx_subset:
+            payload["context"] = ctx_subset
+
+    serialized = json.dumps(payload, sort_keys=True)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 class MediaService:
@@ -63,6 +102,47 @@ class MediaService:
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
 
+        req_hash = compute_request_hash(project_id, request)
+
+        if request.force_regenerate:
+            # Clear request_hash on any active (queued/processing) job to allow clean force regeneration
+            await self.repo.clear_active_media_request_hash(project_id, req_hash)
+        else:
+            # 1. Check if matching asset already exists in database
+            existing_asset = await self.repo.find_media_asset_by_hash(project_id, req_hash)
+            if existing_asset:
+                if existing_asset.status == "completed":
+                    logger.info(
+                        "Deduplication hit: returning existing completed asset %s for hash %s",
+                        existing_asset.id,
+                        req_hash,
+                    )
+                    return MediaJobResponse(
+                        job_id=existing_asset.id,
+                        status="completed",
+                        media_type=request.media_type,
+                        entity_type=existing_asset.entity_type,
+                        entity_id=existing_asset.entity_id,
+                        asset_url=existing_asset.asset_url,
+                        error_message=None,
+                    )
+                elif existing_asset.status in ("queued", "processing"):
+                    logger.info(
+                        "Deduplication hit: attaching to in-flight generation job %s for hash %s",
+                        existing_asset.id,
+                        req_hash,
+                    )
+                    return MediaJobResponse(
+                        job_id=existing_asset.id,
+                        status=existing_asset.status,
+                        media_type=request.media_type,
+                        entity_type=existing_asset.entity_type,
+                        entity_id=existing_asset.entity_id,
+                        asset_url=existing_asset.asset_url,
+                        error_message=None,
+                    )
+
+        # 2. Create new MediaAssetRecord with request_hash
         asset_record = MediaAssetRecord(
             project_id=project_id,
             entity_type=request.entity_type,
@@ -72,21 +152,44 @@ class MediaService:
             prompt=request.prompt,
             aspect_ratio=request.aspect_ratio or "1:1",
             provider_name=self.media_provider.name,
+            request_hash=req_hash,
         )
-        created_asset = await self.repo.create_media_asset(asset_record)
 
-        # Create corresponding GenerationJob in generation_jobs table (shared ID for lockstep tracking)
-        job_record = GenerationJob(
-            id=created_asset.id,
-            project_id=project_id,
-            job_type=f"media_{request.media_type}",
-            status="queued",
-            progress=0,
-            error_code=None,
-            error_message=None,
-            result_json=None,
-        )
-        await self.repo.create_generation_job(job_record)
+        try:
+            created_asset = await self.repo.create_media_asset(asset_record)
+
+            # Create corresponding GenerationJob in generation_jobs table (shared ID for lockstep tracking)
+            job_record = GenerationJob(
+                id=created_asset.id,
+                project_id=project_id,
+                job_type=f"media_{request.media_type}",
+                status="queued",
+                progress=0,
+                error_code=None,
+                error_message=None,
+                result_json=None,
+            )
+            await self.repo.create_generation_job(job_record)
+        except IntegrityError:
+            # Database-backed cross-process race resolution: another worker process created an active job first
+            await self.repo.session.rollback()
+            existing_asset = await self.repo.find_media_asset_by_hash(project_id, req_hash)
+            if existing_asset:
+                logger.info(
+                    "Cross-process deduplication race resolved: attaching to concurrently created asset %s for hash %s",
+                    existing_asset.id,
+                    req_hash,
+                )
+                return MediaJobResponse(
+                    job_id=existing_asset.id,
+                    status=existing_asset.status,
+                    media_type=request.media_type,
+                    entity_type=existing_asset.entity_type,
+                    entity_id=existing_asset.entity_id,
+                    asset_url=existing_asset.asset_url,
+                    error_message=existing_asset.error_message,
+                )
+            raise
 
         # Launch background task with its own independent session
         asyncio.create_task(

@@ -3,8 +3,33 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
 
 
-class ProviderUnavailableError(Exception):
-    """Raised when a media provider is unconfigured, unreachable, or exhausts retries."""
+class MediaProviderError(Exception):
+    """Base exception for all media provider errors."""
+    pass
+
+
+class ProviderUnavailableError(MediaProviderError):
+    """Raised when a media provider is unconfigured, unreachable, or offline."""
+    pass
+
+
+class AuthenticationError(ProviderUnavailableError):
+    """Raised on HTTP 401/403: Invalid, expired, or missing credentials/permissions. Immediate cascade abort."""
+    pass
+
+
+class PaymentRequiredError(ProviderUnavailableError):
+    """Raised on HTTP 402: Insufficient credits or payment required. Immediate cascade abort."""
+    pass
+
+
+class QuotaExceededError(ProviderUnavailableError):
+    """Raised on HTTP 429: Rate limit or quota exhausted. Abort automatic paid cascade."""
+    pass
+
+
+class TransientProviderError(ProviderUnavailableError):
+    """Raised on HTTP 502/503/504 or network timeout where bounded retries may be attempted."""
     pass
 
 
