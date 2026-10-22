@@ -66,6 +66,7 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 - [x] **Phase 49: Azure Scale-to-Zero Worker Pilot & Cloud Benchmarking (Milestone 7)**
 - [x] **Phase 50: HyperFrames Comparative Evaluation & Decision Gate (Milestone 7)**
 - [x] **Phase 51: Production Dispatch, UI Enablement & Release Gate (Milestone 7)**
+- [ ] **Phase 52: Queue-Based Cinematic Rendering Architecture (Milestone 7)**
 
 ---
 
@@ -848,4 +849,20 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   4. Milestone 7 Release Gate certified with total pilot spend verified < ₹500.  
 **Plans**: 1 plan (all completed)
 - [x] **51-01-PLAN.md**: Non-blocking dispatch API, frontend UI enablement, end-to-end acceptance testing, and Milestone 7 release gate sign-off.
+
+---
+
+### Phase 52: Queue-Based Cinematic Rendering Architecture (Milestone 7)
+**Goal**: Design and implement a scale-to-zero, event-driven queue dispatch architecture for PRAROHA cinematic preview generation that completely eliminates worker network ingress, guarantees transactional outbox message delivery, enforces strict idempotency and poison message handling, operates a dedicated standard Azure Container Apps environment `env-praroha-render` while preserving the public backend in `env-tendersaathi` without disruption, and remains strictly within the ₹500 budget limit (< ₹50 target).  
+**Depends on**: Phase 51  
+**Requirements**: QUEUE-01, QUEUE-02, QUEUE-03, QUEUE-04  
+**Success Criteria**:
+  1. Worker container operates with zero network ingress, no open ports, and zero web server code.
+  2. Storage Queue dispatch integrated with Transactional Outbox pattern in primary API.
+  3. Azure Container Apps Job scales to zero when idle (₹0 idle compute).
+  4. Robust failure handling: 300s visibility timeout, poison queue routing after 3 retries, and startup orphan recovery.
+  5. 100% test pass rate with zero regressions across all 250 backend tests and PWA build.
+  6. Verified total execution cost < ₹50.00 (under ₹500 cap).  
+**Plans**: 1 plan (planned)
+- [ ] **52-01-PLAN.md**: Azure Storage Queue setup, event-driven Container Apps Job, transactional outbox dispatch, chaos verification, and release sign-off.
 

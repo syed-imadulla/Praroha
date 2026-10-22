@@ -303,6 +303,12 @@
 - [ ] **PROD-02**: Frontend UI enablement in `MediaPreviewCard.tsx` transitioning from disabled/offline state to active generation with loading states, in-app video playback, and honest `Cinematic Preview` badges.
 - [ ] **PROD-03**: Full end-to-end user lifecycle verification and Milestone 7 release gate sign-off.
 
+### Queue-Based Cinematic Rendering Architecture (QUEUE) — Phase 52
+- [ ] **QUEUE-01**: Azure Storage Queue integration in primary FastAPI backend with Transactional Outbox pattern and zero credentials in payloads.
+- [ ] **QUEUE-02**: Azure Container Apps Job specification running in dedicated standard environment `env-praroha-render` with built-in KEDA `azure-queue` scaler, 1.0 vCPU / 2.0 GiB RAM, and zero network ingress.
+- [ ] **QUEUE-03**: Complete 9-step durable lifecycle with atomic worker claiming, 300s visibility timeouts, poison message handling, and startup orphan recovery.
+- [ ] **QUEUE-04**: End-to-end verification, latency < 35s, honest synthetic labeling (`is_synthetic: true`), and budget audit certifying < ₹50 spend.
+
 ---
-*Last updated: 2026-10-22 for Milestone 7: Dedicated Cinematic Rendering Worker (Active)*
+*Last updated: 2026-10-22 for Milestone 7: Phase 52 Queue-Based Cinematic Rendering Architecture (Planned)*
 
