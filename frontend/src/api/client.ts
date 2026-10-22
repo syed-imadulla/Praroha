@@ -438,6 +438,28 @@ class ApiClient {
     });
   }
 
+  async generateCinematicPreviewJob(
+    projectId: string,
+    payload: {
+      entity_type?: string;
+      entity_id: string;
+      title?: string;
+      location_setting?: string;
+      conflict_narrative?: string;
+      image_url?: string;
+      voice_url?: string;
+      ambient_url?: string;
+      duration_sec?: number;
+      aspect_ratio?: string;
+      force_regenerate?: boolean;
+    }
+  ): Promise<APIResponse<MediaJobResponse>> {
+    return this.request<MediaJobResponse>(`/projects/${projectId}/media/cinematic-preview/jobs`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   async getMediaJob(
     projectId: string,
     jobId: string

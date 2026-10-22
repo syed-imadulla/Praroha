@@ -281,18 +281,46 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
 
           {availableModalities.map((modality) => {
             if (modality === 'video') {
-              return (
-                <div key="video" className="flex items-center gap-2 flex-wrap">
-                  {/* Video Generation - Retired / Currently Unavailable */}
-                  <div
-                    data-testid={`generate-video-disabled-${entityId}`}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#EAE4D4] text-[#8C7A6B] border border-[#D8CCB7] cursor-not-allowed opacity-80 min-h-[32px]"
-                    title="Video generation is currently unavailable. Generative video services have been retired due to poor reliability."
-                  >
-                    <Video className="w-3.5 h-3.5 text-[#8C7A6B]" />
-                    <span>Video Generation Unavailable</span>
+              const isCinematicPreviewEnabled = import.meta.env.VITE_ENABLE_CINEMATIC_PREVIEW === 'true';
+              const isGeneratingVideo = !!isGeneratingMedia[`${entityId}_video`];
+
+              if (!isCinematicPreviewEnabled) {
+                return (
+                  <div key="video" className="flex items-center gap-2 flex-wrap">
+                    {/* Video Generation - Feature Flagged in Production */}
+                    <div
+                      data-testid={`generate-video-disabled-${entityId}`}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#EAE4D4] text-[#8C7A6B] border border-[#D8CCB7] cursor-not-allowed opacity-80 min-h-[32px]"
+                      title="Cinematic preview generation is currently disabled in production. Awaiting release approval."
+                    >
+                      <Video className="w-3.5 h-3.5 text-[#8C7A6B]" />
+                      <span>Cinematic Preview (Disabled)</span>
+                    </div>
                   </div>
-                </div>
+                );
+              }
+
+              return (
+                <button
+                  key="video"
+                  type="button"
+                  onClick={() => handleGenerate('video')}
+                  disabled={isGeneratingVideo}
+                  data-testid={`generate-video-${entityId}`}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#6A4B67] ${
+                    isGeneratingVideo
+                      ? 'bg-[#EAE2E9] border-[#D4C3D2] text-[#6A4B67] cursor-not-allowed opacity-80'
+                      : 'bg-[#F2EBDD] hover:bg-[#EAE4D4] text-[#6A4B67] border-[#D8CCB7] hover:border-[#D4C3D2] shadow-2xs'
+                  }`}
+                  title="Render 16:9 cinematic motion preview with Ken Burns easing and audio ducking"
+                >
+                  {isGeneratingVideo ? (
+                    <RotateCw className="w-3.5 h-3.5 animate-spin text-[#6A4B67]" />
+                  ) : (
+                    <Video className="w-3.5 h-3.5 text-[#6A4B67]" />
+                  )}
+                  <span>{isGeneratingVideo ? 'Rendering Preview...' : 'Cinematic Preview'}</span>
+                </button>
               );
             }
 

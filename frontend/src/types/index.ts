@@ -496,6 +496,7 @@ export interface MediaGenerationRequest {
   duration_sec?: number;
   mood?: string;
   context?: Record<string, any>;
+  force_regenerate?: boolean;
 }
 
 export interface MediaProviderHealth {

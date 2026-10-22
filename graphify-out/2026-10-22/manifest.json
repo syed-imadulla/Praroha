@@ -210,15 +210,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1792675601.93404,
-    "seen": 1792675648.9925122,
-    "ast_hash": "8fcf8f324b4a3d564853051e84ad2136",
+    "mtime": 1792676516.8170693,
+    "seen": 1792676607.9207876,
+    "ast_hash": "2017832c1ad47118ad6b2ad92a72a78f",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792675624.3898861,
-    "seen": 1792675648.9925158,
-    "ast_hash": "8eaa7e11662744c72c73d5559a89991c",
+    "mtime": 1792676542.506869,
+    "seen": 1792676607.9207897,
+    "ast_hash": "9da07b1afafea4fe66fbf645fa9ab4a6",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -3192,9 +3192,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/50-hyperframes-comparative-evaluation/50-01-PLAN.md": {
-    "mtime": 1792664868.7793655,
-    "seen": 1792666577.2210352,
-    "ast_hash": "b4ce53779504c1f59ebdcffad677835e",
+    "mtime": 1792676465.4694693,
+    "seen": 1792676607.9211216,
+    "ast_hash": "6142ade5777274be778cb5afc832df76",
     "semantic_hash": ""
   },
   ".planning/phases/50-hyperframes-comparative-evaluation/50-CONTEXT.md": {
@@ -3237,6 +3237,18 @@
     "mtime": 1792675552.1023815,
     "seen": 1792675648.9931717,
     "ast_hash": "e91ea5bbe7e80d21353382740f51709d",
+    "semantic_hash": ""
+  },
+  ".planning/phases/50-hyperframes-comparative-evaluation/50-01-SUMMARY.md": {
+    "mtime": 1792676485.398314,
+    "seen": 1792676607.921123,
+    "ast_hash": "8fc9a2b876921a19bf3a8aa540dc077c",
+    "semantic_hash": ""
+  },
+  "docs/HYPERFRAMES_VS_NATIVE_EVALUATION.md": {
+    "mtime": 1792676435.8207004,
+    "seen": 1792676607.921146,
+    "ast_hash": "de0aae3a05834ece4b13925c7617519d",
     "semantic_hash": ""
   }
 }

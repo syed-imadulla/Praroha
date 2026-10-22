@@ -19,6 +19,10 @@ from backend.app.models.media import (
 from backend.app.providers.factory import get_storage_provider
 from backend.app.providers.media.factory import get_media_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session
+from backend.app.services.cinematic_dispatcher import (
+    CinematicDispatcherService,
+    CinematicPreviewJobRequest,
+)
 from backend.app.services.media_service import MediaService
 from backend.app.services.soundscape_library import (
     CURATED_SOUNDSCAPE_LAYERS,
@@ -284,3 +288,47 @@ async def compose_soundscape(
             error_message=None,
         )
     )
+
+
+def get_cinematic_dispatcher(session: AsyncSession = Depends(get_session)) -> CinematicDispatcherService:
+    repo = ProjectRepository(session)
+    return CinematicDispatcherService(repo=repo)
+
+
+@router.post(
+    "/projects/{project_id}/media/cinematic-preview/jobs",
+    status_code=202,
+    response_model=APIResponse[MediaJobResponse],
+)
+async def create_cinematic_preview_job(
+    project_id: str,
+    payload: CinematicPreviewJobRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    dispatcher: CinematicDispatcherService = Depends(get_cinematic_dispatcher),
+) -> APIResponse[MediaJobResponse]:
+    """
+    Non-blocking dispatch of a cinematic preview rendering job to the dedicated worker (Phase 51).
+    Validates project authorization, asset integrity, and returns HTTP 202 immediately.
+    FastAPI never renders locally or blocks waiting for FFmpeg.
+    """
+    await verify_project_owner(project_id, current_user.id, dispatcher.repo)
+    job = await dispatcher.dispatch_preview_job(project_id, payload)
+    return api_success(job)
+
+
+@router.post(
+    "/projects/{project_id}/media/cinematic-preview/generate",
+    status_code=202,
+    response_model=APIResponse[MediaJobResponse],
+)
+async def generate_cinematic_preview(
+    project_id: str,
+    payload: CinematicPreviewJobRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    dispatcher: CinematicDispatcherService = Depends(get_cinematic_dispatcher),
+) -> APIResponse[MediaJobResponse]:
+    """Alias for create_cinematic_preview_job."""
+    await verify_project_owner(project_id, current_user.id, dispatcher.repo)
+    job = await dispatcher.dispatch_preview_job(project_id, payload)
+    return api_success(job)
+

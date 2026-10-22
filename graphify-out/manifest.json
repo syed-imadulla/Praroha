@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1792659084.500366,
-    "seen": 1792659799.5177839,
-    "ast_hash": "15df9187aea3470f0ec16d56138a3c0b",
+    "mtime": 1792677867.9615352,
+    "seen": 1792678669.26796,
+    "ast_hash": "458f20e91de6daa6ef2560b6a97c27b5",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -156,15 +156,15 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791498682.173236,
-    "seen": 1791512735.245912,
-    "ast_hash": "c23bd27dc3ee533408a9065d357cefb4",
+    "mtime": 1792677895.025319,
+    "seen": 1792678669.268101,
+    "ast_hash": "341ca15afd4484ed63ca5bc27e657381",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1792659051.697647,
-    "seen": 1792659799.5178862,
-    "ast_hash": "3ae75e3a28690584d0c8312b474acf13",
+    "mtime": 1792678358.697615,
+    "seen": 1792678669.268104,
+    "ast_hash": "b9bf5a7c28ffa33f0328b076b146cb0c",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -198,9 +198,9 @@
     "semantic_hash": ""
   },
   ".planning/PROJECT.md": {
-    "mtime": 1792664984.1273994,
-    "seen": 1792666577.220483,
-    "ast_hash": "da0a79cdf0a155c5e347d1dfb6822ca7",
+    "mtime": 1792678640.4853637,
+    "seen": 1792678669.2681422,
+    "ast_hash": "9a6f86a15433b0caeb7d9b2157050041",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
@@ -210,15 +210,15 @@
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1792676516.8170693,
-    "seen": 1792676607.9207876,
-    "ast_hash": "2017832c1ad47118ad6b2ad92a72a78f",
+    "mtime": 1792678594.5267308,
+    "seen": 1792678669.2681475,
+    "ast_hash": "540f955431d26bf0a244b08704a2dc74",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792676542.506869,
-    "seen": 1792676607.9207897,
-    "ast_hash": "9da07b1afafea4fe66fbf645fa9ab4a6",
+    "mtime": 1792678617.807545,
+    "seen": 1792678669.2681503,
+    "ast_hash": "365fc20e25e38e49a38e56516179fe10",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -1254,9 +1254,9 @@
     "semantic_hash": ""
   },
   "backend/app/routers/media.py": {
-    "mtime": 1791712063.3448646,
-    "seen": 1791713593.12612,
-    "ast_hash": "963a0f54fb2875eaa744864e9243bba6",
+    "mtime": 1792677792.6271265,
+    "seen": 1792678669.267649,
+    "ast_hash": "06d3ce37729e46227df36cf4b066a983",
     "semantic_hash": ""
   },
   "backend/app/services/media_service.py": {
@@ -1278,9 +1278,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/EntityMediaSection.tsx": {
-    "mtime": 1792661204.1919007,
-    "seen": 1792661480.10052,
-    "ast_hash": "d131d5f697b2cfbbf53a372973adacae",
+    "mtime": 1792677923.186094,
+    "seen": 1792678669.2679706,
+    "ast_hash": "4bcb08baa951b3662543f52937b76c75",
     "semantic_hash": ""
   },
   "frontend/src/components/MediaPreviewCard.tsx": {
@@ -3204,9 +3204,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-01-PLAN.md": {
-    "mtime": 1792664896.1151366,
-    "seen": 1792666577.22104,
-    "ast_hash": "4e712e79c1817403c92c1690fb98ac19",
+    "mtime": 1792678502.5724654,
+    "seen": 1792678669.2689288,
+    "ast_hash": "c8efbe81e2171640afd64f4a2bf499ef",
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-CONTEXT.md": {
@@ -3240,15 +3240,33 @@
     "semantic_hash": ""
   },
   ".planning/phases/50-hyperframes-comparative-evaluation/50-01-SUMMARY.md": {
-    "mtime": 1792676485.398314,
-    "seen": 1792676607.921123,
-    "ast_hash": "8fc9a2b876921a19bf3a8aa540dc077c",
+    "mtime": 1792677337.672672,
+    "seen": 1792678669.268922,
+    "ast_hash": "25e4186cf96329c53f74c4927e26fe20",
     "semantic_hash": ""
   },
   "docs/HYPERFRAMES_VS_NATIVE_EVALUATION.md": {
-    "mtime": 1792676435.8207004,
-    "seen": 1792676607.921146,
-    "ast_hash": "de0aae3a05834ece4b13925c7617519d",
+    "mtime": 1792677320.0868092,
+    "seen": 1792678669.2689705,
+    "ast_hash": "2b1e003d696d5b66c6552f11261d3431",
+    "semantic_hash": ""
+  },
+  "backend/app/services/cinematic_dispatcher.py": {
+    "mtime": 1792678299.3740888,
+    "seen": 1792678669.267676,
+    "ast_hash": "dd2c0393e3d1fd73ce15f342b264ae10",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_production_dispatch.py": {
+    "mtime": 1792678241.010555,
+    "seen": 1792678669.2677374,
+    "ast_hash": "c2cb9cdb70e271f0fdf70fe1d4fddc8e",
+    "semantic_hash": ""
+  },
+  ".planning/phases/51-production-dispatch-release-gate/51-01-SUMMARY.md": {
+    "mtime": 1792678538.8821754,
+    "seen": 1792678669.2689316,
+    "ast_hash": "a7307a800a136d8245bbf139dbc90fc1",
     "semantic_hash": ""
   }
 }

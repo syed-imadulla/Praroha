@@ -1259,12 +1259,59 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }));
 
         try {
-          const res = await apiClient.generateMedia(activeProject.id, req);
+          const res = req.media_type === 'video'
+            ? await apiClient.generateCinematicPreviewJob(activeProject.id, {
+                entity_type: req.entity_type,
+                entity_id: req.entity_id,
+                duration_sec: req.duration_sec,
+                aspect_ratio: req.aspect_ratio,
+                force_regenerate: req.force_regenerate,
+              })
+            : await apiClient.generateMedia(activeProject.id, req);
+
           if (res.success && res.data) {
             const job = res.data;
             set((state) => ({
               activeMediaJobs: { ...state.activeMediaJobs, [job.job_id]: job },
             }));
+
+            // Poll for job completion if job is asynchronous
+            if (job.status === 'queued' || job.status === 'processing') {
+              const pollInterval = setInterval(async () => {
+                try {
+                  const checkRes = await apiClient.getMediaJob(activeProject.id, job.job_id);
+                  if (checkRes.success && checkRes.data) {
+                    const currentJob = checkRes.data;
+                    set((state) => ({
+                      activeMediaJobs: { ...state.activeMediaJobs, [currentJob.job_id]: currentJob },
+                    }));
+                    if (currentJob.status === 'completed' || currentJob.status === 'failed') {
+                      clearInterval(pollInterval);
+                      set((state) => ({
+                        isGeneratingMedia: { ...state.isGeneratingMedia, [key]: false },
+                      }));
+                      await get().fetchEntityMedia(req.entity_id);
+                    }
+                  }
+                } catch {
+                  // Keep polling until timeout or completion
+                }
+              }, 2000);
+
+              // Clear interval after 125 seconds timeout
+              setTimeout(() => {
+                clearInterval(pollInterval);
+                set((state) => ({
+                  isGeneratingMedia: { ...state.isGeneratingMedia, [key]: false },
+                }));
+              }, 125000);
+            } else {
+              set((state) => ({
+                isGeneratingMedia: { ...state.isGeneratingMedia, [key]: false },
+              }));
+              await get().fetchEntityMedia(req.entity_id);
+            }
+
             return job.job_id;
           }
         } catch (err) {
@@ -1275,6 +1322,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }));
         return null;
       },
+
 
       loadCanonicalDemoUniverse: async () => {
         try {
