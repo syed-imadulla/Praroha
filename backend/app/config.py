@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Seed Unfold (Praroha)"
     API_V1_PREFIX: str = "/api"
+    ENVIRONMENT: str = "development"  # options: development, staging, production
+    ADMIN_EMAILS: str = ""  # comma-separated list of admin email addresses
     AI_PROVIDER: str = "mock"  # options: mock, gemini
     STORAGE_PROVIDER: str = "local"  # options: local, supabase
     DATABASE_URL: str = "sqlite+aiosqlite:///./seed_unfold.db"
@@ -90,6 +92,13 @@ class Settings(BaseSettings):
             self.SUPABASE_URL = self.SUPABASE_URL.strip().rstrip("/")
         if self.STORAGE_PROVIDER:
             self.STORAGE_PROVIDER = self.STORAGE_PROVIDER.strip().lower()
+        if self.ENVIRONMENT:
+            self.ENVIRONMENT = self.ENVIRONMENT.strip().lower()
+        if self.ENVIRONMENT == "production" and isinstance(self.CORS_ORIGINS, list):
+            self.CORS_ORIGINS = [
+                origin for origin in self.CORS_ORIGINS
+                if not ("localhost" in str(origin).lower() or "127.0.0.1" in str(origin))
+            ]
 
 
 settings = Settings()

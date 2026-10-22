@@ -1,5 +1,6 @@
 import pytest
 from httpx import AsyncClient
+from backend.app.config import settings
 
 
 @pytest.mark.asyncio
@@ -15,10 +16,31 @@ async def test_health_endpoint(client: AsyncClient):
     assert "model" in json_data["data"]["ai_provider"]
     assert "storage_provider" in json_data["data"]
     assert json_data["data"]["storage_provider"]["type"] == "LocalStorageProvider"
+    assert json_data["data"]["environment"] == settings.ENVIRONMENT
 
 
 @pytest.mark.asyncio
-async def test_ai_provider_toggle(client: AsyncClient):
+async def test_ai_provider_toggle_requires_admin(client: AsyncClient):
+    from backend.app.main import app
+    from backend.app.core.auth import get_current_user, AuthenticatedUser
+
+    # Non-admin user gets 403 Forbidden
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        id="regular-user",
+        email="user@praroha.local",
+        role="authenticated",
+    )
+    res_forbidden = await client.post("/api/health/ai-provider", json={"provider": "mock"})
+    assert res_forbidden.status_code == 403
+    err_body = res_forbidden.json()
+    assert "Administrator access required" in err_body["error"]["message"]
+
+    # Admin user in non-production succeeds
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        id="admin-user",
+        email="admin@praroha.local",
+        role="admin",
+    )
     # Switch to mock
     res = await client.post("/api/health/ai-provider", json={"provider": "mock"})
     assert res.status_code == 200

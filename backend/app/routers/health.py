@@ -1,7 +1,8 @@
 from typing import Any, Dict, Optional, List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from backend.app.config import settings
+from backend.app.core.auth import AuthenticatedUser, require_admin_user
 from backend.app.core.response import APIResponse, api_success
 from backend.app.providers.base import AIProvider
 from backend.app.providers.factory import get_ai_provider, get_storage_provider
@@ -21,7 +22,7 @@ def _get_health_payload(ai_health: Dict[str, Any], storage_provider: StorageProv
     return {
         "status": "healthy",
         "service": settings.PROJECT_NAME,
-        "environment": "development",
+        "environment": settings.ENVIRONMENT,
         "ai_provider": {
             "configured": settings.AI_PROVIDER,
             "resolved": resolved,
@@ -55,9 +56,15 @@ async def health_check(
 @router.post("/health/ai-provider", response_model=APIResponse[Dict[str, Any]])
 async def update_ai_provider(
     body: AIProviderUpdateRequest,
+    admin_user: AuthenticatedUser = Depends(require_admin_user),
     storage_provider: StorageProvider = Depends(get_storage_provider),
 ) -> APIResponse[Dict[str, Any]]:
-    """Update active AI provider and/or model at runtime."""
+    """Update active AI provider and/or model at runtime (admin only, disabled in production)."""
+    if settings.ENVIRONMENT.lower() == "production":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Runtime AI provider modification is disabled in production.",
+        )
     prov = body.provider.strip().lower()
     if prov in ["mock", "gemini"]:
         settings.AI_PROVIDER = prov

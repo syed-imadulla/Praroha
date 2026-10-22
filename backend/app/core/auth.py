@@ -126,3 +126,28 @@ async def require_project_owner(
             detail=f"Project with ID '{project_id}' not found.",
         )
     return project
+
+
+async def require_admin_user(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+) -> AuthenticatedUser:
+    """
+    FastAPI dependency to require administrative privileges.
+    Rejects unauthenticated callers with HTTP 401 (via get_current_user)
+    and non-admin users with HTTP 403 Forbidden.
+    """
+    admin_emails = [
+        e.strip().lower()
+        for e in (getattr(settings, "ADMIN_EMAILS", "") or "").split(",")
+        if e.strip()
+    ]
+    user_email = (current_user.email or "").strip().lower()
+    is_admin = current_user.role in ("admin", "service_role") or (
+        bool(user_email) and user_email in admin_emails
+    )
+    if not is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access required.",
+        )
+    return current_user

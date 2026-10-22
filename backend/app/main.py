@@ -51,11 +51,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
 
+is_production = settings.ENVIRONMENT.lower() == "production"
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Seed Unfold backend service for human-guided generative world unfolding.",
     version="0.1.0",
     lifespan=lifespan,
+    docs_url=None if is_production else "/docs",
+    redoc_url=None if is_production else "/redoc",
+    openapi_url=None if is_production else "/openapi.json",
 )
 
 # CORS middleware configuration
