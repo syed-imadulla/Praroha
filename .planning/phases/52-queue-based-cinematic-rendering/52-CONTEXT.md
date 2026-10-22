@@ -30,13 +30,17 @@ To provide true zero-cost scale-to-zero compute, bulletproof delivery guarantees
   2. Supabase Storage (download source images/audio, upload final MP4).
   3. Supabase PostgreSQL (atomic job status updates).
 
-### Decision 4: Least-Privilege Queue Publishing from Primary Backend
-- The primary backend (`praroha-backend` in Express environment) enqueues render jobs using a write-scoped secret (`queue-connection-string` or write-only SAS token). This avoids dependency on unverified Express managed identity support while ensuring least privilege (write-only, no read/delete access).
+### Decision 4: Least-Privilege Queue Publishing & Worker Image Contract
+- The primary backend (`praroha-backend` in Express environment) enqueues render jobs using a write-scoped Queue Service SAS token (`queue-publish-url`) with permissions strictly restricted to `sp=a` (Add messages only) on `cinematic-render-jobs`.
+- The web tier has zero permissions to read, peek, or delete messages from the work queue, and zero access to the poison queue.
+- The worker Job will reference a newly built and verified tag on the existing ACR repository `tendersaathiacr.azurecr.io/praroha-worker` (e.g. `v5`), passing `--args "--queue"` to execute finite batch processing.
 
-### Decision 5: Conservative Cost Model (Zero Free-Grant Assumption)
+### Decision 5: Conservative Cost Model & Safe Operational Governance
 - Because `praroha-backend` already consumes compute against the subscription, the Phase 52 budget model assumes **0% free grant availability**.
 - Every second of worker compute is priced at full retail consumption rates ($0.000024/vCPU-s + $0.000003/GiB-s $\approx$ ₹0.03825 INR per 15s render).
-- Pilot execution (100 renders) is verified at **~₹5.04 INR**, remaining well under the ₹500 authorized cap.
+- Sensitivity modeling shows 100 renders cost between **₹5.05 and ₹21.97 INR** across operational conditions, well under the ₹500 cap.
+- **Lease & Heartbeat Recovery**: Active workers issue heartbeats every 15s; server restarts do not disrupt in-flight renders within the 90s lease window.
+- **Non-Destructive Rollback**: Rollbacks suspend scaling (`--max-executions 0`) and gracefully drain/cancel jobs without blindly purging queue history.
 
 ---
 

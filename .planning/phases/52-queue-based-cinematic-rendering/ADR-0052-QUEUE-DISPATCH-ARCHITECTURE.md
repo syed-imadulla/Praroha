@@ -100,25 +100,119 @@ We adopt **Option A (Refined)**: **Azure Storage Queue with an Event-Driven Azur
 
 ## Security & Authentication Model
 
-### 1. Primary Backend Queue Publishing (`praroha-backend` in `env-tendersaathi`)
-- Because `env-tendersaathi` is an Express environment, managed identity support on individual containers may be restricted or subject to preview instability.
-- **Least-Privilege Mechanism**: A scoped connection string or SAS token with **write-only** permissions (`sp=a` - Add messages only) is injected into `praroha-backend` via the native Container App Secret `queue-publish-conn-string`.
-- This guarantees:
-  - Primary API cannot peek, dequeue, or delete messages from the work queue.
-  - Primary API cannot access the dead-letter poison queue.
-  - Zero credentials are transmitted across client connections.
+### 1. Separation of Responsibilities & Least-Privilege Credentials
+A master Storage Account connection string contains the `AccountKey`, granting root administrative rights (Create, Read, Update, Delete, Manage) across all blobs, queues, and tables. Storing a master connection string on the public web API violates the principle of least privilege. Phase 52 enforces strict least-privilege credential separation:
 
-### 2. Container Apps Job Queue Scaler & Worker (`praroha-render-job` in `env-praroha-render`)
-- **KEDA Scaler Authentication**: Uses secret reference `queue-connection-string` or User-Assigned Managed Identity `tendersaathi-identity` assigned the role `Storage Queue Data Contributor` on `stpraroharender`.
-- **Worker Egress Only**: The container runs with **zero ingress**. It initiates outbound HTTPS traffic over port 443 exclusively to:
-  - Azure Storage Queues (`*.queue.core.windows.net`)
-  - Supabase Storage (`*.supabase.co`)
-  - Supabase PostgreSQL database
+- **Primary Backend (`praroha-backend` in Express environment `env-tendersaathi`)**:
+  - Requires **enqueue-only** access to `cinematic-render-jobs`.
+  - **Credential**: Uses a separately scoped Queue Service Shared Access Signature (SAS) token with permissions strictly restricted to `sp=a` (Add messages only) on `cinematic-render-jobs`.
+  - Zero access to dequeue, peek, update, or delete messages from the work queue.
+  - Zero access to the dead-letter poison queue (`cinematic-render-poison`).
+  - Zero permissions to list or modify storage containers or other storage services.
+- **KEDA Event Scaler (`env-praroha-render`)**:
+  - Requires queue length inspection to evaluate scale triggers (`queueLength >= 1`).
+  - **Credential**: Authenticates via User-Assigned Managed Identity (`uami-praroha-render`) assigned the `Storage Queue Data Reader` role on `stpraroharender`, or a scoped queue monitoring SAS with read-only permission (`sp=r` - Read metadata/length; noting that Azure Queue Service SAS uses canonical `raup` permission characters without 'l').
+- **Worker Job Container (`praroha-render-job` in `env-praroha-render`)**:
+  - Requires dequeuing, updating message visibility, and deleting completed messages from `cinematic-render-jobs`, plus enqueueing poison messages to `cinematic-render-poison`.
+  - **Credential**: Authenticates via User-Assigned Managed Identity (`uami-praroha-render`) assigned:
+    - `Storage Queue Data Message Processor` on `cinematic-render-jobs` (permits peek, dequeue, visibility update, delete).
+    - `Storage Queue Data Message Sender` on `cinematic-render-poison` (permits adding dead-letter messages).
+    - *Fallback if SAS required*: Work queue SAS using canonical permissions `sp=rup` (Read, Update, Process; noting that Azure Queue Service SAS does not support separate 'd' or 'l' flags), and poison queue SAS `sp=a`.
+- **ACR Image-Pull Authentication**:
+  - The worker job attaches `uami-praroha-render` with the `AcrPull` role assigned directly on `tendersaathiacr.azurecr.io`.
+  - Container Apps Job is registered using `--registry-server tendersaathiacr.azurecr.io --registry-identity "$UAMI_RESOURCE_ID"`.
+  - Avoids storing or using registry administrative passwords (`az acr credential show`).
+
+### 2. Comprehensive Service Permissions Matrix
+
+| Service / Component | Target Resource | Required Permissions | Credential Mechanism | Ingress / Port |
+| :--- | :--- | :--- | :--- | :--- |
+| **Primary API (`praroha-backend`)** | `cinematic-render-jobs` | `Add` (`sp=a`) only | Scoped Queue SAS (`queue-publish-url`) | 443 Inbound (Public HTTPS REST API) |
+| **Primary API (`praroha-backend`)** | `render_outbox` & `generation_jobs` | `SELECT`, `INSERT`, `UPDATE` | Supabase DB pooler secret (`db-url`) | Port 6543 / 5432 Egress |
+| **KEDA Scaler** | `cinematic-render-jobs` | Queue length inspection (`sp=r` / Reader) | Managed Identity (`uami-praroha-render`) / Reader SAS | None (Internal ACA engine) |
+| **Worker Job (`praroha-render-job`)** | ACR `tendersaathiacr.azurecr.io` | `AcrPull` | Managed Identity (`uami-praroha-render`) | Port 443 Egress (Image pull) |
+| **Worker Job (`praroha-render-job`)** | `cinematic-render-jobs` | Message Processor (`sp=rup`) | Managed Identity (`uami-praroha-render`) | Zero Ingress (No open ports) |
+| **Worker Job (`praroha-render-job`)** | `cinematic-render-poison` | Message Sender (`sp=a`) | Managed Identity (`uami-praroha-render`) | Zero Ingress |
+| **Worker Job (`praroha-render-job`)** | Supabase DB | `SELECT`, `UPDATE` (`generation_jobs`, `media_assets`) | `DATABASE_URL` secretref | Port 6543 / 5432 Egress |
+| **Worker Job (`praroha-render-job`)** | Supabase Storage (`seed-unfold-assets`) | `GET` (stems), `PUT` (MP4) | `SUPABASE_KEY` secretref | Port 443 Egress |
+
+### 3. Network Security Architecture & Egress Boundary Classification
+
+To maintain security integrity, PRAROHA explicitly classifies network boundaries across three distinct architectural layers:
+
+1. **Zero Inbound Ingress (Platform Enforced)**:
+   - The worker runs as an Azure Container Apps Job (`Microsoft.App/jobs`). By design, Container Apps Jobs have no HTTP ingress controllers, no exposed ports, and no web listeners. Inbound network attacks are structurally blocked by the platform.
+2. **Application-Level Destination Controls (Software Enforced)**:
+   - Worker source code strictly restricts outbound connections to the four required endpoints: Azure Storage Queue (`stpraroharender.queue.core.windows.net`), Supabase DB (`aws-0-ap-south-1.pooler.supabase.com:6543`), Supabase Storage (`dcvyldopjpxehywuvkju.supabase.co`), and ACR during initial image pull (`tendersaathiacr.azurecr.io`).
+3. **Network-Enforced Egress Restrictions (Infrastructure Layer)**:
+   - In standard Consumption Azure Container Apps environments without custom VNet injection, outbound internet access is open by default.
+   - *Infrastructure Dependency Note*: True packet-level network egress enforcement (blocking arbitrary outbound IP/FQDN traffic via Azure Firewall or NSGs with User-Defined Routes) requires deploying ACA into a dedicated Azure Virtual Network (VNet) with NAT Gateway or Azure Firewall. To avoid adding non-trivial fixed monthly cloud costs (~$32/mo for NAT Gateway, ~$900/mo for Azure Firewall) within the strict ₹500 budget constraint, packet-level egress lockdown is documented as an optional enterprise infrastructure dependency rather than a baseline requirement.
 
 ---
 
-## Consequences & Verification
+## Stale-Job Recovery & Liveness Protocol
 
-- **Positive**: Complete network isolation for rendering compute; guaranteed scale-to-zero; zero monthly base fees; clean separation of concerns between web traffic and batch media processing.
-- **Negative / Risks**: Managing two ACA environments in `rg-tendersaathi`. Mitigated by having the rendering environment be completely serverless and sharing the existing Log Analytics workspace.
-- **Decision Status**: Pending user confirmation of cloud provisioning.
+Rather than relying on naive server restart sweeping or loose timestamps (`updated_at < now() - 10m`), Phase 52 establishes a formal lease and heartbeat timing contract:
+
+1. **Atomic CAS Claim**:
+   When the worker claims a job from the queue, it executes an atomic Compare-And-Swap:
+   ```sql
+   UPDATE generation_jobs
+   SET status = 'processing',
+       started_at = NOW(),
+       updated_at = NOW(),
+       worker_id = :worker_id,
+       progress = 10
+   WHERE id = :job_id
+     AND status = 'queued'
+   RETURNING id;
+   ```
+   If 0 rows are returned, the job was already claimed or cancelled; the worker safely deletes the message and terminates.
+2. **Heartbeat & Visibility Renewal Contract**:
+   - Average render execution: 12–18s (renderer accepts 3–60s duration).
+   - Replica execution ceiling: 300s (`--replica-timeout 300`).
+   - Queue visibility timeout: 300s default.
+   - Worker heartbeat interval: Every 15 seconds during active rendering/uploading, worker updates `updated_at = NOW()` and incremental `progress`.
+   - Visibility renewal: If an execution exceeds 60s, worker calls `update_message(visibility_timeout=120)` to ensure Azure Queue does not prematurely redeliver while rendering is in flight.
+3. **Lease Expiration Threshold**:
+   - Lease timeout is strictly set to **90 seconds** (6 missed 15s heartbeats).
+   - `recover_orphaned_jobs()` on API restart or periodic background reaper will **ONLY** transition a job to `failed` if:
+     - `status == 'processing'` AND `updated_at < NOW() - INTERVAL '90 seconds'` (worker is demonstrably dead/crashed).
+     - `status == 'queued'` AND `created_at < NOW() - INTERVAL '15 minutes'` AND outbox record is confirmed `published` (KEDA failed to scale or message was permanently lost).
+   - If a backend restart occurs while a worker is legitimately rendering (`updated_at > NOW() - 90s`), the job is **left untouched** and allowed to finish successfully.
+4. **Idempotent Retry Recovery**:
+   Whenever a stale job is transitioned to `failed`, the recovery routine sets `media_assets.request_hash = NULL`, enabling creators to click "Try Again" without duplicate-key collisions.
+
+---
+
+## Safe Production Rollback Protocol & Kill Switch
+
+Azure Resource Manager validation for Container Apps Jobs enforces `maxExecutions >= 1`; setting `--max-executions 0` is invalid and rejected by the Azure API. Therefore, the rollback and emergency kill-switch protocol employs verified controls that preserve audit history without indiscriminately purging queues:
+
+1. **Level 1 (T+1m) — Frontend Deactivation**: Set `VITE_ENABLE_CINEMATIC_PREVIEW=false` in Vercel to disable the UI button immediately.
+2. **Level 2 (T+5m) — Backend Gate Deactivation**: Set `ENABLE_QUEUE_DISPATCH=false` on `praroha-backend` (returns clean HTTP 503 and ceases queue writes).
+3. **Level 3 (T+10m) — Stop Running Executions**: Terminate any in-flight rendering containers:
+   ```bash
+   az containerapp job stop \
+     --name praroha-render-job \
+     --resource-group rg-tendersaathi
+   ```
+4. **Level 4 (T+12m) — Suspend Scale Triggers**: Suspend event scaling by switching trigger type to manual:
+   ```bash
+   az containerapp job update \
+     --name praroha-render-job \
+     --resource-group rg-tendersaathi \
+     --trigger-type Manual
+   ```
+5. **Level 5 — Graceful Drain & Cancel**:
+   Inspect pending messages in `cinematic-render-jobs`. Update associated `generation_jobs` in PostgreSQL to `cancelled` with message `"System undergoing maintenance. Please retry shortly."`, and route unrendered messages to an archival table before acknowledging queue deletion.
+
+---
+
+## Consequences & Verification Gate
+
+- **Positive**: Complete network ingress isolation for rendering compute; guaranteed scale-to-zero; zero monthly base fees; clean separation of concerns between web traffic and batch media processing; resilient lease-based recovery preventing premature job termination during backend restarts; least-privilege credentials avoiding shared connection strings or ACR admin passwords.
+- **Negative / Constraints**: Infrastructure dependency for strict packet-level egress enforcement (requires dedicated VNet + NAT/Firewall if packet-level egress filtering is mandated); ARM requires manual trigger suspension rather than zero-max-executions.
+- **Budget Realism**: The ₹5.05 to ₹21.97 INR cost estimates represent engineering projections based on published Azure pricing units, not verified billing.
+- **Mandatory Pilot Phase Gate**: The first cloud deployment must execute exactly **1 authorized synthetic canary render**, followed by an immediate billing and telemetry reconciliation in Azure Cost Management before any expanded pilot is authorized.
+- **Decision Status**: Planned design specification for Phase 52 implementation. All acceptance criteria remain marked as planned until verified with empirical evidence.

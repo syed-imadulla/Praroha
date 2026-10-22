@@ -78,11 +78,13 @@ When an ephemeral worker instance starts:
 
 | Failure Mode | Direct Impact | Recovery Mechanism | End State |
 | :--- | :--- | :--- | :--- |
-| **Primary API Restarts during Enqueue** | Message in `render_outbox` was committed but not yet sent to Azure Queue. | Primary API `lifespan` startup runs `recover_outbox()`. Sweeps `pending` outbox records and publishes to queue. | Job reaches queue without loss; UI updates via polling. |
+| **Primary API Restarts during Enqueue** | Message in `render_outbox` was committed but not yet sent to Azure Queue. | Primary API `lifespan` startup runs `recover_outbox()`. Background sweeper (every 30s) also sweeps `pending` outbox records. | Job reaches queue without loss; UI updates via polling. |
+| **Primary API Restarts during Active Worker Render** | Backend container recycles while worker is running FFmpeg. | **Protected by Lease Contract**: Startup recovery checks `updated_at`. Active worker heartbeats ($< 90$s old) protect the job from premature failure. | Worker finishes rendering and updates DB without disruption. |
 | **Worker OOM / Hard Crash during Render** | Worker container dies while running FFmpeg. Message remains invisible in queue. | Azure Storage Queue visibility timeout (300s) expires. Message reappears on queue. | KEDA triggers a fresh worker replica. Worker retries render. |
-| **Repeated Failures (Corrupt Audio Stem)** | Render consistently fails 3 consecutive times. | Message `dequeue_count` reaches 4. Worker intercepts: moves message to `cinematic-render-poison` and marks job `failed`. | Poison message quarantined. Job marked failed with actionable creator error. Zero infinite loops. |
+| **Repeated Failures (Corrupt Audio Stem)** | Render consistently fails 3 consecutive times. | Message `dequeue_count` reaches 4. Worker intercepts: moves message to `cinematic-render-poison`, marks job `failed`, and clears `request_hash = NULL`. | Poison message quarantined. Job marked failed with actionable creator error. Zero infinite loops. |
 | **Transient Supabase Storage Upload Failure** | FFmpeg succeeds, but upload of final MP4 to Supabase fails due to network glitch. | Worker retries upload 3 times with exponential backoff (2s, 4s, 8s). If persistent, message is released for retry. | Temporary network partition recovered without user intervention. |
-| **Stale Orphaned Job on Web Startup** | Job marked `queued` or `processing` for $> 15$ minutes without updates. | Web backend startup runs `recover_orphaned_jobs()`: marks job `failed` and sets `request_hash = NULL`. | Creator can immediately retry by clicking "Try Again". |
+| **Stale Lease / Worker Hang ($> 90$s silence)** | Worker process hangs without crashing; no heartbeat sent for $> 90$s. | Background reaper detects `updated_at < NOW() - 90s`, marks job `failed`, and clears `request_hash = NULL`. | Creator can immediately retry by clicking "Try Again". |
+| **Permanently Lost Queue Message** | Job stuck in `queued` for $> 15$ minutes with outbox `status == 'published'`. | Reaper detects stale queue item, marks job `failed`, and clears `request_hash = NULL`. | Immediate retry capability restored. |
 
 ---
 

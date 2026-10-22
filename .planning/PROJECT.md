@@ -92,11 +92,12 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [x] **Phase 46: Cinematic Preview Proof of Concept** — HyperFrames feasibility evaluation (licensing, Node/Chromium/FFmpeg footprint vs ACA limits) and separate worker pilot to establish a reliable self-contained cinematic preview engine.
 - [x] **Phase 47: Product Evaluation & Release Gate** — Automated E2E verification across arbitrary seeds, character consistency, credit protection, live provider proof, and PWA release gate.
 
-### Milestone 7: Dedicated Cinematic Rendering Worker (Completed & Verified)
+### Milestone 7: Dedicated Cinematic Rendering Worker
 - [x] **Phase 48: Dedicated Worker Architecture & Local Prototype** — Minimal standalone worker container (`Dockerfile.worker`), CLI runner, local benchmark without paid calls, and Supabase Storage handshake.
 - [x] **Phase 49: Azure Container Apps Job Pilot & Cloud Benchmarking** — On-demand ACA worker (1.0 vCPU, 2.0 GiB, scale-to-zero, max concurrency 1, 120s timeout), real Azure cost and duration measurement under ₹500 budget.
 - [x] **Phase 50: HyperFrames Comparative Evaluation & Decision Gate** — Evaluated native baseline (100% aesthetic pass, sub-2s latency, ~75MB RSS, ₹0.00 cost) against projected HyperFrames footprint; formally adopted native FFmpeg (NO-GO on HyperFrames).
-- [x] **Phase 51: Production Dispatch, UI Enablement & Release Gate** — Non-blocking FastAPI dispatch (HTTP 202), frontend UI enablement behind `VITE_ENABLE_CINEMATIC_PREVIEW` feature flag, honest synthetic labeling, and Milestone 7 release candidate certification.
+- [x] **Phase 51: Production Dispatch, UI Enablement & Release Gate (Historical / Superseded)** — Non-blocking FastAPI dispatch (HTTP 202), frontend UI enablement behind `VITE_ENABLE_CINEMATIC_PREVIEW` feature flag, honest synthetic labeling. Direct-HTTP deployment abandoned and superseded by Phase 52.
+- [ ] **Phase 52: Queue-Based Cinematic Rendering Architecture (Active Plan)** — Scale-to-zero, event-driven queue dispatch using Azure Storage Queue and a dedicated standard ACA environment (`env-praroha-render`), eliminating worker ingress and direct HTTP dispatch.
 
 ### Architecture Decisions: Referenced Projects Analysis
 1. **Pollinations (`gen.pollinations.ai`) [ADOPTED WITH BOUNDARIES]**:

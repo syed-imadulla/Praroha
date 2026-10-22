@@ -90,4 +90,4 @@ Because the native FFmpeg renderer achieves full aesthetic compliance with verif
 
 1. **Adopt Native FFmpeg Exclusively**: The native worker architecture deployed in Phase 48 and cloud-verified in Phase 49 (`praroha-cinematic-worker`) is certified as the sole cinematic rendering engine for Milestone 7.
 2. **Discard HyperFrames Pipeline**: No additional Docker images (`Dockerfile.hyperframes`), Node.js packages, or Chromium dependencies will be introduced to PRAROHA.
-3. **Phase 51 Handoff**: Proceed to Phase 51 (Production Dispatch & UI Enablement) using the verified native worker container.
+3. **Phase 51 & 52 Handoff**: Proceeded to Phase 51 for candidate API dispatch and UI components. In production, direct-HTTP worker dispatch was superseded by Phase 52's event-driven Azure Storage Queue and Container Apps Job architecture.

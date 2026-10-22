@@ -838,7 +838,10 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
 
 ---
 
-### Phase 51: Production Dispatch, UI Enablement & Release Gate (Milestone 7)
+### Phase 51: Production Dispatch, UI Enablement & Release Gate (Milestone 7 - Historical / Superseded)
+> [!NOTE]
+> **Historical Archive**: Phase 51 verified the candidate non-blocking API dispatch and UI components. Production rollout of direct-HTTP worker dispatch was halted due to Azure Express environment constraints and worker network exposure. The production rendering architecture is superseded by Phase 52.
+
 **Goal**: Connect the verified on-demand cinematic rendering worker to the PRAROHA web application via non-blocking API dispatch, safely enable the frontend preview generation UI with honest synthetic badges, execute full end-to-end user lifecycle verification, and approve the Milestone 7 release gate.  
 **Depends on**: Phase 50  
 **Requirements**: PROD-01, PROD-02, PROD-03  
@@ -846,9 +849,9 @@ Seed Unfold takes an ambiguous, formless seed idea, understands its core intent,
   1. `/api/media/cinematic-preview/jobs` non-blocking endpoint operational in primary FastAPI web service.
   2. Frontend UI `MediaPreviewCard.tsx` enabled with interactive generation, status updates, in-app video playback, and honest `Cinematic Preview` badges.
   3. Zero regressions across all 230 existing tests, PWA build, and creative memory consistency.
-  4. Milestone 7 Release Gate certified with total pilot spend verified < ₹500.  
-**Plans**: 1 plan (all completed)
-- [x] **51-01-PLAN.md**: Non-blocking dispatch API, frontend UI enablement, end-to-end acceptance testing, and Milestone 7 release gate sign-off.
+  4. Milestone 7 Release Gate evaluated (production deployment superseded by Phase 52).  
+**Plans**: 1 plan (historical candidate completed; superseded by Phase 52)
+- [x] **51-01-PLAN.md**: Non-blocking dispatch API, frontend UI enablement, end-to-end acceptance testing, and Milestone 7 release gate sign-off. *(Historical — Superseded by Phase 52)*
 
 ---
 

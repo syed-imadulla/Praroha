@@ -1,8 +1,21 @@
 # Phase 51: Production Dispatch, UI Enablement & Release Gate Summary
 
+> [!WARNING]
+> **HISTORICAL ARCHIVE — SUPERSEDED BY PHASE 52 (Queue-Based Architecture)**
+> **Do NOT execute the rollout steps or assume the networking topology documented below.**
+> 
+> The direct HTTP dispatch architecture (`http://praroha-cinematic-worker:8080`) explored in this phase was **abandoned and never deployed to production** due to:
+> 1. **Azure Container Apps Express Environment Constraints**: The existing primary backend environment (`env-tendersaathi`) operates in Express mode, which does not support Container Apps Jobs.
+> 2. **Network Attack Surface**: Operating a continuous HTTP listener on a worker container creates unnecessary ingress exposure and vulnerability to orphaned jobs during container recycling.
+> 3. **Server-Side Guard Active**: Production cinematic generation remains strictly locked down with `CINEMATIC_PREVIEW_ENABLED=False` returning HTTP 503 on the backend and `VITE_ENABLE_CINEMATIC_PREVIEW=false` disabling the UI in the frontend.
+> 
+> **Active Target Architecture**: All cinematic rendering is being re-implemented under **[Phase 52: Queue-Based Cinematic Rendering Architecture](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md)**, utilizing Azure Storage Queues (`cinematic-render-jobs`), transactional outbox delivery, a dedicated Standard ACA Managed Environment (`env-praroha-render`), and a zero-ingress Container Apps Job (`praroha-render-job`).
+>
+> All metrics and test results below reflect the historical candidate evaluation at commit `baefbc6` and are preserved strictly for architectural lineage.
+
 **Milestone 7:** Dedicated Cinematic Rendering Worker  
-**Phase Status:** Complete (Implementation & Verification Certified; Release Deployment Pending Explicit Approval)  
-**Deliverable Commit:** Handoff commit following Phase 50 (`0bc8c6c`)
+**Phase Status:** Superseded / Historical (Direct-HTTP Rollout Halted; Succeeded by Phase 52)  
+**Deliverable Commit:** Handoff commit following Phase 50 (`0bc8c6c`), dispatch implementation (`baefbc6`), and security remediation (`070da8b`, `a9530bf`)
 
 ---
 
@@ -28,12 +41,15 @@ In accordance with Phase 51 pre-implementation requirements, the Phase 50 artifa
 
 ---
 
-## 3. Worker Audit Findings
+## 3. Worker Audit Findings (Historical Context)
 
-Audit of the live Azure Container App `praroha-cinematic-worker` confirmed:
+> [!NOTE]
+> The audit findings below reflect historical observations during Phase 51 testing. In actual current production, `praroha-cinematic-worker` has **ingress disabled (`ingress: null`)** and is scaled to zero replicas. It is **not reachable** via HTTP, and `CINEMATIC_WORKER_URL=http://praroha-cinematic-worker:8080` is an inactive legacy route.
+
+Historical snapshot during Phase 51 evaluation:
 - **Container Image**: `tendersaathiacr.azurecr.io/praroha-worker:v4`
-- **Ingress**: `external: false` (Internal-only within `env-tendersaathi`, port 8080)
-- **Primary Backend Configuration**: `CINEMATIC_WORKER_URL=http://praroha-cinematic-worker:8080`
+- **Ingress**: `external: false` (Internal-only within `env-tendersaathi`, port 8080 — *superseded in production by zero-ingress design*)
+- **Primary Backend Configuration**: `CINEMATIC_WORKER_URL=http://praroha-cinematic-worker:8080` (*deprecated*)
 - **Authentication**: Service-to-service Bearer token derived deterministically from `WORKER_AUTH_TOKEN` or SHA256 of `SUPABASE_KEY`.
 - **Payload Compatibility**: The backend payload structure (`job_id`, `spec`, `database_url`, `storage_provider`, `timeout`) matches the worker's HTTP API contract with strict validation for `project_id`, `entity_id`, and asset URL safety.
 
@@ -71,7 +87,7 @@ Audit of the live Azure Container App `praroha-cinematic-worker` confirmed:
 
 ---
 
-## 5. Verification & Regression Results
+## 5. Verification & Regression Results (Historical Evaluation)
 
 1. **New Dispatch Test Suite** (`backend/tests/test_cinematic_production_dispatch.py`):
    - `test_authenticated_project_owner_dispatch`: **PASSED** (HTTP 202, durable DB records)
@@ -83,7 +99,8 @@ Audit of the live Azure Container App `praroha-cinematic-worker` confirmed:
    - `test_worker_failure_handling`: **PASSED** (HTTP 500 cleanly marks job failed; 0 false success)
    - `test_no_ffmpeg_execution_inside_primary_api`: **PASSED** (Zero subprocess/FFmpeg calls in web process)
 2. **Full Backend Regression Suite**:
-   - **250 passed, 1 skipped in 37.03s** (Previous baseline: 242 passed, 1 skipped).
+   - **Historical Baseline**: 250 passed, 1 skipped in 37.03s at commit `baefbc6`.
+   - **Current Baseline**: 260 passed, 1 skipped in 29.01s (following security fixes `7848e02`, `b251df5`, `070da8b`, and `a9530bf`).
    - Zero test failures, zero regressions across creative memory, origin ledger, or media protection.
 3. **Frontend Production Build**:
    - `npm run build --prefix frontend`: **PASSED** in 15.37s (`dist/assets/index-CYbjfWvV.js`, PWA service worker precache generated).
@@ -92,18 +109,19 @@ Audit of the live Azure Container App `praroha-cinematic-worker` confirmed:
 
 ## 6. Release Checklist & Deployment Gate
 
-> [!IMPORTANT]
-> In strict accordance with Phase 51 guidelines, **no production deployment or live container update was executed during this phase**. Commit snapshot is certified as a Release Candidate.
+> [!CAUTION]
+> **DIRECT-HTTP ROLLOUT PERMANENTLY ABANDONED**  
+> The deployment steps below are **obsolete historical artifacts**. Do not execute them. Direct HTTP dispatch between `praroha-backend` and `praroha-cinematic-worker` has been replaced by the Phase 52 queue-based architecture.
 
-### Release Approval Checklist:
-- [x] Codebase audited and verified against all Milestone 7 specifications.
-- [x] Backend test battery: 250 passed, 1 skipped.
+### Historical Checklist (Preserved for Reference):
+- [x] Codebase audited and verified against all Milestone 7 specifications (historical candidate).
+- [x] Backend test battery: 250 passed, 1 skipped (expanded to 260 passed post-Phase 51).
 - [x] Frontend production bundle built successfully without TypeScript errors.
-- [x] Dedicated worker container (`praroha-cinematic-worker`) active on internal ingress.
+- [x] Dedicated worker container (`praroha-cinematic-worker`) verified locally and in cloud pilot.
 - [x] Zero generative AI billing incurred during evaluation (₹0.00 spent).
-- [ ] **Deployment Step 1**: Rebuild and deploy primary backend container (`praroha-backend`) with Phase 51 dispatcher code.
-- [ ] **Deployment Step 2**: Deploy frontend PWA build to Vercel.
-- [ ] **Deployment Step 3**: Set production feature flag `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel environment variables once deployment is approved.
-- [ ] **Deployment Step 4**: Post-deployment smoke test verifying live cinematic preview generation and playback.
+- [ ] ~~**Deployment Step 1**: Rebuild and deploy primary backend container (`praroha-backend`) with Phase 51 dispatcher code.~~ *(SUPERSEDED: Phase 52 replaces dispatcher with queue publisher).*
+- [ ] ~~**Deployment Step 2**: Deploy frontend PWA build to Vercel.~~ *(HOLD: Awaiting Phase 52 completion).*
+- [ ] ~~**Deployment Step 3**: Set production feature flag `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel environment variables once deployment is approved.~~ *(ABORTED: Feature flag must remain `false` until Phase 52 release gate passes).*
+- [ ] ~~**Deployment Step 4**: Post-deployment smoke test verifying live cinematic preview generation and playback.~~ *(SUPERSEDED by Phase 52 verification).*
 
-**Milestone 7 Release Gate Decision:** **RELEASE CANDIDATE APPROVED (Production Release Deployment Approval Pending)**.
+**Milestone 7 Release Gate Decision:** **PHASE 51 SUPERSEDED BY PHASE 52. Direct-HTTP deployment canceled; proceed with Phase 52 Queue-Based Architecture.**

@@ -7,20 +7,24 @@ The queue message is designed to be lightweight, deterministic, and strictly dec
 ### Security Boundary: Zero Credentials in Messages
 Under no circumstances are database credentials, Supabase API keys, JWT tokens, or worker authentication tokens included in queue messages. The worker container authenticates to cloud services using its own runtime environment variables and secrets configured within Azure Container Apps.
 
+### Canonical In-Repository Schema
+The formal JSON schema contract is located at [queue_message_schema.json](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json).
+
 ### JSON Payload Specification
 ```json
 {
-  "$schema": "https://praroha.app/schemas/cinematic-render-job.v1.json",
+  "$schema": ".planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json",
   "schema_version": "1.0",
   "job_id": "7f8b894d-5872-4632-9cb7-7bc8ff3a97a1",
   "project_id": "3b290cb7-3162-4217-a5ec-9042b322dafa",
-  "entity_type": "world",
-  "entity_id": "18f91ea7-d150-42cf-9ca3-18cb9b010c73",
+  "entity_type": "scene",
+  "entity_id": "scene-101",
   "request_hash": "a5e8412ff35b91a78465a31a9829cf9a896d8e23f99b21f37b198124b6f79021",
   "options": {
-    "duration_seconds": 6,
+    "duration_seconds": 12,
     "fps": 24,
     "resolution": "1280x720",
+    "aspect_ratio": "16:9",
     "motion_preset": "slow_pan"
   },
   "enqueued_at": "2026-10-22T21:30:00.000Z",
@@ -28,21 +32,21 @@ Under no circumstances are database credentials, Supabase API keys, JWT tokens, 
 }
 ```
 
-### Field Definitions & Validation Rules
+### Field Definitions & Validation Rules (Reconciled with Codebase Contracts)
 
 | Field | Type | Required | Description | Validation Rule |
 | :--- | :--- | :--- | :--- | :--- |
 | `schema_version` | String | Yes | Version of message contract | Must equal `"1.0"` |
-| `job_id` | UUID | Yes | Primary key in `generation_jobs` table | Standard UUID v4 |
-| `project_id` | UUID | Yes | Project scope identifier | Must exist in `projects` |
-| `entity_type` | String | Yes | Target entity type (`world`, `character`, `scene`) | Regex: `^(world\|character\|scene)$` |
-| `entity_id` | UUID | Yes | Identifier of entity being rendered | Standard UUID v4 |
-| `request_hash` | String | Yes | SHA-256 fingerprint of prompt + asset inputs | 64-character lowercase hex |
-| `options` | Object | No | Rendering parameters | Duration 1–10s, resolution 720p |
+| `job_id` | String | Yes | Identifier in `generation_jobs` table | Regex: `^[a-zA-Z0-9_-]{1,128}$` (UUID or string ID) |
+| `project_id` | String | Yes | Project scope identifier in `projects` | Regex: `^[a-zA-Z0-9_-]{1,128}$` (UUID or slug) |
+| `entity_type` | String | Yes | Domain entity type (`world`, `character`, `location`, `scene`) | Regex: `^(world\|character\|location\|scene)$` |
+| `entity_id` | String | Yes | Target entity identifier | Regex: `^[a-zA-Z0-9_-]{1,128}$` (UUID, slug, or formatted ID like `char-1`, `scene-101`) |
+| `request_hash` | String | Yes | SHA-256 fingerprint of prompt + asset inputs | 64-character lowercase hex (`^[a-f0-9]{64}$`) |
+| `options` | Object | No | Rendering parameters | Duration 3–60s (reconciled with `CinematicPreviewSpec.validate()`), default 12s; resolution 720p/1080p |
 | `enqueued_at` | ISO 8601 | Yes | UTC timestamp when published | Valid UTC ISO string |
 | `attempt` | Integer | Yes | Initial enqueue counter | Must equal `1` when enqueued |
 
-- **Message Size**: ~450 bytes (well below Azure Storage Queue 64 KB limit).
+- **Message Size**: ~480 bytes (well below Azure Storage Queue 64 KB limit).
 - **Encoding**: UTF-8 Base64-encoded string (native Azure Queue standard).
 
 ---
@@ -151,25 +155,38 @@ sequenceDiagram
 | Current State | Event | Target State | Action / Side Effect |
 | :--- | :--- | :--- | :--- |
 | **None** | Client calls POST /jobs | `queued` | Insert DB record + render_outbox; enqueue to Storage Queue. |
-| `queued` | Worker claims message | `processing` | Set `started_at = NOW()`; lease message for 300s. |
+| `queued` | Worker claims message | `processing` | Atomic CAS claim (`WHERE status = 'queued'`); set `started_at = NOW()`, `updated_at = NOW()`; lease message for 300s. |
 | `processing` | Render & upload succeed | `completed` | Set `completed_at = NOW()`, update `media_assets`, delete queue message. |
 | `processing` | Unhandled error in worker | `failed` | Clear `request_hash = NULL`, record error reason, delete or dead-letter message. |
 | `processing` | Worker hard crash / OOM | `queued` (retry) | Visibility timeout (300s) expires; message returns to queue; `dequeue_count` increments. |
 | `queued` | `dequeue_count > 3` | `failed` | Move to `cinematic-render-poison`; set job to `failed` (`"Exceeded maximum retries"`). |
-| `queued` / `processing` | Server restart (>15m) | `failed` | Startup sweeper marks orphaned job `failed` and clears `request_hash = NULL`. |
+| `processing` | Backend restart (heartbeat active $< 90$s) | `processing` | **Untouched / Protected**: Legitimate rendering continues uninterrupted by API reboots. |
+| `processing` | Worker heartbeat silent ($> 90$s) | `failed` | Stale lease expired; sweeper marks job `failed` and clears `request_hash = NULL` for clean retry. |
+| `queued` | Queued for $> 15$m with outbox `published` | `failed` | Stale queue recovery (lost message or KEDA scaling failure); sweeper marks `failed` and clears `request_hash = NULL`. |
 
 ---
 
 ## 4. Lease, Visibility & Poison Message Handling
 
-1. **Visibility Timeout (300 seconds)**:
+1. **Visibility Timeout & Renewal Contract (300 seconds default)**:
    - When a worker dequeues a message, Azure Queue hides it from other consumers for 300 seconds (5 minutes).
-   - Since average FFmpeg render duration is 12–18 seconds, 300 seconds provides ample buffer for network latency and storage uploads.
-2. **Dead-Letter / Poison Queue Strategy**:
+   - Average FFmpeg composition duration is 12–18 seconds; maximum execution timeout ceiling is 60 seconds.
+   - **Visibility Renewal**: If an execution takes longer than 60 seconds (e.g. heavy network transfer to Supabase Storage), the worker calls `update_message(message, visibility_timeout=120)` to ensure the message is not prematurely redelivered while active processing is ongoing.
+2. **Worker Heartbeat & Lease Contract (90 seconds)**:
+   - During execution (stem download, FFmpeg processing, Supabase upload), the worker issues an incremental heartbeat every 15 seconds:
+     ```sql
+     UPDATE generation_jobs
+     SET updated_at = NOW(),
+         progress = :current_progress
+     WHERE id = :job_id AND status = 'processing';
+     ```
+   - A lease is considered valid as long as `updated_at > NOW() - INTERVAL '90 seconds'` (6 missed heartbeats).
+   - Neither application reboots nor background sweepers will interrupt or fail a job with an active lease.
+3. **Dead-Letter / Poison Queue Strategy**:
    - Each message in Azure Storage Queue has an integer metadata property `DequeueCount`.
-   - When `DequeueCount <= 3`: The worker allows standard retry if a transient network failure occurs.
+   - When `DequeueCount <= 3`: The worker allows standard retry if a transient container crash occurs.
    - When `DequeueCount > 3`: The worker detects a persistent crash (poison message). It immediately:
      1. Copies the message to `cinematic-render-poison` with error diagnostics.
      2. Updates `generation_jobs` to `failed` with diagnostic reason `"Job failed after 3 execution attempts. Moved to poison queue."`.
-     3. Clears `media_assets.request_hash = NULL` so the user can re-attempt.
+     3. Clears `media_assets.request_hash = NULL` so the creator can immediately retry.
      4. Deletes the original message from `cinematic-render-jobs`.

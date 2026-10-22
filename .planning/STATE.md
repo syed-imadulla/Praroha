@@ -32,7 +32,7 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
   - Phase 48: Dedicated Worker Architecture & Local Prototype (Completed & Verified)
   - Phase 49: Azure Scale-to-Zero Worker Pilot & Cloud Benchmarking (Completed & Verified)
   - Phase 50: HyperFrames Comparative Evaluation & Decision Gate (Completed & Verified)
-  - Phase 51: Production Dispatch, UI Enablement & Release Gate (Completed & Verified)
+  - Phase 51: Production Dispatch, UI Enablement & Release Gate (Historical / Superseded by Phase 52)
   - Phase 52: Queue-Based Cinematic Rendering Architecture (Planning Completed & Re-Architected for Dual-Environment Topology; Pending User Sign-off)
 
 ## Verification Evidence & Quality Gates

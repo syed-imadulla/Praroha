@@ -60,24 +60,28 @@
 
 ---
 
-## 3. Pilot Scenario Cost Projections
+## 3. Pilot Scenario Cost Projections & Sensitivity Analysis
 
-| Component | Standard Pilot (100 Renders) | Heavy Pilot (500 Renders) | Stress Test (1,000 Renders with 3x Retries) |
-| :--- | :--- | :--- | :--- |
-| **Worker Compute** | ₹3.83 INR | ₹19.13 INR | ₹38.25 INR |
-| **Queue Operations** | ₹0.01 INR | ₹0.02 INR | ₹0.05 INR |
-| **Log Ingestion** | ₹0.10 INR | ₹0.49 INR | ₹1.00 INR |
-| **Internet Egress** | ₹1.11 INR | ₹5.55 INR | ₹11.10 INR |
-| **Base / Idle Fees** | ₹0.00 INR | ₹0.00 INR | ₹0.00 INR |
-| **Total Projected Cost** | **₹5.05 INR** | **₹25.19 INR** | **₹50.40 INR** |
-| **Budget Cap Utilization (₹500)** | **1.01%** | **5.04%** | **10.08%** |
+> [!IMPORTANT]
+> The figures below represent **engineering projections based on published Azure pricing units**, not verified invoices or guaranteed billing. Container startup durations, Log Analytics telemetry volume, and network egress can vary based on cloud conditions. A formal billing reconciliation checkpoint is mandated during the pilot.
+
+### Sensitivity Matrix Across Varied Operational Conditions
+
+| Scenario | Billable Duration per Job | Retries per 100 Jobs | Compute Cost | Queue & Log Cost | Egress Cost | Total Projected Cost | % of ₹500 Cap |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Best-Case Baseline** (100 jobs) | 15s (Instant start) | 0% | ₹3.83 INR | ₹0.11 INR | ₹1.11 INR | **₹5.05 INR** | 1.01% |
+| **Realistic Operational** (100 jobs) | 28s (13s start + 15s render) | 5% | ₹7.50 INR | ₹0.12 INR | ₹1.16 INR | **₹8.78 INR** | 1.76% |
+| **Conservative Ceiling** (100 jobs) | 45s (15s start + 30s render) | 15% | ₹13.20 INR | ₹0.14 INR | ₹1.28 INR | **₹14.62 INR** | 2.92% |
+| **Worst-Case Stress** (100 jobs) | 60s max execution | 30% retries | ₹20.35 INR | ₹0.18 INR | ₹1.44 INR | **₹21.97 INR** | 4.39% |
+| **Heavy Volume** (500 jobs) | 28s average | 5% | ₹37.50 INR | ₹0.60 INR | ₹5.80 INR | **₹43.90 INR** | 8.78% |
+
+Even under the worst-case stress scenario with 30% crash retries and 60-second billing per job, the pilot expenditure remains $< ₹22.00$ INR, which is well within the project's internal $< ₹50.00$ target and less than 5% of the authorized ₹500 cap.
 
 ---
 
-## 4. Hard Financial Safeguards & Circuit Breakers
+## 4. Hard Financial Safeguards, Acceptance Testing & Billing Reconciliation
 
-To guarantee that costs cannot breach the ₹500 cap under unexpected retry loops or queue backlog:
-
+### A. Automated Circuit Breakers
 1. **Execution Concurrency Cap**:
    - `--max-executions 2`: Limits the event scaler to a maximum of 2 concurrent container executions under all conditions.
 2. **Replica Timeout Ceiling**:
@@ -88,3 +92,14 @@ To guarantee that costs cannot breach the ₹500 cap under unexpected retry loop
    - If a message fails 3 times (`dequeue_count > 3`), it is moved to `cinematic-render-poison`, preventing infinite retry loops.
 5. **Subscription-Level Budget Alert**:
    - An Azure Budget alert is set at ₹400 INR (80% of the ₹500 cap) with an automated notification.
+
+### B. Pilot Billing Reconciliation & Acceptance Testing
+During the approved cloud pilot, the following acceptance tests must be executed to reconcile projected vs actual billing:
+1. **Initial 10-Render Reconciliation**:
+   - Execute 10 synthetic canary renders.
+   - Query Log Analytics `ContainerAppSystemLogs_CL` to record exact container start-to-stop billing seconds.
+   - Query Azure Cost Management API at T+24h to verify actual billed meters against the ₹0.88 projection for 10 runs.
+2. **Egress & Storage Op Verification**:
+   - Verify that Supabase Storage MP4 upload size averages $\le 1.8$ MB and that queue operations do not generate unexpected billable API calls.
+3. **Budget Sign-off Gate**:
+   - If actual billing for 10 renders exceeds ₹3.00 INR (more than 3x projected), halt the pilot immediately for root cause analysis before proceeding to 100 renders.

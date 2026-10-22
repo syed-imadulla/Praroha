@@ -32,8 +32,14 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 - **Actions**:
   1. Create Azure Storage Account `stpraroharender` in resource group `rg-tendersaathi` (`location: centralindia`, `sku: Standard_LRS`).
   2. Create Queues: `cinematic-render-jobs` and `cinematic-render-poison`.
-  3. Assign RBAC role `Storage Queue Data Contributor` to `tendersaathi-identity` scoped to `stpraroharender`.
-- **Gate Check**: Run `az storage message peek -q cinematic-render-jobs --auth-mode login` using managed identity to verify read/write access.
+  3. Create User-Assigned Managed Identity `uami-praroha-render`.
+  4. Assign least-privilege RBAC roles to `uami-praroha-render`:
+     - `AcrPull` on `tendersaathiacr`.
+     - `Storage Queue Data Reader` on `stpraroharender` (for KEDA scaler).
+     - `Storage Queue Data Message Processor` on `cinematic-render-jobs`.
+     - `Storage Queue Data Message Sender` on `cinematic-render-poison`.
+  5. Generate scoped Queue Service SAS (`sp=a`) for primary backend enqueueing.
+- **Gate Check**: Run `az storage message peek -q cinematic-render-jobs --auth-mode login` using managed identity to verify read/process access without admin credentials.
 
 #### Stage 2: Standard ACA Environment & Job Provisioning (`env-praroha-render` & `praroha-render-job`)
 - **Actions**:
@@ -42,9 +48,12 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
      - `--trigger-type Event`
      - `--scale-rule-type azure-queue`
      - `--scale-rule-metadata "accountName=stpraroharender" "queueName=cinematic-render-jobs" "queueLength=1"`
-     - `--scale-rule-auth "connection=queue-connection-string"`
+     - `--scale-rule-auth "identity=$UAMI_ID"`
+     - `--mi-user-assigned "$UAMI_ID"`
+     - `--registry-server tendersaathiacr.azurecr.io --registry-identity "$UAMI_ID"`
      - `--min-executions 0 --max-executions 2 --replica-timeout 300`
-     - `--image tendersaathiacr.azurecr.io/praroha-cinematic-worker:v2`
+     - `--args "--queue"`
+     - `--image tendersaathiacr.azurecr.io/praroha-worker:v5` (built, locally tested, and pushed to ACR)
 - **Gate Check**: Run `az containerapp job show -n praroha-render-job -g rg-tendersaathi` and verify:
   - `properties.environmentId` points to `env-praroha-render`.
   - `properties.template.containers[0].resources.cpu == "1.0"`.
@@ -106,15 +115,35 @@ If any gate fails or unexpected behavior is detected during rollout, execute the
 - **Action**: Update `praroha-backend` environment variable `ENABLE_CINEMATIC_DISPATCH=false` or rollback container revision to `baefbc6`.
 - **Result**: API returns clean HTTP 503 `"Cinematic preview temporarily unavailable"` with zero impact on core text/world/audio capabilities.
 
-### Level 3: Azure Worker Teardown & Purge (T + 10 minutes)
+### Level 3: Azure Worker Scale Suspension & Graceful Drain (T + 10 minutes)
 - **Trigger**: KEDA scaling runaway, excessive retries, or cost alert trigger.
 - **Action**:
-  ```bash
-  # 1. Stop and delete the container apps job
-  az containerapp job delete -n praroha-render-job -g rg-tendersaathi --yes
-  
-  # 2. Clear all messages from queues
-  az storage message clear -q cinematic-render-jobs --account-name stpraroharender --auth-mode login
-  az storage message clear -q cinematic-render-poison --account-name stpraroharender --auth-mode login
-  ```
-- **Result**: All background rendering compute stops immediately. Compute cost drops to ₹0.
+  1. **Stop Active Running Job Instances**:
+     ```bash
+     az containerapp job stop \
+       --name praroha-render-job \
+       --resource-group rg-tendersaathi
+     ```
+  2. **Suspend Event-Trigger Scaling** (switch trigger to Manual; ARM rejects `--max-executions 0`):
+     ```bash
+     az containerapp job update \
+       --name praroha-render-job \
+       --resource-group rg-tendersaathi \
+       --trigger-type Manual
+     ```
+  3. **Inspect and Drain Pending Messages Gracefully**:
+     - Inspect messages in `cinematic-render-jobs` without clearing them indiscriminately.
+     - For each pending message, query the associated `generation_jobs` record in Supabase:
+       ```sql
+       UPDATE generation_jobs
+       SET status = 'cancelled',
+           error_details = 'Rendering temporarily suspended for maintenance. Please retry shortly.'
+       WHERE status = 'queued';
+       ```
+     - Clear `request_hash = NULL` on affected `media_assets` so users can cleanly re-request once service is restored.
+  4. **Result**: Background rendering compute halts immediately (0 active executions, ₹0 compute cost). Zero user requests are lost or left in orphaned `processing` state. Audit integrity is 100% preserved.
+
+---
+
+## 4. Phase Verification Status
+All acceptance criteria, stage gates, and test metrics in this plan represent **planned specifications** for Phase 52 implementation. No cloud resources have been provisioned and no synthetic renders have been executed during this architectural design phase. Verification evidence will be captured and documented during Phase 52 execution.

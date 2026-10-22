@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": ".planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json",
+  "title": "CinematicRenderJobQueueMessage",
+  "description": "Canonical contract for PRAROHA cinematic preview queue render messages",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "job_id",
+    "project_id",
+    "entity_type",
+    "entity_id",
+    "request_hash",
+    "enqueued_at",
+    "attempt"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema specification contract version"
+    },
+    "job_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+      "description": "Identifier of the GenerationJob in generation_jobs table (UUID or standard ID string)"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+      "description": "Project scope identifier in projects table"
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": ["world", "character", "location", "scene"],
+      "description": "Domain entity type matching MediaAssetBase"
+    },
+    "entity_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+      "description": "Target entity identifier (UUID, slug, or formatted ID string)"
+    },
+    "request_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 fingerprint for idempotency and duplicate suppression"
+    },
+    "options": {
+      "type": "object",
+      "description": "Rendering parameters reconciled with CinematicPreviewSpec and MediaGenerationRequest",
+      "properties": {
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 60,
+          "default": 12,
+          "description": "Rendered video duration in seconds (reconciled with CinematicPreviewSpec 3-60s range)"
+        },
+        "fps": {
+          "type": "integer",
+          "enum": [24, 30],
+          "default": 24,
+          "description": "Video frame rate"
+        },
+        "resolution": {
+          "type": "string",
+          "enum": ["1280x720", "1920x1080"],
+          "default": "1280x720",
+          "description": "Render resolution"
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "enum": ["16:9", "1:1", "9:16"],
+          "default": "16:9",
+          "description": "Output aspect ratio"
+        },
+        "motion_preset": {
+          "type": "string",
+          "enum": ["slow_pan", "zoom_in", "static"],
+          "default": "slow_pan",
+          "description": "Camera motion effect preset"
+        }
+      },
+      "additionalProperties": false
+    },
+    "enqueued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO 8601 timestamp when job was enqueued"
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Dispatch attempt counter (must equal 1 when initially published)"
+    }
+  },
+  "additionalProperties": false
+}
