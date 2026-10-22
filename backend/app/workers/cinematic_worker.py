@@ -56,6 +56,10 @@ def get_utc_now() -> datetime:
 def build_worker_engine(database_url: str):
     """Build async engine for worker database updates."""
     url_str = str(database_url).strip()
+    if url_str.startswith("postgres://"):
+        url_str = "postgresql+asyncpg://" + url_str[len("postgres://"):]
+    elif url_str.startswith("postgresql://"):
+        url_str = "postgresql+asyncpg://" + url_str[len("postgresql://"):]
     if url_str.startswith("sqlite"):
         return create_async_engine(
             url_str,
@@ -395,8 +399,95 @@ async def run_worker(
             shutil.rmtree(scratch_temp_dir, ignore_errors=True)
 
 
+import http.server
+
+
+class WorkerHTTPHandler(http.server.BaseHTTPRequestHandler):
+    """Standard library HTTP handler for Azure Container Apps scale-to-zero worker."""
+
+    def log_message(self, format, *args):
+        logger.info("Worker HTTP: %s - %s", self.address_string(), format % args)
+
+    def do_GET(self):
+        if self.path in ("/health", "/", "/api/health"):
+            body = json.dumps({
+                "status": "healthy",
+                "service": "praroha-cinematic-worker",
+                "mode": "isolated-scale-to-zero",
+                "runtime": "ffmpeg-native",
+            }).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+    def do_POST(self):
+        if self.path in ("/render", "/api/render"):
+            try:
+                content_len = int(self.headers.get("Content-Length", 0))
+                post_data = self.rfile.read(content_len)
+                payload = json.loads(post_data.decode("utf-8")) if post_data else {}
+
+                job_id = payload.get("job_id")
+                spec_dict = payload.get("spec_dict") or payload.get("spec")
+                db_url = payload.get("database_url")
+                storage_type = payload.get("storage_provider", "supabase")
+                timeout_sec = float(payload.get("timeout", 120.0))
+
+                logger.info("Received render request for job_id=%s, storage=%s", job_id, storage_type)
+                exit_code = asyncio.run(
+                    run_worker(
+                        job_id=job_id,
+                        spec_dict=spec_dict,
+                        database_url=db_url,
+                        storage_provider_type=storage_type,
+                        timeout_sec=timeout_sec,
+                    )
+                )
+                status_code = 200 if exit_code == 0 else 500
+                resp_data = json.dumps({
+                    "status": "completed" if exit_code == 0 else "failed",
+                    "exit_code": exit_code,
+                    "job_id": job_id,
+                }).encode("utf-8")
+                self.send_response(status_code)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(resp_data)))
+                self.end_headers()
+                self.wfile.write(resp_data)
+            except Exception as exc:
+                logger.error("Error processing render request: %s", exc)
+                err_data = json.dumps({"status": "error", "message": str(exc)}).encode("utf-8")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(err_data)))
+                self.end_headers()
+                self.wfile.write(err_data)
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+
+def run_server(port: int = 8080):
+    server_address = ("0.0.0.0", port)
+    httpd = http.server.ThreadingHTTPServer(server_address, WorkerHTTPHandler)
+    logger.info("PRAROHA Dedicated Cinematic Worker server listening on port %d...", port)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        logger.info("Worker server shutting down...")
+    finally:
+        httpd.server_close()
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="PRAROHA Isolated Cinematic Rendering Worker")
+    parser.add_argument("--server", action="store_true", help="Run as lightweight scale-to-zero HTTP worker")
+    parser.add_argument("--port", type=int, default=int(os.getenv("PORT", "8080")), help="HTTP server port")
     parser.add_argument("--job-id", type=str, default=None, help="Database GenerationJob ID")
     parser.add_argument("--spec-json", type=str, default=None, help="JSON string with preview specification")
     parser.add_argument("--spec-file", type=str, default=None, help="Path to JSON file with preview specification")
@@ -409,12 +500,17 @@ def parse_args():
 
 
 def main():
-    # Verify no HTTP framework is active
+    # Verify no heavyweight HTTP framework is active
     if "fastapi" in sys.modules or "uvicorn" in sys.modules:
         logger.error("FATAL: Web frameworks (FastAPI/Uvicorn) must NEVER be imported in the dedicated worker.")
         sys.exit(1)
 
     args = parse_args()
+
+    # Check if server mode requested via flag or environment
+    if args.server or os.getenv("RUN_MODE") == "server" or os.getenv("CONTAINER_APP_PORT"):
+        run_server(port=args.port)
+        return
 
     spec_dict = None
     if args.spec_file and os.path.exists(args.spec_file):
@@ -439,3 +535,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -1,4 +1,13 @@
 node_modules
+*/node_modules
+frontend
+uploads
+backend/uploads
+gallery
+graphify-out
+scratch
+docs
+.planning
 .git
 .pytest_cache
 .venv
@@ -7,4 +16,7 @@ __pycache__
 *.pyo
 dist
 build
-.planning
+backend/*.db*
+*.db
+*.db-shm
+*.db-wal

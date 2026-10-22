@@ -17,15 +17,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements-worker.txt /app/backend/requirements-worker.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements-worker.txt
 
-# Copy backend application source
-COPY backend /app/backend
-
-# Create scratch directory and non-root user
-RUN mkdir -p /app/scratch /app/uploads && \
-    useradd -u 1001 -m -s /bin/bash appuser && \
+# Create non-root user and scratch/uploads directories
+RUN useradd -u 1001 -m -s /bin/bash appuser && \
+    mkdir -p /app/scratch /app/uploads && \
     chown -R appuser:appuser /app
+
+# Copy backend application source with correct ownership
+COPY --chown=appuser:appuser backend /app/backend
 
 USER appuser
 
-# Run as standalone CLI batch worker (NO EXPOSE, NO HTTP SERVER)
+# Run as standalone worker (supports CLI arguments or default --server for ACA scale-to-zero)
 ENTRYPOINT ["python", "-m", "backend.app.workers.cinematic_worker"]
+CMD ["--server"]
+
