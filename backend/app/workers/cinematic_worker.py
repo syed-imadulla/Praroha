@@ -33,6 +33,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import httpx
 import psutil
+import urllib.parse
 from sqlalchemy import update
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -42,6 +43,12 @@ try:
 except ImportError:
     QueueClient = None  # type: ignore
     QueueServiceClient = None  # type: ignore
+
+try:
+    from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
+except ImportError:
+    DefaultAzureCredential = None  # type: ignore
+    ManagedIdentityCredential = None  # type: ignore
 
 from backend.app.models.job import GenerationJob
 from backend.app.models.media import MediaAssetRecord
@@ -1205,43 +1212,153 @@ async def run_queue_worker(
             await db_engine.dispose()
 
 
-async def run_queue_cli(args: argparse.Namespace) -> int:
-    """Entrypoint for CLI --queue execution with Azure Queue credentials."""
+def is_add_only_sas(url_or_token: Optional[str]) -> bool:
+    """Detect if a SAS URL or token contains only add ('a') permissions without dequeue/read capabilities."""
+    if not url_or_token or "?" not in url_or_token:
+        return False
+    try:
+        query = url_or_token.split("?", 1)[1]
+        params = dict(urllib.parse.parse_qsl(query))
+        sp = params.get("sp", "")
+        # If permissions include 'a' but lack read ('r'), update ('u'), process ('p'), or delete ('d')
+        return "a" in sp and not any(c in sp for c in ("r", "u", "p", "d"))
+    except Exception:
+        return False
+
+
+def build_queue_clients(args: Any) -> Tuple[Optional[Any], Optional[Any]]:
+    """
+    Construct authenticated clients for BOTH the work queue and poison queue.
+    Supports:
+    1. Azure Managed Identity via DefaultAzureCredential + AZURE_CLIENT_ID (passwordless, least privilege).
+    2. Scoped Queue URLs (e.g. for fallback testing or development).
+    3. Connection string (local dev/testing/Azurite).
+    Rejects Add-only SAS URLs (backend enqueue credential) with an explicit error.
+    """
     if QueueClient is None:
         logger.error("azure-storage-queue package is required for queue mode.")
-        return 1
+        return None, None
+
+    work_queue_name = (
+        getattr(args, "queue_name", None)
+        or os.getenv("AZURE_STORAGE_QUEUE_NAME")
+        or os.getenv("QUEUE_NAME")
+        or "cinematic-render-jobs"
+    )
+    poison_queue_name = (
+        getattr(args, "poison_queue_name", None)
+        or os.getenv("AZURE_STORAGE_POISON_QUEUE_NAME")
+        or os.getenv("POISON_QUEUE_NAME")
+        or "cinematic-render-poison"
+    )
 
     conn_str = (
-        args.connection_string
+        getattr(args, "connection_string", None)
         or os.getenv("AZURE_STORAGE_CONNECTION_STRING")
         or os.getenv("QUEUE_CONNECTION_STRING")
         or os.getenv("stpraroharender_connection_string")
     )
 
-    queue_name = args.queue_name or os.getenv("QUEUE_NAME", "cinematic-render-jobs")
-    poison_queue_name = args.poison_queue_name or os.getenv("POISON_QUEUE_NAME", "cinematic-render-poison")
+    qurl = (
+        getattr(args, "queue_url", None)
+        or os.getenv("AZURE_STORAGE_QUEUE_URL")
+        or os.getenv("QUEUE_URL")
+    )
+    poison_qurl = (
+        getattr(args, "poison_queue_url", None)
+        or os.getenv("AZURE_STORAGE_POISON_QUEUE_URL")
+        or os.getenv("POISON_QUEUE_URL")
+    )
 
-    queue_client = None
-    poison_client = None
+    account_name = getattr(args, "account_name", None) or os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+    endpoint = getattr(args, "queue_endpoint", None) or os.getenv("AZURE_STORAGE_QUEUE_ENDPOINT")
+    client_id = getattr(args, "client_id", None) or os.getenv("AZURE_CLIENT_ID")
 
+    # Guard: Check for accidental usage of backend's Add-only SAS
+    backend_sas_url = os.getenv("AZURE_STORAGE_QUEUE_SAS_URL")
+    for candidate in [qurl, poison_qurl, backend_sas_url]:
+        if candidate and is_add_only_sas(candidate):
+            logger.error(
+                "FATAL: Add-only SAS credential ('sp=a') detected. "
+                "The backend's Add-only SAS cannot be used for worker queue consumption. "
+                "The worker requires dequeue/update permissions (sp=rup) or Azure Managed Identity."
+            )
+            return None, None
+
+    # Priority 1: Connection string (Local Azurite / dev)
     if conn_str:
         try:
-            queue_client = QueueClient.from_connection_string(conn_str, queue_name=queue_name)
+            logger.info("Initializing Azure QueueClients using connection string (local/test mode)")
+            work_client = QueueClient.from_connection_string(conn_str, queue_name=work_queue_name)
             poison_client = QueueClient.from_connection_string(conn_str, queue_name=poison_queue_name)
+            return work_client, poison_client
         except Exception as exc:
-            logger.error("Failed to initialize Azure QueueClient from connection string: %s", exc)
-            return 1
-    elif args.queue_url or os.getenv("QUEUE_URL"):
-        qurl = args.queue_url or os.getenv("QUEUE_URL")
+            logger.error("Failed to initialize QueueClient from connection string: %s", exc)
+            return None, None
+
+    # Priority 2: Managed Identity (Passwordless production mode on Azure Container Apps Job)
+    if account_name or endpoint:
+        if DefaultAzureCredential is None:
+            logger.error("azure-identity package is required for Managed Identity authentication.")
+            return None, None
+
+        account_url = endpoint.rstrip("/") if endpoint else f"https://{account_name}.queue.core.windows.net"
         try:
-            queue_client = QueueClient.from_queue_url(qurl)
+            if client_id:
+                logger.info("Initializing DefaultAzureCredential with managed_identity_client_id=%s", client_id)
+                credential = DefaultAzureCredential(managed_identity_client_id=client_id)
+            else:
+                logger.info("Initializing DefaultAzureCredential (system identity / environment)")
+                credential = DefaultAzureCredential()
+
+            work_client = QueueClient(account_url=account_url, queue_name=work_queue_name, credential=credential)
+            poison_client = QueueClient(account_url=account_url, queue_name=poison_queue_name, credential=credential)
+            logger.info(
+                "Successfully constructed Managed Identity queue clients for %s and %s on %s",
+                work_queue_name,
+                poison_queue_name,
+                account_url,
+            )
+            return work_client, poison_client
         except Exception as exc:
-            logger.error("Failed to initialize Azure QueueClient from URL: %s", exc)
-            return 1
-    else:
-        logger.error(
-            "Missing Azure Storage credentials. Supply AZURE_STORAGE_CONNECTION_STRING, QUEUE_CONNECTION_STRING, or --connection-string."
-        )
+            logger.error("Failed to initialize Managed Identity QueueClient: %s", exc)
+            return None, None
+
+    # Priority 3: Scoped Queue URLs (Worker SAS / fallback)
+    if qurl:
+        try:
+            if "?" in qurl:
+                work_client = QueueClient.from_queue_url(qurl)
+            else:
+                if DefaultAzureCredential is None:
+                    logger.error("azure-identity required to access queue URL without SAS")
+                    return None, None
+                credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
+                work_client = QueueClient.from_queue_url(qurl, credential=credential)
+
+            poison_client = None
+            if poison_qurl:
+                if "?" in poison_qurl:
+                    poison_client = QueueClient.from_queue_url(poison_qurl)
+                else:
+                    poison_client = QueueClient.from_queue_url(poison_qurl, credential=credential)
+
+            return work_client, poison_client
+        except Exception as exc:
+            logger.error("Failed to initialize QueueClient from URL: %s", exc)
+            return None, None
+
+    logger.error(
+        "Missing Azure Storage credentials. Supply AZURE_STORAGE_ACCOUNT_NAME with AZURE_CLIENT_ID (Managed Identity), "
+        "or QUEUE_URL / POISON_QUEUE_URL, or AZURE_STORAGE_CONNECTION_STRING."
+    )
+    return None, None
+
+
+async def run_queue_cli(args: argparse.Namespace) -> int:
+    """Entrypoint for CLI --queue execution with Azure Queue credentials."""
+    queue_client, poison_client = build_queue_clients(args)
+    if queue_client is None:
         return 1
 
     return await run_queue_worker(
@@ -1415,10 +1532,14 @@ def run_server(port: int = 8080):
 def parse_args():
     parser = argparse.ArgumentParser(description="PRAROHA Isolated Cinematic Rendering Worker")
     parser.add_argument("--queue", action="store_true", help="Run as queue consumer batch worker")
-    parser.add_argument("--queue-name", type=str, default=os.getenv("QUEUE_NAME", "cinematic-render-jobs"), help="Azure Storage Queue name")
-    parser.add_argument("--poison-queue-name", type=str, default=os.getenv("POISON_QUEUE_NAME", "cinematic-render-poison"), help="Azure Poison Queue name")
+    parser.add_argument("--queue-name", type=str, default=os.getenv("AZURE_STORAGE_QUEUE_NAME") or os.getenv("QUEUE_NAME", "cinematic-render-jobs"), help="Azure Storage Queue name")
+    parser.add_argument("--poison-queue-name", type=str, default=os.getenv("AZURE_STORAGE_POISON_QUEUE_NAME") or os.getenv("POISON_QUEUE_NAME", "cinematic-render-poison"), help="Azure Poison Queue name")
+    parser.add_argument("--account-name", type=str, default=os.getenv("AZURE_STORAGE_ACCOUNT_NAME"), help="Azure Storage Account name for Managed Identity authentication")
+    parser.add_argument("--queue-endpoint", type=str, default=os.getenv("AZURE_STORAGE_QUEUE_ENDPOINT"), help="Azure Storage Queue endpoint (e.g. https://<account>.queue.core.windows.net)")
+    parser.add_argument("--client-id", type=str, default=os.getenv("AZURE_CLIENT_ID"), help="User-Assigned Managed Identity Client ID")
     parser.add_argument("--connection-string", type=str, default=None, help="Azure Storage Connection String")
-    parser.add_argument("--queue-url", type=str, default=None, help="Azure Queue URL")
+    parser.add_argument("--queue-url", type=str, default=os.getenv("AZURE_STORAGE_QUEUE_URL") or os.getenv("QUEUE_URL"), help="Azure Queue URL")
+    parser.add_argument("--poison-queue-url", type=str, default=os.getenv("AZURE_STORAGE_POISON_QUEUE_URL") or os.getenv("POISON_QUEUE_URL"), help="Azure Poison Queue URL")
     parser.add_argument("--max-messages", type=int, default=32, help="Max messages per batch")
     parser.add_argument("--visibility-timeout", type=int, default=300, help="Queue visibility timeout in seconds")
     parser.add_argument("--heartbeat-interval", type=float, default=15.0, help="Lease heartbeat interval in seconds")

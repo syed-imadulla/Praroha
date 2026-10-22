@@ -35,15 +35,15 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
   - Phase 51: Production Dispatch, UI Enablement & Release Gate (Historical / Superseded by Phase 52)
   - Phase 52: Queue-Based Cinematic Rendering Architecture:
     - Wave 1 (TASK-52-01 to TASK-52-04): Storage `stpraroharender`, queues, `env-praroha-render` Standard ACA environment, and Add-only SAS secret on backend. (Completed & Verified)
-    - Wave 2 (TASK-52-08, TASK-52-05): Queue consumer loop (`--queue`), 14 unit tests, and verified release image `tendersaathiacr.azurecr.io/praroha-worker:v5` (digest `sha256:747160cf60fc2c7c72f77e659a714321771fba5d5eb135712122fb8bd0ce6e04`). (Completed & Verified)
+    - Wave 2 (TASK-52-08, TASK-52-05): Queue consumer loop (`--queue`), passwordless Managed Identity authentication (`azure-identity`), dual-queue initialization (`cinematic-render-jobs`, `cinematic-render-poison`), Add-only SAS rejection guard, 20 unit tests, and verified release image `tendersaathiacr.azurecr.io/praroha-worker:v6` (digest `sha256:abb5713fa8d831ab3a3fdde7a1ebeca387c57dc9bfeac2f7f05803860c7d332d`). (Completed & Verified)
     - Next: Container Apps Job definition (`TASK-52-06`) & Backend Outbox Dispatch (`Wave 3`).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
   - Frontend: `https://praroha-ai.vercel.app` (Alias: `https://frontend-iota-green-73.vercel.app`)
   - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io`
-- **Backend Test Battery**: 274 passed, 1 skipped in 32.4s (`pytest backend/tests`). Includes 14 new specialized queue worker tests (schema validation, CAS claiming, poison queue routing, heartbeat leasing, clean drain exit, and zero secret leakage).
-- **Frontend Production Bundle**: Compiled in 13.5s with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries.
+- **Backend Test Battery**: 280 passed, 1 skipped in 33.6s (`pytest backend/tests`). Includes 20 specialized queue worker tests (schema validation, CAS claiming, poison queue routing, heartbeat leasing, clean drain exit, Managed Identity setup, Add-only SAS rejection, and zero secret leakage).
+- **Frontend Production Bundle**: Compiled in 13.9s with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries.
 - **PWA Installation Audit**: 100% passed on live Vercel domain (`node frontend/e2e/test_phase37_pwa.mjs`). Verified manifest, icons (192px, 512px, maskable), active Service Worker, and offline transparency banner.
 - **Full User Journey E2E**: 100% passed on live cloud stack (`node frontend/e2e/test_phase31_10_journey.mjs`). Verified end-to-end flow with live Gemini AI extraction, divergent 3-world synthesis, EdgeTTS voice generation, concept art and narration, DAG rendering, portable project JSON export, and state reload.
 - **Release Free Media & Isolation E2E**: 100% passed on live Azure backend (`node frontend/e2e/test_release_media_and_isolation.mjs`). Verified all 10 checks: CC0 soundscape library, pure WAV synthesis, storage persistence, honest labeling, JSON2Video composed preview, clean failure when generative AI credits are exhausted, and cross-project data isolation.

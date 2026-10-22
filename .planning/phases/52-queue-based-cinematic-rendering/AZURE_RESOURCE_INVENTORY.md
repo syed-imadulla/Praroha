@@ -16,7 +16,7 @@ All existing resources reside in Resource Group `rg-tendersaathi` in region **Ce
 | **`cinematic-render-poison`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Dead-letter poison queue (>3 retries). *(Provisioned 2026-10-22)* |
 | **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `ConsumptionOnly` mode (Central India) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. *(Provisioned 2026-10-22)* |
 | **`queue-publish-url`** | `Microsoft.App/containerApps/secrets` | Stored in `praroha-backend` | Scoped SAS: `sp=a` (Add only) on `cinematic-render-jobs`, HTTPS-only, expires 2026-11-21T18:24Z (30 days). Not yet bound to env var. *(Stored 2026-10-22)* |
-| **`praroha-worker:v5`** | `Microsoft.ContainerRegistry/registries/repositories/tags` | Image in `tendersaathiacr.azurecr.io/praroha-worker:v5` | Queue-capable release image (digest `sha256:747160cf60fc2c7c72f77e659a714321771fba5d5eb135712122fb8bd0ce6e04`). Includes `--queue` consumer mode, schema validation, atomic CAS claiming, and FFmpeg composition. *(Built, tested & pushed 2026-10-22)* |
+| **`praroha-worker:v6`** | `Microsoft.ContainerRegistry/registries/repositories/tags` | Image in `tendersaathiacr.azurecr.io/praroha-worker:v6` | Queue-capable release image with passwordless Managed Identity auth (`azure-identity`, digest `sha256:abb5713fa8d831ab3a3fdde7a1ebeca387c57dc9bfeac2f7f05803860c7d332d`). Includes dual-client initialization (`cinematic-render-jobs`, `cinematic-render-poison`), Add-only SAS rejection guard, atomic CAS claim, 300s lease, and native FFmpeg composition. *(Built, tested & pushed 2026-10-22)* |
 
 ---
 
@@ -211,7 +211,7 @@ az containerapp job create \
                         "queueName=cinematic-render-jobs" \
   --scale-rule-auth "identity=$UAMI_ID" \
   --mi-user-assigned "$UAMI_ID" \
-  --image tendersaathiacr.azurecr.io/praroha-worker:v5 \
+  --image tendersaathiacr.azurecr.io/praroha-worker:v6 \
   --registry-server tendersaathiacr.azurecr.io \
   --registry-identity "$UAMI_ID" \
   --cpu 1.0 \

@@ -10,3 +10,4 @@ psutil>=5.9.0
 edge-tts>=7.0.0
 pyjwt[crypto]>=2.8.0
 azure-storage-queue>=12.14.0,<13.0.0
+azure-identity>=1.15.0,<2.0.0

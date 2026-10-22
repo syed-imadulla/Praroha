@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792695271.0272436,
-    "seen": 1792695357.0912588,
-    "ast_hash": "0c1673f96e6b9b1146da3f3459c9cf53",
+    "mtime": 1792696915.3011014,
+    "seen": 1792696936.8242333,
+    "ast_hash": "73d6fce0193f89d2fb953d12bb44d5ff",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -276,9 +276,9 @@
     "semantic_hash": ""
   },
   "backend/requirements.txt": {
-    "mtime": 1792694098.8115683,
-    "seen": 1792695357.0918224,
-    "ast_hash": "66d755599d59e7c0d83252098fe48f01",
+    "mtime": 1792696161.693544,
+    "seen": 1792696936.8245633,
+    "ast_hash": "06f7a2fb03133fab9335a6fa38c20882",
     "semantic_hash": ""
   },
   "docs/architecture/DEMO_FIXTURES.md": {
@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "backend/app/workers/cinematic_worker.py": {
-    "mtime": 1792694474.626242,
-    "seen": 1792695357.090821,
-    "ast_hash": "3c818ecdbfe4b2e21e1df01f70dac109",
+    "mtime": 1792696300.404349,
+    "seen": 1792696936.8239763,
+    "ast_hash": "2bf31144ddeb04f8cf562cadcffd3cdc",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_worker.py": {
@@ -3216,9 +3216,9 @@
     "semantic_hash": ""
   },
   "backend/requirements-worker.txt": {
-    "mtime": 1792694092.064628,
-    "seen": 1792695357.0918212,
-    "ast_hash": "64714ae8458311b4ad5bd1e60984a467",
+    "mtime": 1792696154.5306058,
+    "seen": 1792696936.824562,
+    "ast_hash": "1c69fb7dae94a3a681b939e0364c8e28",
     "semantic_hash": ""
   },
   "docs/decisions/ADR-004-cinematic-rendering-worker-architecture.md": {
@@ -3294,9 +3294,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/AZURE_RESOURCE_INVENTORY.md": {
-    "mtime": 1792695185.0119994,
-    "seen": 1792695357.0918107,
-    "ast_hash": "9dc8c8ec2fc01bc11f601f696fe8f77b",
+    "mtime": 1792696863.72854,
+    "seen": 1792696936.8245523,
+    "ast_hash": "101ec456585815ac73cd6b4586644c7a",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/COST_MODEL_AND_BUDGET.md": {
@@ -3330,9 +3330,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_queue_worker.py": {
-    "mtime": 1792694592.0222104,
-    "seen": 1792695357.0908482,
-    "ast_hash": "f3af68f968f806887c02be0cb05940b3",
+    "mtime": 1792696343.6949763,
+    "seen": 1792696936.823992,
+    "ast_hash": "94ba5a018a468169ffc653b10db29630",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-01-SUMMARY.md": {
@@ -3354,9 +3354,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-05-SUMMARY.md": {
-    "mtime": 1792695237.0905418,
-    "seen": 1792695357.0918057,
-    "ast_hash": "5fb6126ce4730dbe733e0c45416e2694",
+    "mtime": 1792696897.8662496,
+    "seen": 1792696936.8245475,
+    "ast_hash": "6aec1541da366d4b691828d4877dfd6a",
     "semantic_hash": ""
   }
 }

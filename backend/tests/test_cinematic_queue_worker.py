@@ -598,3 +598,148 @@ def test_zero_secret_leakage_in_credential_rejection():
         assert super_secret_value not in err_msg
         assert "Forbidden credential field detected: 'token'" in err_msg
 
+
+def test_is_add_only_sas_detection():
+    """Verify accurate detection of Add-only SAS vs read/process SAS."""
+    from backend.app.workers.cinematic_worker import is_add_only_sas
+
+    # Backend Add-only SAS
+    assert is_add_only_sas("https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?sp=a&sv=2024-05-04") is True
+    assert is_add_only_sas("https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?sp=a") is True
+
+    # Worker Read/Update/Process SAS
+    assert is_add_only_sas("https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?sp=rup&sv=2024-05-04") is False
+    assert is_add_only_sas("https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?sp=r&sv=2024-05-04") is False
+
+    # Plain URL or None
+    assert is_add_only_sas("https://stpraroharender.queue.core.windows.net/cinematic-render-jobs") is False
+    assert is_add_only_sas(None) is False
+
+
+def test_build_queue_clients_managed_identity():
+    """Verify build_queue_clients constructs both work and poison queue clients via Managed Identity."""
+    import argparse
+    from backend.app.workers.cinematic_worker import build_queue_clients
+
+    args = argparse.Namespace(
+        account_name="stpraroharender",
+        client_id="12345678-abcd-1234-abcd-1234567890ab",
+        queue_name="cinematic-render-jobs",
+        poison_queue_name="cinematic-render-poison",
+        connection_string=None,
+        queue_url=None,
+        poison_queue_url=None,
+        queue_endpoint=None,
+    )
+
+    with patch("backend.app.workers.cinematic_worker.DefaultAzureCredential") as mock_cred_cls:
+        mock_cred = MagicMock()
+        mock_cred_cls.return_value = mock_cred
+
+        work_client, poison_client = build_queue_clients(args)
+
+        mock_cred_cls.assert_called_once_with(managed_identity_client_id="12345678-abcd-1234-abcd-1234567890ab")
+        assert work_client is not None
+        assert poison_client is not None
+        assert "cinematic-render-jobs" in work_client.url
+        assert "cinematic-render-poison" in poison_client.url
+
+
+def test_build_queue_clients_rejects_add_only_sas():
+    """Verify build_queue_clients immediately rejects Add-only SAS URLs."""
+    import argparse
+    from backend.app.workers.cinematic_worker import build_queue_clients
+
+    args = argparse.Namespace(
+        queue_url="https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?sp=a&sv=2024-05-04",
+        connection_string=None,
+        account_name=None,
+        queue_endpoint=None,
+        client_id=None,
+        poison_queue_url=None,
+        queue_name="cinematic-render-jobs",
+        poison_queue_name="cinematic-render-poison",
+    )
+
+    work_client, poison_client = build_queue_clients(args)
+    assert work_client is None
+    assert poison_client is None
+
+
+def test_build_queue_clients_connection_string():
+    """Verify build_queue_clients uses connection string when provided."""
+    import argparse
+    from backend.app.workers.cinematic_worker import build_queue_clients
+
+    args = argparse.Namespace(
+        connection_string="DefaultEndpointsProtocol=https;AccountName=testacc;AccountKey=dGVzdGtleQ==;EndpointSuffix=core.windows.net",
+        account_name=None,
+        queue_endpoint=None,
+        client_id=None,
+        queue_url=None,
+        poison_queue_url=None,
+        queue_name="cinematic-render-jobs",
+        poison_queue_name="cinematic-render-poison",
+    )
+
+    work_client, poison_client = build_queue_clients(args)
+    assert work_client is not None
+    assert poison_client is not None
+    assert "cinematic-render-jobs" in work_client.url
+    assert "cinematic-render-poison" in poison_client.url
+
+
+def test_build_queue_clients_missing_credentials_returns_none():
+    """Verify build_queue_clients returns (None, None) when no credentials are configured."""
+    import argparse
+    from backend.app.workers.cinematic_worker import build_queue_clients
+
+    args = argparse.Namespace(
+        connection_string=None,
+        account_name=None,
+        queue_endpoint=None,
+        client_id=None,
+        queue_url=None,
+        poison_queue_url=None,
+        queue_name="cinematic-render-jobs",
+        poison_queue_name="cinematic-render-poison",
+    )
+
+    with patch.dict(os.environ, {}, clear=True):
+        work_client, poison_client = build_queue_clients(args)
+        assert work_client is None
+        assert poison_client is None
+
+
+@pytest.mark.asyncio
+async def test_run_queue_cli_managed_identity_drain_exit():
+    """Verify run_queue_cli sets up clients and exits cleanly when queue is drained."""
+    import argparse
+    from backend.app.workers.cinematic_worker import run_queue_cli
+
+    args = argparse.Namespace(
+        queue=True,
+        account_name="stpraroharender",
+        client_id="test-client-id",
+        queue_name="cinematic-render-jobs",
+        poison_queue_name="cinematic-render-poison",
+        connection_string=None,
+        queue_url=None,
+        poison_queue_url=None,
+        queue_endpoint=None,
+        database_url=None,
+        timeout=120.0,
+        max_messages=32,
+        visibility_timeout=300,
+        heartbeat_interval=15.0,
+        once=True,
+        output_dir=None,
+    )
+
+    mock_work_queue = MockQueueClient([])
+    mock_poison_queue = MockQueueClient([])
+
+    with patch("backend.app.workers.cinematic_worker.build_queue_clients", return_value=(mock_work_queue, mock_poison_queue)):
+        exit_code = await run_queue_cli(args)
+        assert exit_code == 0
+
