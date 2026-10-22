@@ -12,6 +12,9 @@ from backend.app.models.job import GenerationJob, GenerationJobRead
 from backend.app.providers.factory import get_ai_provider
 from backend.app.repositories.project_repo import ProjectRepository, get_session, async_session
 from backend.app.services.job_service import update_job_status
+from backend.app.services.context_service import ContextConstructionService
+from backend.app.services.consistency_validator import ConsistencyValidator
+
 
 logger = logging.getLogger("seed_unfold.router.unfold")
 
@@ -88,6 +91,18 @@ async def generate_unfold_task(job_id: str, project_id: str, context: dict, acti
     try:
         async with async_session() as session:
             repo = ProjectRepository(session)
+            context_service = ContextConstructionService(repo)
+            try:
+                canon_context = await context_service.build_generation_context(
+                    project_id=project_id,
+                    operation_type="universe",
+                    budget_tokens=1500,
+                )
+                if canon_context.get("context_text"):
+                    context["creative_memory_context"] = canon_context["context_text"]
+            except Exception as ctx_err:
+                logger.warning("Could not construct creative memory context: %s", ctx_err)
+
             provider = get_ai_provider()
             unfolded_data = await provider.unfold_universe(context)
             
@@ -100,6 +115,29 @@ async def generate_unfold_task(job_id: str, project_id: str, context: dict, acti
                     hoz = sel_rec.get_human_only_zones()
                     if hoz and hoz.is_locked:
                         unfolded_data = enforce_human_only_zones_guard(unfolded_data, hoz)
+
+            # Validate generated universe bundle against explicit hard constraints prior to persistence
+            validator = ConsistencyValidator(repo)
+            val_result = await validator.validate_universe_candidate(project_id, unfolded_data)
+            if not val_result.is_valid:
+                error_msg = f"Universe consistency validation failed: {val_result.reason}"
+                logger.error(
+                    "Universe candidate rejected by consistency validator for project '%s': %s",
+                    project_id,
+                    error_msg,
+                )
+                await update_job_status(
+                    job_id,
+                    "failed",
+                    error_code="CONSISTENCY_VIOLATION",
+                    error_message=error_msg,
+                )
+                p = await repo.get_project(project_id)
+                if p:
+                    p.status = "world_selected"
+                    session.add(p)
+                    await session.commit()
+                return
 
             unfolded_universe = await repo.save_unfolded_universe(
                 project_id=project_id,

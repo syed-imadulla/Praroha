@@ -23,6 +23,8 @@ from backend.app.routers.unfold import router as unfold_router
 from backend.app.routers.worlds import router as worlds_router
 from backend.app.routers.jobs import router as jobs_router
 from backend.app.routers.auth import router as auth_router
+from backend.app.routers.memory import router as memory_router
+
 
 
 @asynccontextmanager
@@ -134,6 +136,8 @@ app.include_router(counterfactual_router, prefix=settings.API_V1_PREFIX)
 app.include_router(media_router, prefix=settings.API_V1_PREFIX)
 app.include_router(jobs_router, prefix=settings.API_V1_PREFIX)
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
+app.include_router(memory_router, prefix=settings.API_V1_PREFIX)
+
 
 # Ensure upload directory exists and is mounted for static asset retrieval
 uploads_path = Path(settings.UPLOAD_DIR)

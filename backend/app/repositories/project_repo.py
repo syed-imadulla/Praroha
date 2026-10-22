@@ -26,6 +26,10 @@ from backend.app.models.potential import (
     SeedPotentialItemRecord,
     PotentialItemStatus,
 )
+from backend.app.models.memory import (
+    CreativeMemoryRecord,
+    CreativeMemoryRead,
+)
 from backend.app.providers.mock_provider import (
     CANONICAL_SEED_DNA,
     CANONICAL_WORLDS,
@@ -271,6 +275,54 @@ def _migrate_columns(connection):
             """))
         except Exception:
             pass
+
+    if "creative_memory" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("creative_memory")]
+        for col, col_type in [
+            ("world_candidate_id", "VARCHAR"),
+            ("canon_rules_json", "TEXT DEFAULT '[]'"),
+            ("character_profiles_json", "TEXT DEFAULT '[]'"),
+            ("relationship_matrix_json", "TEXT DEFAULT '[]'"),
+            ("timeline_anchors_json", "TEXT DEFAULT '[]'"),
+            ("creator_locks_json", "TEXT DEFAULT '{}'"),
+            ("negative_constraints_json", "TEXT DEFAULT '[]'"),
+            ("provenance_json", "TEXT DEFAULT '{}'"),
+            ("version", "INTEGER DEFAULT 1"),
+            ("updated_at", "TIMESTAMP"),
+        ]:
+            if col not in cols:
+                try:
+                    connection.execute(text(f"ALTER TABLE creative_memory ADD COLUMN {col} {col_type}"))
+                except Exception:
+                    pass
+        try:
+            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_creative_memory_project_id ON creative_memory (project_id)"))
+        except Exception:
+            pass
+    else:
+        try:
+            connection.execute(text("""
+                CREATE TABLE IF NOT EXISTS creative_memory (
+                    id VARCHAR PRIMARY KEY,
+                    project_id VARCHAR NOT NULL UNIQUE,
+                    world_candidate_id VARCHAR,
+                    canon_rules_json TEXT DEFAULT '[]',
+                    character_profiles_json TEXT DEFAULT '[]',
+                    relationship_matrix_json TEXT DEFAULT '[]',
+                    timeline_anchors_json TEXT DEFAULT '[]',
+                    creator_locks_json TEXT DEFAULT '{}',
+                    negative_constraints_json TEXT DEFAULT '[]',
+                    provenance_json TEXT DEFAULT '{}',
+                    version INTEGER DEFAULT 1,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+                )
+            """))
+            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_creative_memory_project_id ON creative_memory (project_id)"))
+        except Exception:
+            pass
+
 
 
 
@@ -649,6 +701,11 @@ class ProjectRepository:
         if project:
             await self.session.refresh(project)
 
+        try:
+            await self.sync_creative_memory_from_universe(project_id)
+        except Exception as mem_err:
+            logger.warning("Failed to auto-sync creative memory on world selection: %s", mem_err)
+
         return selection
 
     async def get_active_world_selection(
@@ -898,6 +955,11 @@ class ProjectRepository:
             # Commit the atomic transaction
             await self.session.commit()
 
+            try:
+                await self.sync_creative_memory_from_universe(project_id)
+            except Exception as mem_err:
+                logger.warning("Failed to auto-sync creative memory on unfold: %s", mem_err)
+
             unfolded = await self.get_unfolded_universe(project_id)
             if not unfolded:
                 raise RuntimeError("Failed to retrieve unfolded universe after commit")
@@ -1122,6 +1184,12 @@ class ProjectRepository:
         self.session.add(record)
         await self.session.commit()
         await self.session.refresh(record)
+
+        try:
+            await self.sync_creative_memory_from_universe(project_id)
+        except Exception as mem_err:
+            logger.warning("Failed to auto-sync creative memory on character refinement: %s", mem_err)
+
         return record
 
     async def refine_scene(
@@ -1170,6 +1238,12 @@ class ProjectRepository:
         self.session.add(record)
         await self.session.commit()
         await self.session.refresh(record)
+
+        try:
+            await self.sync_creative_memory_from_universe(project_id)
+        except Exception as mem_err:
+            logger.warning("Failed to auto-sync creative memory on scene refinement: %s", mem_err)
+
         return record
 
     async def get_character(self, character_id: str) -> Optional[CharacterRecord]:
@@ -1183,6 +1257,252 @@ class ProjectRepository:
         stmt = select(SceneRecord).where(SceneRecord.id == scene_id)
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def get_creative_memory(self, project_id: str) -> Optional[CreativeMemoryRecord]:
+        """Fetch creative memory record by project_id."""
+        stmt = select(CreativeMemoryRecord).where(CreativeMemoryRecord.project_id == project_id)
+        res = await self.session.execute(stmt)
+        return res.scalars().first()
+
+    async def get_or_create_creative_memory(self, project_id: str) -> Optional[CreativeMemoryRecord]:
+        """Fetch existing creative memory record or lazily compile from universe data for backward compatibility."""
+        mem = await self.get_creative_memory(project_id)
+        if mem:
+            return mem
+        project = await self.get_project(project_id)
+        if not project:
+            return None
+        return await self.sync_creative_memory_from_universe(project_id)
+
+    async def sync_creative_memory_from_universe(self, project_id: str) -> Optional[CreativeMemoryRecord]:
+        """Compile and synchronize canonical creative memory snapshot from World Bible, selections, characters, relationships, and scenes."""
+        project = await self.get_project(project_id)
+        if not project:
+            return None
+
+        bible = await self.get_latest_world_bible(project_id)
+        selection_stmt = (
+            select(WorldSelectionRecord)
+            .where(WorldSelectionRecord.project_id == project_id)
+            .order_by(WorldSelectionRecord.created_at.desc())
+            .limit(1)
+        )
+        selection = (await self.session.execute(selection_stmt)).scalars().first()
+        dna = await self.get_latest_seed_dna(project_id)
+
+        char_stmt = (
+            select(CharacterRecord)
+            .where(CharacterRecord.project_id == project_id)
+            .order_by(CharacterRecord.created_at.asc())
+        )
+        characters = (await self.session.execute(char_stmt)).scalars().all()
+
+        rel_stmt = (
+            select(CharacterRelationshipRecord)
+            .where(CharacterRelationshipRecord.project_id == project_id)
+            .order_by(CharacterRelationshipRecord.created_at.asc())
+        )
+        relationships = (await self.session.execute(rel_stmt)).scalars().all()
+
+        # 1. Creator locks & Human-Only Zones
+        hoz = selection.get_human_only_zones() if selection else None
+        creator_locks = {
+            "core_theme": hoz.core_theme if hoz else None,
+            "protagonist_motivation": hoz.protagonist_motivation if hoz else None,
+            "central_conflict": hoz.central_conflict if hoz else None,
+            "is_locked": hoz.is_locked if hoz else False,
+            "user_rationale": selection.user_rationale if selection else None,
+            "custom_directives": selection.custom_directives if selection else None,
+            "creative_priorities": json.loads(selection.creative_priorities_json or "[]") if selection else [],
+        }
+
+        # 2. Negative constraints (guardrails & rejected directions)
+        rejected = json.loads(selection.rejected_directions_json or "[]") if selection else []
+        constraints = json.loads(dna.constraints_json or "[]") if (dna and dna.constraints_json) else []
+        negative_constraints = list(dict.fromkeys([str(r).strip() for r in (rejected + constraints) if str(r).strip()]))
+
+        # 3. Canon Rules
+        canon_rules: List[Dict[str, Any]] = []
+        if bible:
+            if bible.physics_rules and bible.physics_rules.strip():
+                canon_rules.append({
+                    "rule": bible.physics_rules.strip(),
+                    "category": "physics",
+                    "origin_type": "WORLD_BIBLE",
+                    "source_id": bible.id,
+                    "is_hard_rule": True,
+                })
+            if bible.geography and bible.geography.strip():
+                canon_rules.append({
+                    "rule": bible.geography.strip(),
+                    "category": "ecology",
+                    "origin_type": "WORLD_BIBLE",
+                    "source_id": bible.id,
+                    "is_hard_rule": True,
+                })
+            try:
+                parsed_facts = json.loads(bible.canon_facts_json or "[]")
+                for f in parsed_facts:
+                    fact_str = (
+                        (f.get("fact") or f.get("rule") or f.get("text") or str(f))
+                        if isinstance(f, dict)
+                        else str(f)
+                    ).strip()
+                    if fact_str:
+                        canon_rules.append({
+                            "rule": fact_str,
+                            "category": "canon_fact",
+                            "origin_type": f.get("origin_type", "WORLD_BIBLE") if isinstance(f, dict) else "WORLD_BIBLE",
+                            "source_id": bible.id,
+                            "is_hard_rule": True,
+                        })
+            except Exception:
+                pass
+
+        for neg in negative_constraints:
+            canon_rules.append({
+                "rule": f"NEGATIVE CONSTRAINT: {neg}",
+                "category": "negative_guardrail",
+                "origin_type": "HUMAN_DECISION",
+                "source_id": selection.id if selection else None,
+                "is_hard_rule": True,
+            })
+
+        # 4. Character Profiles
+        char_profiles: List[Dict[str, Any]] = []
+        for c in characters:
+            is_locked = False
+            if c.origin_type == "HUMAN_DECISION":
+                is_locked = True
+            elif hoz and hoz.is_locked and hoz.protagonist_motivation:
+                if hoz.protagonist_motivation.strip().lower() in (c.motivation or "").lower():
+                    is_locked = True
+
+            flaws: List[str] = []
+            if c.core_conflict and c.core_conflict.strip():
+                flaws.append(c.core_conflict.strip())
+
+            char_profiles.append({
+                "character_id": c.id,
+                "name": c.name,
+                "role": c.role,
+                "archetype": c.archetype,
+                "motivation": c.motivation,
+                "core_conflict": c.core_conflict,
+                "visual_prompt": c.visual_prompt or "",
+                "flaws": flaws,
+                "origin_type": c.origin_type,
+                "is_locked": is_locked,
+            })
+
+        # 5. Relationship Matrix
+        id_to_name = {c.id: c.name for c in characters}
+        rel_matrix: List[Dict[str, Any]] = []
+        for r in relationships:
+            desc_lower = (r.dynamic_description or "").lower()
+            type_lower = (r.relation_type or "").lower()
+            tension = "medium"
+            if any(w in desc_lower or w in type_lower for w in ["rival", "hostil", "clash", "friction", "enemy", "betray"]):
+                tension = "high"
+            elif any(w in desc_lower or w in type_lower for w in ["symbio", "ally", "friend", "protect"]):
+                tension = "low"
+
+            rel_matrix.append({
+                "source_character_id": r.source_character_id,
+                "target_character_id": r.target_character_id,
+                "source_character_name": id_to_name.get(r.source_character_id, "Character A"),
+                "target_character_name": id_to_name.get(r.target_character_id, "Character B"),
+                "relation_type": r.relation_type,
+                "dynamic_description": r.dynamic_description,
+                "tension_level": tension,
+            })
+
+        # 6. Timeline Anchors
+        timeline_anchors: List[Dict[str, Any]] = []
+        if bible:
+            try:
+                events = json.loads(bible.history_timeline_json or "[]")
+                for idx, ev in enumerate(events):
+                    era = ev.get("era") if isinstance(ev, dict) else "Era"
+                    event_text = ev.get("event") if isinstance(ev, dict) else str(ev)
+                    timeline_anchors.append({
+                        "era": str(era),
+                        "event": str(event_text),
+                        "chronology_order": idx + 1,
+                    })
+            except Exception:
+                pass
+
+        # 7. Provenance Tracking
+        provenance = {
+            "world_bible_id": bible.id if bible else None,
+            "selection_id": selection.id if selection else None,
+            "seed_dna_id": dna.id if dna else None,
+            "last_synced_at": get_utc_now().isoformat(),
+        }
+
+        # 8. Upsert Record
+        cand_id = project.selected_world_id or (bible.world_candidate_id if bible else None)
+        existing = await self.get_creative_memory(project_id)
+        if existing:
+            existing.world_candidate_id = cand_id
+            existing.canon_rules_json = json.dumps(canon_rules)
+            existing.character_profiles_json = json.dumps(char_profiles)
+            existing.relationship_matrix_json = json.dumps(rel_matrix)
+            existing.timeline_anchors_json = json.dumps(timeline_anchors)
+            existing.creator_locks_json = json.dumps(creator_locks)
+            existing.negative_constraints_json = json.dumps(negative_constraints)
+            existing.provenance_json = json.dumps(provenance)
+            existing.version += 1
+            existing.updated_at = get_utc_now()
+            self.session.add(existing)
+            await self.session.commit()
+            await self.session.refresh(existing)
+            return existing
+        else:
+            new_mem = CreativeMemoryRecord(
+                project_id=project_id,
+                world_candidate_id=cand_id,
+                canon_rules_json=json.dumps(canon_rules),
+                character_profiles_json=json.dumps(char_profiles),
+                relationship_matrix_json=json.dumps(rel_matrix),
+                timeline_anchors_json=json.dumps(timeline_anchors),
+                creator_locks_json=json.dumps(creator_locks),
+                negative_constraints_json=json.dumps(negative_constraints),
+                provenance_json=json.dumps(provenance),
+                version=1,
+            )
+            self.session.add(new_mem)
+            await self.session.commit()
+            await self.session.refresh(new_mem)
+            return new_mem
+
+    async def update_world_bible(
+        self, project_id: str, updates: Dict[str, Any]
+    ) -> Optional[WorldBibleRecord]:
+        """Update World Bible fields and automatically synchronize canonical creative memory."""
+        bible = await self.get_latest_world_bible(project_id)
+        if not bible:
+            return None
+        if "physics_rules" in updates:
+            bible.physics_rules = str(updates["physics_rules"])
+        if "geography" in updates:
+            bible.geography = str(updates["geography"])
+        if "canon_facts" in updates:
+            canon_val = updates["canon_facts"]
+            bible.canon_facts_json = json.dumps(canon_val) if isinstance(canon_val, (list, dict)) else str(canon_val)
+        if "history_timeline" in updates:
+            t_val = updates["history_timeline"]
+            bible.history_timeline_json = json.dumps(t_val) if isinstance(t_val, (list, dict)) else str(t_val)
+        if "visual_style_prompt" in updates:
+            bible.visual_style_prompt = str(updates["visual_style_prompt"])
+        self.session.add(bible)
+        await self.session.commit()
+        await self.session.refresh(bible)
+        # Synchronize creative memory
+        await self.sync_creative_memory_from_universe(project_id)
+        return bible
+
 
 
     async def create_snapshot_asset(

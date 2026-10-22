@@ -32,6 +32,7 @@ import {
   CounterfactualDeltaResponse,
   ForkCounterfactualRequest,
   GenerationJobRead,
+  CreativeMemoryRead,
 } from '../types';
 
 import { supabase } from '../realtime/supabaseRealtime';
@@ -506,6 +507,10 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  }
+
+  async getCreativeMemory(projectId: string): Promise<APIResponse<CreativeMemoryRead>> {
+    return this.request<CreativeMemoryRead>(`/projects/${projectId}/memory`);
   }
 }
 

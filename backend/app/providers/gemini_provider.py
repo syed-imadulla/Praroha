@@ -576,6 +576,8 @@ class GeminiProvider(AIProvider):
         )
         if contract_text:
             user_prompt += f"\n{contract_text}\n"
+        if context.get("creative_memory_context"):
+            user_prompt += f"\n{context['creative_memory_context']}\n"
 
         payload = {
             "systemInstruction": {"parts": [{"text": system_instruction}]},

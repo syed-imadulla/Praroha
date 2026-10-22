@@ -29,6 +29,7 @@ from backend.app.models.world import WorldCandidateRecord
 from backend.app.providers.storage import StorageProvider
 from backend.app.repositories.project_repo import ProjectRepository
 from backend.app.services.lineage_service import LineageService
+from backend.app.services.consistency_validator import ConsistencyValidator
 
 
 class PersistenceService:
@@ -44,6 +45,8 @@ class PersistenceService:
         self.repo = repo
         self.storage = storage
         self.lineage_service = lineage_service
+        self.validator = ConsistencyValidator(repo)
+
 
     async def branch_project(self, source_project_id: str, request: BranchCreate) -> Project:
         """Branch timeline by cloning source project state into an isolated child project with strict ID remapping (PERS-02)."""
@@ -230,7 +233,15 @@ class PersistenceService:
     async def refine_character(
         self, project_id: str, char_id: str, req: CharacterRefineRequest
     ) -> CharacterRead:
-        """Refine character with before/after revision snapshots (PERS-01)."""
+        """Refine character with before/after revision snapshots (PERS-01) and canon consistency checks."""
+        val = await self.validator.validate_character_refinement(
+            project_id=project_id,
+            character_id=char_id,
+            updates=req.model_dump(exclude_unset=True),
+        )
+        if not val.is_valid:
+            raise ValueError(f"Lore consistency violation: {val.reason}")
+
         record = await self.repo.refine_character(project_id, char_id, req)
         if not record:
             raise KeyError(f"Character with ID '{char_id}' not found in project '{project_id}'.")
@@ -239,7 +250,15 @@ class PersistenceService:
     async def refine_scene(
         self, project_id: str, scene_id: str, req: SceneRefineRequest
     ) -> SceneRead:
-        """Refine story scene with before/after revision snapshots (PERS-01)."""
+        """Refine story scene with before/after revision snapshots (PERS-01) and canon consistency checks."""
+        val = await self.validator.validate_scene_refinement(
+            project_id=project_id,
+            scene_id=scene_id,
+            updates=req.model_dump(exclude_unset=True),
+        )
+        if not val.is_valid:
+            raise ValueError(f"Lore consistency violation: {val.reason}")
+
         record = await self.repo.refine_scene(project_id, scene_id, req)
         if not record:
             raise KeyError(f"Scene with ID '{scene_id}' not found in project '{project_id}'.")

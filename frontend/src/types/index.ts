@@ -724,5 +724,59 @@ export interface CounterfactualMetadata {
   rationale?: string;
 }
 
+export interface CreativeMemoryRead {
+  id: string;
+  project_id: string;
+  world_candidate_id?: string | null;
+  canon_rules: Array<{
+    rule: string;
+    category?: string;
+    origin_type?: string;
+    source_id?: string | null;
+    is_hard_rule?: boolean;
+  }>;
+  character_profiles: Array<{
+    character_id: string;
+    name: string;
+    role: string;
+    archetype: string;
+    motivation: string;
+    core_conflict: string;
+    visual_prompt?: string;
+    flaws?: string[];
+    origin_type?: string;
+    is_locked?: boolean;
+  }>;
+  relationship_matrix: Array<{
+    source_character_id: string;
+    target_character_id: string;
+    source_character_name: string;
+    target_character_name: string;
+    relation_type: string;
+    dynamic_description: string;
+    tension_level?: string;
+  }>;
+  timeline_anchors: Array<{
+    era: string;
+    event: string;
+    chronology_order?: number;
+  }>;
+  creator_locks: {
+    core_theme?: string | null;
+    protagonist_motivation?: string | null;
+    central_conflict?: string | null;
+    is_locked?: boolean;
+    user_rationale?: string | null;
+    custom_directives?: string | null;
+    creative_priorities?: string[];
+  };
+  negative_constraints: string[];
+  provenance: Record<string, any>;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+
 
 

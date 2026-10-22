@@ -98,6 +98,15 @@ from backend.app.models.counterfactual import (
     ForkCounterfactualRequest,
     CounterfactualMetadata,
 )
+from backend.app.models.memory import (
+    CanonRuleItem,
+    CharacterProfileItem,
+    MemoryRelationshipItem,
+    TimelineAnchorItem,
+    CreativeMemoryBase,
+    CreativeMemoryRecord,
+    CreativeMemoryRead,
+)
 from backend.app.models.job import (
     GenerationJob,
     GenerationJobBase,
@@ -189,6 +198,13 @@ __all__ = [
     "GenerationJob",
     "GenerationJobBase",
     "GenerationJobRead",
+    "CanonRuleItem",
+    "CharacterProfileItem",
+    "MemoryRelationshipItem",
+    "TimelineAnchorItem",
+    "CreativeMemoryBase",
+    "CreativeMemoryRecord",
+    "CreativeMemoryRead",
 ]
 
 
