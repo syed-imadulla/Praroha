@@ -24,6 +24,7 @@ import httpx
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
+from backend.app.config import settings
 from backend.app.models.job import GenerationJob
 from backend.app.models.media import MediaAssetRecord, MediaJobResponse
 from backend.app.repositories.project_repo import ProjectRepository, async_session
@@ -93,6 +94,13 @@ class CinematicDispatcherService:
         Validate, create durable job record, and dispatch to worker asynchronously.
         Returns immediately with HTTP 202-compatible MediaJobResponse.
         """
+        # 0. Server-side feature gate
+        if not getattr(settings, "CINEMATIC_PREVIEW_ENABLED", False):
+            raise HTTPException(
+                status_code=503,
+                detail="Cinematic preview generation is currently disabled on this server.",
+            )
+
         # 1. Validate Project and Entity ID formats
         if not re.match(r"^[a-zA-Z0-9_\-]+$", project_id):
             raise HTTPException(status_code=400, detail="Invalid project_id format.")

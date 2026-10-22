@@ -1,7 +1,8 @@
 import logging
 from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from backend.app.config import settings
 
 import json
 from pydantic import BaseModel
@@ -311,6 +312,11 @@ async def create_cinematic_preview_job(
     Validates project authorization, asset integrity, and returns HTTP 202 immediately.
     FastAPI never renders locally or blocks waiting for FFmpeg.
     """
+    if not getattr(settings, "CINEMATIC_PREVIEW_ENABLED", False):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Cinematic preview generation is currently disabled on this server.",
+        )
     await verify_project_owner(project_id, current_user.id, dispatcher.repo)
     job = await dispatcher.dispatch_preview_job(project_id, payload)
     return api_success(job)
@@ -328,6 +334,11 @@ async def generate_cinematic_preview(
     dispatcher: CinematicDispatcherService = Depends(get_cinematic_dispatcher),
 ) -> APIResponse[MediaJobResponse]:
     """Alias for create_cinematic_preview_job."""
+    if not getattr(settings, "CINEMATIC_PREVIEW_ENABLED", False):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Cinematic preview generation is currently disabled on this server.",
+        )
     await verify_project_owner(project_id, current_user.id, dispatcher.repo)
     job = await dispatcher.dispatch_preview_job(project_id, payload)
     return api_success(job)

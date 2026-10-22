@@ -132,3 +132,48 @@ def test_production_cors_filters_localhost():
         ],
     )
     assert "http://localhost:5173" in dev_settings.CORS_ORIGINS
+
+
+@pytest.mark.asyncio
+async def test_direct_cinematic_dispatch_returns_503_by_default():
+    """Direct dispatch call returns HTTP 503 when CINEMATIC_PREVIEW_ENABLED is false."""
+    from backend.app.main import app
+    from backend.app.repositories import project_repo
+    from backend.app.models.project import ProjectCreate
+
+    overrides_backup = dict(app.dependency_overrides)
+    user_id = "test-sec-user"
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        id=user_id,
+        email="sec@praroha.local",
+    )
+
+    prev_flag = settings.CINEMATIC_PREVIEW_ENABLED
+    settings.CINEMATIC_PREVIEW_ENABLED = False
+
+    try:
+        async with project_repo.async_session() as session:
+            repo = project_repo.ProjectRepository(session)
+            proj = await repo.create_project(
+                ProjectCreate(title="Sec Project", seed_text="Seed"),
+                owner_id=user_id,
+            )
+
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+            resp = await client.post(
+                f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
+                json={"entity_type": "world", "entity_id": "world-sec-1"},
+            )
+            assert resp.status_code == 503
+            assert "disabled on this server" in resp.json()["error"]["message"]
+
+            resp2 = await client.post(
+                f"/api/projects/{proj.id}/media/cinematic-preview/generate",
+                json={"entity_type": "world", "entity_id": "world-sec-1"},
+            )
+            assert resp2.status_code == 503
+            assert "disabled on this server" in resp2.json()["error"]["message"]
+    finally:
+        settings.CINEMATIC_PREVIEW_ENABLED = prev_flag
+        app.dependency_overrides = overrides_backup

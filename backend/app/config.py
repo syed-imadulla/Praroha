@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api"
     ENVIRONMENT: str = "development"  # options: development, staging, production
     ADMIN_EMAILS: str = ""  # comma-separated list of admin email addresses
+    CINEMATIC_PREVIEW_ENABLED: bool = False  # Server-side guard against cinematic generation
     AI_PROVIDER: str = "mock"  # options: mock, gemini
     STORAGE_PROVIDER: str = "local"  # options: local, supabase
     DATABASE_URL: str = "sqlite+aiosqlite:///./seed_unfold.db"

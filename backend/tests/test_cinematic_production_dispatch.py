@@ -8,12 +8,21 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
+from backend.app.config import settings
 from backend.app.core.auth import AuthenticatedUser, get_current_user
 from backend.app.main import app
 from backend.app.models.media import MediaAssetRecord
 from backend.app.models.project import Project
 from backend.app.models.world import WorldCandidate
 from backend.app.repositories import project_repo
+
+
+@pytest.fixture(autouse=True)
+def enable_cinematic_preview_for_tests():
+    orig = settings.CINEMATIC_PREVIEW_ENABLED
+    settings.CINEMATIC_PREVIEW_ENABLED = True
+    yield
+    settings.CINEMATIC_PREVIEW_ENABLED = orig
 
 
 @pytest_asyncio.fixture
@@ -369,3 +378,59 @@ async def test_worker_payload_excludes_credentials(client, setup_project):
         assert "spec" in payload
         assert "storage_provider" in payload
         assert "timeout" in payload
+
+
+@pytest.mark.asyncio
+async def test_cinematic_dispatch_blocked_when_feature_flag_false(client, setup_project):
+    """
+    Requirement: Direct authenticated API calls cannot create cinematic render jobs
+    while backend CINEMATIC_PREVIEW_ENABLED is False (returns HTTP 503).
+    """
+    proj, world, _ = setup_project
+    settings.CINEMATIC_PREVIEW_ENABLED = False
+
+    resp = await client.post(
+        f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
+        json={"entity_type": "world", "entity_id": world.id},
+    )
+    assert resp.status_code == 503
+    err_body = resp.json()
+    assert "disabled on this server" in err_body["error"]["message"]
+
+    # Verify no job or asset was created
+    async with project_repo.async_session() as session:
+        repo = project_repo.ProjectRepository(session)
+        assets = await repo.list_media_assets(project_id=proj.id, entity_id=world.id)
+        video_assets = [a for a in assets if a.media_type == "video"]
+        assert len(video_assets) == 0
+
+
+@pytest.mark.asyncio
+async def test_non_cinematic_media_operations_preserved_when_cinematic_disabled(client, setup_project):
+    """
+    Requirement: Existing non-cinematic media operations (e.g. soundscape library and composition)
+    remain fully operational when CINEMATIC_PREVIEW_ENABLED is False.
+    """
+    proj, world, _ = setup_project
+    settings.CINEMATIC_PREVIEW_ENABLED = False
+
+    # 1. Verify soundscape library remains accessible
+    lib_resp = await client.get(f"/api/projects/{proj.id}/media/soundscapes/library")
+    assert lib_resp.status_code == 200
+    layers = lib_resp.json()["data"]
+    assert len(layers) > 0
+
+    # 2. Compose ambient soundscape (non-cinematic media)
+    resp = await client.post(
+        f"/api/projects/{proj.id}/media/soundscapes/compose",
+        json={
+            "entity_type": "world",
+            "entity_id": world.id,
+            "layers": [{"layer_id": layers[0]["id"], "gain": 0.8}],
+            "duration_sec": 5,
+        },
+    )
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["entity_id"] == world.id
+    assert data["media_type"] == "audio"
