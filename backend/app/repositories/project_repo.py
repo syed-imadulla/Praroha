@@ -2115,6 +2115,7 @@ class ProjectRepository:
             if asset and asset.status in ("queued", "processing"):
                 asset.status = "failed"
                 asset.error_message = job.error_message
+                asset.request_hash = None
                 self.session.add(asset)
                 handled_asset_ids.add(asset.id)
             count += 1
@@ -2126,6 +2127,7 @@ class ProjectRepository:
             if stray_asset.id not in handled_asset_ids:
                 stray_asset.status = "failed"
                 stray_asset.error_message = "Generation task interrupted by server restart. Please retry generation."
+                stray_asset.request_hash = None
                 self.session.add(stray_asset)
                 count += 1
 

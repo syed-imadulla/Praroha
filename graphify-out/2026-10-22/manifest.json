@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "backend/app/config.py": {
-    "mtime": 1792660473.9628377,
-    "seen": 1792661480.1002285,
-    "ast_hash": "35a4fae56f501b04ae5a7c06208a92aa",
+    "mtime": 1792683281.8745399,
+    "seen": 1792687829.4930003,
+    "ast_hash": "5c492630f6eafd8ee3b0d71730e2d359",
     "semantic_hash": ""
   },
   "backend/app/core/response.py": {
@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1792655262.123381,
-    "seen": 1792656129.2126663,
-    "ast_hash": "4502b819e9720427a90d9bb49e7667f7",
+    "mtime": 1792682395.7152076,
+    "seen": 1792687829.4930081,
+    "ast_hash": "633c98ba0c9328c81c8a65ecd3cd15f2",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -72,9 +72,9 @@
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
-    "mtime": 1791466745.275588,
-    "seen": 1791481179.786636,
-    "ast_hash": "bae4965be6bb6c3f3ae11ea6d72767ac",
+    "mtime": 1792682374.489386,
+    "seen": 1792687829.4930704,
+    "ast_hash": "fe5efa917459470fdbebe89b078cfc13",
     "semantic_hash": ""
   },
   "backend/app/routers/projects.py": {
@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_health.py": {
-    "mtime": 1791461352.1119633,
-    "seen": 1791481179.786667,
-    "ast_hash": "6e1bc524896a9e1c6e79f8eb75d0f801",
+    "mtime": 1792682446.9887762,
+    "seen": 1792687829.4931333,
+    "ast_hash": "18e4553dc0ff5673677b5fb3719e1d9a",
     "semantic_hash": ""
   },
   "backend/tests/test_providers.py": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1792659084.500366,
-    "seen": 1792659799.5177839,
-    "ast_hash": "15df9187aea3470f0ec16d56138a3c0b",
+    "mtime": 1792677867.9615352,
+    "seen": 1792678669.26796,
+    "ast_hash": "458f20e91de6daa6ef2560b6a97c27b5",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -156,15 +156,15 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1791498682.173236,
-    "seen": 1791512735.245912,
-    "ast_hash": "c23bd27dc3ee533408a9065d357cefb4",
+    "mtime": 1792677895.025319,
+    "seen": 1792678669.268101,
+    "ast_hash": "341ca15afd4484ed63ca5bc27e657381",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
-    "mtime": 1792659051.697647,
-    "seen": 1792659799.5178862,
-    "ast_hash": "3ae75e3a28690584d0c8312b474acf13",
+    "mtime": 1792678358.697615,
+    "seen": 1792678669.268104,
+    "ast_hash": "b9bf5a7c28ffa33f0328b076b146cb0c",
     "semantic_hash": ""
   },
   "frontend/tailwind.config.js": {
@@ -198,27 +198,27 @@
     "semantic_hash": ""
   },
   ".planning/PROJECT.md": {
-    "mtime": 1792664984.1273994,
-    "seen": 1792666577.220483,
-    "ast_hash": "da0a79cdf0a155c5e347d1dfb6822ca7",
+    "mtime": 1792678640.4853637,
+    "seen": 1792678669.2681422,
+    "ast_hash": "9a6f86a15433b0caeb7d9b2157050041",
     "semantic_hash": ""
   },
   ".planning/REQUIREMENTS.md": {
-    "mtime": 1792666500.459657,
-    "seen": 1792666577.2204862,
-    "ast_hash": "25164eeac053785050e6a14f23ab865b",
+    "mtime": 1792685722.2073882,
+    "seen": 1792687829.4933236,
+    "ast_hash": "90c3fcda7c60136f6395f7fa323b8afc",
     "semantic_hash": ""
   },
   ".planning/ROADMAP.md": {
-    "mtime": 1792676516.8170693,
-    "seen": 1792676607.9207876,
-    "ast_hash": "2017832c1ad47118ad6b2ad92a72a78f",
+    "mtime": 1792685708.0615065,
+    "seen": 1792687829.4933245,
+    "ast_hash": "679bd802ae97b450d021a1f0c3999c73",
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792676542.506869,
-    "seen": 1792676607.9207897,
-    "ast_hash": "9da07b1afafea4fe66fbf645fa9ab4a6",
+    "mtime": 1792685734.7192833,
+    "seen": 1792687829.4933257,
+    "ast_hash": "4624fbe8e28d58606eb8e86a7751daa9",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -1254,9 +1254,9 @@
     "semantic_hash": ""
   },
   "backend/app/routers/media.py": {
-    "mtime": 1791712063.3448646,
-    "seen": 1791713593.12612,
-    "ast_hash": "963a0f54fb2875eaa744864e9243bba6",
+    "mtime": 1792683353.6888738,
+    "seen": 1792687829.493075,
+    "ast_hash": "074ddc554d61bd2fbbe93cbff874401b",
     "semantic_hash": ""
   },
   "backend/app/services/media_service.py": {
@@ -1278,9 +1278,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/EntityMediaSection.tsx": {
-    "mtime": 1792661204.1919007,
-    "seen": 1792661480.10052,
-    "ast_hash": "d131d5f697b2cfbbf53a372973adacae",
+    "mtime": 1792677923.186094,
+    "seen": 1792678669.2679706,
+    "ast_hash": "4bcb08baa951b3662543f52937b76c75",
     "semantic_hash": ""
   },
   "frontend/src/components/MediaPreviewCard.tsx": {
@@ -2430,9 +2430,9 @@
     "semantic_hash": ""
   },
   "backend/app/core/auth.py": {
-    "mtime": 1791482927.3498223,
-    "seen": 1791484196.6685236,
-    "ast_hash": "67ed9d4655ddfee6824467c016eb9222",
+    "mtime": 1792682352.0395749,
+    "seen": 1792687829.4930027,
+    "ast_hash": "620f874f4c2fed4b1804f6e56ec05d7d",
     "semantic_hash": ""
   },
   "backend/tests/test_auth_ownership.py": {
@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "backend/app/workers/cinematic_worker.py": {
-    "mtime": 1792675268.0413284,
-    "seen": 1792675648.9920287,
-    "ast_hash": "0ed48dcdf3d76662d1a78ffc6917180e",
+    "mtime": 1792680072.1559284,
+    "seen": 1792687829.4931087,
+    "ast_hash": "9ea4ee54b733602956ac53f55ee0442b",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_worker.py": {
@@ -3204,9 +3204,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-01-PLAN.md": {
-    "mtime": 1792664896.1151366,
-    "seen": 1792666577.22104,
-    "ast_hash": "4e712e79c1817403c92c1690fb98ac19",
+    "mtime": 1792678502.5724654,
+    "seen": 1792678669.2689288,
+    "ast_hash": "c8efbe81e2171640afd64f4a2bf499ef",
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-CONTEXT.md": {
@@ -3228,9 +3228,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_worker_security.py": {
-    "mtime": 1792674944.533546,
-    "seen": 1792675648.9921556,
-    "ast_hash": "2e146a916d9ebc734cb72851e1fe4b7d",
+    "mtime": 1792680168.0121627,
+    "seen": 1792687829.493177,
+    "ast_hash": "c5d6000a68f083d2b9896b778e7d7aa1",
     "semantic_hash": ""
   },
   ".planning/phases/49-azure-job-pilot-cloud-benchmark/49-01-SUMMARY.md": {
@@ -3240,15 +3240,93 @@
     "semantic_hash": ""
   },
   ".planning/phases/50-hyperframes-comparative-evaluation/50-01-SUMMARY.md": {
-    "mtime": 1792676485.398314,
-    "seen": 1792676607.921123,
-    "ast_hash": "8fc9a2b876921a19bf3a8aa540dc077c",
+    "mtime": 1792677337.672672,
+    "seen": 1792678669.268922,
+    "ast_hash": "25e4186cf96329c53f74c4927e26fe20",
     "semantic_hash": ""
   },
   "docs/HYPERFRAMES_VS_NATIVE_EVALUATION.md": {
-    "mtime": 1792676435.8207004,
-    "seen": 1792676607.921146,
-    "ast_hash": "de0aae3a05834ece4b13925c7617519d",
+    "mtime": 1792677320.0868092,
+    "seen": 1792678669.2689705,
+    "ast_hash": "2b1e003d696d5b66c6552f11261d3431",
+    "semantic_hash": ""
+  },
+  "backend/app/services/cinematic_dispatcher.py": {
+    "mtime": 1792683320.4781818,
+    "seen": 1792687829.493088,
+    "ast_hash": "7520b489a262cf8231410177088e70e6",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_production_dispatch.py": {
+    "mtime": 1792683469.7047977,
+    "seen": 1792687829.493119,
+    "ast_hash": "ca6065dfa7ef6d1e65472f5cb83da297",
+    "semantic_hash": ""
+  },
+  ".planning/phases/51-production-dispatch-release-gate/51-01-SUMMARY.md": {
+    "mtime": 1792678538.8821754,
+    "seen": 1792678669.2689316,
+    "ast_hash": "a7307a800a136d8245bbf139dbc90fc1",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_security_remediation.py": {
+    "mtime": 1792683505.349467,
+    "seen": 1792687829.4931586,
+    "ast_hash": "07722c25658e435603198e221fb84d9a",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md": {
+    "mtime": 1792687551.7552621,
+    "seen": 1792687829.4936168,
+    "ast_hash": "8a4319d54e5dcbe4d8244fe523b1f8d2",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-CONTEXT.md": {
+    "mtime": 1792687757.695566,
+    "seen": 1792687829.4936182,
+    "ast_hash": "869f17955364e8cebc79c1beebad202c",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/ADR-0052-QUEUE-DISPATCH-ARCHITECTURE.md": {
+    "mtime": 1792688696.897821,
+    "seen": 1792688923.439368,
+    "ast_hash": "ef7726929a6d33ed34cb0594855a5245",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/AZURE_RESOURCE_INVENTORY.md": {
+    "mtime": 1792688731.9305317,
+    "seen": 1792688923.4393694,
+    "ast_hash": "092c6935b39d19e49cd7caf575d466e7",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/COST_MODEL_AND_BUDGET.md": {
+    "mtime": 1792687649.9524534,
+    "seen": 1792687829.4936213,
+    "ast_hash": "9824ffefcad2e8d59294cd7d01f9ba08",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/MESSAGE_SCHEMA_AND_LIFECYCLE.md": {
+    "mtime": 1792688826.1607537,
+    "seen": 1792688923.4393725,
+    "ast_hash": "f80256ef660b9e6405f2bc9b7de6e263",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/RELIABILITY_AND_OBSERVABILITY_PLAN.md": {
+    "mtime": 1792687672.1792703,
+    "seen": 1792687829.4936233,
+    "ast_hash": "b8ceaa9abf9510e9bf200ab4c92ae61b",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/ROLLOUT_TEST_AND_ROLLBACK_PLAN.md": {
+    "mtime": 1792688771.7122033,
+    "seen": 1792688923.4393756,
+    "ast_hash": "e7eb46c839ddb137694ba7ee0e1c7022",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json": {
+    "mtime": 1792688841.8946238,
+    "seen": 1792688923.4385312,
+    "ast_hash": "fcbf1defd1d3546371fea319b2135600",
     "semantic_hash": ""
   }
 }

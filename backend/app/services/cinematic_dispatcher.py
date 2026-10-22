@@ -220,6 +220,11 @@ class CinematicDispatcherService:
                         asset_url=existing.asset_url,
                         error_message=None,
                     )
+                elif existing.status == "failed":
+                    logger.info("Retrying previously failed cinematic preview %s; clearing stale request_hash", existing.id)
+                    existing.request_hash = None
+                    self.repo.session.add(existing)
+                    await self.repo.session.commit()
 
         # 6. Create durable records in database
         asset_record = MediaAssetRecord(

@@ -434,3 +434,61 @@ async def test_non_cinematic_media_operations_preserved_when_cinematic_disabled(
     data = resp.json()["data"]
     assert data["entity_id"] == world.id
     assert data["media_type"] == "audio"
+
+
+@pytest.mark.asyncio
+async def test_restart_orphaned_job_recovery_and_retry(client, setup_project):
+    """
+    Requirement 2: Server restart before worker completion marks orphaned jobs as failed
+    and clears request_hash so creators can cleanly retry with identical parameters.
+    """
+    proj, world, _ = setup_project
+
+    # 1. Create an asset that was queued/processing when server died
+    async with project_repo.async_session() as session:
+        repo = project_repo.ProjectRepository(session)
+        import uuid
+        job_id = f"job-interrupted-{uuid.uuid4().hex[:8]}"
+        asset = MediaAssetRecord(
+            id=job_id,
+            project_id=proj.id,
+            entity_type="world",
+            entity_id=world.id,
+            media_type="video",
+            status="processing",
+            prompt="Aetheria floating cities",
+            aspect_ratio="16:9",
+            request_hash="stale_hash_from_interrupted_run",
+        )
+        await repo.create_media_asset(asset)
+
+        # 2. Simulate server restart: recover_orphaned_jobs
+        recovered_count = await repo.recover_orphaned_jobs()
+        assert recovered_count >= 1
+
+        # Verify asset is marked failed and request_hash cleared
+        interrupted = await repo.get_media_asset(job_id)
+        assert interrupted.status == "failed"
+        assert interrupted.request_hash is None
+
+    # 3. Creator retries with identical parameters
+    with patch("backend.app.services.cinematic_dispatcher.httpx.AsyncClient") as mock_client_cls:
+        mock_instance = AsyncMock()
+        mock_instance.post.return_value = MagicMock(status_code=200, json=lambda: {"status": "completed"})
+        mock_client_cls.return_value.__aenter__.return_value = mock_instance
+
+        resp = await client.post(
+            f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
+            json={
+                "entity_type": "world",
+                "entity_id": world.id,
+                "duration_sec": 5,
+                "aspect_ratio": "16:9",
+            },
+        )
+        assert resp.status_code == 202
+        data = resp.json()["data"]
+        # New job created cleanly
+        assert data["job_id"] != job_id
+        assert data["status"] in ("queued", "processing", "completed")
+
