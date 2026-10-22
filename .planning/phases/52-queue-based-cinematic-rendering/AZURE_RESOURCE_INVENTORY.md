@@ -11,18 +11,18 @@ All existing resources reside in Resource Group `rg-tendersaathi` in region **Ce
 | **`tendersaathiacr`** | `Microsoft.ContainerRegistry/registries` | Basic Tier (`tendersaathiacr.azurecr.io`) | Stores Docker images for backend and rendering worker. |
 | **`workspace-rgtendersaathinzG6`** | `Microsoft.OperationalInsights/workspaces` | Per-GB 2018 (30-day retention) | Unified Log Analytics workspace. **Reused by both environments**. |
 | **`tendersaathi-identity`** | `Microsoft.ManagedIdentity/userAssignedIdentities` | User-Assigned Managed Identity | Available for RBAC on standard resources. |
+| **`stpraroharender`** | `Microsoft.Storage/storageAccounts` | `Standard_LRS`, TLS 1.2, HTTPS-only, no public blob | Dedicated storage account for queues. *(Provisioned 2026-10-22)* |
+| **`cinematic-render-jobs`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Primary rendering work queue. *(Provisioned 2026-10-22)* |
+| **`cinematic-render-poison`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Dead-letter poison queue (>3 retries). *(Provisioned 2026-10-22)* |
 
 ---
 
-## 2. Proposed New Resources for Queue-Based Rendering
+## 2. Pending Resources for Queue-Based Rendering (Awaiting Separate Approval)
 
 To support Container Apps Jobs without altering or compromising the Express environment, the following resources are designed for creation upon explicit user approval:
 
 | Resource Name | Azure Resource Type | Region / SKU | Role & Configuration | Monthly Base Cost |
 | :--- | :--- | :--- | :--- | :--- |
-| **`stpraroharender`** | `Microsoft.Storage/storageAccounts` | `centralindia`<br>`Standard_LRS`<br>TLS 1.2 | Dedicated storage account for durable queue orchestration. Public blob access disabled. | **₹0.00** (Pay per transaction) |
-| **`cinematic-render-jobs`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Primary work queue. 300s default visibility timeout, 24h message TTL. | **₹0.00** |
-| **`cinematic-render-poison`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Dead-letter queue for jobs failing $> 3$ processing attempts. | **₹0.00** |
 | **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `centralindia`<br>**ConsumptionOnly** (`--environment-mode ConsumptionOnly`) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. **Supports Container Apps Jobs**. | **₹0.00** (Serverless, ₹0 idle) |
 | **`praroha-render-job`** | `Microsoft.App/jobs` | `centralindia`<br>1.0 vCPU, 2.0 GiB RAM | Event-driven rendering job. Triggers via KEDA `azure-queue` scaler when `queueLength >= 1`. **Zero Ingress**. | **₹0.00 idle** (Charges only when running) |
 
