@@ -28,7 +28,8 @@ CRITERION                                      STATUS        EVIDENCE TYPE
 7. Cloud Health & Authorization Security       PASSED        Live Cloud GET (Vercel + ACA)
 8. Frontend Production Build & PWA Precache    PASSED        Vite Build (0 errors, 33 files)
 ========================================================================================
-OVERALL MILESTONE 6 VERDICT: PASSED (230/230 automated tests passed, 1 skipped)
+OVERALL MILESTONE 6 VERDICT: RELEASE CANDIDATE APPROVED (230 passed, 1 skipped out of 231 tests)
+* Note: 1 skipped test (test_live_gemini_generation_seed_a_vs_seed_b) is an explicit cost-safety guard against unapproved cloud API spend, not an unmet requirement.
 ========================================================================================
 ```
 
@@ -93,9 +94,12 @@ To maintain absolute architectural honesty:
 | **Controlled Regen** | **Unit & DB Session** | SQLite/SQLModel tests verify revision incrementing, entity preservation, and lock immutability. |
 | **Cinematic Preview** | **Empirical Execution** | Standalone script rendered real 12s MP4 (`scratch/cinematic_preview_benchmark.mp4`, 750KB) in 1.85s. |
 | **Removed Providers** | **Code & Factory Test** | `test_removed_providers.py` verifies all 5 providers raise `ProviderUnavailableError` and have no code footprint. |
-| **ACA Cloud Backend** | **Live HTTP Evidence** | Non-mutating GET to `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health` returned `200 OK`, `status: "healthy"`. |
-| **Vercel Cloud Frontend**| **Live HTTP Evidence** | Non-mutating GET to `https://praroha-ai.vercel.app` returned `200 OK` (Vercel Edge, PWA precache active). |
-| **Live Model Spend** | **UNVERIFIED / BLOCKED**| Live API calls incurring paid Gemini/Pollinations charges were deliberately omitted per cost-safety instructions. |
+| **ACA Cloud Backend** | **Live HTTP Evidence** | Non-mutating GET to `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health` returned `200 OK`, `status: "healthy"`. Confirms cloud service health; does NOT verify commit `e9810a6` deployment. |
+| **Vercel Cloud Frontend**| **Live HTTP Evidence** | Non-mutating GET to `https://praroha-ai.vercel.app` returned `200 OK` (Vercel Edge, PWA precache active). Confirms frontend availability. |
+| **Live Model Spend** | **UNVERIFIED / BLOCKED**| Live API calls incurring paid Gemini/Pollinations charges were deliberately omitted per cost-safety instructions. Mock-based test evidence preserves deterministic correctness. |
+
+> [!NOTE]
+> **Live vs Mock Clarification**: Live HTTP health checks verify infrastructure durability but do NOT constitute live generative AI model tests. Genuine live Gemini generation across arbitrary seeds was safely skipped (`test_live_gemini_generation_seed_a_vs_seed_b`) to avoid unapproved cloud spend.
 
 ---
 
@@ -109,8 +113,15 @@ When scheduling future video infrastructure:
 
 ---
 
-## 6. Release Gate Recommendation
+## 6. Release Gate Recommendation & Boundaries
 
-**RECOMMENDATION: APPROVE MILESTONE 6 RELEASE**
+**VERDICT: RELEASE CANDIDATE APPROVED (MILESTONE 6 COMPLETE)**
 
-The PRAROHA core product is stable, cost-protected, persistent, and functionally complete. All acceptance criteria for Milestone 6 are supported by automated and empirical evidence.
+- **Milestone 6 Scope**: Phases 41–47 (7 phases) are 100% complete and verified.
+- **Roadmap Totals**: 57 total phases (Phases 1–40 including subphases 31.1–31.11, and Phases 41–47) across 83 plans in the GSD roadmap are complete.
+- **Release Candidate vs. Production Deployment**:
+  - The codebase at commit `e9810a6` is approved as a **Release Candidate**.
+  - Phase 47 **did not deploy code to production**. Existing live endpoints (ACA backend, Vercel frontend) are running previously deployed release containers.
+  - Video rendering remains safely disabled in production until an isolated background worker job is provisioned.
+- **Acceptance Criteria**: 230 automated backend tests passed; 1 test skipped due to cost-safety constraints; 0 unmet criteria. All core PRAROHA guarantees (*Tatva 2: Forms Hidden in Formless*) are verified.
+

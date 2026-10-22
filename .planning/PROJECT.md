@@ -83,14 +83,14 @@ One incomplete seed becomes structured intent, exactly three distinct creative w
 - [x] **Phase 39: Full-System Verification & Release Documentation** — End-to-end user lifecycle verification, updated documentation, and deployment audit.
 - [x] **Phase 40: Production Cloud Deployment (Azure + Vercel + Supabase)** — Azure Container Apps backend, Vercel Edge frontend, Supabase DB/Auth/Storage/Realtime, 100% live cloud verified.
 
-### Milestone 6: Core Product Intelligence & Media Reliability (Active)
-- [ ] **Phase 41: Product Alignment & Technical Audit** — Baseline seed interpretation, 3-world divergence, character consistency, origin trail accuracy, failure modes, and credit constraints.
-- [ ] **Phase 42: Pollinations & Media Capability Audit** — Live catalog audit of `gen.pollinations.ai`, modal capabilities (image, audio, video), pollen pricing, quota behavior, and zero-cost vs credit routing.
-- [ ] **Phase 43: Media Reliability & Credit Protection** — Cost-safe composite provider routing (no cascading on 402/403/429), request deduplication, content-hash caching, and container job recovery.
-- [ ] **Phase 44: Universe Consistency & Creative Memory** — Canonical creative memory schema, context construction engine, and rule validation preventing lore contradictions.
-- [ ] **Phase 45: Origin Trail & Controlled Regeneration** — Blast radius change-impact preview (`AFFECTED`/`CONDITIONAL`/`PRESERVED`), stale entity detection, selective subtree regeneration, and DAG updates.
-- [ ] **Phase 46: Cinematic Preview Proof of Concept** — HyperFrames feasibility evaluation (licensing, Node/Chromium/FFmpeg footprint vs ACA limits) and separate worker pilot to establish a reliable self-contained cinematic preview engine.
-- [ ] **Phase 47: Product Evaluation & Release Gate** — Automated E2E verification across arbitrary seeds, character consistency, credit protection, live provider proof, and PWA release gate.
+### Milestone 6: Core Product Intelligence & Media Reliability (Completed & Verified)
+- [x] **Phase 41: Product Alignment & Technical Audit** — Baseline seed interpretation, 3-world divergence, character consistency, origin trail accuracy, failure modes, and credit constraints.
+- [x] **Phase 42: Pollinations & Media Capability Audit** — Live catalog audit of `gen.pollinations.ai`, modal capabilities (image, audio, video), pollen pricing, quota behavior, and zero-cost vs credit routing.
+- [x] **Phase 43: Media Reliability & Credit Protection** — Cost-safe composite provider routing (no cascading on 402/403/429), request deduplication, content-hash caching, and container job recovery.
+- [x] **Phase 44: Universe Consistency & Creative Memory** — Canonical creative memory schema, context construction engine, and rule validation preventing lore contradictions.
+- [x] **Phase 45: Origin Trail & Controlled Regeneration** — Blast radius change-impact preview (`AFFECTED`/`CONDITIONAL`/`PRESERVED`), stale entity detection, selective subtree regeneration, and DAG updates.
+- [x] **Phase 46: Cinematic Preview Proof of Concept** — HyperFrames feasibility evaluation (licensing, Node/Chromium/FFmpeg footprint vs ACA limits) and separate worker pilot to establish a reliable self-contained cinematic preview engine.
+- [x] **Phase 47: Product Evaluation & Release Gate** — Automated E2E verification across arbitrary seeds, character consistency, credit protection, live provider proof, and PWA release gate.
 
 ### Architecture Decisions: Referenced Projects Analysis
 1. **Pollinations (`gen.pollinations.ai`) [ADOPTED WITH BOUNDARIES]**:
