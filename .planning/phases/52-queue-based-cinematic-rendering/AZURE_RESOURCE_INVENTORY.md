@@ -15,6 +15,7 @@ All existing resources reside in Resource Group `rg-tendersaathi` in region **Ce
 | **`cinematic-render-jobs`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Primary rendering work queue. *(Provisioned 2026-10-22)* |
 | **`cinematic-render-poison`** | `Microsoft.Storage/storageAccounts/queueServices/queues` | Inside `stpraroharender` | Dead-letter poison queue (>3 retries). *(Provisioned 2026-10-22)* |
 | **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `ConsumptionOnly` mode (Central India) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. *(Provisioned 2026-10-22)* |
+| **`queue-publish-url`** | `Microsoft.App/containerApps/secrets` | Stored in `praroha-backend` | Scoped SAS: `sp=a` (Add only) on `cinematic-render-jobs`, HTTPS-only, expires 2026-11-21T18:24Z (30 days). Not yet bound to env var. *(Stored 2026-10-22)* |
 
 ---
 
