@@ -23,7 +23,7 @@
 
 ## Critical Findings Summary
 
-1. **Divergence:** Mathematical separation between archetypes is valid, but `MockProvider.extract_dna` has a dictionary mismatch (`raw_seed` key missing in `seed_dna`), and 1,599/1,599 historical database records defaulted to `familiar`.
+1. **Divergence:** Schema bounds and archetype definitions are structurally valid. However, live LLM semantic divergence across arbitrary seeds was **NOT RUN / NOT VERIFIED** during Phase 41 to uphold the $0 spend constraint (deferred to Phase 47). In the mock provider, per-seed metrics are static hardcoded template profiles (90/55/30/85, 65/95/80/70, 55/85/92/60). `MockProvider.extract_dna` has a dictionary mismatch (`raw_seed` key missing in `seed_dna`), and 1,599/1,599 historical database records defaulted to `familiar`.
 2. **Lineage:** 100% of characters (756) and scenes (532) in `seed_unfold.db` are classified as `AI_INTRODUCED`. `SeedPotentialItem` and `MediaAssetRecord` are not linked to the lineage DAG.
 3. **Media Cascading:** `CompositeAudioProvider` and `CompositeVideoProvider` catch general exceptions, allowing HTTP 401/402 payment errors to cascade into paid providers.
 4. **Media Caching:** `MediaService.dispatch_job` lacks payload SHA-256 deduplication, allowing duplicate identical jobs.
@@ -31,4 +31,4 @@
 ---
 
 ## Readiness for Milestone 6
-Phase 42 (Media Pipeline Hardening & Free-Tier First) is unblocked and ready for planning and execution.
+Phase 42 (Pollinations & Media Capability Audit) is unblocked and ready for planning and execution.

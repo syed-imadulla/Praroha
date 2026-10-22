@@ -15,7 +15,7 @@ Phase 41 performed an exhaustive, non-destructive audit of PRAROHA's core produc
 
 | Audit Domain | Status | Key Confirmed Findings |
 | :--- | :--- | :--- |
-| **1. 3-World Divergence** | **PARTIALLY SOUND / DEFECT DETECTED** | Mathematical divergence metrics correctly separate Familiar (Fidelity 90 / Novelty 55), Radical (Fidelity 65 / Novelty 95), and Inverse (Fidelity 55 / Novelty 85). However, a dictionary mismatch in `MockProvider.extract_dna` caused canonical ocean demo fallback unless patched caller-side, and **100% (1,599/1,599)** of historical database records default to `familiar`. |
+| **1. 3-World Divergence** | **STATIC CONFIG AUDITED / LIVE EVAL NOT RUN** | Schema bounds and archetype definitions are structurally valid. However, live LLM semantic divergence across arbitrary seeds was **NOT RUN / NOT VERIFIED** to uphold the $0 spend constraint. In the mock engine, per-seed metrics are static hardcoded template values (90/55/30/85, 65/95/80/70, 55/85/92/60), and **100% (1,599/1,599)** of historical database records default to `familiar`. |
 | **2. Universe Lore Codex** | **SOUND WITH DRIFT RISK** | Single-pass prompt generation (`expand_universe_single_pass`) provides strong localized coherence across factions, physics laws, and characters, but lacks cross-scene state persistence or progressive context chaining for long-form narrative arcs. |
 | **3. Lineage DAG & Provenance** | **STRUCTURALLY INCOMPLETE** | Causal DAG model supports 6 origin types, but **100% of historical characters (756/756) and scenes (532/532)** are labeled `AI_INTRODUCED`. Neither `SeedPotentialItem` nor `MediaAssetRecord` are attached to the lineage graph. Scene-to-character edge linkage relies on brittle exact string matching. |
 | **4. Media Reliability & Cost** | **HIGH CASCADE RISK** | `CompositeAudioProvider` and `CompositeVideoProvider` catch all generic `Exception` types, causing HTTP 401/402 (payment required) and HTTP 429 (rate limited) errors to cascade directly into paid downstream tiers. Zero content-hash deduplication exists in `MediaService.dispatch_job`. |
@@ -24,57 +24,57 @@ Phase 41 performed an exhaustive, non-destructive audit of PRAROHA's core produc
 
 ## 1. Seed Interpretation & 3-World Divergence Benchmark
 
-### 1.1 Methodology & Evaluation Matrix
+### 1.1 Methodology & Evidence Separation
 
-We evaluated three contrasting creative seeds across four quantitative dimensions (rated 0–100):
-- **Seed Fidelity (0–100):** Preservation of core thematic premise and primary motif.
-- **Novelty (0–100):** Originality and departure from common genre clichés.
-- **Conceptual Distance (0–100):** Degree of semantic displacement from the literal seed phrasing.
-- **Feasibility (0–100):** Internal structural viability for narrative worldbuilding.
+To strictly enforce the $0 spend guardrail and maintain complete factual accuracy, we distinguish four distinct categories of evidence:
+1. **Static Mock Configuration:** Hardcoded archetype values and template strings defined in `backend/app/providers/mock_provider.py`.
+2. **Schema & Unit Test Bounds:** Validation tests in `backend/tests/test_divergence.py` verifying metric ranges (0–100) and Pydantic enums.
+3. **Historical Database Records:** Persisted rows in `backend/seed_unfold.db` reflecting previous runs.
+4. **Live Provider Inference:** Actual real-time API generation from LLM providers (Gemini / Claude).
 
-#### Evaluated Seeds:
+#### Evaluated Seeds Considered for Analysis:
 1. **Seed A (Sci-Fi / Solarpunk):** *"A silent monastery floating in the upper atmosphere of Venus"*
 2. **Seed B (Magical Realism / Drama):** *"A clockmaker realizes that whenever he repairs an antique timepiece, someone's forgotten memory is erased"*
 3. **Seed C (Canonical Demo):** *"A child discovers a forgotten city beneath the ocean"*
 
-### 1.2 Divergence Benchmark Results
+### 1.2 Divergence Evidence & Metric Resolution
 
-*Note: Results derived from deterministic provider evaluation, test fixtures, and verified Gemini structured schema definitions.*
+#### A. Static Configuration Values in `MockProvider`
+When inspecting `MockProvider.generate_worlds` (`backend/app/providers/mock_provider.py`, lines 308–356), the provider returns hardcoded `exploration_profile` metrics for any non-canonical seed:
+- **World 1 (Familiar):** Fidelity = 90, Novelty = 55, Distance = 30, Feasibility = 85  
+  *Template Title:* `"The Grounded Expanse: {lead_theme}"`
+- **World 2 (Radical):** Fidelity = 65, Novelty = 95, Distance = 80, Feasibility = 70  
+  *Template Title:* `"The Metamorphic Nexus"`
+- **World 3 (Inverse):** Fidelity = 55, Novelty = 85, Distance = 92, Feasibility = 60  
+  *Template Title:* `"The Inverted Sanctuary"`
 
-```
-DIVERGENCE ARCHETYPE SCATTER (Conceptual Distance vs Novelty):
+For the canonical demo seed (Seed C), `CANONICAL_WORLDS` (`mock_provider.py`, lines 35–105) specifies:
+- **World 1 (Lost Civilization):** Fidelity = 92, Novelty = 50, Distance = 25, Feasibility = 88
+- **World 2 (Bio-City):** Fidelity = 68, Novelty = 92, Distance = 75, Feasibility = 72
+- **World 3 (Time Capsule):** Fidelity = 58, Novelty = 82, Distance = 88, Feasibility = 65
 
-100 |                                   [Seed A: Radical]
-    |                                   [Seed B: Radical]
- 80 |                       [Seed A: Inverse]
-    |                       [Seed B: Inverse]
- 60 |
-    |       [Seed A: Familiar]
- 40 |       [Seed B: Familiar]
-    |
-  0 +----------------------------------------------------
-    0                       50                          100
-                            Conceptual Distance
-```
+#### B. Status of Live Semantic Divergence: NOT RUN / NOT VERIFIED
+- **Audit Finding:** Live LLM generation across Seed A and Seed B was **NOT RUN** during Phase 41 to avoid consuming paid API credits or making unbudgeted external model calls.
+- **Resolution:** The metrics (90/55/30/85, 65/95/80/70, 55/85/92/60) represent **configured static profiles** of the mock provider, **NOT empirical semantic measurements** of live LLM divergence. Any illustrative world titles (e.g., "The Cloud Cloister", "The Horologist's Ledger") are qualitative design examples, not system-generated outputs. Genuine multi-seed semantic divergence measurement with live models remains **UNVERIFIED** and is formally deferred to the release evaluation gate (Phase 47).
 
-#### Detailed Measurement Table:
+#### Detailed Evidence Matrix:
 
-| Seed | Archetype | World Name / Concept | Seed Fidelity | Novelty | Conceptual Distance | Feasibility | Classification Type |
+| Seed | Archetype | World Name / Title | Seed Fidelity | Novelty | Conceptual Distance | Feasibility | Evidence Source & Status |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Seed A** | **Familiar** | *The Cloud Cloister: Solitude in the Acid Mists* | 90 | 55 | 30 | 85 | Deterministic Model Evaluation |
-| **Seed A** | **Radical** | *Barometric Liturgy: The Floating Atmospheric Lattice* | 65 | 95 | 80 | 70 | Deterministic Model Evaluation |
-| **Seed A** | **Inverse** | *Sulfur Echoes: Sub-Surface Geothermal Abbey* | 55 | 85 | 92 | 60 | Deterministic Model Evaluation |
-| **Seed B** | **Familiar** | *The Horologist's Ledger: Lost Moments* | 90 | 55 | 30 | 85 | Deterministic Model Evaluation |
-| **Seed B** | **Radical** | *Chronometric Synapse: The Memory Escapement Network* | 65 | 95 | 80 | 70 | Deterministic Model Evaluation |
-| **Seed B** | **Inverse** | *Static Mnemonics: The Unwound Mind* | 55 | 85 | 92 | 60 | Deterministic Model Evaluation |
-| **Seed C** | **Familiar** | *The Drowned spires of Thalassos* | 90 | 55 | 30 | 85 | Deterministic Model Evaluation |
-| **Seed C** | **Radical** | *Bioluminescent Symbiosis: Abyss City* | 65 | 95 | 80 | 70 | Deterministic Model Evaluation |
-| **Seed C** | **Inverse** | *Desiccated Ocean Trench: The Salt Spires* | 55 | 85 | 92 | 60 | Deterministic Model Evaluation |
+| **Seed A (Venus)** | **Familiar** | *The Grounded Expanse: Discovery* | 90 | 55 | 30 | 85 | **Static Mock Profile** (Live Eval NOT RUN) |
+| **Seed A (Venus)** | **Radical** | *The Metamorphic Nexus* | 65 | 95 | 80 | 70 | **Static Mock Profile** (Live Eval NOT RUN) |
+| **Seed A (Venus)** | **Inverse** | *The Inverted Sanctuary* | 55 | 85 | 92 | 60 | **Static Mock Profile** (Live Eval NOT RUN) |
+| **Seed B (Clockmaker)**| **Familiar** | *The Grounded Expanse: Discovery* | 90 | 55 | 30 | 85 | **Static Mock Profile** (Live Eval NOT RUN) |
+| **Seed B (Clockmaker)**| **Radical** | *The Metamorphic Nexus* | 65 | 95 | 80 | 70 | **Static Mock Profile** (Live Eval NOT RUN) |
+| **Seed B (Clockmaker)**| **Inverse** | *The Inverted Sanctuary* | 55 | 85 | 92 | 60 | **Static Mock Profile** (Live Eval NOT RUN) |
+| **Seed C (Ocean Demo)**| **Familiar** | *Lost Civilization* | 92 | 50 | 25 | 88 | **Canonical Demo Fixture** (Verified in tests) |
+| **Seed C (Ocean Demo)**| **Radical** | *Bio-City* | 68 | 92 | 75 | 72 | **Canonical Demo Fixture** (Verified in tests) |
+| **Seed C (Ocean Demo)**| **Inverse** | *Time Capsule* | 58 | 82 | 88 | 65 | **Canonical Demo Fixture** (Verified in tests) |
 
 ### 1.3 Confirmed Defects in Divergence Architecture
 
 1. **`MockProvider.extract_dna` Dictionary Mismatch (Confirmed Defect):**
-   - **Location:** `backend/app/providers/mock.py:38`
+   - **Location:** `backend/app/providers/mock_provider.py:202` (and `mock.py:38`)
    - **Mechanism:** `extract_dna(seed)` returns `{"raw_seed": seed, "seed_dna": CANONICAL_SEED_DNA}`. However, `CANONICAL_SEED_DNA` dictionary does not itself include the `"raw_seed"` key. When downstream components pass `dna_res["seed_dna"]` into `generate_worlds(dna)`, `dna.get("raw_seed")` evaluates to `None`.
    - **Consequence:** `MockProvider.generate_worlds` contains a fallback check: `if not raw_seed: return CANONICAL_WORLDS`. Because `raw_seed` is missing, the provider returned canonical ocean demo worlds ("Lost Civilization", "Bio-City", "Time Capsule") for **all seeds**, masking dynamic mock generation.
    - **Status in Code:** Mitigated caller-side in `backend/app/routers/worlds.py` line 79 by injecting `dna_dict["raw_seed"] = latest_dna_record.raw_seed`, but the provider contract itself remains broken.
@@ -274,27 +274,38 @@ Stage 5: expand_universe_single_pass
 6. **Un-Cached Media Dispatch:** Duplicate identical requests generate redundant background jobs.
 
 ### 6.3 What Remains Unverified
-1. **Live Stable Audio Paid Generations:** Not executed to comply with $0 spend guardrail.
-2. **Dedicated Hugging Face Inference Endpoints:** Serverless endpoints return 404/410; dedicated endpoints require paid account provisioning.
-3. **Cross-Scene Dynamic Re-balancing:** Behavior of universe codex when 20+ scenes are added sequentially over time has not been tested at scale.
+1. **Live LLM Semantic Divergence Across Arbitrary Seeds:** Genuine semantic divergence with live models (Gemini/Claude) was not run during Phase 41 to uphold the $0 spend constraint. Metrics in the audit are static mock template profiles. Formally deferred to Phase 47 (Product Evaluation & Release Gate).
+2. **Live Stable Audio Paid Generations:** Not executed in order to strictly maintain the $0 spend guardrail.
+3. **Dedicated Hugging Face Inference Endpoints:** Serverless endpoints return 404/410; dedicated endpoints require paid account provisioning and were not provisioned.
+4. **Cross-Scene Dynamic Re-balancing:** Behavior of universe codex when 20+ scenes are added sequentially over time has not been tested at scale.
 
-### 6.4 Adjustments Required for Milestone 6 Phases (42–47)
+### 6.4 Adjustments & Action Assignments for Milestone 6 Phases (42–47)
 
-- **Phase 42 (Media Pipeline Hardening & Free-Tier First):**
-  - **Adjustment:** Must fix the cascade vulnerability in `CompositeAudioProvider` and `CompositeVideoProvider` before adding new providers.
-  - **Adjustment:** Implement SHA-256 deduplication cache in `MediaService.dispatch_job`.
-  - **Adjustment:** Pin Pollinations provider to use unauthenticated `image.pollinations.ai` or explicit `sana` model on `gen.pollinations.ai` to avoid 401 errors.
-- **Phase 43 (Seed Interpretation & 3-World Divergence Hardening):**
-  - **Adjustment:** Fix `MockProvider.extract_dna` dictionary structure so `raw_seed` is present within `seed_dna`.
-  - **Adjustment:** Add negative constraint filtering to Stage 5 prompt generation.
-- **Phase 44 (Universe Codex & Dynamic Lore Consistency):**
-  - **Adjustment:** Implement fuzzy/normalized matching for character names in scene character associations.
-- **Phase 45 (Origin Trail & Lineage DAG Integrity):**
-  - **Adjustment:** Ingest `SeedPotentialItem` and `MediaAssetRecord` as nodes into `LineageService`.
-  - **Adjustment:** Implement heuristic attribution logic in Stage 5 so characters reflecting seed keywords receive `SEED_EXPLICIT` or `SEED_INFERRED` origin tags.
+*Using the approved GSD Roadmap as the authoritative source of truth:*
+
+- **Phase 42: Pollinations & Media Capability Audit:**
+  - *Scope:* Inspect live official Pollinations documentation and model catalog (`gen.pollinations.ai/openapi.json`), establish exact request schemas, pricing (pollen units), quotas, and authentication boundaries across image, audio, and video modalities without blind spending.
+  - *Key Audit Action:* Pin Pollinations provider to use unauthenticated `image.pollinations.ai` or explicit `sana` model on `gen.pollinations.ai` to prevent HTTP 401/403 authorization failures on free tiers.
+- **Phase 43: Media Reliability & Credit Protection:**
+  - *Scope:* Implement strict cost-safe composite provider routing, request deduplication, content-hash asset caching, and background job recovery, preventing accidental spend or runaway cascading upon 402/403/429 errors.
+  - *Key Audit Action:* Fix the cascade vulnerability in `CompositeAudioProvider` and `CompositeVideoProvider` so HTTP 401/402/429 immediately abort instead of cascading into paid tiers (Stable Audio / Pixazo).
+  - *Key Audit Action:* Implement SHA-256 deduplication cache in `MediaService.dispatch_job` using entity, type, and prompt hashes.
+- **Phase 44: Universe Consistency & Creative Memory:**
+  - *Scope:* Establish a canonical creative memory schema and context construction engine that ensures progressive world unfolding respects established world rules, character traits, timelines, visual references, and creator decisions without lore drift.
+  - *Key Audit Action:* Implement fuzzy/normalized matching for character names in scene character associations to prevent broken character-scene links.
+  - *Key Audit Action:* Integrate negative constraint validation into prompt synthesis to prevent trope violations.
+- **Phase 45: Origin Trail & Controlled Regeneration:**
+  - *Scope:* Enhance the Origin Trail with dependency-aware change impact preview (`AFFECTED`, `CONDITIONAL`, `PRESERVED`), stale entity detection, and selective subtree regeneration that preserves approved creator work while updating the lineage DAG.
+  - *Key Audit Action:* Ingest `SeedPotentialItem` and `MediaAssetRecord` as nodes into `LineageService`.
+  - *Key Audit Action:* Implement heuristic attribution logic in Stage 5 so characters reflecting seed keywords receive `SEED_EXPLICIT` or `SEED_INFERRED` origin tags instead of default `AI_INTRODUCED`.
+- **Phase 46: Cinematic Preview Proof of Concept:**
+  - *Scope:* Evaluate HyperFrames programmatic video rendering against Azure Container Apps resource limits (0.5 vCPU, 1.0 GiB RAM), pilot an isolated preview worker, and maintain JSON2Video as the verified operational baseline with clear synthetic preview watermarking.
+- **Phase 47: Product Evaluation & Release Gate:**
+  - *Scope:* Execute comprehensive end-to-end acceptance testing across arbitrary seeds, 3-world divergence, creative memory consistency, change impact preview, credit protection circuit breakers, and cloud deployment resilience.
+  - *Key Audit Action:* Execute genuine live LLM multi-seed divergence benchmark across arbitrary creative seeds (verifying real semantic divergence, novelty, and feasibility) under controlled evaluation budgets.
 
 ### 6.5 Phase 42 Safe Readiness Assessment
 
 > **DECISION: Phase 42 Can Begin Safely.**  
 >
-> All baseline measurements are documented, existing vulnerabilities are cataloged, and no production state or runtime code was altered. Phase 42 can proceed with clear, bounded objectives: hardening media providers against failure cascades, implementing deduplication caching, and establishing resilient free-tier routing.
+> All baseline measurements are documented, existing vulnerabilities are cataloged, evidence types (static mock, test assertions, historical DB, live endpoints) are strictly separated, and no production state or runtime code was altered. Phase 42 can proceed with its approved scope: auditing official Pollinations API capabilities, parameters, and quotas.
