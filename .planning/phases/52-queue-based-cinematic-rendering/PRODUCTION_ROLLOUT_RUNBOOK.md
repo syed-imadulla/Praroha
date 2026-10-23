@@ -328,12 +328,38 @@ Before any production state is modified, the following sequential operator appro
    - Frontend production build (`npm run build`) succeeded without error.
    - `git diff --check` passed with 0 errors.
 
-### 7.4 Candidate Image v7.2 Verification (Phase 4 — Ready)
+### 7.4 Candidate Image v7.2 Verification (Superceded by v7.3)
 - **Image Tag**: `tendersaathiacr.azurecr.io/praroha-backend:v7.2`
 - **ACR Digest**: `sha256:3c92a5c6300b96fda3e1fe95a91db341d0416edf777a59a6665cfc4afb8621ac`
-- **Local Container Fail-Closed Test**:
-  - Run with `ENVIRONMENT=production` and invalid PostgreSQL URL: Exited with code 3, raised `RuntimeError: Silent fallback to SQLite is disabled`. No SQLite fallback.
-- **Local Container Live PostgreSQL Test**:
-  - Run with `ENVIRONMENT=production` against live Supabase PostgreSQL: Connected cleanly, completed migrations, `/api/health` returned HTTP 200 OK (`"fallback_used": false`), verified no `/app/seed_unfold.db` was created.
-- **Strict Boundary**: Image is pushed to ACR only. **Not deployed to production.**
+- Superceded by `v7.3` due to separation of production runtime validation from automatic DDL migrations.
+
+---
+
+## 8. Final Database Safety Hardening & Candidate Image v7.3 Verification
+
+### 8.1 Architectural Policy: Separation of Validation and Migrations
+1. **Production Runtime (Zero DDL)**:
+   - Application startup (`ENVIRONMENT=production` or targeting production Supabase database) connects to PostgreSQL and invokes `validate_production_schema()`.
+   - Checks required tables (`projects`, `characters`, `scenes`, `world_bibles`, `world_candidates`, `world_selections`, `generation_jobs`, `media_assets`, `creative_memory`, `render_outbox`, `seed_dna`, `seed_potential_items`), required columns, and indexes/constraints.
+   - Executes **ZERO DDL** statements (`CREATE`, `ALTER`, `DROP`).
+   - If any required schema object is missing, startup immediately fails with a descriptive `RuntimeError`. Never silently switches to SQLite.
+2. **Explicit Migration Operation**:
+   - Schema modifications are executed ONLY via explicit migration operations (`run_migrations()` or `ALLOW_PRODUCTION_DB_MIGRATIONS=True`).
+   - `ALLOW_PRODUCTION_DB_MIGRATIONS` defaults to `False` and cannot be bypassed simply by setting `ENVIRONMENT=production`.
+3. **Development / Test Isolation**:
+   - Automated tests targeting production Supabase URLs are rejected before connection or DDL.
+   - Development initialization runs automatically only on explicitly isolated SQLite or disposable test databases.
+
+### 8.2 Candidate Image v7.3 Verification
+- **Image Tag**: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`
+- **ACR Digest**: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`
+- **Commit**: `e9a42cb`
+- **Verification Evidence (Isolated PostgreSQL Container `testdb`)**:
+  1. *Unmigrated DB*: Startup failed with exit code 3 and logged:
+     `RuntimeError: Database startup failed against postgresql+asyncpg: Production schema validation failed: missing required tables... Automatic schema migrations are disabled in production runtime. Apply approved database migrations before starting the service.. Silent fallback to SQLite is disabled.`
+  2. *Explicit Migration*: Executed via `run_migrations()` with `ALLOW_PRODUCTION_DB_MIGRATIONS=True`. Completed cleanly.
+  3. *Migrated DB*: Normal production container startup (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`) connected, validated schema with zero DDL, and `/api/health` returned `HTTP 200 OK`.
+  4. *Fail-Closed*: Invalid PostgreSQL URL terminated immediately with code 3.
+- **Strict Boundary**: Candidate `v7.3` is pushed to ACR only. **Not deployed to production.** Production Container App remains on `v6`.
+
 
