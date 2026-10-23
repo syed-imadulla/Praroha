@@ -89,7 +89,9 @@ When authorized for production application in Phase 52 Wave 3 release gate:
 psql "$DATABASE_URL" -f backend/migrations/0001_create_render_outbox.sql
 ```
 
-### Rollback Command (If Needed):
+### Teardown Command (Dev/Testing Clean-up Only; NEVER during Operational Rollback):
+> [!CAUTION]
+> Do NOT drop `render_outbox` during an operational rollback. Normal rollback halts dispatch and preserves all table records for audit integrity (see [PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md)).
 ```sql
 DROP INDEX IF EXISTS idx_render_outbox_pending;
 DROP INDEX IF EXISTS uq_render_outbox_job_id;

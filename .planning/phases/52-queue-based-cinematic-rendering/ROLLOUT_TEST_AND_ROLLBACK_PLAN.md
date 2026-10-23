@@ -112,8 +112,9 @@ If any gate fails or unexpected behavior is detected during rollout, execute the
 
 ### Level 2: Backend Dispatch Decoupling (T + 5 minutes)
 - **Trigger**: Queue dispatch exceptions, database outbox locks, or message serialization issues.
-- **Action**: Update `praroha-backend` environment variable `ENABLE_CINEMATIC_DISPATCH=false` or rollback container revision to `baefbc6`.
+- **Action**: Update `praroha-backend` container to unbind `QUEUE_PUBLISH_URL` or revert container revision to `tendersaathiacr.azurecr.io/praroha-backend:v6`.
 - **Result**: API returns clean HTTP 503 `"Cinematic preview temporarily unavailable"` with zero impact on core text/world/audio capabilities.
+- **Non-Destructive Invariant**: Do NOT drop `render_outbox` or delete database records during an operational rollback. Preserving rows guarantees audit traceability.
 
 ### Level 3: Azure Worker Scale Suspension & Graceful Drain (T + 10 minutes)
 - **Trigger**: KEDA scaling runaway, excessive retries, or cost alert trigger.
@@ -131,13 +132,14 @@ If any gate fails or unexpected behavior is detected during rollout, execute the
        --resource-group rg-tendersaathi \
        --trigger-type Manual
      ```
-  3. **Inspect and Drain Pending Messages Gracefully**:
+  3. **Inspect and Reconcile Pending Messages Gracefully (DO NOT run `message clear`)**:
      - Inspect messages in `cinematic-render-jobs` without clearing them indiscriminately.
      - For each pending message, query the associated `generation_jobs` record in Supabase:
        ```sql
        UPDATE generation_jobs
-       SET status = 'cancelled',
-           error_details = 'Rendering temporarily suspended for maintenance. Please retry shortly.'
+       SET status = 'failed',
+           error_code = 'SERVICE_SUSPENDED',
+           error_message = 'Rendering temporarily suspended for maintenance. Please retry shortly.'
        WHERE status = 'queued';
        ```
      - Clear `request_hash = NULL` on affected `media_assets` so users can cleanly re-request once service is restored.
@@ -145,5 +147,6 @@ If any gate fails or unexpected behavior is detected during rollout, execute the
 
 ---
 
-## 4. Phase Verification Status
-All acceptance criteria, stage gates, and test metrics in this plan represent **planned specifications** for Phase 52 implementation. No cloud resources have been provisioned and no synthetic renders have been executed during this architectural design phase. Verification evidence will be captured and documented during Phase 52 execution.
+## 4. Authoritative Production Runbook
+For the complete step-by-step non-destructive execution checklist and safety classifications, see:
+- [PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md)
