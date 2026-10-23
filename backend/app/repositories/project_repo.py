@@ -330,55 +330,164 @@ def _migrate_columns(connection):
 
 
 
-async def init_db() -> None:
-    """Initialize database tables asynchronously.
+REQUIRED_TABLES: List[str] = [
+    "projects",
+    "characters",
+    "scenes",
+    "world_bibles",
+    "world_candidates",
+    "world_selections",
+    "generation_jobs",
+    "media_assets",
+    "creative_memory",
+    "render_outbox",
+    "seed_dna",
+    "seed_potential_items",
+]
 
-    CRITICAL ARCHITECTURAL BOUNDARY:
-    When configured for production/staging or when targeting PostgreSQL,
-    initialization failure MUST fail startup immediately.
-    Silent fallback to ephemeral SQLite in production is strictly prohibited.
+REQUIRED_COLUMNS: Dict[str, List[str]] = {
+    "projects": ["id", "title", "seed_text", "status"],
+    "characters": ["id", "project_id", "name", "is_stale", "stale_reason", "is_approved", "is_locked"],
+    "scenes": ["id", "project_id", "title", "is_stale", "stale_reason", "is_approved", "is_locked"],
+    "world_bibles": ["id", "project_id", "is_stale", "stale_reason", "is_locked"],
+    "media_assets": ["id", "project_id", "request_hash", "status", "aspect_ratio"],
+    "creative_memory": ["id", "project_id"],
+    "render_outbox": ["id", "project_id", "job_id", "payload", "status", "attempt_count", "last_error", "claimed_at", "published_at"],
+    "generation_jobs": ["id", "project_id", "job_type", "status"],
+}
+
+REQUIRED_INDEXES: Dict[str, List[str]] = {
+    "render_outbox": ["ix_render_outbox_project_id", "uq_render_outbox_job_id", "idx_render_outbox_pending"],
+    "media_assets": ["ix_media_assets_request_hash"],
+    "creative_memory": ["ix_creative_memory_project_id"],
+}
+
+
+def validate_production_schema(connection) -> None:
+    """Validate that required production schema objects exist without performing any DDL.
+
+    Checks required tables, columns, and indexes. Raises RuntimeError with clear,
+    actionable diagnosis if any required object is missing.
+    """
+    from sqlalchemy import inspect
+    inspector = inspect(connection)
+    existing_tables = set(inspector.get_table_names())
+
+    missing_tables = [t for t in REQUIRED_TABLES if t not in existing_tables]
+    if missing_tables:
+        raise RuntimeError(
+            f"Production schema validation failed: missing required tables: {missing_tables}. "
+            "Automatic schema migrations are disabled in production runtime. "
+            "Apply approved database migrations before starting the service."
+        )
+
+    missing_columns = []
+    for table, req_cols in REQUIRED_COLUMNS.items():
+        actual_cols = {c["name"] for c in inspector.get_columns(table)}
+        for col in req_cols:
+            if col not in actual_cols:
+                missing_columns.append(f"{table}.{col}")
+
+    if missing_columns:
+        raise RuntimeError(
+            f"Production schema validation failed: missing required columns: {missing_columns}. "
+            "Automatic schema migrations are disabled in production runtime. "
+            "Apply approved database migrations before starting the service."
+        )
+
+    missing_indexes = []
+    for table, req_indexes in REQUIRED_INDEXES.items():
+        actual_indexes = {idx["name"] for idx in inspector.get_indexes(table)}
+        try:
+            actual_constraints = {uc["name"] for uc in inspector.get_unique_constraints(table)}
+        except Exception:
+            actual_constraints = set()
+        all_actual = actual_indexes | actual_constraints
+        for idx in req_indexes:
+            if idx not in all_actual:
+                missing_indexes.append(f"{table}:{idx}")
+
+    if missing_indexes:
+        raise RuntimeError(
+            f"Production schema validation failed: missing required indexes/constraints: {missing_indexes}. "
+            "Automatic schema migrations are disabled in production runtime. "
+            "Apply approved database migrations before starting the service."
+        )
+
+
+async def init_db(allow_migrations: Optional[bool] = None) -> None:
+    """Initialize or validate database tables asynchronously.
+
+    RESPONSIBILITY SEPARATION:
+    - Production runtime: Connects to PostgreSQL and validates that required tables,
+      columns, indexes, and constraints exist via validate_production_schema().
+      Does NOT automatically apply schema migrations or execute DDL during application startup.
+    - Explicit migration operation: Applies approved schema migrations ONLY when
+      allow_migrations=True (or settings.ALLOW_PRODUCTION_DB_MIGRATIONS=True) is explicitly provided.
+      Even then, test suites targeting production URLs are rejected.
+    - Development/test: Automatic initialization (create_all + column migrations) is permitted
+      ONLY when an explicitly configured isolated SQLite or disposable PostgreSQL database is used.
+    - Fails startup immediately with actionable error if schema validation or connection fails.
+      Never silently switches to SQLite.
     """
     global engine, async_session
-    is_prod = settings.ENVIRONMENT.lower() in ("production", "staging")
+    is_prod_env = settings.ENVIRONMENT.lower() in ("production", "staging")
+    is_prod_url = Settings.is_production_database_url(str(engine.url))
+    is_prod = is_prod_env or is_prod_url
     is_sqlite = str(engine.url).startswith("sqlite")
     is_test = bool(os.environ.get("PYTEST_CURRENT_TEST")) or getattr(settings, "IS_TEST_MODE", False)
 
-    # CRITICAL TEST & LOCAL ISOLATION GUARD:
-    # Under no circumstances may automated tests or routine local scripts run init_db() / migrations
-    # against the production Supabase database.
-    if Settings.is_production_database_url(str(engine.url)):
-        if is_test:
-            raise RuntimeError(
-                "PRODUCTION DATABASE GUARD BLOCKED init_db(): Attempted to execute database migrations / "
-                "init_db() against production Supabase database during test execution. "
-                "Routine tests must run against an isolated test database or disposable schema."
-            )
-        if not is_prod and not getattr(settings, "ALLOW_PRODUCTION_DB_MIGRATIONS", False):
-            raise RuntimeError(
-                "PRODUCTION DATABASE GUARD BLOCKED init_db(): Attempted to execute init_db() against "
-                "production Supabase database from a non-production environment without "
-                "ALLOW_PRODUCTION_DB_MIGRATIONS=True."
-            )
+    effective_allow_migrations = (
+        allow_migrations
+        if allow_migrations is not None
+        else getattr(settings, "ALLOW_PRODUCTION_DB_MIGRATIONS", False)
+    )
+
+    # CRITICAL TEST ISOLATION GUARD:
+    # Automated tests targeting production Supabase URLs are rejected before ANY database connection or DDL.
+    if is_prod_url and is_test:
+        raise RuntimeError(
+            "PRODUCTION DATABASE GUARD BLOCKED init_db(): Attempted to target production Supabase database "
+            "during test execution. Routine tests must run against an isolated test database or disposable schema."
+        )
 
     try:
+        # PATH 1: Production runtime (Zero DDL, read-only validation)
+        if is_prod and not effective_allow_migrations:
+            async with engine.connect() as conn:
+                await conn.run_sync(validate_production_schema)
+            logger.info("Production schema validated successfully against %s. Zero DDL executed.", engine.url.drivername)
+            return
+
+        # PATH 2: Explicit migration operation (controlled DDL execution)
+        if is_prod and effective_allow_migrations:
+            logger.warning("EXPLICIT MIGRATION OPERATION: Applying schema changes against %s.", engine.url.drivername)
+            async with engine.begin() as conn:
+                await conn.run_sync(SQLModel.metadata.create_all)
+                await conn.run_sync(_migrate_columns)
+            logger.info("Production schema migration completed successfully on %s.", engine.url.drivername)
+            return
+
+        # PATH 3: Development / Isolated Test initialization (isolated SQLite or disposable PostgreSQL)
         async with engine.begin() as conn:
             if is_sqlite:
                 await conn.execute(text("PRAGMA journal_mode=WAL;"))
                 await conn.execute(text("PRAGMA busy_timeout=15000;"))
             await conn.run_sync(SQLModel.metadata.create_all)
             await conn.run_sync(_migrate_columns)
-        logger.info("Database initialized successfully using %s", engine.url.drivername)
+        logger.info("Development database initialized successfully using %s.", engine.url.drivername)
+
     except Exception as exc:
         logger.error(
-            "Database initialization failed against %s: %s",
+            "Database initialization/validation failed against %s: %s",
             engine.url.drivername,
             exc,
             exc_info=True,
         )
-        # Production/staging or any database without explicit opt-in must FAIL FAST
+        # Production, staging, or any database without explicit opt-in must FAIL FAST
         if is_prod or not getattr(settings, "ALLOW_SQLITE_FALLBACK", False):
             raise RuntimeError(
-                f"Database initialization failed against {engine.url.drivername}: {exc}. "
+                f"Database startup failed against {engine.url.drivername}: {exc}. "
                 "Silent fallback to SQLite is disabled."
             ) from exc
 
@@ -401,6 +510,11 @@ async def init_db() -> None:
             await conn.run_sync(SQLModel.metadata.create_all)
             await conn.run_sync(_migrate_columns)
         logger.info("Local SQLite fallback database initialized successfully.")
+
+
+async def run_migrations() -> None:
+    """Explicit migration operation entrypoint. Applies approved DDL to configured database."""
+    await init_db(allow_migrations=True)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

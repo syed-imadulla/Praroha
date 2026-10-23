@@ -213,3 +213,147 @@ async def test_disposable_postgres_isolation():
         assert not str(project_repo.engine.url).startswith("sqlite")
     finally:
         await pg_engine.dispose()
+
+
+def test_production_runtime_validation_performs_no_ddl():
+    """
+    Requirement: Production runtime schema validation MUST perform ZERO DDL operations
+    (no CREATE, ALTER, DROP statements). It must only inspect existing tables/columns.
+    """
+    mock_conn = MagicMock()
+    with patch("sqlalchemy.inspect") as mock_inspect:
+        inspector = MagicMock()
+        mock_inspect.return_value = inspector
+        # Setup valid schema
+        inspector.get_table_names.return_value = project_repo.REQUIRED_TABLES
+        inspector.get_columns.side_effect = lambda table: [
+            {"name": col} for col in project_repo.REQUIRED_COLUMNS.get(table, ["id"])
+        ]
+        inspector.get_indexes.side_effect = lambda table: [
+            {"name": idx} for idx in project_repo.REQUIRED_INDEXES.get(table, [])
+        ]
+        inspector.get_unique_constraints.return_value = []
+
+        # Execute validation
+        project_repo.validate_production_schema(mock_conn)
+
+        # Confirm connection.execute was NEVER called with any DDL
+        assert mock_conn.execute.call_count == 0
+
+
+def test_production_runtime_validation_fails_on_missing_table():
+    """
+    Requirement: If a required table is missing in production, validation must raise
+    RuntimeError with an actionable message and NOT apply DDL or fallback to SQLite.
+    """
+    mock_conn = MagicMock()
+    with patch("sqlalchemy.inspect") as mock_inspect:
+        inspector = MagicMock()
+        mock_inspect.return_value = inspector
+        # Table 'render_outbox' is missing
+        inspector.get_table_names.return_value = [
+            t for t in project_repo.REQUIRED_TABLES if t != "render_outbox"
+        ]
+
+        with pytest.raises(RuntimeError, match="missing required tables: \\['render_outbox'\\]"):
+            project_repo.validate_production_schema(mock_conn)
+
+
+def test_production_runtime_validation_fails_on_missing_column():
+    """
+    Requirement: If a required column (e.g. is_stale) is missing in production,
+    validation must raise RuntimeError with clear diagnosis.
+    """
+    mock_conn = MagicMock()
+    with patch("sqlalchemy.inspect") as mock_inspect:
+        inspector = MagicMock()
+        mock_inspect.return_value = inspector
+        inspector.get_table_names.return_value = project_repo.REQUIRED_TABLES
+        # Characters missing 'is_stale'
+        def cols_for_table(table):
+            cols = project_repo.REQUIRED_COLUMNS.get(table, ["id"])
+            if table == "characters":
+                return [{"name": c} for c in cols if c != "is_stale"]
+            return [{"name": c} for c in cols]
+        inspector.get_columns.side_effect = cols_for_table
+
+        with pytest.raises(RuntimeError, match="missing required columns: \\['characters.is_stale'\\]"):
+            project_repo.validate_production_schema(mock_conn)
+
+
+def test_production_runtime_validation_fails_on_missing_index():
+    """
+    Requirement: If a required index/constraint is missing in production,
+    validation must raise RuntimeError.
+    """
+    mock_conn = MagicMock()
+    with patch("sqlalchemy.inspect") as mock_inspect:
+        inspector = MagicMock()
+        mock_inspect.return_value = inspector
+        inspector.get_table_names.return_value = project_repo.REQUIRED_TABLES
+        inspector.get_columns.side_effect = lambda table: [
+            {"name": col} for col in project_repo.REQUIRED_COLUMNS.get(table, ["id"])
+        ]
+        # Missing uq_render_outbox_job_id
+        def indexes_for_table(table):
+            idxs = project_repo.REQUIRED_INDEXES.get(table, [])
+            if table == "render_outbox":
+                return [{"name": i} for i in idxs if i != "uq_render_outbox_job_id"]
+            return [{"name": i} for i in idxs]
+        inspector.get_indexes.side_effect = indexes_for_table
+        inspector.get_unique_constraints.return_value = []
+
+        with pytest.raises(RuntimeError, match="missing required indexes/constraints: \\['render_outbox:uq_render_outbox_job_id'\\]"):
+            project_repo.validate_production_schema(mock_conn)
+
+
+@pytest.mark.asyncio
+async def test_disposable_sqlite_development_path_supported():
+    """
+    Requirement: In development/test with isolated SQLite database,
+    automatic initialization (create_all and _migrate_columns) operates smoothly.
+    """
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
+        dev_url = f"sqlite+aiosqlite:///{tmp.name}"
+        dev_engine = build_engine(dev_url)
+        project_repo.engine = dev_engine
+        project_repo.settings.ENVIRONMENT = "development"
+        project_repo.settings.ALLOW_SQLITE_FALLBACK = False
+
+        try:
+            await init_db()
+            assert str(project_repo.engine.url).startswith("sqlite")
+        finally:
+            await dev_engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_init_db_in_production_calls_validation_with_zero_ddl(monkeypatch):
+    """
+    Requirement: When ENVIRONMENT=production and ALLOW_PRODUCTION_DB_MIGRATIONS=False,
+    init_db() invokes validate_production_schema() on a read-only connection and performs ZERO DDL.
+    """
+    monkeypatch.setattr(project_repo.settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(project_repo.settings, "ALLOW_PRODUCTION_DB_MIGRATIONS", False)
+    monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
+
+    fake_pg_url = "postgresql+asyncpg://disposable_user:pass@127.0.0.1:5432/disposable_db"
+    assert Settings.is_production_database_url(fake_pg_url) is False
+
+    mock_engine = MagicMock()
+    mock_engine.url.drivername = "postgresql+asyncpg"
+    mock_conn = MagicMock()
+
+    # Async context manager for engine.connect()
+    mock_engine.connect.return_value.__aenter__.return_value = mock_conn
+    mock_conn.run_sync = AsyncMock()
+
+    project_repo.engine = mock_engine
+
+    with patch("backend.app.repositories.project_repo.validate_production_schema") as mock_val:
+        await init_db()
+        assert mock_conn.run_sync.called
+        # Verify connect was called, but begin (transaction for DDL) was NOT called
+        assert mock_engine.connect.called
+        assert mock_engine.begin.call_count == 0

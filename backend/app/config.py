@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     QUEUE_PUBLISH_URL: Optional[str] = None  # Add-only SAS URL targeting cinematic-render-jobs
     DEV_AUTO_CONFIRM_EMAILS: bool = False
     ALLOW_SQLITE_FALLBACK: bool = False  # Explicit opt-in for development; strictly prohibited in production
-    ALLOW_PRODUCTION_DB_MIGRATIONS: bool = False  # Strict guard: local test runs must never run DDL against production
+    ALLOW_PRODUCTION_DB_MIGRATIONS: bool = False  # Explicit opt-in for controlled migrations; normal production runtime only validates schema and executes ZERO DDL
 
     @classmethod
     def is_production_database_url(cls, url: Optional[str]) -> bool:
