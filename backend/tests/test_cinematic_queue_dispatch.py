@@ -394,3 +394,82 @@ async def test_api_route_authorization_and_feature_flag(client, setup_dispatch_p
         json={"entity_type": "world", "entity_id": world.id},
     )
     assert resp_unauth.status_code in (403, 404)
+
+
+def test_dispatcher_dependency_isolation():
+    """
+    Requirement 1: Importing cinematic_dispatcher must NEVER import cinematic_worker.
+    Requirement 2: Importing cinematic_dispatcher must NEVER require psutil.
+    """
+    import subprocess
+    import sys
+
+    # Run in a fresh, isolated Python subprocess to guarantee pristine sys.modules
+    # and verify strict dependency and import isolation.
+    cmd = [
+        sys.executable,
+        "-c",
+        (
+            "import sys; "
+            "sys.modules['psutil'] = None; "
+            "import backend.app.services.cinematic_dispatcher as disp; "
+            "assert 'backend.app.workers.cinematic_worker' not in sys.modules, "
+            "'cinematic_worker was illegally imported by cinematic_dispatcher!'"
+        ),
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    assert proc.returncode == 0, f"Isolation check failed: {proc.stderr}"
+
+
+def test_queue_contract_validation_and_credential_rejection():
+    """
+    Verify queue contract validation enforces canonical schema and rejects credentials.
+    """
+    from backend.app.services.queue_contract import (
+        validate_queue_message_dict,
+        scan_for_credentials,
+        decode_message_content,
+        FORBIDDEN_CREDENTIAL_KEYWORDS,
+    )
+
+    valid_payload = {
+        "schema_version": "1.0",
+        "job_id": "job-123",
+        "project_id": "proj-456",
+        "entity_type": "world",
+        "entity_id": "ent-789",
+        "request_hash": "a" * 64,
+        "options": {
+            "duration_seconds": 12,
+            "fps": 24,
+            "resolution": "1280x720",
+            "aspect_ratio": "16:9",
+            "motion_preset": "slow_pan",
+        },
+        "enqueued_at": "2026-10-23T12:00:00Z",
+        "attempt": 1,
+    }
+
+    # Valid payload passes
+    res = validate_queue_message_dict(valid_payload)
+    assert res["job_id"] == "job-123"
+    assert res["options"]["fps"] == 24
+
+    # Credential rejection across all forbidden keywords
+    for keyword in ("api_key", "secret", "password", "token", "conn_str", "database_url"):
+        bad_payload = dict(valid_payload)
+        bad_payload[keyword] = "sensitive-value"
+        with pytest.raises(ValueError, match="Forbidden credential field detected"):
+            validate_queue_message_dict(bad_payload)
+
+    # Missing required field raises ValueError
+    bad_missing = dict(valid_payload)
+    del bad_missing["request_hash"]
+    with pytest.raises(ValueError, match="Missing required fields"):
+        validate_queue_message_dict(bad_missing)
+
+    # Invalid additional property raises ValueError
+    bad_extra = dict(valid_payload)
+    bad_extra["custom_extra_metadata"] = "value"
+    with pytest.raises(ValueError, match="Unexpected fields"):
+        validate_queue_message_dict(bad_extra)

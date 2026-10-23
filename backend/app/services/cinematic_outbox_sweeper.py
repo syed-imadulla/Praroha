@@ -22,7 +22,7 @@ from backend.app.services.cinematic_dispatcher import (
     sanitize_queue_url,
     validate_queue_url,
 )
-from backend.app.workers.cinematic_worker import validate_queue_message_dict
+from backend.app.services.queue_contract import validate_queue_message_dict
 
 logger = logging.getLogger("seed_unfold.cinematic_outbox_sweeper")
 

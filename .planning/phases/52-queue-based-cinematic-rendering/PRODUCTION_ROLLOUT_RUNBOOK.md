@@ -70,46 +70,49 @@ The following pre-rollout facts have been empirically audited as of commit `e023
 ### Phase Gate B: Backend Container Build & Deployment
 *Prerequisite: Phase Gate A verified. Explicit operator approval to build and deploy image `v7`.*
 
-- [ ] **Step B1 `[PROD-CHANGING]`**: Build backend image `v7` via Azure Container Registry:
-  ```bash
-  az acr build \
-    --registry tendersaathiacr \
-    --image praroha-backend:v7 \
-    --file Dockerfile.backend .
-  ```
-  *Verification*: Image includes `backend/app/models/outbox.py`, `backend/app/services/cinematic_outbox_sweeper.py`, `backend/app/services/cinematic_dispatcher.py`, and `backend/requirements.txt` (`azure-storage-queue`, `azure-identity`).
-- [ ] **Step B2 `[PROD-CHANGING]`**: Update `praroha-backend` container app:
-  ```bash
-  az containerapp update \
-    --name praroha-backend \
-    --resource-group rg-tendersaathi \
-    --image tendersaathiacr.azurecr.io/praroha-backend:v7 \
-    --set-env-vars QUEUE_PUBLISH_URL=secretref:queue-publish-url
-  ```
-  *Security Note*: `secretref:queue-publish-url` references the existing backend secret without exposing the SAS token in command arguments or shell history.
-  *Safety Guarantee*: `CINEMATIC_PREVIEW_ENABLED` remains unset/false, so public users cannot trigger renders.
+- [x] **Step B1 `[PROD-CHANGING]`**: Build backend image `v7` via Azure Container Registry:
+  - `az acr build` returned `TasksOperationsNotAllowed` (Azure for Students subscription does not permit remote ACR Tasks).
+  - Built locally using BuildKit with OCI container manifest (`docker build --load -f Dockerfile.backend -t tendersaathiacr.azurecr.io/praroha-backend:v7 .`).
+  - Authenticated via `az acr login -n tendersaathiacr` and pushed to ACR.
+  - Published Image Tags: `praroha-backend:v7` and `praroha-backend:v7.0`.
+  - Image Digest: `sha256:4b180a7f78f832412ecfdedbdd3e343c5654ba08cea545191d5443afa8440b5d` *(Recorded 2026-10-23)*.
+- [!] **Step B2 `[PROD-CHANGING]`**: Update `praroha-backend` container app & Startup Diagnostics:
+  - Deployed image `tendersaathiacr.azurecr.io/praroha-backend:v7.0` and bound `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
+  - Azure Container Apps provisioning succeeded (`provisioningState: Succeeded`).
+  - Container entered `CrashLoopBackOff` on boot.
+  - **Diagnostic Root Cause**: Log Analytics query revealed `ModuleNotFoundError: No module named 'psutil'` in `backend/app/main.py` -> `routers/media.py` -> `services/cinematic_dispatcher.py` -> `workers/cinematic_worker.py:35` (`import psutil`). `psutil` is listed in `requirements-worker.txt` for the worker, but was not in `backend/requirements.txt` for the backend app.
+- [x] **Step B3 `[ROLLBACK-EXECUTED]`**: Execute Rollback Level 1 per runbook:
+  - Immediate non-destructive rollback executed:
+    ```bash
+    az containerapp update \
+      --name praroha-backend \
+      --resource-group rg-tendersaathi \
+      --image tendersaathiacr.azurecr.io/praroha-backend:v6 \
+      --remove-env-vars QUEUE_PUBLISH_URL
+    ```
+  - `praroha-backend` returned to `provisioningState: Succeeded`, `runningStatus: Running`.
+  - Production service fully restored on `v6` with zero data loss and zero disruption to users.
 
 ---
 
 ### Phase Gate C: Post-Deployment Health & Infrastructure Audit
 *Prerequisite: Phase Gate B deployed.*
 
-- [ ] **Step C1 `[READ-ONLY]`**: Verify backend API health:
+- [x] **Step C1 `[READ-ONLY]`**: Verify backend API health:
   ```bash
   curl -fsS https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health | jq .
-  # Expected: {"success": true, "data": {"status": "healthy", ...}}
   ```
-- [ ] **Step C2 `[READ-ONLY]`**: Confirm startup tasks & sweeper initialization:
-  - Startup orphan recovery runs without falsely failing active leases.
-  - Background outbox sweeper starts and enters its 30-second polling cycle.
-- [ ] **Step C3 `[READ-ONLY]`**: Verify queue baseline & zero worker activity:
-  ```bash
-  az containerapp job execution list \
-    --name praroha-render-job \
-    --resource-group rg-tendersaathi \
-    --output json
-  # Expected: [] (0 active or past executions)
-  ```
+  *Result*: HTTP 200 OK, `{"success": true, "data": {"status": "healthy", "service": "PRAROHA — Seed to Universe", "environment": "production"}}`.
+- [x] **Step C2 `[READ-ONLY]`**: Verify database outbox state:
+  - Connected via production connection to Supabase `stxnxkzaftmwcbtvgzbm`.
+  - `render_outbox` table verified accessible with exactly 0 rows (`count = 0`). Zero unexpected rows.
+- [x] **Step C3 `[READ-ONLY]`**: Verify queue baseline & zero worker activity:
+  - `cinematic-render-jobs`: 0 messages.
+  - `cinematic-render-poison`: 0 messages.
+  - `praroha-render-job` execution history: `[]` (0 executions).
+- [x] **Step C4 `[READ-ONLY]`**: Verify feature flag status:
+  - Backend `CINEMATIC_PREVIEW_ENABLED = False`.
+  - Frontend `VITE_ENABLE_CINEMATIC_PREVIEW` disabled.
 
 ---
 
