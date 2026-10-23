@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1792689571.0325358,
-    "seen": 1792689858.7335463,
-    "ast_hash": "a251e353e41d269ad943a8c6a2d41049",
+    "mtime": 1792729827.0523045,
+    "seen": 1792730037.4306533,
+    "ast_hash": "49b6d0c74a24a73675c2eba05a39384f",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792729092.3635328,
-    "seen": 1792729156.1132936,
-    "ast_hash": "bb5a6e9141cd9d802cb8ca022e856812",
+    "mtime": 1792730002.5349083,
+    "seen": 1792730037.4350047,
+    "ast_hash": "d96bfcffe550503632d925648a33ef4a",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "backend/app/models/__init__.py": {
-    "mtime": 1792658611.0354784,
-    "seen": 1792659799.5173914,
-    "ast_hash": "bc4773d814ff694d7ba268831dc7b2a6",
+    "mtime": 1792729785.9976013,
+    "seen": 1792730037.4297378,
+    "ast_hash": "474ed99844da09fb344ce55cb80bfb40",
     "semantic_hash": ""
   },
   "backend/app/models/dna.py": {
@@ -3276,9 +3276,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md": {
-    "mtime": 1792728926.4499118,
-    "seen": 1792729156.1136649,
-    "ast_hash": "867db421e463772a74c7c666b37740bf",
+    "mtime": 1792729983.8740625,
+    "seen": 1792730037.4406734,
+    "ast_hash": "e9344128c20b562b96c00937b5245915",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-CONTEXT.md": {
@@ -3363,6 +3363,24 @@
     "mtime": 1792729130.2512565,
     "seen": 1792729156.1136737,
     "ast_hash": "9e50e2ae2535547ee1d9ccfe0ec2a519",
+    "semantic_hash": ""
+  },
+  "backend/app/models/outbox.py": {
+    "mtime": 1792729897.958772,
+    "seen": 1792730037.4299588,
+    "ast_hash": "969d0e54f4bf6f01fda2326dbaeb56fc",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_render_outbox_migration.py": {
+    "mtime": 1792729868.4420056,
+    "seen": 1792730037.432242,
+    "ast_hash": "a47c41fe060ff35ac70dfc459aac2fca",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-09-SUMMARY.md": {
+    "mtime": 1792730019.8757653,
+    "seen": 1792730037.4408057,
+    "ast_hash": "968002f5e3d53bb8060435fc86a15bff",
     "semantic_hash": ""
   }
 }

@@ -121,6 +121,13 @@ from backend.app.models.dependency import (
     SelectiveRegenerateRequest,
     SelectiveRegenerateResponse,
 )
+from backend.app.models.outbox import (
+    OutboxStatus,
+    RenderOutbox,
+    RenderOutboxBase,
+    RenderOutboxCreate,
+    RenderOutboxRead,
+)
 
 __all__ = [
     "Project",
@@ -221,6 +228,11 @@ __all__ = [
     "ImpactPreviewResponse",
     "SelectiveRegenerateRequest",
     "SelectiveRegenerateResponse",
+    "OutboxStatus",
+    "RenderOutbox",
+    "RenderOutboxBase",
+    "RenderOutboxCreate",
+    "RenderOutboxRead",
 ]
 
 

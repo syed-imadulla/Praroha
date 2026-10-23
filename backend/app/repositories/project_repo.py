@@ -391,6 +391,58 @@ def _migrate_columns(connection):
         except Exception:
             pass
 
+    is_sqlite = connection.dialect.name == "sqlite"
+    if "render_outbox" in table_names:
+        cols = [c["name"] for c in inspector.get_columns("render_outbox")]
+        for col, col_type in [
+            ("project_id", "VARCHAR"),
+            ("job_id", "VARCHAR"),
+            ("payload", "JSON" if is_sqlite else "JSONB"),
+            ("status", "VARCHAR DEFAULT 'pending'"),
+            ("attempt_count", "INTEGER DEFAULT 0"),
+            ("last_error", "TEXT"),
+            ("claimed_at", "TIMESTAMP"),
+            ("published_at", "TIMESTAMP"),
+            ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+            ("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+        ]:
+            if col not in cols:
+                try:
+                    connection.execute(text(f"ALTER TABLE render_outbox ADD COLUMN {col} {col_type}"))
+                except Exception:
+                    pass
+        try:
+            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_render_outbox_project_id ON render_outbox (project_id)"))
+            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_render_outbox_job_id ON render_outbox (job_id)"))
+            connection.execute(text("CREATE INDEX IF NOT EXISTS idx_render_outbox_pending ON render_outbox (status, created_at) WHERE status = 'pending'"))
+        except Exception:
+            pass
+    else:
+        try:
+            payload_type = "JSON" if is_sqlite else "JSONB"
+            connection.execute(text(f"""
+                CREATE TABLE IF NOT EXISTS render_outbox (
+                    id VARCHAR PRIMARY KEY,
+                    project_id VARCHAR NOT NULL,
+                    job_id VARCHAR NOT NULL UNIQUE,
+                    payload {payload_type} NOT NULL,
+                    status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'published', 'failed')),
+                    attempt_count INTEGER NOT NULL DEFAULT 0,
+                    last_error TEXT,
+                    claimed_at TIMESTAMP,
+                    published_at TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+                    FOREIGN KEY(job_id) REFERENCES generation_jobs(id) ON DELETE CASCADE
+                )
+            """))
+            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_render_outbox_project_id ON render_outbox (project_id)"))
+            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_render_outbox_job_id ON render_outbox (job_id)"))
+            connection.execute(text("CREATE INDEX IF NOT EXISTS idx_render_outbox_pending ON render_outbox (status, created_at) WHERE status = 'pending'"))
+        except Exception:
+            pass
+
 
 
 
@@ -2199,3 +2251,57 @@ class ProjectRepository:
             revisions=[],
             lineage=lineage,
         )
+
+    async def create_render_outbox_record(self, record: "RenderOutbox") -> "RenderOutbox":
+        """Persist a new render outbox record."""
+        self.session.add(record)
+        await self.session.commit()
+        await self.session.refresh(record)
+        return record
+
+    async def get_render_outbox_by_job_id(self, job_id: str) -> Optional["RenderOutbox"]:
+        """Retrieve render outbox record by job_id."""
+        from backend.app.models.outbox import RenderOutbox
+        stmt = select(RenderOutbox).where(RenderOutbox.job_id == job_id)
+        res = await self.session.execute(stmt)
+        return res.scalar_one_or_none()
+
+    async def get_pending_render_outbox_records(self, limit: int = 50) -> List["RenderOutbox"]:
+        """Retrieve pending outbox records ordered by creation time."""
+        from backend.app.models.outbox import RenderOutbox
+        stmt = (
+            select(RenderOutbox)
+            .where(RenderOutbox.status == "pending")
+            .order_by(RenderOutbox.created_at.asc())
+            .limit(limit)
+        )
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
+
+    async def update_render_outbox_status(
+        self,
+        job_id: str,
+        status: str,
+        last_error: Optional[str] = None,
+        published_at: Optional[datetime] = None,
+        increment_attempt: bool = False,
+    ) -> Optional["RenderOutbox"]:
+        """Update render outbox status, attempts, and error information."""
+        from backend.app.models.outbox import RenderOutbox
+        stmt = select(RenderOutbox).where(RenderOutbox.job_id == job_id)
+        res = await self.session.execute(stmt)
+        rec = res.scalar_one_or_none()
+        if not rec:
+            return None
+        rec.status = status
+        if increment_attempt:
+            rec.attempt_count += 1
+        if last_error is not None:
+            rec.last_error = last_error
+        if published_at is not None:
+            rec.published_at = published_at
+        rec.updated_at = get_utc_now()
+        self.session.add(rec)
+        await self.session.commit()
+        await self.session.refresh(rec)
+        return rec
