@@ -23,19 +23,31 @@ All operations in this runbook are strictly gated and categorized into three exp
 
 ---
 
-## 2. Audited Pre-Deployment Verification
+## 2. Authoritative Current Production State
 
-The following pre-rollout facts have been empirically audited as of commit `e0239e7`:
+As of the latest read-only audit (commit `13abb6d`), the live production environment state is:
+
+- **Production backend:** `v6` (`tendersaathiacr.azurecr.io/praroha-backend:v6`, revision `praroha-backend--latest`, status `Running`, healthy on `/api/health`).
+- **Queue-publisher environment binding:** unbound (no `QUEUE_PUBLISH_URL` environment variable present on `praroha-backend`; secret reference `queue-publish-url` remains provisioned in ACA secrets store, ready for binding upon authorization).
+- **Candidate `v7.3`:** published to ACR (`tendersaathiacr.azurecr.io/praroha-backend:v7.3`, digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`), **NOT deployed**.
+- **Production `render_outbox`:** exists in Supabase (`public.render_outbox` created via `0001_create_render_outbox.sql` with 11 columns, 5 constraints, 3 indexes; currently 0 total rows, 0 pending rows).
+- **Both cinematic-preview feature flags:** disabled (backend `CINEMATIC_PREVIEW_ENABLED=False` unset/default false; frontend `VITE_ENABLE_CINEMATIC_PREVIEW` unset/falsy).
+- **Both queues:** empty (`cinematic-render-jobs`: 0 messages; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
+- **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v6`, zero ingress (`ingress: null`), and 0 active/historical executions.
+- **Canary:** **not executed**.
+- **Next required authorization:** deploy candidate `v7.3` and bind the existing queue-publisher secret reference (`QUEUE_PUBLISH_URL=secretref:queue-publish-url`).
 
 | Component | Target Resource | Live Audited State | Status |
-| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` created via `0001_create_render_outbox.sql`. 11 columns, 5 constraints, 3 indexes verified. HTTP 200 on REST API. | **MIGRATED & VERIFIED** (Phase Gate A Complete) |
-| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.1`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **DEPLOYED & HEALTHY** (Phase Gate B Complete) |
-| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
-| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`, UAMI `uami-praroha-render`, zero ingress (`ingress: null`), and 0 active executions. | Verified scale-to-zero active |
+| :--- | :--- | :--- | :--- |
+| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` verified present (11 columns, 5 constraints, 3 indexes). HTTP 200 on REST API; 0 total rows, 0 pending rows. | **MIGRATED & VERIFIED** (Phase Gate A Complete) |
+| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v6`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **ACTIVE LIVE REVISION (v6)** |
+| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` environment variable is **unbound**; secret reference `queue-publish-url` is provisioned and ready. | **UNBOUND (Awaiting Gate B Approval)** |
+| **Candidate Image v7.3** | `tendersaathiacr.azurecr.io` | Tag: `praroha-backend:v7.3`. Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`. Tested in isolated container; zero DDL on startup. | **STAGED IN ACR (Not Deployed)** |
+| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`, UAMI `uami-praroha-render`, zero ingress (`ingress: null`), and 0 active or historical executions. | Verified scale-to-zero active |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (`[]`).<br>`cinematic-render-poison`: 0 messages (`[]`). | Verified clean queue baseline |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
 | **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). | Verified disabled |
-| **Test Battery & Build** | Local repo | 306 passed in `pytest backend/tests/`. Frontend production build succeeds in 13.1s (33 precached PWA entries). | Verified 100% green |
+| **Test Battery & Build** | Local repo | 318 passed (2 skipped) in `pytest backend/tests/`. Frontend production build succeeds in 13.9s. | Verified 100% green |
 
 ---
 
@@ -64,24 +76,23 @@ The following pre-rollout facts have been empirically audited as of commit `e023
   - All 11 columns, 5 constraints (PK, 2 FKs, unique, status check), and 3 indexes verified.
   - Baselines preserved: `projects` (381), `generation_jobs` (492), `media_assets` (282). *(Completed 2026-10-23)*
 
-
 ---
 
-### Phase Gate B: Backend Container Build & Deployment
-*Prerequisite: Phase Gate A verified. Explicit operator approval to build and deploy image `v7`.*
+### Phase Gate B: Backend Container Build & Deployment History
+*Historical Record of v7/v7.1 deployments, incident containment, hardening, and Candidate v7.3 release gate:*
 
-- [x] **Step B1 `[PROD-CHANGING]`**: Build backend image `v7` via Azure Container Registry:
+- [x] **Step B1 `[PROD-CHANGING-HISTORICAL]`**: Build backend image `v7` via Azure Container Registry:
   - `az acr build` returned `TasksOperationsNotAllowed` (Azure for Students subscription does not permit remote ACR Tasks).
   - Built locally using BuildKit with OCI container manifest (`docker build --load -f Dockerfile.backend -t tendersaathiacr.azurecr.io/praroha-backend:v7 .`).
   - Authenticated via `az acr login -n tendersaathiacr` and pushed to ACR.
   - Published Image Tags: `praroha-backend:v7` and `praroha-backend:v7.0`.
   - Image Digest: `sha256:4b180a7f78f832412ecfdedbdd3e343c5654ba08cea545191d5443afa8440b5d` *(Recorded 2026-10-23)*.
-- [!] **Step B2 `[PROD-CHANGING]`**: Update `praroha-backend` container app & Startup Diagnostics:
+- [!] **Step B2 `[INCIDENT-HISTORICAL]`**: Update `praroha-backend` container app & Startup Crash on v7.0:
   - Deployed image `tendersaathiacr.azurecr.io/praroha-backend:v7.0` and bound `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
   - Azure Container Apps provisioning succeeded (`provisioningState: Succeeded`).
   - Container entered `CrashLoopBackOff` on boot.
   - **Diagnostic Root Cause**: Log Analytics query revealed `ModuleNotFoundError: No module named 'psutil'` in `backend/app/main.py` -> `routers/media.py` -> `services/cinematic_dispatcher.py` -> `workers/cinematic_worker.py:35` (`import psutil`). `psutil` is listed in `requirements-worker.txt` for the worker, but was not in `backend/requirements.txt` for the backend app.
-- [x] **Step B3 `[ROLLBACK-EXECUTED]`**: Execute Rollback Level 1 per runbook:
+- [x] **Step B3 `[ROLLBACK-EXECUTED-HISTORICAL]`**: Execute Rollback Level 1 to v6:
   - Immediate non-destructive rollback executed:
     ```bash
     az containerapp update \
@@ -90,7 +101,7 @@ The following pre-rollout facts have been empirically audited as of commit `e023
       --image tendersaathiacr.azurecr.io/praroha-backend:v6 \
       --remove-env-vars QUEUE_PUBLISH_URL
     ```
-- [x] **Step B4 `[PROD-DEPLOYED]`**: Build, Verify, and Deploy Candidate `v7.1`:
+- [x] **Step B4 `[PROD-DEPLOYED-HISTORICAL]`**: Build and Deploy Candidate `v7.1` (Superseded):
   - Extracted pure `backend/app/services/queue_contract.py` removing `psutil` dependency boundary.
   - Validated local container boot and clean dependency imports inside built container.
   - Published immutable image `tendersaathiacr.azurecr.io/praroha-backend:v7.1`.
@@ -103,8 +114,24 @@ The following pre-rollout facts have been empirically audited as of commit `e023
       --image tendersaathiacr.azurecr.io/praroha-backend:v7.1 \
       --set-env-vars QUEUE_PUBLISH_URL=secretref:queue-publish-url
     ```
-  - Deployment status: `provisioningState: Succeeded`, `runningStatus: Running`.
-  - `QUEUE_PUBLISH_URL` bound via `secretref:queue-publish-url`.
+- [!] **Step B5 `[INCIDENT-HISTORICAL]`**: Database Fallback Incident on v7.1 Startup:
+  - During v7.1 startup, `project_repo._migrate_columns()` executed: `ALTER TABLE characters ADD COLUMN is_stale BOOLEAN DEFAULT 0;`.
+  - PostgreSQL rejected integer default `0` for `BOOLEAN` column (`DatatypeMismatch`), aborting the transaction.
+  - An overly permissive `except Exception` caught the error and triggered a legacy fallback to local SQLite (`/app/seed_unfold.db`).
+- [x] **Step B6 `[ROLLBACK-EXECUTED-CONTAINED]`**: Immediate Rollback to v6 & Containment:
+  - Reverted production container app `praroha-backend` to `tendersaathiacr.azurecr.io/praroha-backend:v6`.
+  - Removed `QUEUE_PUBLISH_URL` environment variable binding from `praroha-backend`.
+  - Telemetry audit: exactly 0 writes occurred during brief v7.1 runtime; zero data lost. Both queues remained at 0 messages.
+- [x] **Step B7 `[PREPARED-IN-ACR]`**: Database Safety Hardening & Candidate `v7.3` Release Gate:
+  - Fail-closed initialization implemented (`RuntimeError` on DB init failure; silent SQLite fallback completely eliminated in production).
+  - Strict separation of concerns: production runtime startup only validates schema (`validate_production_schema()`) with **ZERO DDL** statements; automatic migrations disabled (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`).
+  - Built and verified candidate `v7.3` locally in an isolated PostgreSQL container (`testdb`):
+    - Unmigrated DB: cleanly refused startup with exit code 3 (`RuntimeError`).
+    - Explicit migration: `run_migrations()` succeeded with `ALLOW_PRODUCTION_DB_MIGRATIONS=True`.
+    - Migrated DB: normal startup validated schema with zero DDL; `/api/health` returned HTTP 200.
+  - Published immutable candidate image `tendersaathiacr.azurecr.io/praroha-backend:v7.3` to ACR.
+  - Expected & Verified Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`.
+  - **Status: STAGED IN ACR. NOT DEPLOYED TO PRODUCTION. AWAITING OPERATOR AUTHORIZATION.**
 
 ---
 
@@ -285,19 +312,46 @@ WHERE media_type = 'video'
 
 ---
 
-## 6. Exact Remaining Production Approvals
+## 6. Authoritative Production Approvals Status & Next Required Gate
 
-Before any production state is modified, the following sequential operator approvals are required:
+All operations remain strictly gated. The reconciliation of historical and remaining approvals is as follows:
 
-1. **Approval 1 [PROD-CHANGING]**: Approval to apply [0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) to production Supabase database.
-2. **Approval 2 [PROD-CHANGING]**: Approval to build image `praroha-backend:v7` via ACR and update `praroha-backend` Container App with `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
-3. **Approval 3 [RENDER-TRIGGERING]**: Separate approval to trigger exactly one synthetic canary render to verify end-to-end rendering, storage upload, and worker scale-to-zero.
+### 6.1 Historical Production Approvals
+1. **Approval 1 `[PROD-CHANGING]` (Supabase Outbox Schema)**:
+   - *Action*: Apply [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) to production Supabase.
+   - *Status*: **GRANTED & FULLY EXECUTED** (2026-10-23). `render_outbox` verified present with 11 columns, 5 constraints, 3 indexes, 0 rows.
+2. **Approval 2 (Historical) `[PROD-CHANGING]` (Deploy v7 / v7.1)**:
+   - *Action*: Deploy `praroha-backend:v7` / `v7.1` and bind `QUEUE_PUBLISH_URL`.
+   - *Status*: **EXECUTED, INCIDENTS ENCOUNTERED, AND FULLY ROLLED BACK TO v6** (2026-10-23). `QUEUE_PUBLISH_URL` unbound. Telemetry verified 0 writes and zero data loss.
 
-**CURRENT STATUS: Staged & Paused. Awaiting Operator Approval for Candidate v7.2.**
+### 6.2 Next Required Production Approval: Deploy Candidate v7.3 Gate
+The **SINGLE** next required operational approval before any further production modification is:
+
+- **Operation `[PROD-CHANGING]`**: Deploy candidate `v7.3` image and bind existing secret reference `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
+- **Target Container App**: `praroha-backend` (Resource Group: `rg-tendersaathi`).
+- **Verified Candidate Image**: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`
+- **Expected & Verified Digest**: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`
+- **Exact Azure CLI Command**:
+  ```bash
+  az containerapp update \
+    --name praroha-backend \
+    --resource-group rg-tendersaathi \
+    --image tendersaathiacr.azurecr.io/praroha-backend:v7.3 \
+    --set-env-vars QUEUE_PUBLISH_URL=secretref:queue-publish-url
+  ```
+- **Safety Properties of v7.3**:
+  - Production runtime startup performs **ZERO DDL** schema changes (`validate_production_schema()`); automatic migrations disabled (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`).
+  - Fails closed immediately on connection or schema validation failure; silent SQLite fallback completely eliminated.
+  - Dependency boundary clean: pure `queue_contract.py` without `psutil` or FFmpeg worker dependencies.
+- **Current Status**: **STAGED & PAUSED. AWAITING EXPLICIT OPERATOR AUTHORIZATION FOR CANDIDATE v7.3.**
+
+### 6.3 Subsequent Deployment Gate: Synthetic Canary Render
+- **Operation `[RENDER-TRIGGERING]`**: Execute exactly ONE synthetic canary render.
+- **Status**: **NOT EXECUTED / PENDING SEPARATE AUTHORIZATION**. Strictly blocked until Candidate `v7.3` is deployed and verified healthy.
 
 ---
 
-## 7. Incident Post-Mortem & Candidate Image v7.2 Verification
+## 7. Incident Post-Mortem & Candidate Image v7.2 / v7.3 Verification
 
 ### 7.1 Incident Summary (v7.1 Boot Failure & Silent SQLite Fallback)
 - **Incident**: Upon deployment of `praroha-backend:v7.1`, during application startup, `project_repo._migrate_columns()` executed:

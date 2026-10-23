@@ -62,10 +62,13 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 
 #### Stage 3: Primary API Outbox Integration (`praroha-backend`)
 - **Actions**:
-  1. Add `render_outbox` table migration in Supabase PostgreSQL.
-  2. Update `CinematicDispatcherService` in `backend/app/services/cinematic_dispatcher.py` to write to `render_outbox` and dispatch to `cinematic-render-jobs`.
-  3. Deploy updated `praroha-backend` revision to ACA.
-- **Gate Check**: Verify 250 backend tests pass with zero regressions. Confirm FastAPI startup logs indicate `recover_orphaned_jobs()` and outbox initialization succeed.
+  1. Add `render_outbox` table migration in Supabase PostgreSQL. *(Completed & Verified 2026-10-23: 11 columns, 5 constraints, 3 indexes, 0 rows).*
+  2. Update `CinematicDispatcherService` in `backend/app/services/cinematic_dispatcher.py` to write to `render_outbox` and dispatch to `cinematic-render-jobs`. *(Completed & Verified).*
+  3. Deploy updated `praroha-backend` revision to ACA:
+     - *Historical Note*: Initial deployments of v7 and v7.1 encountered startup exceptions (psutil worker import and boolean column migration fallback) and were safely rolled back to `v6` with `QUEUE_PUBLISH_URL` unbound. Telemetry confirmed 0 writes and zero data loss.
+     - *Candidate Hardening*: Candidate `v7.3` (`sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`) separates runtime validation (zero DDL) from migrations and fails closed against PostgreSQL errors.
+     - *Status*: Staged in ACR. **Awaiting operator authorization to deploy candidate v7.3 and bind `QUEUE_PUBLISH_URL=secretref:queue-publish-url`**. Production currently runs `v6` (unbound).
+- **Gate Check**: Verify backend tests pass (318 passed, 2 skipped). Live `/api/health` returns HTTP 200.
 
 #### Stage 4: Synthetic Canary Validation
 - **Actions**:
@@ -73,17 +76,20 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
   2. Observe KEDA trigger execution in Azure Log Analytics.
   3. Confirm rendered MP4 is uploaded to Supabase Storage bucket `seed-unfold-assets`.
 - **Gate Check**: Verify MP4 metadata: `duration == 6.0s`, `codec == h264`, `resolution == 1280x720`, `is_synthetic == true`, `provider_label == "Cinematic Preview"`.
+- **Status**: **NOT EXECUTED**. Strictly blocked awaiting deployment of Candidate `v7.3` and separate explicit canary authorization.
 
 #### Stage 5: Fault Injection & Resilience Testing
 - **Actions**:
   1. **Restart Simulation**: Enqueue a job and immediately restart the `praroha-backend` container. Confirm the outbox sweeper detects and recovers the job without duplicate execution.
   2. **Poison Message Test**: Inject an intentionally malformed message (`{"schema_version": "0.1", "corrupt": true}`). Verify the message is dequeued, retried up to 3 times, moved to `cinematic-render-poison`, and the job marked `failed` with clear diagnostics.
 - **Gate Check**: Zero orphaned locks in `generation_jobs`; `cinematic-render-poison` contains exactly 1 entry.
+- **Status**: Pending Stage 4 verification.
 
 #### Stage 6: Frontend Feature Flag Enablement
 - **Actions**:
   1. Toggle `VITE_ENABLE_CINEMATIC_PREVIEW=true` in Vercel environment variables for preview deployment.
   2. Verify creator UI in browser: button transitions from disabled to interactive, displays honest tooltip, runs progress animation, and plays back video upon completion.
+- **Status**: Pending Stage 5 verification. Both backend and frontend flags currently remain **disabled**.
 
 ---
 
