@@ -86,6 +86,23 @@ async_session = async_sessionmaker(
 )
 
 
+def _safe_execute(connection, stmt):
+    """Execute DDL statement with savepoint protection to prevent transaction abortion in PostgreSQL."""
+    if connection.dialect.name == "sqlite":
+        try:
+            connection.execute(stmt)
+        except Exception:
+            pass
+    else:
+        # Use nested transaction (SAVEPOINT) on PostgreSQL so individual statement failures
+        # do not abort the overall connection transaction block.
+        try:
+            with connection.begin_nested():
+                connection.execute(stmt)
+        except Exception as exc:
+            logger.debug("Safe DDL migration skipped (%s): %s", type(exc).__name__, exc)
+
+
 def _migrate_columns(connection):
     from sqlalchemy import inspect, text
     inspector = inspect(connection)
@@ -94,265 +111,139 @@ def _migrate_columns(connection):
     if "projects" in table_names:
         cols = [c["name"] for c in inspector.get_columns("projects")]
         if "selected_world_id" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN selected_world_id VARCHAR"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN selected_world_id VARCHAR"))
         if "parent_project_id" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN parent_project_id VARCHAR"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN parent_project_id VARCHAR"))
         if "branch_name" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN branch_name VARCHAR DEFAULT 'main'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN branch_name VARCHAR DEFAULT 'main'"))
         if "mutation_metadata_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN mutation_metadata_json TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN mutation_metadata_json TEXT"))
         if "counterfactual_metadata_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN counterfactual_metadata_json TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN counterfactual_metadata_json TEXT"))
         if "deleted_at" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN deleted_at TIMESTAMP"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN deleted_at TIMESTAMP"))
         if "owner_id" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE projects ADD COLUMN owner_id VARCHAR"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE projects ADD COLUMN owner_id VARCHAR"))
 
     if "characters" in table_names:
         cols = [c["name"] for c in inspector.get_columns("characters")]
         if "version" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN version INTEGER DEFAULT 1"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN version INTEGER DEFAULT 1"))
         if "revision_notes" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN revision_notes VARCHAR"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN revision_notes VARCHAR"))
         if "origin_type" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN origin_type VARCHAR DEFAULT 'AI_INTRODUCED'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN origin_type VARCHAR DEFAULT 'AI_INTRODUCED'"))
         if "origin_source" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN origin_source TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN origin_source TEXT"))
         if "is_stale" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN is_stale BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN is_stale BOOLEAN DEFAULT FALSE"))
         if "stale_reason" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN stale_reason TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN stale_reason TEXT"))
         if "is_approved" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN is_approved BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN is_approved BOOLEAN DEFAULT FALSE"))
         if "is_locked" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE characters ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE characters ADD COLUMN is_locked BOOLEAN DEFAULT FALSE"))
 
     if "scenes" in table_names:
         cols = [c["name"] for c in inspector.get_columns("scenes")]
         if "version" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN version INTEGER DEFAULT 1"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN version INTEGER DEFAULT 1"))
         if "revision_notes" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN revision_notes VARCHAR"))
         if "origin_type" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN origin_type VARCHAR DEFAULT 'AI_INTRODUCED'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN origin_type VARCHAR DEFAULT 'AI_INTRODUCED'"))
         if "origin_source" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN origin_source TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN origin_source TEXT"))
         if "is_stale" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN is_stale BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN is_stale BOOLEAN DEFAULT FALSE"))
         if "stale_reason" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN stale_reason TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN stale_reason TEXT"))
         if "is_approved" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN is_approved BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN is_approved BOOLEAN DEFAULT FALSE"))
         if "is_locked" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE scenes ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE scenes ADD COLUMN is_locked BOOLEAN DEFAULT FALSE"))
 
     if "world_bibles" in table_names:
         cols = [c["name"] for c in inspector.get_columns("world_bibles")]
         if "version" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN version INTEGER DEFAULT 1"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_bibles ADD COLUMN version INTEGER DEFAULT 1"))
         if "revision_notes" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN revision_notes VARCHAR"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_bibles ADD COLUMN revision_notes VARCHAR"))
         if "is_stale" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN is_stale BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_bibles ADD COLUMN is_stale BOOLEAN DEFAULT FALSE"))
         if "stale_reason" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN stale_reason TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_bibles ADD COLUMN stale_reason TEXT"))
         if "is_locked" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_bibles ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_bibles ADD COLUMN is_locked BOOLEAN DEFAULT FALSE"))
 
     if "world_candidates" in table_names:
         cols = [c["name"] for c in inspector.get_columns("world_candidates")]
         if "divergence_archetype" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_candidates ADD COLUMN divergence_archetype VARCHAR DEFAULT 'familiar'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_candidates ADD COLUMN divergence_archetype VARCHAR DEFAULT 'familiar'"))
         if "exploration_profile_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_candidates ADD COLUMN exploration_profile_json TEXT DEFAULT '{}'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_candidates ADD COLUMN exploration_profile_json TEXT DEFAULT '{}'"))
         if "emphasized_potential_labels_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_candidates ADD COLUMN emphasized_potential_labels_json TEXT DEFAULT '[]'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_candidates ADD COLUMN emphasized_potential_labels_json TEXT DEFAULT '[]'"))
 
     if "world_selections" in table_names:
         cols = [c["name"] for c in inspector.get_columns("world_selections")]
         if "creative_priorities_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_selections ADD COLUMN creative_priorities_json TEXT DEFAULT '[]'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_selections ADD COLUMN creative_priorities_json TEXT DEFAULT '[]'"))
         if "rejected_directions_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_selections ADD COLUMN rejected_directions_json TEXT DEFAULT '[]'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_selections ADD COLUMN rejected_directions_json TEXT DEFAULT '[]'"))
         if "custom_directives" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_selections ADD COLUMN custom_directives TEXT"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_selections ADD COLUMN custom_directives TEXT"))
         if "human_only_zones_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE world_selections ADD COLUMN human_only_zones_json TEXT DEFAULT '{}'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE world_selections ADD COLUMN human_only_zones_json TEXT DEFAULT '{}'"))
 
     if "media_assets" in table_names:
         cols = [c["name"] for c in inspector.get_columns("media_assets")]
         if "width" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE media_assets ADD COLUMN width INTEGER"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE media_assets ADD COLUMN width INTEGER"))
         if "height" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE media_assets ADD COLUMN height INTEGER"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE media_assets ADD COLUMN height INTEGER"))
         if "aspect_ratio" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE media_assets ADD COLUMN aspect_ratio VARCHAR DEFAULT '1:1'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE media_assets ADD COLUMN aspect_ratio VARCHAR DEFAULT '1:1'"))
         if "metadata_json" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE media_assets ADD COLUMN metadata_json TEXT DEFAULT '{}'"))
-            except Exception:
-                pass
+            _safe_execute(connection, text("ALTER TABLE media_assets ADD COLUMN metadata_json TEXT DEFAULT '{}'"))
         if "request_hash" not in cols:
-            try:
-                connection.execute(text("ALTER TABLE media_assets ADD COLUMN request_hash VARCHAR"))
-            except Exception:
-                pass
-        try:
-            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_media_assets_request_hash ON media_assets (request_hash)"))
-            connection.execute(text("""
-                CREATE UNIQUE INDEX IF NOT EXISTS uq_media_active_request
-                ON media_assets (project_id, request_hash)
-                WHERE request_hash IS NOT NULL AND status IN ('queued', 'processing')
-            """))
-        except Exception:
-            pass
+            _safe_execute(connection, text("ALTER TABLE media_assets ADD COLUMN request_hash VARCHAR"))
+        _safe_execute(connection, text("CREATE INDEX IF NOT EXISTS ix_media_assets_request_hash ON media_assets (request_hash)"))
+        _safe_execute(connection, text("""
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_media_active_request
+            ON media_assets (project_id, request_hash)
+            WHERE request_hash IS NOT NULL AND status IN ('queued', 'processing')
+        """))
     else:
-        try:
-            connection.execute(text("""
-                CREATE TABLE IF NOT EXISTS media_assets (
-                    id VARCHAR PRIMARY KEY,
-                    project_id VARCHAR NOT NULL,
-                    entity_type VARCHAR NOT NULL,
-                    entity_id VARCHAR NOT NULL,
-                    media_type VARCHAR NOT NULL,
-                    status VARCHAR NOT NULL,
-                    asset_url TEXT,
-                    mime_type VARCHAR,
-                    prompt TEXT NOT NULL,
-                    provider_name VARCHAR NOT NULL,
-                    error_message TEXT,
-                    width INTEGER,
-                    height INTEGER,
-                    aspect_ratio VARCHAR DEFAULT '1:1',
-                    metadata_json TEXT DEFAULT '{}',
-                    request_hash VARCHAR,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    completed_at TIMESTAMP,
-                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-                )
-            """))
-            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_media_assets_request_hash ON media_assets (request_hash)"))
-            connection.execute(text("""
-                CREATE UNIQUE INDEX IF NOT EXISTS uq_media_active_request
-                ON media_assets (project_id, request_hash)
-                WHERE request_hash IS NOT NULL AND status IN ('queued', 'processing')
-            """))
-        except Exception:
-            pass
+        _safe_execute(connection, text("""
+            CREATE TABLE IF NOT EXISTS media_assets (
+                id VARCHAR PRIMARY KEY,
+                project_id VARCHAR NOT NULL,
+                entity_type VARCHAR NOT NULL,
+                entity_id VARCHAR NOT NULL,
+                media_type VARCHAR NOT NULL,
+                status VARCHAR NOT NULL,
+                asset_url TEXT,
+                mime_type VARCHAR,
+                prompt TEXT NOT NULL,
+                provider_name VARCHAR NOT NULL,
+                error_message TEXT,
+                width INTEGER,
+                height INTEGER,
+                aspect_ratio VARCHAR DEFAULT '1:1',
+                metadata_json TEXT DEFAULT '{}',
+                request_hash VARCHAR,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP,
+                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+            )
+        """))
+        _safe_execute(connection, text("CREATE INDEX IF NOT EXISTS ix_media_assets_request_hash ON media_assets (request_hash)"))
+        _safe_execute(connection, text("""
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_media_active_request
+            ON media_assets (project_id, request_hash)
+            WHERE request_hash IS NOT NULL AND status IN ('queued', 'processing')
+        """))
 
     if "creative_memory" in table_names:
         cols = [c["name"] for c in inspector.get_columns("creative_memory")]
@@ -369,37 +260,28 @@ def _migrate_columns(connection):
             ("updated_at", "TIMESTAMP"),
         ]:
             if col not in cols:
-                try:
-                    connection.execute(text(f"ALTER TABLE creative_memory ADD COLUMN {col} {col_type}"))
-                except Exception:
-                    pass
-        try:
-            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_creative_memory_project_id ON creative_memory (project_id)"))
-        except Exception:
-            pass
+                _safe_execute(connection, text(f"ALTER TABLE creative_memory ADD COLUMN {col} {col_type}"))
+        _safe_execute(connection, text("CREATE UNIQUE INDEX IF NOT EXISTS ix_creative_memory_project_id ON creative_memory (project_id)"))
     else:
-        try:
-            connection.execute(text("""
-                CREATE TABLE IF NOT EXISTS creative_memory (
-                    id VARCHAR PRIMARY KEY,
-                    project_id VARCHAR NOT NULL UNIQUE,
-                    world_candidate_id VARCHAR,
-                    canon_rules_json TEXT DEFAULT '[]',
-                    character_profiles_json TEXT DEFAULT '[]',
-                    relationship_matrix_json TEXT DEFAULT '[]',
-                    timeline_anchors_json TEXT DEFAULT '[]',
-                    creator_locks_json TEXT DEFAULT '{}',
-                    negative_constraints_json TEXT DEFAULT '[]',
-                    provenance_json TEXT DEFAULT '{}',
-                    version INTEGER DEFAULT 1,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-                )
-            """))
-            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_creative_memory_project_id ON creative_memory (project_id)"))
-        except Exception:
-            pass
+        _safe_execute(connection, text("""
+            CREATE TABLE IF NOT EXISTS creative_memory (
+                id VARCHAR PRIMARY KEY,
+                project_id VARCHAR NOT NULL UNIQUE,
+                world_candidate_id VARCHAR,
+                canon_rules_json TEXT DEFAULT '[]',
+                character_profiles_json TEXT DEFAULT '[]',
+                relationship_matrix_json TEXT DEFAULT '[]',
+                timeline_anchors_json TEXT DEFAULT '[]',
+                creator_locks_json TEXT DEFAULT '{}',
+                negative_constraints_json TEXT DEFAULT '[]',
+                provenance_json TEXT DEFAULT '{}',
+                version INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+            )
+        """))
+        _safe_execute(connection, text("CREATE UNIQUE INDEX IF NOT EXISTS ix_creative_memory_project_id ON creative_memory (project_id)"))
 
     is_sqlite = connection.dialect.name == "sqlite"
     if "render_outbox" in table_names:
@@ -417,78 +299,89 @@ def _migrate_columns(connection):
             ("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
         ]:
             if col not in cols:
-                try:
-                    connection.execute(text(f"ALTER TABLE render_outbox ADD COLUMN {col} {col_type}"))
-                except Exception:
-                    pass
-        try:
-            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_render_outbox_project_id ON render_outbox (project_id)"))
-            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_render_outbox_job_id ON render_outbox (job_id)"))
-            connection.execute(text("CREATE INDEX IF NOT EXISTS idx_render_outbox_pending ON render_outbox (status, created_at) WHERE status = 'pending'"))
-        except Exception:
-            pass
+                _safe_execute(connection, text(f"ALTER TABLE render_outbox ADD COLUMN {col} {col_type}"))
+        _safe_execute(connection, text("CREATE INDEX IF NOT EXISTS ix_render_outbox_project_id ON render_outbox (project_id)"))
+        _safe_execute(connection, text("CREATE UNIQUE INDEX IF NOT EXISTS uq_render_outbox_job_id ON render_outbox (job_id)"))
+        _safe_execute(connection, text("CREATE INDEX IF NOT EXISTS idx_render_outbox_pending ON render_outbox (status, created_at) WHERE status = 'pending'"))
     else:
-        try:
-            payload_type = "JSON" if is_sqlite else "JSONB"
-            connection.execute(text(f"""
-                CREATE TABLE IF NOT EXISTS render_outbox (
-                    id VARCHAR PRIMARY KEY,
-                    project_id VARCHAR NOT NULL,
-                    job_id VARCHAR NOT NULL UNIQUE,
-                    payload {payload_type} NOT NULL,
-                    status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'published', 'failed')),
-                    attempt_count INTEGER NOT NULL DEFAULT 0,
-                    last_error TEXT,
-                    claimed_at TIMESTAMP,
-                    published_at TIMESTAMP,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
-                    FOREIGN KEY(job_id) REFERENCES generation_jobs(id) ON DELETE CASCADE
-                )
-            """))
-            connection.execute(text("CREATE INDEX IF NOT EXISTS ix_render_outbox_project_id ON render_outbox (project_id)"))
-            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_render_outbox_job_id ON render_outbox (job_id)"))
-            connection.execute(text("CREATE INDEX IF NOT EXISTS idx_render_outbox_pending ON render_outbox (status, created_at) WHERE status = 'pending'"))
-        except Exception:
-            pass
+        payload_type = "JSON" if is_sqlite else "JSONB"
+        _safe_execute(connection, text(f"""
+            CREATE TABLE IF NOT EXISTS render_outbox (
+                id VARCHAR PRIMARY KEY,
+                project_id VARCHAR NOT NULL,
+                job_id VARCHAR NOT NULL UNIQUE,
+                payload {payload_type} NOT NULL,
+                status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'published', 'failed')),
+                attempt_count INTEGER NOT NULL DEFAULT 0,
+                last_error TEXT,
+                claimed_at TIMESTAMP,
+                published_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+                FOREIGN KEY(job_id) REFERENCES generation_jobs(id) ON DELETE CASCADE
+            )
+        """))
+        _safe_execute(connection, text("CREATE INDEX IF NOT EXISTS ix_render_outbox_project_id ON render_outbox (project_id)"))
+        _safe_execute(connection, text("CREATE UNIQUE INDEX IF NOT EXISTS uq_render_outbox_job_id ON render_outbox (job_id)"))
+        _safe_execute(connection, text("CREATE INDEX IF NOT EXISTS idx_render_outbox_pending ON render_outbox (status, created_at) WHERE status = 'pending'"))
 
 
 
 
 async def init_db() -> None:
-    """Initialize database tables asynchronously with automatic fallback to local SQLite."""
+    """Initialize database tables asynchronously.
+
+    CRITICAL ARCHITECTURAL BOUNDARY:
+    When configured for production/staging or when targeting PostgreSQL,
+    initialization failure MUST fail startup immediately.
+    Silent fallback to ephemeral SQLite in production is strictly prohibited.
+    """
     global engine, async_session
+    is_prod = settings.ENVIRONMENT.lower() in ("production", "staging")
+    is_sqlite = str(engine.url).startswith("sqlite")
+
     try:
         async with engine.begin() as conn:
-            if str(engine.url).startswith("sqlite"):
+            if is_sqlite:
                 await conn.execute(text("PRAGMA journal_mode=WAL;"))
                 await conn.execute(text("PRAGMA busy_timeout=15000;"))
             await conn.run_sync(SQLModel.metadata.create_all)
             await conn.run_sync(_migrate_columns)
         logger.info("Database initialized successfully using %s", engine.url.drivername)
     except Exception as exc:
-        if not str(engine.url).startswith("sqlite"):
-            logger.warning(
-                "Failed to connect to primary database (%s: %s). Falling back gracefully to local SQLite.",
-                type(exc).__name__,
-                exc,
-            )
-            sqlite_url = "sqlite+aiosqlite:///./seed_unfold.db"
-            engine = build_engine(sqlite_url)
-            async_session = async_sessionmaker(
-                engine,
-                class_=AsyncSession,
-                expire_on_commit=False,
-            )
-            async with engine.begin() as conn:
-                await conn.execute(text("PRAGMA journal_mode=WAL;"))
-                await conn.execute(text("PRAGMA busy_timeout=15000;"))
-                await conn.run_sync(SQLModel.metadata.create_all)
-                await conn.run_sync(_migrate_columns)
-            logger.info("Local SQLite fallback database initialized successfully.")
-        else:
-            raise exc
+        logger.error(
+            "Database initialization failed against %s: %s",
+            engine.url.drivername,
+            exc,
+            exc_info=True,
+        )
+        # Production/staging or any database without explicit opt-in must FAIL FAST
+        if is_prod or not getattr(settings, "ALLOW_SQLITE_FALLBACK", False):
+            raise RuntimeError(
+                f"Database initialization failed against {engine.url.drivername}: {exc}. "
+                "Silent fallback to SQLite is disabled."
+            ) from exc
+
+        # Only explicitly allowed development environments may use local SQLite fallback
+        logger.warning(
+            "Explicit fallback to local SQLite permitted for development (%s: %s).",
+            type(exc).__name__,
+            exc,
+        )
+        sqlite_url = "sqlite+aiosqlite:///./seed_unfold.db"
+        engine = build_engine(sqlite_url)
+        async_session = async_sessionmaker(
+            engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
+        )
+        async with engine.begin() as conn:
+            await conn.execute(text("PRAGMA journal_mode=WAL;"))
+            await conn.execute(text("PRAGMA busy_timeout=15000;"))
+            await conn.run_sync(SQLModel.metadata.create_all)
+            await conn.run_sync(_migrate_columns)
+        logger.info("Local SQLite fallback database initialized successfully.")
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

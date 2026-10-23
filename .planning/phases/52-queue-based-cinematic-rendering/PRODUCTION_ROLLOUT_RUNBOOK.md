@@ -293,4 +293,47 @@ Before any production state is modified, the following sequential operator appro
 2. **Approval 2 [PROD-CHANGING]**: Approval to build image `praroha-backend:v7` via ACR and update `praroha-backend` Container App with `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
 3. **Approval 3 [RENDER-TRIGGERING]**: Separate approval to trigger exactly one synthetic canary render to verify end-to-end rendering, storage upload, and worker scale-to-zero.
 
-**CURRENT STATUS: Staged & Paused. Awaiting Operator Approval 1.**
+**CURRENT STATUS: Staged & Paused. Awaiting Operator Approval for Candidate v7.2.**
+
+---
+
+## 7. Incident Post-Mortem & Candidate Image v7.2 Verification
+
+### 7.1 Incident Summary (v7.1 Boot Failure & Silent SQLite Fallback)
+- **Incident**: Upon deployment of `praroha-backend:v7.1`, during application startup, `project_repo._migrate_columns()` executed:
+  `ALTER TABLE characters ADD COLUMN is_stale BOOLEAN DEFAULT 0;`
+- **PostgreSQL Rejection**: PostgreSQL rejects integer defaults (`0`) on `BOOLEAN` columns (`DatatypeMismatch`), aborting the transaction block (`current transaction is aborted, commands ignored until end of transaction block`).
+- **Unintended Fallback**: In `init_db()`, an overly permissive `except Exception` clause caught the error and triggered a legacy development fallback path to local ephemeral SQLite (`/app/seed_unfold.db`), silently decoupling the app from Supabase PostgreSQL.
+
+### 7.2 Containment (Phase 1 — Executed)
+- **Rollback Applied**: Reverted production container app `praroha-backend` to `tendersaathiacr.azurecr.io/praroha-backend:v6`.
+- **Secret Unbound**: Removed `QUEUE_PUBLISH_URL` environment variable binding from `praroha-backend`.
+- **Health Verified**: Live production endpoint verified at `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health` (HTTP/2 200 OK, `service: "PRAROHA — Seed to Universe"`, `status: "healthy"`).
+- **Log Audit**: Log Analytics telemetry for the brief v7.1 runtime showed only two `/api/health` probes (200 OK) and one unauthenticated `/api/projects` GET (401 Unauthorized). Exactly **0 writes** (POST/PUT/PATCH/DELETE) were issued; zero data was stored in SQLite or lost.
+- **Queues & Jobs Verified**: `cinematic-render-jobs`: 0 messages, `cinematic-render-poison`: 0 messages, `praroha-render-job` executions: 0.
+
+### 7.3 Code Remediation (Phase 2 & Phase 3 — Completed)
+1. **Config Hardening** (`backend/app/config.py`):
+   - Added `ALLOW_SQLITE_FALLBACK: bool = False` to `Settings`.
+2. **Fail-Closed Database Initialization** (`backend/app/repositories/project_repo.py`):
+   - `init_db()` now strictly fails closed (`RuntimeError: Database initialization failed against <dialect>. Silent fallback to SQLite is disabled.`) in `production`, `staging`, or whenever targeting PostgreSQL without explicit `ALLOW_SQLITE_FALLBACK=True`.
+   - Silent SQLite fallback in production is completely eliminated.
+3. **PostgreSQL-Safe Boolean Defaults** (`backend/app/repositories/project_repo.py`):
+   - Changed all column additions from `DEFAULT 0` to `DEFAULT FALSE` for `characters.is_stale`, `scenes.is_stale`, `world_bibles.is_stale`.
+4. **Savepoint Isolation Pattern** (`backend/app/repositories/project_repo.py`):
+   - Implemented `_safe_execute()` using `with connection.begin_nested():` (SAVEPOINT) on PostgreSQL dialects. Individual DDL errors (such as column already existing) roll back only to the savepoint and do not poison the outer transaction.
+5. **Comprehensive Test Suite**:
+   - Added `backend/tests/test_production_database_init.py` verifying fail-closed behavior, opt-in development fallback, SQLite compatibility, PostgreSQL savepoint isolation, and live Supabase PostgreSQL connection initialization.
+   - All backend test suites passed (312 tests).
+   - Frontend production build (`npm run build`) succeeded without error.
+   - `git diff --check` passed with 0 errors.
+
+### 7.4 Candidate Image v7.2 Verification (Phase 4 — Ready)
+- **Image Tag**: `tendersaathiacr.azurecr.io/praroha-backend:v7.2`
+- **ACR Digest**: `sha256:3c92a5c6300b96fda3e1fe95a91db341d0416edf777a59a6665cfc4afb8621ac`
+- **Local Container Fail-Closed Test**:
+  - Run with `ENVIRONMENT=production` and invalid PostgreSQL URL: Exited with code 3, raised `RuntimeError: Silent fallback to SQLite is disabled`. No SQLite fallback.
+- **Local Container Live PostgreSQL Test**:
+  - Run with `ENVIRONMENT=production` against live Supabase PostgreSQL: Connected cleanly, completed migrations, `/api/health` returned HTTP 200 OK (`"fallback_used": false`), verified no `/app/seed_unfold.db` was created.
+- **Strict Boundary**: Image is pushed to ACR only. **Not deployed to production.**
+

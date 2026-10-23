@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     SUPABASE_BUCKET: str = "seed-unfold-assets"
     QUEUE_PUBLISH_URL: Optional[str] = None  # Add-only SAS URL targeting cinematic-render-jobs
     DEV_AUTO_CONFIRM_EMAILS: bool = False
+    ALLOW_SQLITE_FALLBACK: bool = False  # Explicit opt-in for development; strictly prohibited in production
 
     @classmethod
     def clean_database_url(cls, v: Optional[str]) -> str:
