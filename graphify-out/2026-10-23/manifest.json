@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "backend/app/config.py": {
-    "mtime": 1792683281.8745399,
-    "seen": 1792687829.4930003,
-    "ast_hash": "5c492630f6eafd8ee3b0d71730e2d359",
+    "mtime": 1792733449.3520002,
+    "seen": 1792733931.6607232,
+    "ast_hash": "5a1a69bfec0e4696a794db0aa9897a80",
     "semantic_hash": ""
   },
   "backend/app/core/response.py": {
@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792730002.5349083,
-    "seen": 1792730037.4350047,
-    "ast_hash": "d96bfcffe550503632d925648a33ef4a",
+    "mtime": 1792733914.0098422,
+    "seen": 1792733931.6661074,
+    "ast_hash": "04cf0e2dfe6b94cd25b2eb1243941152",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -3252,15 +3252,15 @@
     "semantic_hash": ""
   },
   "backend/app/services/cinematic_dispatcher.py": {
-    "mtime": 1792689603.7922587,
-    "seen": 1792689858.733572,
-    "ast_hash": "cbb84438eb490814e61f1d32d9990715",
+    "mtime": 1792733693.6068144,
+    "seen": 1792733931.6622076,
+    "ast_hash": "3e7de7a4c977be801e566fc42c8d817b",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_production_dispatch.py": {
-    "mtime": 1792689634.0910025,
-    "seen": 1792689858.7336082,
-    "ast_hash": "ae76c14f5da9e129b205bc8f5834b3a1",
+    "mtime": 1792733611.4815493,
+    "seen": 1792733931.6627164,
+    "ast_hash": "7350d643787df991f5db2718f6d8ff23",
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-01-SUMMARY.md": {
@@ -3276,9 +3276,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md": {
-    "mtime": 1792729983.8740625,
-    "seen": 1792730037.4406734,
-    "ast_hash": "e9344128c20b562b96c00937b5245915",
+    "mtime": 1792733901.850951,
+    "seen": 1792733931.6717536,
+    "ast_hash": "abe167597a095a63c91dfe6799d76e60",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-CONTEXT.md": {
@@ -3372,15 +3372,27 @@
     "semantic_hash": ""
   },
   "backend/tests/test_render_outbox_migration.py": {
-    "mtime": 1792729868.4420056,
-    "seen": 1792730037.432242,
-    "ast_hash": "a47c41fe060ff35ac70dfc459aac2fca",
+    "mtime": 1792733787.6009734,
+    "seen": 1792733931.6633456,
+    "ast_hash": "64ff4494e8dfd43ecab4421784ab1da2",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-09-SUMMARY.md": {
     "mtime": 1792730019.8757653,
     "seen": 1792730037.4408057,
     "ast_hash": "968002f5e3d53bb8060435fc86a15bff",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_queue_dispatch.py": {
+    "mtime": 1792733721.142568,
+    "seen": 1792733931.662718,
+    "ast_hash": "85a801358f3de17cc8fe73eeb0b14b52",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-10-SUMMARY.md": {
+    "mtime": 1792733892.233037,
+    "seen": 1792733931.6719112,
+    "ast_hash": "48e380ada296579da087d70c4f4dc59c",
     "semantic_hash": ""
   }
 }

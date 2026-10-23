@@ -1,7 +1,8 @@
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
+from sqlalchemy import or_, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, delete, select, text
 from backend.app.config import settings
@@ -44,6 +45,15 @@ logger = logging.getLogger(__name__)
 
 def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
+
+
+def ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    """Ensure datetime is timezone-aware in UTC for cross-database consistency."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def build_engine(database_url: str):
@@ -2147,45 +2157,113 @@ class ProjectRepository:
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
-    async def recover_orphaned_jobs(self) -> int:
-        """Find jobs left in 'queued' or 'processing' across restarts and transition them cleanly to 'failed' with actionable message."""
+    async def recover_orphaned_jobs(
+        self,
+        stale_lease_seconds: int = 90,
+        queued_timeout_seconds: int = 900,
+    ) -> int:
+        """
+        Recover stale orphaned jobs across server restarts without disrupting active renders.
+        - 'processing' jobs: stale only when updated_at < now - 90s (worker heartbeat expired).
+        - 'queued' jobs: lost only when queued > 15m AND associated outbox record is 'published'.
+        - Pending outbox records are NOT failed (preserved for sweeper).
+        - Truly failed jobs clear request_hash on associated asset for clean creator retries.
+        """
         from backend.app.models.job import GenerationJob
         from backend.app.models.media import MediaAssetRecord
+        from backend.app.models.outbox import RenderOutbox
+
+        now = get_utc_now()
+        processing_cutoff = now - timedelta(seconds=stale_lease_seconds)
+        queued_cutoff = now - timedelta(seconds=queued_timeout_seconds)
+
         stmt = select(GenerationJob).where(GenerationJob.status.in_(["queued", "processing"]))
         res = await self.session.execute(stmt)
-        orphaned_jobs = list(res.scalars().all())
-        count = 0
+        active_jobs = list(res.scalars().all())
+
+        recovered_count = 0
         handled_asset_ids = set()
-        for job in orphaned_jobs:
-            job.status = "failed"
-            job.error_message = "Generation task interrupted by server restart. Please retry generation."
-            job.updated_at = get_utc_now()
-            self.session.add(job)
-            stmt_asset = select(MediaAssetRecord).where(MediaAssetRecord.id == job.id)
-            res_asset = await self.session.execute(stmt_asset)
-            asset = res_asset.scalar_one_or_none()
-            if asset and asset.status in ("queued", "processing"):
-                asset.status = "failed"
-                asset.error_message = job.error_message
-                asset.request_hash = None
-                self.session.add(asset)
-                handled_asset_ids.add(asset.id)
-            count += 1
+
+        for job in active_jobs:
+            should_fail = False
+            fail_reason = ""
+
+            outbox_stmt = select(RenderOutbox).where(RenderOutbox.job_id == job.id)
+            outbox_res = await self.session.execute(outbox_stmt)
+            outbox = outbox_res.scalar_one_or_none()
+
+            if outbox is not None:
+                # Phase 52 queue-managed job with outbox and worker heartbeats
+                if job.status == "processing":
+                    # Rule 1: A processing job is stale only when updated_at is older than 90 seconds.
+                    job_updated = ensure_utc(job.updated_at) or ensure_utc(job.started_at) or ensure_utc(job.created_at)
+                    if job_updated and job_updated < processing_cutoff:
+                        should_fail = True
+                        fail_reason = "Generation task interrupted (worker heartbeat expired). Please retry generation."
+                    else:
+                        # Heartbeat is still fresh (< 90s). Respect active worker lease!
+                        continue
+
+                elif job.status == "queued":
+                    if outbox.status == "pending":
+                        # Rule 3: Do not mark queued jobs failed merely because outbox records are still pending or publication failed.
+                        continue
+                    elif outbox.status == "published":
+                        # Rule 2: A queued job may be considered lost only when it has remained queued for more than 15 minutes and outbox is published.
+                        job_created = ensure_utc(job.created_at)
+                        if job_created and job_created < queued_cutoff:
+                            should_fail = True
+                            fail_reason = "Generation task timed out waiting for worker pickup (>15m). Please retry generation."
+                        else:
+                            # Waiting in queue within 15m window
+                            continue
+                    elif outbox.status == "failed":
+                        # Outbox dispatch failed permanently
+                        should_fail = True
+                        fail_reason = f"Generation job dispatch failed: {outbox.last_error or 'Outbox retries exhausted'}. Please retry generation."
+            else:
+                # In-process / legacy job without an outbox record.
+                # These tasks ran inside the web server process itself. Since the server restarted,
+                # the in-process execution was interrupted and died with the process.
+                should_fail = True
+                fail_reason = "Generation task interrupted by server restart. Please retry generation."
+
+            if should_fail:
+                job.status = "failed"
+                job.error_message = fail_reason
+                job.updated_at = now
+                self.session.add(job)
+
+                # Update associated MediaAssetRecord
+                stmt_asset = select(MediaAssetRecord).where(MediaAssetRecord.id == job.id)
+                res_asset = await self.session.execute(stmt_asset)
+                asset = res_asset.scalar_one_or_none()
+                if asset and asset.status in ("queued", "processing"):
+                    asset.status = "failed"
+                    asset.error_message = fail_reason
+                    asset.request_hash = None  # Clear request_hash for clean retry
+                    self.session.add(asset)
+                    handled_asset_ids.add(asset.id)
+                recovered_count += 1
 
         # Also catch any stray MediaAssetRecord left in queued/processing without an active GenerationJob
         stmt_assets = select(MediaAssetRecord).where(MediaAssetRecord.status.in_(["queued", "processing"]))
         res_assets = await self.session.execute(stmt_assets)
         for stray_asset in res_assets.scalars().all():
             if stray_asset.id not in handled_asset_ids:
-                stray_asset.status = "failed"
-                stray_asset.error_message = "Generation task interrupted by server restart. Please retry generation."
-                stray_asset.request_hash = None
-                self.session.add(stray_asset)
-                count += 1
+                check_job = await self.session.execute(select(GenerationJob).where(GenerationJob.id == stray_asset.id))
+                if check_job.scalar_one_or_none() is None:
+                    # Genuine orphan stray asset
+                    stray_asset.status = "failed"
+                    stray_asset.error_message = "Generation task interrupted by server restart. Please retry generation."
+                    stray_asset.request_hash = None
+                    self.session.add(stray_asset)
+                    recovered_count += 1
 
-        if count > 0:
+        if recovered_count > 0:
             await self.session.commit()
-        return count
+
+        return recovered_count
 
     async def get_project_bundle(self, project_id: str) -> Optional["ProjectBundleRead"]:
         from backend.app.models.project import ProjectBundleRead
@@ -2284,9 +2362,11 @@ class ProjectRepository:
         status: str,
         last_error: Optional[str] = None,
         published_at: Optional[datetime] = None,
+        claimed_at: Optional[datetime] = None,
         increment_attempt: bool = False,
+        clear_claim: bool = False,
     ) -> Optional["RenderOutbox"]:
-        """Update render outbox status, attempts, and error information."""
+        """Update render outbox status, attempts, claim, and error information."""
         from backend.app.models.outbox import RenderOutbox
         stmt = select(RenderOutbox).where(RenderOutbox.job_id == job_id)
         res = await self.session.execute(stmt)
@@ -2300,8 +2380,129 @@ class ProjectRepository:
             rec.last_error = last_error
         if published_at is not None:
             rec.published_at = published_at
+        if clear_claim:
+            rec.claimed_at = None
+        elif claimed_at is not None:
+            rec.claimed_at = claimed_at
         rec.updated_at = get_utc_now()
         self.session.add(rec)
         await self.session.commit()
         await self.session.refresh(rec)
+        return rec
+
+    async def claim_eligible_outbox_records(
+        self,
+        limit: int = 10,
+        lease_seconds: int = 60,
+        max_attempts: int = 5,
+        base_backoff_seconds: int = 30,
+    ) -> List["RenderOutbox"]:
+        """
+        Concurrency-safe claiming of eligible pending render outbox records using atomic CAS updates.
+        Eligible records:
+        - status == 'pending'
+        - attempt_count < max_attempts
+        - claimed_at IS NULL or claimed_at < now - lease_seconds (expired lease)
+        - exponential backoff: updated_at <= now - (base_backoff * 2^(attempt_count - 1)) if attempt_count > 0
+        """
+        from backend.app.models.outbox import RenderOutbox
+        now = get_utc_now()
+        lease_cutoff = now - timedelta(seconds=lease_seconds)
+
+        stmt = (
+            select(RenderOutbox)
+            .where(
+                RenderOutbox.status == "pending",
+                RenderOutbox.attempt_count < max_attempts,
+            )
+            .order_by(RenderOutbox.created_at.asc())
+            .limit(limit * 3)
+        )
+        res = await self.session.execute(stmt)
+        candidates = list(res.scalars().all())
+
+        claimed_records: List[RenderOutbox] = []
+        for cand in candidates:
+            if len(claimed_records) >= limit:
+                break
+
+            # 1. Active lease check
+            cand_claimed = ensure_utc(cand.claimed_at)
+            if cand_claimed and cand_claimed >= lease_cutoff:
+                continue
+
+            # 2. Exponential backoff check
+            if cand.attempt_count > 0:
+                backoff_sec = min(300, base_backoff_seconds * (2 ** (cand.attempt_count - 1)))
+                cand_updated = ensure_utc(cand.updated_at) or ensure_utc(cand.created_at) or now
+                if cand_updated > (now - timedelta(seconds=backoff_sec)):
+                    continue
+
+            # 3. Concurrency-safe CAS claim
+            update_stmt = (
+                update(RenderOutbox)
+                .where(
+                    RenderOutbox.id == cand.id,
+                    RenderOutbox.status == "pending",
+                    or_(
+                        RenderOutbox.claimed_at.is_(None),
+                        RenderOutbox.claimed_at < lease_cutoff,
+                    ),
+                )
+                .values(claimed_at=now, updated_at=now)
+            )
+            upd_res = await self.session.execute(update_stmt)
+            if upd_res.rowcount > 0:
+                await self.session.commit()
+                stmt_ref = select(RenderOutbox).where(RenderOutbox.id == cand.id)
+                ref_res = await self.session.execute(stmt_ref)
+                refreshed = ref_res.scalar_one_or_none()
+                if refreshed:
+                    claimed_records.append(refreshed)
+
+        return claimed_records
+
+    async def mark_terminal_outbox_failure(
+        self,
+        job_id: str,
+        last_error: str,
+    ) -> Optional["RenderOutbox"]:
+        """Transition outbox, job, and asset to terminal failed state and clear request_hash."""
+        from backend.app.models.outbox import RenderOutbox
+        from backend.app.models.job import GenerationJob
+        from backend.app.models.media import MediaAssetRecord
+
+        stmt = select(RenderOutbox).where(RenderOutbox.job_id == job_id)
+        res = await self.session.execute(stmt)
+        rec = res.scalar_one_or_none()
+        now = get_utc_now()
+        if rec:
+            rec.status = "failed"
+            rec.last_error = last_error
+            rec.claimed_at = None
+            rec.attempt_count += 1
+            rec.updated_at = now
+            self.session.add(rec)
+
+        stmt_job = select(GenerationJob).where(GenerationJob.id == job_id)
+        res_job = await self.session.execute(stmt_job)
+        job = res_job.scalar_one_or_none()
+        if job and job.status in ("queued", "processing"):
+            job.status = "failed"
+            job.error_message = f"Failed to enqueue render job: {last_error}"
+            job.updated_at = now
+            self.session.add(job)
+
+        stmt_asset = select(MediaAssetRecord).where(MediaAssetRecord.id == job_id)
+        res_asset = await self.session.execute(stmt_asset)
+        asset = res_asset.scalar_one_or_none()
+        if asset and asset.status in ("queued", "processing"):
+            asset.status = "failed"
+            asset.error_message = last_error
+            asset.request_hash = None  # Clear request_hash for clean retry
+            self.session.add(asset)
+
+        await self.session.commit()
+        if rec:
+            await self.session.refresh(rec)
         return rec

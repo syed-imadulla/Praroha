@@ -38,6 +38,7 @@ from backend.app.models.job import GenerationJob
 from backend.app.models.media import MediaAssetRecord, MediaJobResponse
 from backend.app.models.outbox import RenderOutbox, assert_no_secrets_in_payload
 from backend.app.repositories.project_repo import ProjectRepository, async_session
+from backend.app.workers.cinematic_worker import validate_queue_message_dict
 
 logger = logging.getLogger("seed_unfold.cinematic_dispatcher")
 
@@ -103,6 +104,9 @@ class CinematicPreviewJobRequest(BaseModel):
     ambient_url: Optional[str] = Field(None, description="Optional remote URL or asset path for ambient audio")
     duration_sec: int = Field(5, ge=3, le=60, description="Duration in seconds (3-60s)")
     aspect_ratio: str = Field("16:9", description="Aspect ratio (default 16:9 widescreen)")
+    fps: int = Field(24, description="Video frame rate (24 or 30)")
+    resolution: str = Field("1280x720", description="Video resolution ('1280x720' or '1920x1080')")
+    motion_preset: str = Field("slow_pan", description="Camera motion preset ('slow_pan', 'zoom_in', 'static')")
     force_regenerate: bool = Field(False, description="Bypass deduplication and force regeneration")
 
 
@@ -336,12 +340,18 @@ class CinematicDispatcherService:
         job_id = str(uuid.uuid4())
         enqueued_at = get_utc_now().isoformat()
 
+        dur = max(3, min(60, int(round(request.duration_sec))))
+        ar = request.aspect_ratio if request.aspect_ratio in ("16:9", "1:1", "9:16") else "16:9"
+        fps_val = request.fps if request.fps in (24, 30) else 24
+        res_val = request.resolution if request.resolution in ("1280x720", "1920x1080") else "1280x720"
+        mp_val = request.motion_preset if request.motion_preset in ("slow_pan", "zoom_in", "static") else "slow_pan"
+
         options = {
-            "duration_seconds": request.duration_sec,
-            "fps": 24,
-            "resolution": "1280x720",
-            "aspect_ratio": request.aspect_ratio or "16:9",
-            "motion_preset": "slow_pan",
+            "duration_seconds": dur,
+            "fps": fps_val,
+            "resolution": res_val,
+            "aspect_ratio": ar,
+            "motion_preset": mp_val,
         }
 
         queue_payload = {
@@ -358,6 +368,8 @@ class CinematicDispatcherService:
 
         # Enforce zero credentials in payload
         assert_no_secrets_in_payload(queue_payload)
+        # Validate strictly against canonical schema and worker validator
+        validate_queue_message_dict(queue_payload)
 
         # 7. Step A: Atomic Database Transaction
         # Persist MediaAssetRecord, GenerationJob, and RenderOutbox together in one commit.

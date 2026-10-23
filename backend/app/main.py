@@ -48,7 +48,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logging.getLogger("backend.app").warning(
             f"Failed to recover orphaned generation jobs: {exc}"
         )
-    yield
+    # Start background cinematic outbox sweeper
+    sweeper = None
+    try:
+        from backend.app.services.cinematic_outbox_sweeper import get_outbox_sweeper
+        sweeper = get_outbox_sweeper()
+        sweeper.start()
+    except Exception as exc:
+        import logging
+        logging.getLogger("backend.app").warning(
+            f"Failed to start cinematic outbox sweeper: {exc}"
+        )
+
+    try:
+        yield
+    finally:
+        # Graceful shutdown of background outbox sweeper
+        if sweeper is not None:
+            try:
+                await sweeper.stop()
+            except Exception as exc:
+                import logging
+                logging.getLogger("backend.app").warning(
+                    f"Error stopping cinematic outbox sweeper: {exc}"
+                )
 
 
 is_production = settings.ENVIRONMENT.lower() == "production"
