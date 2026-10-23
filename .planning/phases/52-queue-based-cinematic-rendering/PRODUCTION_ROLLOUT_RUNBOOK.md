@@ -29,13 +29,13 @@ The following pre-rollout facts have been empirically audited as of commit `e023
 
 | Component | Target Resource | Live Audited State | Status |
 | **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` created via `0001_create_render_outbox.sql`. 11 columns, 5 constraints, 3 indexes verified. HTTP 200 on REST API. | **MIGRATED & VERIFIED** (Phase Gate A Complete) |
-| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v6`. Does not yet contain TASK-52-09, 52-10, or 52-11 code. | Verified ready for image update |
-| **Queue Secret Binding** | `praroha-backend` secrets store | Secret `queue-publish-url` exists in backend configuration. `QUEUE_PUBLISH_URL` env var is NOT yet bound to container. | Verified ready for secret binding |
+| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.1`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **DEPLOYED & HEALTHY** (Phase Gate B Complete) |
+| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
 | **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`, UAMI `uami-praroha-render`, zero ingress (`ingress: null`), and 0 active executions. | Verified scale-to-zero active |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (`[]`).<br>`cinematic-render-poison`: 0 messages (`[]`). | Verified clean queue baseline |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
 | **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). | Verified disabled |
-| **Test Battery & Build** | Local repo | 304 passed in `pytest backend/tests/`. Frontend production build succeeds in 13.7s (33 precached PWA entries). | Verified 100% green |
+| **Test Battery & Build** | Local repo | 306 passed in `pytest backend/tests/`. Frontend production build succeeds in 13.1s (33 precached PWA entries). | Verified 100% green |
 
 ---
 
@@ -90,8 +90,21 @@ The following pre-rollout facts have been empirically audited as of commit `e023
       --image tendersaathiacr.azurecr.io/praroha-backend:v6 \
       --remove-env-vars QUEUE_PUBLISH_URL
     ```
-  - `praroha-backend` returned to `provisioningState: Succeeded`, `runningStatus: Running`.
-  - Production service fully restored on `v6` with zero data loss and zero disruption to users.
+- [x] **Step B4 `[PROD-DEPLOYED]`**: Build, Verify, and Deploy Candidate `v7.1`:
+  - Extracted pure `backend/app/services/queue_contract.py` removing `psutil` dependency boundary.
+  - Validated local container boot and clean dependency imports inside built container.
+  - Published immutable image `tendersaathiacr.azurecr.io/praroha-backend:v7.1`.
+  - Image Digest: `sha256:ecc6751d1bd93fa0d02bfd69b762d24ea268c1604788e8702a5954bad2535744`.
+  - Operator approved Gate 2 deployment:
+    ```bash
+    az containerapp update \
+      --name praroha-backend \
+      --resource-group rg-tendersaathi \
+      --image tendersaathiacr.azurecr.io/praroha-backend:v7.1 \
+      --set-env-vars QUEUE_PUBLISH_URL=secretref:queue-publish-url
+    ```
+  - Deployment status: `provisioningState: Succeeded`, `runningStatus: Running`.
+  - `QUEUE_PUBLISH_URL` bound via `secretref:queue-publish-url`.
 
 ---
 
@@ -102,17 +115,20 @@ The following pre-rollout facts have been empirically audited as of commit `e023
   ```bash
   curl -fsS https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health | jq .
   ```
-  *Result*: HTTP 200 OK, `{"success": true, "data": {"status": "healthy", "service": "PRAROHA — Seed to Universe", "environment": "production"}}`.
+  *Result*: HTTP/2 200 OK, `{"success": true, "data": {"status": "healthy", "service": "PRAROHA — Seed to Universe", "environment": "production"}}`.
 - [x] **Step C2 `[READ-ONLY]`**: Verify database outbox state:
   - Connected via production connection to Supabase `stxnxkzaftmwcbtvgzbm`.
-  - `render_outbox` table verified accessible with exactly 0 rows (`count = 0`). Zero unexpected rows.
+  - `render_outbox` table verified accessible with exactly 0 rows (`count = 0`). Zero unexpected rows, zero pending rows.
 - [x] **Step C3 `[READ-ONLY]`**: Verify queue baseline & zero worker activity:
   - `cinematic-render-jobs`: 0 messages.
   - `cinematic-render-poison`: 0 messages.
   - `praroha-render-job` execution history: `[]` (0 executions).
 - [x] **Step C4 `[READ-ONLY]`**: Verify feature flag status:
-  - Backend `CINEMATIC_PREVIEW_ENABLED = False`.
+  - Backend `CINEMATIC_PREVIEW_ENABLED = False` (unset in environment).
   - Frontend `VITE_ENABLE_CINEMATIC_PREVIEW` disabled.
+- [x] **Step C5 `[READ-ONLY]`**: Verify startup log telemetry:
+  - Log Analytics shows clean server process boot: `INFO: Started server process [5]`, `INFO: Application startup complete.`, `INFO: Uvicorn running on http://0.0.0.0:8000`.
+  - Zero import errors, zero crash loops. Health probe returned 200 OK.
 
 ---
 
