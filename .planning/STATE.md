@@ -35,8 +35,9 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
   - Phase 51: Production Dispatch, UI Enablement & Release Gate (Historical / Superseded by Phase 52)
   - Phase 52: Queue-Based Cinematic Rendering Architecture:
     - Wave 1 (TASK-52-01 to TASK-52-04): Storage `stpraroharender`, queues, `env-praroha-render` Standard ACA environment, and Add-only SAS secret on backend. (Completed & Verified)
-    - Wave 2 (TASK-52-08, TASK-52-05): Queue consumer loop (`--queue`), passwordless Managed Identity authentication (`azure-identity`), dual-queue initialization (`cinematic-render-jobs`, `cinematic-render-poison`), Add-only SAS rejection guard, 20 unit tests, and verified release image `tendersaathiacr.azurecr.io/praroha-worker:v6` (digest `sha256:abb5713fa8d831ab3a3fdde7a1ebeca387c57dc9bfeac2f7f05803860c7d332d`). (Completed & Verified)
-    - Next: Container Apps Job definition (`TASK-52-06`) & Backend Outbox Dispatch (`Wave 3`).
+    - Wave 2 Worker & Auth (TASK-52-08, TASK-52-05): Queue consumer loop (`--queue`), passwordless Managed Identity authentication (`azure-identity`), dual-queue initialization (`cinematic-render-jobs`, `cinematic-render-poison`), Add-only SAS rejection guard, 20 unit tests, and verified release image `tendersaathiacr.azurecr.io/praroha-worker:v6` (digest `sha256:abb5713fa8d831ab3a3fdde7a1ebeca387c57dc9bfeac2f7f05803860c7d332d`). (Completed & Verified)
+    - Wave 2 Job Provisioning (TASK-52-06, TASK-52-07): Dedicated UAMI `uami-praroha-render` with 4 least-privilege RBAC assignments, event-driven Container Apps Job `praroha-render-job` created in `env-praroha-render` with zero ingress (`ingress: null`), KEDA queue scaler (`azure-queue`), scale-to-zero verified (0 executions with empty queues), and secure secret references. (Completed & Verified 2026-10-23)
+    - Next: Wave 3 Backend Outbox Dispatch (`TASK-52-09` `render_outbox` migration, `TASK-52-10` `CinematicDispatcherService`, `TASK-52-11` sweeper, `TASK-52-12` E2E rollout).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:

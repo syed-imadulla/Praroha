@@ -17,16 +17,26 @@ All existing resources reside in Resource Group `rg-tendersaathi` in region **Ce
 | **`env-praroha-render`** | `Microsoft.App/managedEnvironments` | `ConsumptionOnly` mode (Central India) | Standard ACA managed environment. Reuses `workspace-rgtendersaathinzG6`. *(Provisioned 2026-10-22)* |
 | **`queue-publish-url`** | `Microsoft.App/containerApps/secrets` | Stored in `praroha-backend` | Scoped SAS: `sp=a` (Add only) on `cinematic-render-jobs`, HTTPS-only, expires 2026-11-21T18:24Z (30 days). Not yet bound to env var. *(Stored 2026-10-22)* |
 | **`praroha-worker:v6`** | `Microsoft.ContainerRegistry/registries/repositories/tags` | Image in `tendersaathiacr.azurecr.io/praroha-worker:v6` | Queue-capable release image with passwordless Managed Identity auth (`azure-identity`, digest `sha256:abb5713fa8d831ab3a3fdde7a1ebeca387c57dc9bfeac2f7f05803860c7d332d`). Includes dual-client initialization (`cinematic-render-jobs`, `cinematic-render-poison`), Add-only SAS rejection guard, atomic CAS claim, 300s lease, and native FFmpeg composition. *(Built, tested & pushed 2026-10-22)* |
+| **`uami-praroha-render`** | `Microsoft.ManagedIdentity/userAssignedIdentities` | Central India | Dedicated User-Assigned Managed Identity (`clientId: 6ec7ec48-9deb-4518-b530-fbc483a9b0c7`, `principalId: f0eff22c-3999-4236-aa03-570d3f2a380c`). Assigned `AcrPull`, `Storage Queue Data Message Processor`, `Storage Queue Data Message Sender`, and `Storage Queue Data Reader`. *(Provisioned 2026-10-23)* |
+| **`praroha-render-job`** | `Microsoft.App/jobs` | `centralindia`<br>1.0 vCPU, 2.0 GiB RAM | Event-driven rendering Container Apps Job in `env-praroha-render`. Triggers via KEDA `azure-queue` scaler when `queueLength >= 1` (polling=15s, min=0, max=2). Authenticated via `uami-praroha-render`. **Zero Ingress** (`ingress: null`). Runs `--queue`. *(Provisioned 2026-10-23)* |
 
 ---
 
-## 2. Pending Resources for Queue-Based Rendering (Awaiting Separate Approval)
+## 2. Infrastructure Provisioning Status & Remaining Phase 52 Work
 
-To support Container Apps Jobs without altering or compromising the Express environment, the following resources are designed for creation upon explicit user approval:
+All Azure infrastructure resources for Phase 52 queue-based rendering have been provisioned and verified:
+- `stpraroharender` (Storage Account)
+- `cinematic-render-jobs` & `cinematic-render-poison` (Azure Storage Queues)
+- `env-praroha-render` (Standard Container Apps Environment)
+- `uami-praroha-render` (User-Assigned Managed Identity with least-privilege RBAC)
+- `praroha-worker:v6` (Queue-capable worker container image in ACR)
+- `praroha-render-job` (Event-driven Container Apps Job with zero ingress and KEDA scale-to-zero)
 
-| Resource Name | Azure Resource Type | Region / SKU | Role & Configuration | Monthly Base Cost |
-| :--- | :--- | :--- | :--- | :--- |
-| **`praroha-render-job`** | `Microsoft.App/jobs` | `centralindia`<br>1.0 vCPU, 2.0 GiB RAM | Event-driven rendering job. Triggers via KEDA `azure-queue` scaler when `queueLength >= 1`. **Zero Ingress**. | **₹0.00 idle** (Charges only when running) |
+Remaining Phase 52 work consists of Wave 3 backend software implementation:
+1. `TASK-52-09`: Database migration creating `render_outbox` table.
+2. `TASK-52-10`: `CinematicDispatcherService` with transactional outbox pattern.
+3. `TASK-52-11`: Background outbox sweeper task in `praroha-backend`.
+4. `TASK-52-12`: End-to-end integration testing and controlled feature flag rollout.
 
 ---
 
@@ -118,19 +128,19 @@ az containerapp update \
 
 #### 4a. Worker Image Build & Tagging Workflow
 - **ACR Repository**: `praroha-worker` (verified existing repository in `tendersaathiacr.azurecr.io`).
-- **Existing ACR Tags**: `v1`, `v2`, `v3`, `v4` (verified).
-- **CRITICAL**: Tag `v5` does **NOT** exist yet. It must never be referenced until built, locally verified, and pushed.
+- **Existing ACR Tags**: `v1`, `v2`, `v3`, `v4`, `v5`, `v6` (verified).
+- **CRITICAL**: Tag `v6` is built, locally verified with passwordless Managed Identity, and pushed to ACR.
 - **Pre-Registration Build & Verification Workflow**:
   ```bash
   # 1. Build worker container image locally or via ACR build task
-  docker build -f Dockerfile.worker -t tendersaathiacr.azurecr.io/praroha-worker:v5 .
+  docker build -f Dockerfile.worker -t tendersaathiacr.azurecr.io/praroha-worker:v6 .
   
   # 2. Verify image entrypoint argument handling locally (--queue mode help check)
-  docker run --rm tendersaathiacr.azurecr.io/praroha-worker:v5 --help
+  docker run --rm tendersaathiacr.azurecr.io/praroha-worker:v6 --help
   
   # 3. Authenticate and push to ACR
   az acr login --name tendersaathiacr
-  docker push tendersaathiacr.azurecr.io/praroha-worker:v5
+  docker push tendersaathiacr.azurecr.io/praroha-worker:v6
   
   # 4. Verify tag exists in ACR repository
   az acr repository show-tags --name tendersaathiacr --repository praroha-worker -o table
@@ -242,7 +252,7 @@ az containerapp job create \
 | **`Microsoft.App/jobs` in `centralindia`** | **TRUE (Verified)**. Central India is confirmed in Azure resource provider locations. | Job can be hosted locally in `centralindia` with zero cross-region data transfer fees. |
 | **Consumption Environment Base Fee** | **TRUE (Verified)**. ₹0.00 / month idle base fee on Consumption profile. | Zero recurring idle charges. |
 | **Worker Ingress Disabled** | **TRUE (Verified)**. Container Apps Jobs have no ingress listeners or open ports. | Complete network isolation from inbound attacks. |
-| **ACR Repository & Image Tag** | **`praroha-worker:v5` (Verified & Pushed)**. Tags `v1-v5` exist. Tag `v5` digest is `sha256:747160cf60fc2c7c72f77e659a714321771fba5d5eb135712122fb8bd0ce6e04`. | Validated locally, passed all 14 queue unit tests, and verified in ACR before job registration. |
+| **ACR Repository & Image Tag** | **`praroha-worker:v6` (Verified & Pushed)**. Tags `v1-v6` exist. Tag `v6` digest is `sha256:abb5713fa8d831ab3a3fdde7a1ebeca387c57dc9bfeac2f7f05803860c7d332d`. | Validated locally, passed all 20 queue unit tests, and verified in ACR before job registration. |
 | **Worker CLI Argument Contract** | **`--args "--queue"` Required (Verified)**. Default CMD is `--server`. | Passing `--args "--queue"` guarantees finite batch execution and exit code 0 on completion. |
 | **Worker Environment Completeness** | **`DATABASE_URL`, `SUPABASE_KEY`, `STORAGE_PROVIDER` (Verified)**. | All required secrets and runtime variables explicitly provided in Job spec. |
 | **Free-Tier Compute Available** | **UNVERIFIED / TREATED AS ZERO**. Subscription already has active workloads. | 100% of compute cost is modeled as billable retail, yet remains < ₹5.05 for 100 runs. |

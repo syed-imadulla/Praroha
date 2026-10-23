@@ -53,7 +53,7 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
      - `--registry-server tendersaathiacr.azurecr.io --registry-identity "$UAMI_ID"`
      - `--min-executions 0 --max-executions 2 --replica-timeout 300`
      - `--args "--queue"`
-     - `--image tendersaathiacr.azurecr.io/praroha-worker:v5` (built, locally tested, and pushed to ACR)
+     - `--image tendersaathiacr.azurecr.io/praroha-worker:v6` (built, locally tested, and pushed to ACR)
 - **Gate Check**: Run `az containerapp job show -n praroha-render-job -g rg-tendersaathi` and verify:
   - `properties.environmentId` points to `env-praroha-render`.
   - `properties.template.containers[0].resources.cpu == "1.0"`.
