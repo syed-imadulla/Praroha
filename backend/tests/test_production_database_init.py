@@ -152,37 +152,64 @@ async def test_safe_execute_savepoint_isolation_on_postgres():
 
 
 @pytest.mark.asyncio
-async def test_live_postgres_init_db_no_fallback():
+async def test_init_db_refuses_production_supabase_in_test_environment(monkeypatch):
     """
-    Integration verification: If live PostgreSQL connection is available in .env,
-    verify init_db runs against PostgreSQL and completes without SQLite fallback.
+    Requirement: Automated tests must NEVER execute init_db() or schema migrations against
+    the production Supabase database. Attempting to do so must raise RuntimeError immediately.
     """
-    from pathlib import Path
-    from dotenv import dotenv_values
-    env_vars = dotenv_values(Path(__file__).parents[2] / ".env")
-    raw_url = env_vars.get("DATABASE_URL")
-    if not raw_url or "sqlite" in raw_url:
-        pytest.skip("No PostgreSQL DATABASE_URL configured in .env")
+    prod_pg_url = "postgresql+asyncpg://postgres:fake-password@db.stxnxkzaftmwcbtvgzbm.supabase.co:5432/postgres"
+    fake_engine = build_engine(prod_pg_url)
+    project_repo.engine = fake_engine
 
-    db_url = Settings.clean_database_url(raw_url)
+    try:
+        with pytest.raises(RuntimeError, match="PRODUCTION DATABASE GUARD BLOCKED init_db()"):
+            await init_db()
+    finally:
+        await fake_engine.dispose()
 
-    orig_engine = project_repo.engine
-    orig_env = project_repo.settings.ENVIRONMENT
-    orig_fallback = project_repo.settings.ALLOW_SQLITE_FALLBACK
 
-    pg_engine = build_engine(db_url)
+@pytest.mark.asyncio
+async def test_read_only_schema_audit_mode_guard(monkeypatch):
+    """
+    Requirement: Read-only schema audits against production Supabase are permitted ONLY
+    via explicit read-only query inspection and must NEVER execute init_db() or DDL.
+    """
+    monkeypatch.setenv("PYTEST_CURRENT_TEST", "test_read_only_schema_audit_mode_guard")
+    prod_url = "postgresql+asyncpg://postgres:fake-password@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"
+    assert Settings.is_production_database_url(prod_url) is True
+
+    fake_engine = build_engine(prod_url)
+    project_repo.engine = fake_engine
+
+    try:
+        # Running init_db() against production in test mode must strictly fail
+        with pytest.raises(RuntimeError, match="PRODUCTION DATABASE GUARD BLOCKED init_db()"):
+            await init_db()
+    finally:
+        await fake_engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_disposable_postgres_isolation():
+    """
+    Requirement: PostgreSQL integration tests must ONLY run against disposable test databases
+    (e.g., TEST_POSTGRESQL_DATABASE_URL), and must never point to production Supabase.
+    """
+    test_pg_url = os.environ.get("TEST_POSTGRESQL_DATABASE_URL")
+    if not test_pg_url:
+        pytest.skip("No disposable TEST_POSTGRESQL_DATABASE_URL configured")
+
+    if Settings.is_production_database_url(test_pg_url):
+        pytest.fail("CRITICAL: TEST_POSTGRESQL_DATABASE_URL illegally points to production Supabase!")
+
+    clean_url = Settings.clean_database_url(test_pg_url)
+    pg_engine = build_engine(clean_url)
     project_repo.engine = pg_engine
-    project_repo.settings.ENVIRONMENT = "production"
+    project_repo.settings.ENVIRONMENT = "test"
     project_repo.settings.ALLOW_SQLITE_FALLBACK = False
 
     try:
         await init_db()
-        assert not str(project_repo.engine.url).startswith("sqlite"), (
-            "init_db() illegally fell back to SQLite when connected to PostgreSQL!"
-        )
-        assert project_repo.engine.url.drivername == "postgresql+asyncpg"
+        assert not str(project_repo.engine.url).startswith("sqlite")
     finally:
         await pg_engine.dispose()
-        project_repo.engine = orig_engine
-        project_repo.settings.ENVIRONMENT = orig_env
-        project_repo.settings.ALLOW_SQLITE_FALLBACK = orig_fallback

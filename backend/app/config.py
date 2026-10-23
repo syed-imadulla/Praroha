@@ -54,6 +54,21 @@ class Settings(BaseSettings):
     QUEUE_PUBLISH_URL: Optional[str] = None  # Add-only SAS URL targeting cinematic-render-jobs
     DEV_AUTO_CONFIRM_EMAILS: bool = False
     ALLOW_SQLITE_FALLBACK: bool = False  # Explicit opt-in for development; strictly prohibited in production
+    ALLOW_PRODUCTION_DB_MIGRATIONS: bool = False  # Strict guard: local test runs must never run DDL against production
+
+    @classmethod
+    def is_production_database_url(cls, url: Optional[str]) -> bool:
+        """Identify whether a database URL targets the production Supabase database."""
+        if not url:
+            return False
+        clean = str(url).lower()
+        production_identifiers = [
+            "stxnxkzaftmwcbtvgzbm",
+            "supabase.co",
+            "supabase.com",
+            "pooler.supabase.com",
+        ]
+        return any(ident in clean for ident in production_identifiers)
 
     @classmethod
     def clean_database_url(cls, v: Optional[str]) -> str:

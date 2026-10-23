@@ -1,11 +1,12 @@
 import json
+import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
 from sqlalchemy import or_, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, delete, select, text
-from backend.app.config import settings
+from backend.app.config import Settings, settings
 from backend.app.models.dna import SeedDNA, SeedDNARecord
 from backend.app.models.media import MediaAssetRecord
 from backend.app.models.project import Asset, AssetCreate, Project, ProjectCreate
@@ -340,6 +341,24 @@ async def init_db() -> None:
     global engine, async_session
     is_prod = settings.ENVIRONMENT.lower() in ("production", "staging")
     is_sqlite = str(engine.url).startswith("sqlite")
+    is_test = bool(os.environ.get("PYTEST_CURRENT_TEST")) or getattr(settings, "IS_TEST_MODE", False)
+
+    # CRITICAL TEST & LOCAL ISOLATION GUARD:
+    # Under no circumstances may automated tests or routine local scripts run init_db() / migrations
+    # against the production Supabase database.
+    if Settings.is_production_database_url(str(engine.url)):
+        if is_test:
+            raise RuntimeError(
+                "PRODUCTION DATABASE GUARD BLOCKED init_db(): Attempted to execute database migrations / "
+                "init_db() against production Supabase database during test execution. "
+                "Routine tests must run against an isolated test database or disposable schema."
+            )
+        if not is_prod and not getattr(settings, "ALLOW_PRODUCTION_DB_MIGRATIONS", False):
+            raise RuntimeError(
+                "PRODUCTION DATABASE GUARD BLOCKED init_db(): Attempted to execute init_db() against "
+                "production Supabase database from a non-production environment without "
+                "ALLOW_PRODUCTION_DB_MIGRATIONS=True."
+            )
 
     try:
         async with engine.begin() as conn:
