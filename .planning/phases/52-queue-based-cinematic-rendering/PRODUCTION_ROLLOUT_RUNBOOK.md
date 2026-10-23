@@ -25,11 +25,11 @@ All operations in this runbook are strictly gated and categorized into three exp
 
 ## 2. Authoritative Current Production State
 
-As of the latest read-only audit (commit `13abb6d`), the live production environment state is:
+As of the latest verified deployment (commit `3a27031`):
 
-- **Production backend:** `v6` (`tendersaathiacr.azurecr.io/praroha-backend:v6`, revision `praroha-backend--latest`, status `Running`, healthy on `/api/health`).
-- **Queue-publisher environment binding:** unbound (no `QUEUE_PUBLISH_URL` environment variable present on `praroha-backend`; secret reference `queue-publish-url` remains provisioned in ACA secrets store, ready for binding upon authorization).
-- **Candidate `v7.3`:** published to ACR (`tendersaathiacr.azurecr.io/praroha-backend:v7.3`, digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`), **NOT deployed**.
+- **Production backend:** `v7.3` (`tendersaathiacr.azurecr.io/praroha-backend:v7.3`, digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`, revision `praroha-backend--latest`, status `Running`, `provisioningState: Succeeded`, healthy on `/api/health`).
+- **Queue-publisher environment binding:** **BOUND** (`QUEUE_PUBLISH_URL=secretref:queue-publish-url`).
+- **Database initialization:** Production schema validated via `validate_production_schema()` with **ZERO DDL**. PostgreSQL connection confirmed (`fallback_used: false`). No SQLite fallback, no crash loop, no import errors.
 - **Production `render_outbox`:** exists in Supabase (`public.render_outbox` created via `0001_create_render_outbox.sql` with 11 columns, 5 constraints, 3 indexes; currently 0 total rows, 0 pending rows).
 - **Both cinematic-preview feature flags:** disabled (backend `CINEMATIC_PREVIEW_ENABLED=False` unset/default false; frontend `VITE_ENABLE_CINEMATIC_PREVIEW` unset/falsy).
 - **Both queues:** empty (`cinematic-render-jobs`: 0 messages; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
@@ -40,9 +40,8 @@ As of the latest read-only audit (commit `13abb6d`), the live production environ
 | Component | Target Resource | Live Audited State | Status |
 | :--- | :--- | :--- | :--- |
 | **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` verified present (11 columns, 5 constraints, 3 indexes). HTTP 200 on REST API; 0 total rows, 0 pending rows. | **MIGRATED & VERIFIED** (Phase Gate A Complete) |
-| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v6`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **ACTIVE LIVE REVISION (v6)** |
-| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` environment variable is **unbound**; secret reference `queue-publish-url` is provisioned and ready. | **UNBOUND (Awaiting Gate B Approval)** |
-| **Candidate Image v7.3** | `tendersaathiacr.azurecr.io` | Tag: `praroha-backend:v7.3`. Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`. Tested in isolated container; zero DDL on startup. | **STAGED IN ACR (Not Deployed)** |
+| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`. Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **DEPLOYED & HEALTHY** (Phase Gate B & C Complete) |
+| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
 | **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`, UAMI `uami-praroha-render`, zero ingress (`ingress: null`), and 0 active or historical executions. | Verified scale-to-zero active |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (`[]`).<br>`cinematic-render-poison`: 0 messages (`[]`). | Verified clean queue baseline |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
@@ -131,31 +130,52 @@ As of the latest read-only audit (commit `13abb6d`), the live production environ
     - Migrated DB: normal startup validated schema with zero DDL; `/api/health` returned HTTP 200.
   - Published immutable candidate image `tendersaathiacr.azurecr.io/praroha-backend:v7.3` to ACR.
   - Expected & Verified Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`.
-  - **Status: STAGED IN ACR. NOT DEPLOYED TO PRODUCTION. AWAITING OPERATOR AUTHORIZATION.**
+- [x] **Step B8 `[PROD-DEPLOYED]`**: Operator-Authorized Deployment of Candidate `v7.3` (2026-10-23):
+  - Operator explicitly authorized deploying `v7.3` and binding `QUEUE_PUBLISH_URL`.
+  - All preflight prerequisites verified read-only before deployment:
+    - Production on `v6`, ACR digest `sha256:74c0f103...` exact match, `render_outbox` exists with 0 rows, both queues empty, 0 job executions, both feature flags disabled, secret reference `queue-publish-url` provisioned.
+  - Executed:
+    ```bash
+    az containerapp update \
+      --name praroha-backend \
+      --resource-group rg-tendersaathi \
+      --image tendersaathiacr.azurecr.io/praroha-backend:v7.3 \
+      --set-env-vars QUEUE_PUBLISH_URL=secretref:queue-publish-url
+    ```
+  - Deployment result: `provisioningState: Succeeded`, `runningStatus: Running`.
+  - `QUEUE_PUBLISH_URL` bound via `secretref:queue-publish-url` (secret value never printed or logged).
+  - **Status: DEPLOYED & HEALTHY. Phase Gate C verification follows.**
 
 ---
 
-### Phase Gate C: Post-Deployment Health & Infrastructure Audit
-*Prerequisite: Phase Gate B deployed.*
+### Phase Gate C: Post-Deployment Health & Infrastructure Audit (v7.3)
+*Prerequisite: Phase Gate B step B8 deployed. All checks verified 2026-10-23.*
 
 - [x] **Step C1 `[READ-ONLY]`**: Verify backend API health:
   ```bash
-  curl -fsS https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health | jq .
+  curl -fsS -i https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health
   ```
-  *Result*: HTTP/2 200 OK, `{"success": true, "data": {"status": "healthy", "service": "PRAROHA — Seed to Universe", "environment": "production"}}`.
-- [x] **Step C2 `[READ-ONLY]`**: Verify database outbox state:
-  - Connected via production connection to Supabase `stxnxkzaftmwcbtvgzbm`.
-  - `render_outbox` table verified accessible with exactly 0 rows (`count = 0`). Zero unexpected rows, zero pending rows.
-- [x] **Step C3 `[READ-ONLY]`**: Verify queue baseline & zero worker activity:
-  - `cinematic-render-jobs`: 0 messages.
-  - `cinematic-render-poison`: 0 messages.
+  *Result*: HTTP/2 200 OK, `{"success": true, "data": {"status": "healthy", "service": "PRAROHA — Seed to Universe", "environment": "production"}, "fallback_used": false}`.
+- [x] **Step C2 `[READ-ONLY]`**: Verify PostgreSQL connection & production schema validation:
+  - `init_db()` called at `main.py:34` during FastAPI lifespan, before uvicorn's `Application startup complete`.
+  - In production mode, `init_db()` executes `validate_production_schema()` with **ZERO DDL** and raises `RuntimeError` on any failure (line 456–460 of `project_repo.py`).
+  - Log Analytics confirmed clean startup: `INFO: Waiting for application startup.` (13:10:16Z) → `INFO: Application startup complete.` (13:10:23Z) → `INFO: Uvicorn running on http://0.0.0.0:8000` (13:10:23Z). Startup took ~7s consistent with PostgreSQL connection + schema validation.
+  - Zero log entries matching: `error`, `ERROR`, `SQLite`, `sqlite`, `fallback`, `RuntimeError`, `Traceback`, `CrashLoop`, `database`, `schema`, `migration`, `sweeper` (comprehensive keyword search across 15-minute window).
+  - Health response confirms `"fallback_used": false` — no SQLite fallback triggered.
+  - **Conclusion**: PostgreSQL connected, production schema validated with zero DDL, no silent fallback.
+- [x] **Step C3 `[READ-ONLY]`**: Verify database outbox state:
+  - Supabase REST API query: `GET /rest/v1/render_outbox` → HTTP 200, `Content-Range: */0`. Exactly 0 rows, 0 pending rows.
+- [x] **Step C4 `[READ-ONLY]`**: Verify queue baseline & zero worker activity:
+  - `cinematic-render-jobs`: 0 messages (`[]` via `az storage message peek`).
+  - `cinematic-render-poison`: 0 messages (`[]`).
   - `praroha-render-job` execution history: `[]` (0 executions).
-- [x] **Step C4 `[READ-ONLY]`**: Verify feature flag status:
-  - Backend `CINEMATIC_PREVIEW_ENABLED = False` (unset in environment).
-  - Frontend `VITE_ENABLE_CINEMATIC_PREVIEW` disabled.
-- [x] **Step C5 `[READ-ONLY]`**: Verify startup log telemetry:
-  - Log Analytics shows clean server process boot: `INFO: Started server process [5]`, `INFO: Application startup complete.`, `INFO: Uvicorn running on http://0.0.0.0:8000`.
-  - Zero import errors, zero crash loops. Health probe returned 200 OK.
+- [x] **Step C5 `[READ-ONLY]`**: Verify feature flag status:
+  - Backend `CINEMATIC_PREVIEW_ENABLED`: not present in container env vars (defaults to `False`).
+  - Frontend `VITE_ENABLE_CINEMATIC_PREVIEW`: not present (falsy).
+  - `QUEUE_PUBLISH_URL`: present and bound to `secretref:queue-publish-url` (value never exposed).
+- [x] **Step C6 `[READ-ONLY]`**: Verify running image matches approved digest:
+  - `az containerapp show` confirms `image: tendersaathiacr.azurecr.io/praroha-backend:v7.3`.
+  - ACR manifest confirms tag `v7.3` → digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f` (exact match).
 
 ---
 
@@ -343,11 +363,12 @@ The **SINGLE** next required operational approval before any further production 
   - Production runtime startup performs **ZERO DDL** schema changes (`validate_production_schema()`); automatic migrations disabled (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`).
   - Fails closed immediately on connection or schema validation failure; silent SQLite fallback completely eliminated.
   - Dependency boundary clean: pure `queue_contract.py` without `psutil` or FFmpeg worker dependencies.
-- **Current Status**: **STAGED & PAUSED. AWAITING EXPLICIT OPERATOR AUTHORIZATION FOR CANDIDATE v7.3.**
+- **Current Status**: **DEPLOYED & VERIFIED (2026-10-23). Phase Gate B step B8 and Phase Gate C complete.**
 
 ### 6.3 Subsequent Deployment Gate: Synthetic Canary Render
 - **Operation `[RENDER-TRIGGERING]`**: Execute exactly ONE synthetic canary render.
-- **Status**: **NOT EXECUTED / PENDING SEPARATE AUTHORIZATION**. Strictly blocked until Candidate `v7.3` is deployed and verified healthy.
+- **Prerequisite**: Candidate `v7.3` deployed and verified healthy — **SATISFIED** (Phase Gate C complete).
+- **Status**: **NOT EXECUTED / PENDING SEPARATE OPERATOR AUTHORIZATION**.
 
 ---
 

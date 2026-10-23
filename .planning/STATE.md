@@ -46,7 +46,10 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Implemented database safety hardening: fail-closed startup, separation of zero-DDL runtime schema validation (`validate_production_schema`) from explicit migrations (`run_migrations`).
       - Built, isolated-tested, and published candidate `tendersaathiacr.azurecr.io/praroha-backend:v7.3` (digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`).
       - Reconciled authoritative runbook ([PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md)) and test plan ([ROLLOUT_TEST_AND_ROLLBACK_PLAN.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/ROLLOUT_TEST_AND_ROLLBACK_PLAN.md)): established explicit current state (backend on `v6`, `QUEUE_PUBLISH_URL` unbound, candidate `v7.3` staged in ACR, outbox exists with 0 rows, feature flags disabled, queues empty, 0 worker executions, canary unexecuted).
-    - Next Required Action: Explicit operator authorization to deploy candidate `v7.3` and bind `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
+    - Operator authorized deployment of candidate `v7.3` with `QUEUE_PUBLISH_URL=secretref:queue-publish-url` (2026-10-23).
+      - Phase Gate B step B8 complete: `az containerapp update` succeeded, `provisioningState: Succeeded`, `runningStatus: Running`.
+      - Phase Gate C complete: `/api/health` HTTP 200, `fallback_used: false`, PostgreSQL connected (zero DDL schema validation via `validate_production_schema()`), zero errors/SQLite/fallback in logs, `render_outbox` at 0 rows, both queues empty, 0 job executions, feature flags disabled.
+    - Next Required Action: Explicit operator authorization for synthetic canary render (Phase Gate D).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
