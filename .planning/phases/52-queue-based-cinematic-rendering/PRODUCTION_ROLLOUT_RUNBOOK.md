@@ -28,8 +28,7 @@ All operations in this runbook are strictly gated and categorized into three exp
 The following pre-rollout facts have been empirically audited as of commit `e0239e7`:
 
 | Component | Target Resource | Live Audited State | Status |
-| :--- | :--- | :--- | :--- |
-| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` is absent (`PGRST205`). `projects` and `generation_jobs` exist with UUID primary keys. | Verified ready for DDL migration |
+| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` created via `0001_create_render_outbox.sql`. 11 columns, 5 constraints, 3 indexes verified. HTTP 200 on REST API. | **MIGRATED & VERIFIED** (Phase Gate A Complete) |
 | **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v6`. Does not yet contain TASK-52-09, 52-10, or 52-11 code. | Verified ready for image update |
 | **Queue Secret Binding** | `praroha-backend` secrets store | Secret `queue-publish-url` exists in backend configuration. `QUEUE_PUBLISH_URL` env var is NOT yet bound to container. | Verified ready for secret binding |
 | **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`, UAMI `uami-praroha-render`, zero ingress (`ingress: null`), and 0 active executions. | Verified scale-to-zero active |
@@ -45,34 +44,25 @@ The following pre-rollout facts have been empirically audited as of commit `e023
 ### Phase Gate A: Database Schema Migration
 *Prerequisite: Explicit operator approval to apply DDL to Supabase.*
 
-- [ ] **Step A1 `[READ-ONLY]`**: Re-verify `render_outbox` absence:
-  ```bash
-  SUPA_URL=$(grep "^SUPABASE_URL=" .env | cut -d= -f2-)
-  SUPA_KEY=$(grep "^SUPABASE_KEY=" .env | cut -d= -f2-)
-  curl -s -X GET "$SUPA_URL/rest/v1/render_outbox?limit=1" \
-    -H "apikey: $SUPA_KEY" -H "Authorization: Bearer $SUPA_KEY"
-  # Expected: {"code":"PGRST205", ...}
-  ```
+- [x] **Step A1 `[READ-ONLY]`**: Re-verify `render_outbox` absence:
+  - Confirmed via asyncpg and REST probe (`PGRST205` / `to_regclass = None`). *(Completed 2026-10-23)*
 
-- [ ] **Step A2 `[READ-ONLY]`**: Verified Column Type Compatibility:
+- [x] **Step A2 `[READ-ONLY]`**: Verified Column Type Compatibility:
   - *Empirical Verification*: Queried PostgREST OpenAPI schema definition directly from live Supabase:
     - `projects.id`: `{"format": "character varying", "type": "string"}` (unbounded `VARCHAR`)
     - `generation_jobs.id`: `{"format": "character varying", "type": "string"}` (unbounded `VARCHAR`)
     - `media_assets.id`: `{"format": "character varying", "type": "string"}` (unbounded `VARCHAR`)
-  - *PostgreSQL Type Compatibility*: Both referenced columns are `character varying` (OID 1043). The proposed foreign keys in [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) declare `project_id VARCHAR(64)` and `job_id VARCHAR(64)`. Both share the exact same underlying PostgreSQL type category (`character varying`). Because all PRAROHA identifiers are 36-character UUID strings (well within 64 characters), this is type-compatible.
-  - *Database Convention*: All other tables in the production database (`scenes`, `world_candidates`, `world_bibles`) declare foreign keys as unbounded `VARCHAR`. In PostgreSQL, unbounded `VARCHAR REFERENCES projects(id)` and `VARCHAR(64) REFERENCES projects(id)` are both valid.
+  - *PostgreSQL Type Compatibility*: Both referenced columns are `character varying` (OID 1043). The proposed foreign keys in [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) declare `project_id VARCHAR(64)` and `job_id VARCHAR(64)`. Both share the exact same underlying PostgreSQL type category (`character varying`). Because all PRAROHA identifiers are 36-character UUID strings (well within 64 characters), this is type-compatible. *(Completed 2026-10-23)*
 
-- [ ] **Step A3 `[PROD-CHANGING]`**: Apply [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) in Supabase SQL Editor.
-  - Safe, non-destructive, idempotent DDL (`CREATE TABLE IF NOT EXISTS`).
-  - Creates partial index `idx_render_outbox_pending` on `(status, created_at) WHERE status = 'pending'`.
-  - Creates foreign keys to `projects(id)` and `generation_jobs(id)` with `ON DELETE CASCADE`.
+- [x] **Step A3 `[PROD-CHANGING]`**: Apply [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) in production Supabase:
+  - Applied atomically in transaction using authorized database pooler connection (`postgres.stxnxkzaftmwcbtvgzbm`).
+  - Zero application downtime; zero changes to existing records. *(Completed 2026-10-23)*
 
-- [ ] **Step A4 `[READ-ONLY]`**: Verify migration success:
-  ```bash
-  curl -s -X GET "$SUPA_URL/rest/v1/render_outbox?limit=1" \
-    -H "apikey: $SUPA_KEY" -H "Authorization: Bearer $SUPA_KEY"
-  # Expected: [] (HTTP 200 with empty array)
-  ```
+- [x] **Step A4 `[READ-ONLY]`**: Verify migration success:
+  - `to_regclass('public.render_outbox')` confirmed present.
+  - REST query `GET /rest/v1/render_outbox?limit=1` returns HTTP 200 with `[]`.
+  - All 11 columns, 5 constraints (PK, 2 FKs, unique, status check), and 3 indexes verified.
+  - Baselines preserved: `projects` (381), `generation_jobs` (492), `media_assets` (282). *(Completed 2026-10-23)*
 
 
 ---
