@@ -1,7 +1,7 @@
 # Phase 52 — TASK-52-12 Completion Summary: Release Readiness & Production Runbook
 
-**Execution Date:** 2026-10-23  
-**Status:** Complete & Fully Audited — Execution Paused for Operator Approvals  
+**Execution Date:** 2026-10-23
+**Status:** Complete & Fully Audited — Execution Paused for Operator Approvals
 **Reference Document:** [.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md)
 
 ---
@@ -65,13 +65,15 @@ The production environment was inspected without executing any mutations, secret
 Per user instructions, rollout documentation was hardened to enforce strict non-destructive guarantees:
 - **No Indiscriminate Queue Clearing**: Removed all automated calls to `az storage message clear`. Messages are retained and inspected.
 - **No Table Drops on Rollback**: Prohibited dropping `render_outbox` (especially with `CASCADE`). Outbox rows are preserved for audit lineage.
-- **Graceful State Reconciliation**: Defined exact SQL procedures to transition `queued` and `processing` jobs to `failed` with sanitized explanation, while clearing `request_hash = NULL` on media assets so creators can retry without unique key collisions.
+- **Strictly Scoped Job Reconciliation**: Scoped rollback SQL strictly to `job_type = 'media_video'` and `provider_name = 'Cinematic Preview'`. Verified that `media_assets.id` is identical to `generation_jobs.id` (`job_id`) and eliminated the invalid `target_asset_id` column assumption. Non-cinematic jobs (DNA extraction, world generation, audio, voice) are 100% untouched.
+- **Verified Schema Data Types**: Directly audited PostgREST OpenAPI schema for `projects.id` and `generation_jobs.id`: both are `character varying` (`format: "character varying"`, `type: "string"`). Confirmed type compatibility with `VARCHAR(64)` and unbounded `VARCHAR`.
 - **Classified Non-Destructive Checklist**: Created [PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md) dividing operations into:
   - `[READ-ONLY]`: Preflight, health checks, log inspection, queue peek.
   - `[PROD-CHANGING]`: Supabase SQL migration, ACR build `v7`, ACA container update.
   - `[RENDER-TRIGGERING]`: Single synthetic canary render.
 
 ---
+
 
 ## 4. Remaining Production Approvals
 

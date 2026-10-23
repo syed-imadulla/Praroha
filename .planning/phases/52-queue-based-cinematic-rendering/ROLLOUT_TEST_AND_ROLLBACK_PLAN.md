@@ -5,7 +5,7 @@
 To ensure zero downtime, strict security compliance, and budget safety, the queue-based rendering architecture follows a 6-stage gated rollout:
 
 ```
-[Stage 1: Storage & Identity] 
+[Stage 1: Storage & Identity]
        │ ── Checkpoint: Storage Account & Queues created with RBAC role
        ▼
 [Stage 2: ACA Job Deployment]
@@ -134,16 +134,30 @@ If any gate fails or unexpected behavior is detected during rollout, execute the
      ```
   3. **Inspect and Reconcile Pending Messages Gracefully (DO NOT run `message clear`)**:
      - Inspect messages in `cinematic-render-jobs` without clearing them indiscriminately.
-     - For each pending message, query the associated `generation_jobs` record in Supabase:
+     - For pending cinematic preview jobs, reconcile only `job_type = 'media_video'` records (preserving all other job types like DNA, world, audio):
        ```sql
        UPDATE generation_jobs
        SET status = 'failed',
            error_code = 'SERVICE_SUSPENDED',
-           error_message = 'Rendering temporarily suspended for maintenance. Please retry shortly.'
-       WHERE status = 'queued';
+           error_message = 'Cinematic rendering temporarily suspended for maintenance. Please retry shortly.'
+       WHERE job_type = 'media_video'
+         AND status = 'queued'
+         AND id IN (
+             SELECT id FROM media_assets
+             WHERE media_type = 'video' AND provider_name = 'Cinematic Preview'
+         );
        ```
-     - Clear `request_hash = NULL` on affected `media_assets` so users can cleanly re-request once service is restored.
-  4. **Result**: Background rendering compute halts immediately (0 active executions, ₹0 compute cost). Zero user requests are lost or left in orphaned `processing` state. Audit integrity is 100% preserved.
+     - Clear `request_hash = NULL` on affected `media_assets` (`media_assets.id` is identical to `generation_jobs.id`) so users can cleanly re-request once service is restored:
+       ```sql
+       UPDATE media_assets
+       SET request_hash = NULL,
+           status = 'failed',
+           error_message = 'Cinematic preview interrupted by service suspension. Request hash released for clean retry.'
+       WHERE media_type = 'video'
+         AND provider_name = 'Cinematic Preview'
+         AND status IN ('queued', 'processing');
+       ```
+  4. **Result**: Background rendering compute halts immediately (0 active executions, ₹0 compute cost). Zero user requests are lost or left in orphaned `processing` state. Non-cinematic jobs remain 100% unaffected. Audit integrity is 100% preserved.
 
 ---
 

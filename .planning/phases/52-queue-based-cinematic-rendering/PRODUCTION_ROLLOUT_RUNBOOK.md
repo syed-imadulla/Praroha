@@ -1,8 +1,8 @@
 # PRAROHA Phase 52 — Production Rollout Runbook & Safe Rollback Protocol
 
-**Target Milestone:** Milestone 7: Dedicated Cinematic Rendering Worker  
-**Target Phase:** Phase 52: Queue-Based Cinematic Rendering Architecture  
-**Authoritative Plan Reference:** [.planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md)  
+**Target Milestone:** Milestone 7: Dedicated Cinematic Rendering Worker
+**Target Phase:** Phase 52: Queue-Based Cinematic Rendering Architecture
+**Authoritative Plan Reference:** [.planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md)
 **Security & Integrity Mandate:** Zero secret leakage, zero data loss, zero indiscriminate queue clearing, and zero premature production changes.
 
 ---
@@ -53,16 +53,27 @@ The following pre-rollout facts have been empirically audited as of commit `e023
     -H "apikey: $SUPA_KEY" -H "Authorization: Bearer $SUPA_KEY"
   # Expected: {"code":"PGRST205", ...}
   ```
-- [ ] **Step A2 `[PROD-CHANGING]`**: Apply [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) in Supabase SQL Editor.
+
+- [ ] **Step A2 `[READ-ONLY]`**: Verified Column Type Compatibility:
+  - *Empirical Verification*: Queried PostgREST OpenAPI schema definition directly from live Supabase:
+    - `projects.id`: `{"format": "character varying", "type": "string"}` (unbounded `VARCHAR`)
+    - `generation_jobs.id`: `{"format": "character varying", "type": "string"}` (unbounded `VARCHAR`)
+    - `media_assets.id`: `{"format": "character varying", "type": "string"}` (unbounded `VARCHAR`)
+  - *PostgreSQL Type Compatibility*: Both referenced columns are `character varying` (OID 1043). The proposed foreign keys in [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) declare `project_id VARCHAR(64)` and `job_id VARCHAR(64)`. Both share the exact same underlying PostgreSQL type category (`character varying`). Because all PRAROHA identifiers are 36-character UUID strings (well within 64 characters), this is type-compatible.
+  - *Database Convention*: All other tables in the production database (`scenes`, `world_candidates`, `world_bibles`) declare foreign keys as unbounded `VARCHAR`. In PostgreSQL, unbounded `VARCHAR REFERENCES projects(id)` and `VARCHAR(64) REFERENCES projects(id)` are both valid.
+
+- [ ] **Step A3 `[PROD-CHANGING]`**: Apply [backend/migrations/0001_create_render_outbox.sql](file:///home/syed-imadulla/Desktop/Praroha/backend/migrations/0001_create_render_outbox.sql) in Supabase SQL Editor.
   - Safe, non-destructive, idempotent DDL (`CREATE TABLE IF NOT EXISTS`).
   - Creates partial index `idx_render_outbox_pending` on `(status, created_at) WHERE status = 'pending'`.
   - Creates foreign keys to `projects(id)` and `generation_jobs(id)` with `ON DELETE CASCADE`.
-- [ ] **Step A3 `[READ-ONLY]`**: Verify migration success:
+
+- [ ] **Step A4 `[READ-ONLY]`**: Verify migration success:
   ```bash
   curl -s -X GET "$SUPA_URL/rest/v1/render_outbox?limit=1" \
     -H "apikey: $SUPA_KEY" -H "Authorization: Bearer $SUPA_KEY"
   # Expected: [] (HTTP 200 with empty array)
   ```
+
 
 ---
 
@@ -182,47 +193,70 @@ If an anomaly, dispatch exception, worker failure, or unexpected cost alert occu
 - **Impact**: Compute cost drops to ₹0.00 immediately. No worker will execute automatically until manually triggered.
 
 ### Rollback Level 3: Graceful Job & Queue Reconciliation (T + 10 minutes)
-*Goal: Reconcile all job states safely without dropping tables or clearing queues.*
+*Goal: Reconcile all job states safely without dropping tables, clearing queues, or corrupting unrelated application jobs.*
 
 > [!CAUTION]
-> **DO NOT** run `az storage message clear` on `cinematic-render-jobs`.  
-> **DO NOT** run `DROP TABLE render_outbox CASCADE`.  
-> Indiscriminate deletion destroys audit history and permanently corrupts client retry semantics.
+> **DO NOT** run `az storage message clear` on `cinematic-render-jobs`.
+> **DO NOT** run `DROP TABLE render_outbox CASCADE`.
+> **DO NOT** run unscoped updates on `generation_jobs` (`WHERE status = 'queued'`). PRAROHA runs concurrent generation jobs (DNA extraction, world synthesis, voice generation, universe unfold). Unscoped updates will corrupt active non-cinematic jobs!
 
-Instead, execute the following state-by-state reconciliation in Supabase SQL:
+#### Verified Schema Relationships:
+- **`GenerationJob`**: Cinematic preview jobs strictly use `job_type = 'media_video'`.
+- **`MediaAssetRecord`**: Cinematic preview assets have `media_type = 'video'` and `provider_name = 'Cinematic Preview'`.
+- **Primary/Foreign Key Alignment**: In `CinematicDispatcherService.dispatch_preview_job()`, `job_record.id` is explicitly created identical to `asset_record.id` (`job_id`). There is NO `target_asset_id` column on `generation_jobs`. `media_assets.id` directly matches `generation_jobs.id`.
+- **`RenderOutbox`**: Every Phase 52 cinematic job has `render_outbox.job_id = generation_jobs.id`.
 
-1. **Reconcile `queued` jobs**:
-   For jobs that were enqueued but not rendered:
-   ```sql
-   UPDATE generation_jobs
-   SET status = 'failed',
-       error_code = 'SERVICE_SUSPENDED',
-       error_message = 'Rendering service temporarily suspended for maintenance. Please retry shortly.',
-       updated_at = CURRENT_TIMESTAMP
-   WHERE status = 'queued';
-   ```
-2. **Reconcile `processing` jobs**:
-   For jobs that were actively rendering when the worker was stopped:
-   ```sql
-   UPDATE generation_jobs
-   SET status = 'failed',
-       error_code = 'RENDER_INTERRUPTED',
-       error_message = 'Rendering was interrupted during service maintenance.',
-       updated_at = CURRENT_TIMESTAMP
-   WHERE status = 'processing';
-   ```
-3. **Release Creator Request Hashes**:
-   Allow affected creators to re-request video generation without unique hash collisions:
-   ```sql
-   UPDATE media_assets
-   SET request_hash = NULL
-   WHERE id IN (
-       SELECT target_asset_id FROM generation_jobs 
-       WHERE error_code IN ('SERVICE_SUSPENDED', 'RENDER_INTERRUPTED')
-   );
-   ```
+Execute the following scoped, verified reconciliation in Supabase SQL:
+
+```sql
+-- Step 1: Reconcile ONLY queued cinematic preview jobs (protects DNA, world, and voice jobs)
+UPDATE generation_jobs
+SET status = 'failed',
+    error_code = 'SERVICE_SUSPENDED',
+    error_message = 'Cinematic rendering temporarily suspended for maintenance. Please retry shortly.',
+    updated_at = CURRENT_TIMESTAMP
+WHERE job_type = 'media_video'
+  AND status = 'queued'
+  AND id IN (
+      SELECT id FROM media_assets
+      WHERE media_type = 'video' AND provider_name = 'Cinematic Preview'
+  );
+
+-- Step 2: Reconcile ONLY interrupted processing cinematic preview jobs
+UPDATE generation_jobs
+SET status = 'failed',
+    error_code = 'RENDER_INTERRUPTED',
+    error_message = 'Cinematic rendering was interrupted during service maintenance.',
+    updated_at = CURRENT_TIMESTAMP
+WHERE job_type = 'media_video'
+  AND status = 'processing'
+  AND id IN (
+      SELECT id FROM media_assets
+      WHERE media_type = 'video' AND provider_name = 'Cinematic Preview'
+  );
+
+-- Step 3: Reconcile pending outbox records so sweeper will not attempt dispatch
+UPDATE render_outbox
+SET status = 'failed',
+    last_error = 'Rollback: Dispatch cancelled due to service suspension.',
+    updated_at = CURRENT_TIMESTAMP
+WHERE status = 'pending';
+
+-- Step 4: Release request_hash ONLY on the affected cinematic preview media assets
+-- Allows creators to re-request preview rendering without hash collisions.
+UPDATE media_assets
+SET request_hash = NULL,
+    status = 'failed',
+    error_message = 'Cinematic preview interrupted by service suspension. Request hash released for clean retry.'
+WHERE media_type = 'video'
+  AND provider_name = 'Cinematic Preview'
+  AND status IN ('queued', 'processing');
+```
+
 4. **Preserve `completed` and `failed` records**:
-   - `completed` jobs and their stored MP4 assets remain 100% intact.
+   - `completed` jobs and their stored MP4 assets in Supabase Storage remain 100% intact.
+   - Non-cinematic jobs (`dna_extraction`, `world_generation`, `media_audio`, `media_voice`) remain 100% intact.
+   - Historical error diagnostics remain preserved for post-mortem analysis.
    - `failed` jobs and diagnostic errors remain available for engineering analysis.
 5. **Inspect Queue Messages**:
    Peek at pending messages to correlate message IDs with database records:
