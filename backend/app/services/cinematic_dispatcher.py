@@ -1,13 +1,20 @@
 """
-PRAROHA Cinematic Preview Job Dispatcher (Phase 51).
+PRAROHA Cinematic Preview Job Dispatcher (Phase 52).
 
 Architectural Contract:
-- Non-blocking asynchronous dispatch to the isolated cinematic worker.
-- The primary FastAPI web application NEVER imports FFmpeg, executes rendering subprocesses,
-  or blocks synchronously waiting for an MP4 to render.
+- Non-blocking asynchronous dispatch using the Transactional Outbox pattern.
+- Primary FastAPI web application commits GenerationJob and RenderOutbox atomically
+  in PostgreSQL/SQLite before attempting Azure Queue publication.
+- Azure Storage Queue message is dispatched to 'cinematic-render-jobs' using the backend's
+  scoped Add-only SAS URL (QUEUE_PUBLISH_URL).
+- No database transaction is held open during Azure Storage Queue network requests.
+- Upon successful enqueue, the outbox record is marked 'published'.
+- If enqueue fails, the outbox record is preserved in 'pending' status with sanitized error
+  for recovery by the background sweeper (TASK-52-11).
 - Strictly validates project ownership, entity permissions, and asset boundaries.
-- Reuses request deduplication and active-job tracking.
+- Reuses request deduplication and active-job tracking (idempotency).
 - Preserves honest labeling: is_synthetic=True, provider_label="Cinematic Preview".
+- Strictly forbids credentials or secrets in queue payloads or logs.
 """
 
 import asyncio
@@ -16,17 +23,20 @@ import json
 import logging
 import os
 import re
+import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
+from urllib.parse import urlparse
 from pydantic import BaseModel, Field
 
-import httpx
+import httpx  # retained for backward compatibility with legacy test patches
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from backend.app.config import settings
 from backend.app.models.job import GenerationJob
 from backend.app.models.media import MediaAssetRecord, MediaJobResponse
+from backend.app.models.outbox import RenderOutbox, assert_no_secrets_in_payload
 from backend.app.repositories.project_repo import ProjectRepository, async_session
 
 logger = logging.getLogger("seed_unfold.cinematic_dispatcher")
@@ -36,8 +46,43 @@ def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def validate_queue_url(queue_url: str) -> None:
+    """Validate that the queue publish URL is an HTTPS URL targeting cinematic-render-jobs."""
+    if not queue_url or not isinstance(queue_url, str):
+        raise ValueError("Queue URL must be a non-empty string.")
+    parsed = urlparse(queue_url.strip())
+    if parsed.scheme != "https":
+        raise ValueError("Queue publish URL must use HTTPS protocol.")
+    path = parsed.path.strip("/")
+    if path != "cinematic-render-jobs":
+        raise ValueError(f"Queue publish URL must target 'cinematic-render-jobs', got '{path}'.")
+
+
+def sanitize_queue_url(queue_url: Optional[str]) -> str:
+    """Return queue URL with SAS token / query string redacted for safe logging."""
+    if not queue_url:
+        return "[NOT CONFIGURED]"
+    try:
+        parsed = urlparse(queue_url.strip())
+        return f"{parsed.scheme}://{parsed.netloc}{parsed.path} (SAS redacted)"
+    except Exception:
+        return "[REDACTED_URL]"
+
+
+def sanitize_error_message(err_str: Optional[str]) -> str:
+    """Scrub sensitive query parameters, SAS tokens, passwords, and keys from error messages."""
+    if not err_str:
+        return "Unknown queue publication error"
+    cleaned = re.sub(r"sig=[a-zA-Z0-9%_\-]+", "sig=REDACTED", str(err_str))
+    cleaned = re.sub(r"sp=[a-zA-Z0-9%_\-]+", "sp=REDACTED", cleaned)
+    cleaned = re.sub(r"se=[a-zA-Z0-9%_\-]+", "se=REDACTED", cleaned)
+    cleaned = re.sub(r"sv=[a-zA-Z0-9%_\-]+", "sv=REDACTED", cleaned)
+    cleaned = re.sub(r"://[^:]+:[^@]+@", "://[REDACTED]@", cleaned)
+    return cleaned[:300]
+
+
 def get_worker_auth_token() -> str:
-    """Return expected service-to-service authentication token."""
+    """Return expected service-to-service authentication token (legacy helper)."""
     token = os.getenv("WORKER_AUTH_TOKEN")
     if token and token.strip():
         return token.strip()
@@ -79,11 +124,52 @@ def compute_preview_hash(project_id: str, request: CinematicPreviewJobRequest) -
 
 
 class CinematicDispatcherService:
-    """Dispatches non-blocking cinematic preview rendering jobs to the isolated worker."""
+    """
+    Dispatches non-blocking cinematic preview rendering jobs using the transactional outbox pattern
+    and Azure Storage Queue (cinematic-render-jobs) for Phase 52.
+    """
 
-    def __init__(self, repo: ProjectRepository, worker_url: Optional[str] = None):
+    def __init__(
+        self,
+        repo: ProjectRepository,
+        queue_publish_url: Optional[str] = None,
+        queue_client: Optional[Any] = None,
+        worker_url: Optional[str] = None,
+    ):
         self.repo = repo
+        if queue_publish_url is not None:
+            self.queue_publish_url = queue_publish_url.strip() if queue_publish_url else None
+        else:
+            raw_url = getattr(settings, "QUEUE_PUBLISH_URL", None) or os.getenv("QUEUE_PUBLISH_URL")
+            self.queue_publish_url = raw_url.strip() if raw_url else None
+        self._queue_client = queue_client
         self.worker_url = worker_url or os.getenv("CINEMATIC_WORKER_URL", "http://praroha-cinematic-worker:8080")
+
+    async def _send_queue_message(self, payload: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+        """
+        Send canonical queue message to Azure Storage Queue.
+        Executed outside database transaction boundaries to avoid holding connection locks.
+        """
+        import inspect
+        try:
+            message_content = json.dumps(payload)
+            if self._queue_client is not None:
+                client = self._queue_client
+                if inspect.iscoroutinefunction(getattr(client, "send_message", None)):
+                    await client.send_message(message_content)
+                else:
+                    await asyncio.to_thread(client.send_message, message_content)
+            else:
+                from azure.storage.queue import QueueClient
+
+                def _sync_send():
+                    q_client = QueueClient.from_queue_url(self.queue_publish_url)
+                    return q_client.send_message(message_content)
+
+                await asyncio.to_thread(_sync_send)
+            return True, None
+        except Exception as exc:
+            return False, str(exc)
 
     async def dispatch_preview_job(
         self,
@@ -91,7 +177,8 @@ class CinematicDispatcherService:
         request: CinematicPreviewJobRequest,
     ) -> MediaJobResponse:
         """
-        Validate, create durable job record, and dispatch to worker asynchronously.
+        Validate request, commit GenerationJob and RenderOutbox atomically,
+        then dispatch to Azure Storage Queue outside the database transaction.
         Returns immediately with HTTP 202-compatible MediaJobResponse.
         """
         # 0. Server-side feature gate
@@ -100,6 +187,25 @@ class CinematicDispatcherService:
                 status_code=503,
                 detail="Cinematic preview generation is currently disabled on this server.",
             )
+
+        # 0.1 Queue configuration pre-check
+        queue_url = self.queue_publish_url
+        if not queue_url and self._queue_client is None:
+            logger.warning("Cinematic preview dispatch rejected: QUEUE_PUBLISH_URL is not configured.")
+            raise HTTPException(
+                status_code=503,
+                detail="Cinematic preview queue is currently not configured on this server.",
+            )
+
+        if queue_url:
+            try:
+                validate_queue_url(queue_url)
+            except ValueError as val_err:
+                logger.error("Invalid queue URL configuration: %s", str(val_err))
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Invalid queue configuration: {str(val_err)}",
+                )
 
         # 1. Validate Project and Entity ID formats
         if not re.match(r"^[a-zA-Z0-9_\-]+$", project_id):
@@ -161,7 +267,7 @@ class CinematicDispatcherService:
                 detail="No visual concept art found for this entity. Generate an image first before composing a cinematic preview.",
             )
 
-        # Asset safety validation
+        # Asset safety validation (path traversal and SSRF protection)
         for field_name, url_val in (("image_url", resolved_image), ("voice_url", resolved_voice), ("ambient_url", resolved_ambient)):
             if url_val:
                 s_val = str(url_val).strip()
@@ -226,8 +332,37 @@ class CinematicDispatcherService:
                     self.repo.session.add(existing)
                     await self.repo.session.commit()
 
-        # 6. Create durable records in database
+        # 6. Prepare canonical queue message payload
+        job_id = str(uuid.uuid4())
+        enqueued_at = get_utc_now().isoformat()
+
+        options = {
+            "duration_seconds": request.duration_sec,
+            "fps": 24,
+            "resolution": "1280x720",
+            "aspect_ratio": request.aspect_ratio or "16:9",
+            "motion_preset": "slow_pan",
+        }
+
+        queue_payload = {
+            "schema_version": "1.0",
+            "job_id": job_id,
+            "project_id": project_id,
+            "entity_type": request.entity_type,
+            "entity_id": request.entity_id,
+            "request_hash": req_hash,
+            "options": options,
+            "enqueued_at": enqueued_at,
+            "attempt": 1,
+        }
+
+        # Enforce zero credentials in payload
+        assert_no_secrets_in_payload(queue_payload)
+
+        # 7. Step A: Atomic Database Transaction
+        # Persist MediaAssetRecord, GenerationJob, and RenderOutbox together in one commit.
         asset_record = MediaAssetRecord(
+            id=job_id,
             project_id=project_id,
             entity_type=request.entity_type,
             entity_id=request.entity_id,
@@ -239,19 +374,34 @@ class CinematicDispatcherService:
             request_hash=req_hash,
         )
 
+        job_record = GenerationJob(
+            id=job_id,
+            project_id=project_id,
+            job_type="media_video",
+            status="queued",
+            progress=0,
+            error_code=None,
+            error_message=None,
+            result_json=None,
+        )
+
+        outbox_record = RenderOutbox(
+            id=str(uuid.uuid4()),
+            project_id=project_id,
+            job_id=job_id,
+            payload=queue_payload,
+            status="pending",
+            attempt_count=0,
+        )
+
         try:
-            created_asset = await self.repo.create_media_asset(asset_record)
-            job_record = GenerationJob(
-                id=created_asset.id,
-                project_id=project_id,
-                job_type="media_video",
-                status="queued",
-                progress=0,
-                error_code=None,
-                error_message=None,
-                result_json=None,
-            )
-            await self.repo.create_generation_job(job_record)
+            self.repo.session.add(asset_record)
+            self.repo.session.add(job_record)
+            self.repo.session.add(outbox_record)
+            await self.repo.session.commit()
+            await self.repo.session.refresh(asset_record)
+            await self.repo.session.refresh(job_record)
+            await self.repo.session.refresh(outbox_record)
         except IntegrityError:
             await self.repo.session.rollback()
             existing = await self.repo.find_media_asset_by_hash(project_id, req_hash)
@@ -267,109 +417,46 @@ class CinematicDispatcherService:
                 )
             raise
 
-        # 7. Prepare specification dictionary for the worker
-        spec_dict = {
-            "project_id": project_id,
-            "entity_type": request.entity_type,
-            "entity_id": request.entity_id,
-            "title": resolved_title,
-            "location_setting": resolved_setting or "",
-            "conflict_narrative": resolved_conflict or "",
-            "image_path": resolved_image,
-            "voice_path": resolved_voice,
-            "ambient_path": resolved_ambient,
-            "duration_sec": request.duration_sec,
-            "aspect_ratio": request.aspect_ratio or "16:9",
-        }
+        # 8. Step B: Publish to Azure Storage Queue (Outside Database Transaction)
+        safe_url = sanitize_queue_url(self.queue_publish_url)
+        logger.info("Publishing cinematic render job %s to queue %s...", job_id, safe_url)
 
-        # 8. Dispatch asynchronously without blocking FastAPI
-        asyncio.create_task(
-            self._dispatch_to_worker_background(
-                job_id=created_asset.id,
-                project_id=project_id,
-                spec_dict=spec_dict,
-                worker_url=self.worker_url,
+        publish_ok, publish_err = await self._send_queue_message(queue_payload)
+
+        # 9. Step C: Handle Enqueue Outcome
+        if publish_ok:
+            published_at = get_utc_now()
+            await self.repo.update_render_outbox_status(
+                job_id=job_id,
+                status="published",
+                published_at=published_at,
             )
-        )
+            logger.info("Successfully published job %s to queue. Outbox marked published.", job_id)
 
-        return MediaJobResponse(
-            job_id=created_asset.id,
-            status="queued",
-            media_type="video",
-            entity_type=request.entity_type,
-            entity_id=request.entity_id,
-            asset_url=None,
-            error_message=None,
-        )
+            return MediaJobResponse(
+                job_id=job_id,
+                status="queued",
+                media_type="video",
+                entity_type=request.entity_type,
+                entity_id=request.entity_id,
+                asset_url=None,
+                error_message=None,
+            )
+        else:
+            sanitized_err = sanitize_error_message(publish_err)
+            logger.error(
+                "Failed to enqueue job %s to Azure Queue: %s. Preserving outbox record in pending status.",
+                job_id,
+                sanitized_err,
+            )
+            await self.repo.update_render_outbox_status(
+                job_id=job_id,
+                status="pending",
+                last_error=sanitized_err,
+                increment_attempt=True,
+            )
 
-    @staticmethod
-    async def _dispatch_to_worker_background(
-        job_id: str,
-        project_id: str,
-        spec_dict: Dict[str, Any],
-        worker_url: str,
-    ) -> None:
-        """Background coroutine to invoke the worker HTTP endpoint and ensure reliable job transition."""
-        logger.info("Background dispatching job %s to worker at %s...", job_id, worker_url)
-        target_url = (worker_url or "").strip().rstrip("/")
-
-        if not target_url:
-            async with async_session() as session:
-                repo = ProjectRepository(session)
-                err_msg = "Cinematic preview worker unavailable (CINEMATIC_WORKER_URL not configured)."
-                await repo.update_media_asset(job_id, {"status": "failed", "error_message": err_msg})
-                await repo.update_generation_job(job_id, {"status": "failed", "error_message": err_msg})
-            logger.error("Failed job %s: Worker URL not configured.", job_id)
-            return
-
-        # Transition to processing
-        async with async_session() as session:
-            repo = ProjectRepository(session)
-            await repo.update_media_asset(job_id, {"status": "processing"})
-            await repo.update_generation_job(job_id, {"status": "processing", "started_at": get_utc_now(), "progress": 25})
-
-        auth_token = get_worker_auth_token()
-        headers = {
-            "Authorization": f"Bearer {auth_token}",
-            "Content-Type": "application/json",
-        }
-
-        storage_provider = os.getenv("STORAGE_PROVIDER", "supabase")
-
-        worker_payload = {
-            "job_id": job_id,
-            "spec": spec_dict,
-            "storage_provider": storage_provider,
-            "timeout": 120.0,
-        }
-
-        try:
-            async with httpx.AsyncClient(timeout=125.0) as client:
-                resp = await client.post(f"{target_url}/render", json=worker_payload, headers=headers)
-
-                if resp.status_code == 200:
-                    resp_data = resp.json()
-                    logger.info("Worker successfully completed render for job %s: %s", job_id, resp_data)
-                    # Verify job in database is marked completed
-                    async with async_session() as session:
-                        repo = ProjectRepository(session)
-                        asset = await repo.get_media_asset(job_id)
-                        if asset and asset.status != "completed":
-                            # In case worker did not update directly, update here
-                            await repo.update_media_asset(job_id, {"status": "completed", "completed_at": get_utc_now()})
-                            await repo.update_generation_job(job_id, {"status": "completed", "progress": 100})
-                else:
-                    err_text = resp.text
-                    logger.error("Worker failed for job %s with HTTP %d: %s", job_id, resp.status_code, err_text)
-                    async with async_session() as session:
-                        repo = ProjectRepository(session)
-                        err_msg = f"Worker HTTP {resp.status_code}: {err_text[:200]}"
-                        await repo.update_media_asset(job_id, {"status": "failed", "error_message": err_msg})
-                        await repo.update_generation_job(job_id, {"status": "failed", "error_message": err_msg})
-        except Exception as exc:
-            logger.error("Exception invoking cinematic worker for job %s: %s", job_id, exc, exc_info=True)
-            async with async_session() as session:
-                repo = ProjectRepository(session)
-                err_msg = f"Worker connection error: {str(exc)[:200]}"
-                await repo.update_media_asset(job_id, {"status": "failed", "error_message": err_msg})
-                await repo.update_generation_job(job_id, {"status": "failed", "error_message": err_msg})
+            raise HTTPException(
+                status_code=502,
+                detail=f"Failed to enqueue cinematic preview job: {sanitized_err}. Job preserved in outbox for recovery.",
+            )

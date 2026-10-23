@@ -19,10 +19,22 @@ from backend.app.repositories import project_repo
 
 @pytest.fixture(autouse=True)
 def enable_cinematic_preview_for_tests():
-    orig = settings.CINEMATIC_PREVIEW_ENABLED
+    orig_flag = settings.CINEMATIC_PREVIEW_ENABLED
+    orig_url = settings.QUEUE_PUBLISH_URL
     settings.CINEMATIC_PREVIEW_ENABLED = True
+    settings.QUEUE_PUBLISH_URL = "https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?mock-sas"
     yield
-    settings.CINEMATIC_PREVIEW_ENABLED = orig
+    settings.CINEMATIC_PREVIEW_ENABLED = orig_flag
+    settings.QUEUE_PUBLISH_URL = orig_url
+
+
+@pytest.fixture(autouse=True)
+def mock_azure_queue():
+    with patch("azure.storage.queue.QueueClient.from_queue_url") as mock_from_url:
+        mock_client = MagicMock()
+        mock_client.send_message.return_value = {"message_id": "mock-msg-id"}
+        mock_from_url.return_value = mock_client
+        yield mock_client
 
 
 @pytest_asyncio.fixture
@@ -272,42 +284,36 @@ async def test_path_traversal_and_ssrf_rejection(client, setup_project):
 
 
 @pytest.mark.asyncio
-async def test_worker_failure_handling(client, setup_project):
+async def test_worker_failure_handling(client, setup_project, mock_azure_queue):
     """
-    Requirement 5 & 7: When worker returns 500 or network fails,
-    the job transitions cleanly to 'failed' with error_message. Zero false success.
+    Requirement 5 & 7: When Azure queue enqueue fails,
+    the outbox record is preserved in 'pending' status with sanitized error, and the API returns HTTP 502. Zero false success.
     """
     proj, world, _ = setup_project
+    mock_azure_queue.send_message.side_effect = Exception("Simulated Azure queue network timeout")
 
-    with patch("backend.app.services.cinematic_dispatcher.httpx.AsyncClient") as mock_client_cls:
-        mock_instance = AsyncMock()
-        mock_instance.post.return_value = MagicMock(
-            status_code=500,
-            text='{"status": "error", "message": "Simulated GPU memory timeout"}',
-        )
-        mock_client_cls.return_value.__aenter__.return_value = mock_instance
+    resp = await client.post(
+        f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
+        json={"entity_type": "world", "entity_id": world.id, "force_regenerate": True},
+    )
+    assert resp.status_code == 502
+    err_body = resp.json().get("error", {}).get("message") or resp.json().get("detail", "")
+    assert "Failed to enqueue cinematic preview job" in err_body
+    assert "Simulated Azure queue network timeout" in err_body
 
-        resp = await client.post(
-            f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
-            json={"entity_type": "world", "entity_id": world.id, "force_regenerate": True},
-        )
-        assert resp.status_code == 202
-        job_id = resp.json()["data"]["job_id"]
+    # Inspect durable database state
+    async with project_repo.async_session() as session:
+        repo = project_repo.ProjectRepository(session)
+        assets = await repo.list_media_assets(project_id=proj.id, entity_id=world.id)
+        video_assets = [a for a in assets if a.media_type == "video"]
+        assert len(video_assets) == 1
+        job_id = video_assets[0].id
 
-        # Allow background task to execute
-        await asyncio.sleep(0.1)
-
-        # Inspect durable database state
-        async with project_repo.async_session() as session:
-            repo = project_repo.ProjectRepository(session)
-            asset = await repo.get_media_asset(job_id)
-            assert asset is not None
-            assert asset.status == "failed"
-            assert "Worker HTTP 500" in (asset.error_message or "")
-
-            job = await repo.get_generation_job(job_id)
-            assert job is not None
-            assert job.status == "failed"
+        outbox = await repo.get_render_outbox_by_job_id(job_id)
+        assert outbox is not None
+        assert outbox.status == "pending"
+        assert "Simulated Azure queue network timeout" in (outbox.last_error or "")
+        assert outbox.attempt_count == 1
 
 
 @pytest.mark.asyncio
@@ -319,65 +325,52 @@ async def test_no_ffmpeg_execution_inside_primary_api(client, setup_project):
     proj, world, _ = setup_project
 
     with patch("subprocess.Popen") as mock_popen, patch("subprocess.run") as mock_run:
-        with patch("backend.app.services.cinematic_dispatcher.httpx.AsyncClient") as mock_client_cls:
-            mock_instance = AsyncMock()
-            mock_instance.post.return_value = MagicMock(status_code=200, json=lambda: {"status": "completed"})
-            mock_client_cls.return_value.__aenter__.return_value = mock_instance
-
-            resp = await client.post(
-                f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
-                json={"entity_type": "world", "entity_id": world.id, "force_regenerate": True},
-            )
-            assert resp.status_code == 202
-
-            # Give background task a moment
-            await asyncio.sleep(0.05)
-
-            # Neither Popen nor run should have been called with ffmpeg in FastAPI
-            for call in mock_popen.call_args_list:
-                args = call[0][0] if call[0] else []
-                assert "ffmpeg" not in str(args).lower()
-
-            for call in mock_run.call_args_list:
-                args = call[0][0] if call[0] else []
-                assert "ffmpeg" not in str(args).lower()
-
-
-@pytest.mark.asyncio
-async def test_worker_payload_excludes_credentials(client, setup_project):
-    """
-    Security verification: The dispatched HTTP payload to the worker must NEVER
-    contain database credentials (DATABASE_URL), API secrets, or storage credentials.
-    """
-    proj, world, _ = setup_project
-
-    with patch("backend.app.services.cinematic_dispatcher.httpx.AsyncClient") as mock_client_cls:
-        mock_instance = AsyncMock()
-        mock_instance.post.return_value = MagicMock(status_code=200, json=lambda: {"status": "completed"})
-        mock_client_cls.return_value.__aenter__.return_value = mock_instance
-
         resp = await client.post(
             f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
             json={"entity_type": "world", "entity_id": world.id, "force_regenerate": True},
         )
         assert resp.status_code == 202
 
-        await asyncio.sleep(0.05)
+        # Neither Popen nor run should have been called with ffmpeg in FastAPI
+        for call in mock_popen.call_args_list:
+            args = call[0][0] if call[0] else []
+            assert "ffmpeg" not in str(args).lower()
 
-        # Inspect the payload passed to mock_instance.post
-        assert mock_instance.post.called
-        call_kwargs = mock_instance.post.call_args[1]
-        payload = call_kwargs.get("json", {})
+        for call in mock_run.call_args_list:
+            args = call[0][0] if call[0] else []
+            assert "ffmpeg" not in str(args).lower()
 
-        # Assert no credential fields present
-        assert "database_url" not in payload
-        assert "supabase_key" not in payload
-        assert "password" not in str(payload).lower()
-        # Assert expected identifiers only
-        assert "job_id" in payload
-        assert "spec" in payload
-        assert "storage_provider" in payload
-        assert "timeout" in payload
+
+@pytest.mark.asyncio
+async def test_worker_payload_excludes_credentials(client, setup_project, mock_azure_queue):
+    """
+    Security verification: The dispatched queue payload must NEVER
+    contain database credentials (DATABASE_URL), API secrets, or storage credentials.
+    """
+    proj, world, _ = setup_project
+
+    resp = await client.post(
+        f"/api/projects/{proj.id}/media/cinematic-preview/jobs",
+        json={"entity_type": "world", "entity_id": world.id, "force_regenerate": True},
+    )
+    assert resp.status_code == 202
+
+    # Inspect the payload passed to mock_azure_queue.send_message
+    assert mock_azure_queue.send_message.called
+    raw_msg = mock_azure_queue.send_message.call_args[0][0]
+    payload = json.loads(raw_msg)
+
+    # Assert no credential fields present
+    assert "database_url" not in payload
+    assert "supabase_key" not in payload
+    assert "password" not in str(payload).lower()
+    # Assert expected identifiers only
+    assert payload["schema_version"] == "1.0"
+    assert "job_id" in payload
+    assert payload["project_id"] == proj.id
+    assert payload["entity_id"] == world.id
+    assert "options" in payload
+    assert "enqueued_at" in payload
 
 
 @pytest.mark.asyncio

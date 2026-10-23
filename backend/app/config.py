@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     SUPABASE_URL: Optional[str] = None
     SUPABASE_KEY: Optional[str] = None
     SUPABASE_BUCKET: str = "seed-unfold-assets"
+    QUEUE_PUBLISH_URL: Optional[str] = None  # Add-only SAS URL targeting cinematic-render-jobs
     DEV_AUTO_CONFIRM_EMAILS: bool = False
 
     @classmethod

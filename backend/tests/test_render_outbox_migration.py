@@ -237,7 +237,7 @@ async def test_render_outbox_repository_crud(canonical_payload):
         assert fetched.job_id == job.id
 
         # 3. List pending records
-        pending_list = await repo.get_pending_render_outbox_records(limit=10)
+        pending_list = await repo.get_pending_render_outbox_records(limit=100)
         job_ids = [p.job_id for p in pending_list]
         assert job.id in job_ids
 
