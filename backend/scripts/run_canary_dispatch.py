@@ -252,43 +252,46 @@ async def find_canonical_demo_seed(
     """
     repo = ProjectRepository(session)
 
-    # 1. Resolve project
-    target_project: Optional[Project] = None
+    # 1. Resolve project candidates
+    candidates: List[Project] = []
     if project_id:
         target_project = await repo.get_project(project_id)
         if not target_project:
             return None, None, None, f"Specified project_id '{project_id}' not found."
+        candidates = [target_project]
     else:
         stmt = select(Project).where(Project.title == CANONICAL_DEMO_TITLE)
         candidates = (await session.execute(stmt)).scalars().all()
         if not candidates:
             return None, None, None, f"No project with title '{CANONICAL_DEMO_TITLE}' found in database."
-        target_project = candidates[0]
 
-    # 2. Resolve verified keyframe image asset
-    stmt_assets = select(MediaAssetRecord).where(
-        MediaAssetRecord.project_id == target_project.id,
-        MediaAssetRecord.media_type == "image",
-        MediaAssetRecord.status == "completed",
-    )
-    if entity_id:
-        stmt_assets = stmt_assets.where(MediaAssetRecord.entity_id == entity_id)
+    # 2. Find candidate project that has a completed keyframe image asset
+    for candidate_project in candidates:
+        stmt_assets = select(MediaAssetRecord).where(
+            MediaAssetRecord.project_id == candidate_project.id,
+            MediaAssetRecord.media_type == "image",
+            MediaAssetRecord.status == "completed",
+        )
+        if entity_id:
+            stmt_assets = stmt_assets.where(MediaAssetRecord.entity_id == entity_id)
 
-    image_assets = (await session.execute(stmt_assets)).scalars().all()
-    if not image_assets:
-        return target_project, None, None, f"Project '{target_project.id}' has no completed image assets."
+        image_assets = (await session.execute(stmt_assets)).scalars().all()
+        if not image_assets:
+            continue
 
-    selected_asset = image_assets[0]
-    resolved_entity_id = selected_asset.entity_id
+        selected_asset = image_assets[0]
+        resolved_entity_id = selected_asset.entity_id
 
-    # 3. Path traversal & SSRF check
-    url_val = selected_asset.asset_url or ""
-    if ".." in url_val or "\x00" in url_val:
-        return target_project, selected_asset, resolved_entity_id, "Keyframe asset URL rejected: path traversal detected."
-    if "169.254.169.254" in url_val or "metadata.google" in url_val:
-        return target_project, selected_asset, resolved_entity_id, "Keyframe asset URL rejected: SSRF address detected."
+        # 3. Path traversal & SSRF check
+        url_val = selected_asset.asset_url or ""
+        if ".." in url_val or "\x00" in url_val:
+            continue
+        if "169.254.169.254" in url_val or "metadata.google" in url_val:
+            continue
 
-    return target_project, selected_asset, resolved_entity_id, f"Found verified keyframe asset '{selected_asset.id}'"
+        return candidate_project, selected_asset, resolved_entity_id, f"Found verified keyframe asset '{selected_asset.id}' in project '{candidate_project.id}'"
+
+    return candidates[0], None, None, f"None of the {len(candidates)} projects matching '{CANONICAL_DEMO_TITLE}' have completed image assets."
 
 
 def audit_worker_contract_compatibility(
@@ -515,7 +518,7 @@ async def execute_canary_dispatch(
         job_resp = await dispatcher.dispatch_preview_job(project.id, request_payload)
 
         # 3. Retrieve durable records to confirm commit
-        outbox_entry = await repo.get_render_outbox_entry(job_resp.job_id)
+        outbox_entry = await repo.get_render_outbox_by_job_id(job_resp.job_id)
         generation_job = await repo.get_generation_job(job_resp.job_id)
         media_asset = await repo.get_media_asset(job_resp.job_id)
 
