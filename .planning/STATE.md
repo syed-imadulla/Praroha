@@ -5,10 +5,10 @@ status: planning
 current_phase: 52
 progress:
   total_phases: 62
-  completed_phases: 61
+  completed_phases: 62
   total_plans: 88
-  completed_plans: 87
-  percent: 98.8
+  completed_plans: 88
+  percent: 100.0
 ---
 
 # Project State: PRAROHA (Seed Unfold)
@@ -49,13 +49,20 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
     - Operator authorized deployment of candidate `v7.3` with `QUEUE_PUBLISH_URL=secretref:queue-publish-url` (2026-10-23).
       - Phase Gate B step B8 complete: `az containerapp update` succeeded, `provisioningState: Succeeded`, `runningStatus: Running`.
       - Phase Gate C complete: `/api/health` HTTP 200, `fallback_used: false`, PostgreSQL connected (zero DDL schema validation via `validate_production_schema()`), zero errors/SQLite/fallback in logs, `render_outbox` at 0 rows, both queues empty, 0 job executions, feature flags disabled.
-    - Next Required Action: Explicit operator authorization for synthetic canary render (Phase Gate D).
+    - Single Synthetic Canary Render Executed & Audited (Phase Gate D Complete, 2026-10-24):
+      - Dispatched Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f` via `backend.scripts.run_canary_dispatch`.
+      - Outbox record `e3cfdc80-dca2-4489-98c4-c4dd74a551e2` transitioned durably to `published`.
+      - Worker execution `praroha-render-job-rsjqv` ran 55s, succeeded (exit 0), queues drained cleanly (`cinematic-render-jobs: 0`, `cinematic-render-poison: 0`), worker scaled back to 0.
+      - Supabase Storage artifact uploaded: `124,558` bytes, H.264, 1280x720, 6.000s duration, genuine playability with 0 decode errors.
+      - Post-Canary FPS Acceptance Audit: 25.0 FPS output diagnosed to hardcoded PAL constant in `CinematicPreviewComposer` and dropped parameter in `CinematicPreviewSpec`. Fixed dynamically for 24 and 30 FPS, verified with `ffprobe`. Candidate worker image `praroha-worker:v7` built locally (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`).
+      - Azure Billing reconciliation status documented: pending until billing data posts (`pretaxCost: None`); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
+    - Next Required Action: Phase Gate E (Isolated Resilience Testing Plan — Awaiting Operator Authorization).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
   - Frontend: `https://praroha-ai.vercel.app` (Alias: `https://frontend-iota-green-73.vercel.app`)
   - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io`
-- **Backend Test Battery**: 280 passed, 1 skipped in 33.6s (`pytest backend/tests`). Includes 20 specialized queue worker tests (schema validation, CAS claiming, poison queue routing, heartbeat leasing, clean drain exit, Managed Identity setup, Add-only SAS rejection, and zero secret leakage).
+- **Backend Test Battery**: 332 passed, 2 skipped in 39.6s (`pytest backend/tests`). Includes 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification with `ffprobe` stream cadence auditing.
 - **Frontend Production Bundle**: Compiled in 13.9s with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries.
 - **PWA Installation Audit**: 100% passed on live Vercel domain (`node frontend/e2e/test_phase37_pwa.mjs`). Verified manifest, icons (192px, 512px, maskable), active Service Worker, and offline transparency banner.
 - **Full User Journey E2E**: 100% passed on live cloud stack (`node frontend/e2e/test_phase31_10_journey.mjs`). Verified end-to-end flow with live Gemini AI extraction, divergent 3-world synthesis, EdgeTTS voice generation, concept art and narration, DAG rendering, portable project JSON export, and state reload.
