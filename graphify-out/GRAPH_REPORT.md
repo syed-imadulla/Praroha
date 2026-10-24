@@ -1,7 +1,7 @@
 # Graph Report - Praroha  (2026-10-24)
 
 ## Corpus Check
-- 498 files · ~838,741 words
+- 498 files · ~838,939 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 14 file(s) not represented in the graph (top: (none) 4, .example 2, .zip 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `87240507`
+- Built from commit: `8021d7c6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1474,7 +1474,7 @@ Nodes (4): Architectural Objectives, Live Endpoint Investigation Findings, Overv
 
 ### Community 288 - "9. Post-Canary Acceptance Audit, FPS Root Cause & Candidate Worker v7 Verification"
 Cohesion: 0.25
-Nodes (8): 9.1 Canary Execution Summary & Telemetry, 9.2 24-versus-25 FPS Discrepancy & Root Cause Analysis, 9.3 Code Remediation & Verification, 9.4 Candidate Image Worker v7 Verification, 9.5 Azure Billing & Financial Reconciliation Status, 9.7 Canary Latency & End-to-End Timing Reconciliation (QG-06), 9.8 Release Plan for Worker v7 Deployment, 9. Post-Canary Acceptance Audit, FPS Root Cause & Candidate Worker v7 Verification
+Nodes (8): 9.1 Canary Execution Summary & Telemetry, 9.2 24-versus-25 FPS Discrepancy & Root Cause Analysis, 9.3 Code Remediation & Verification, 9.4 Candidate Image Worker v7 Verification, 9.5 Azure Billing & Financial Reconciliation Status, 9.7 Canary Latency & End-to-End Timing Reconciliation (QG-06), 9.8 Executed Worker v7 Publication & Deployment (Completed & Verified 2026-10-24), 9. Post-Canary Acceptance Audit, FPS Root Cause & Candidate Worker v7 Verification
 
 ### Community 289 - "Reliability, Fault Tolerance & Observability Plan: Phase 52"
 Cohesion: 0.18

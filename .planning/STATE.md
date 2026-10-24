@@ -68,7 +68,15 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Audited source, Dockerfile.worker, and dependencies: pure queue worker with no FastAPI/Uvicorn runtime overhead; UAMI `uami-praroha-render` role compatibility confirmed; database connection and honest synthetic MP4 metadata verified.
       - In-container validation: 24 and 30 FPS clips rendered, probed with `ffprobe` (`24/1` and `30/1`), frame count verified, 0 FFmpeg decode errors.
       - Release and non-destructive rollback plans prepared; awaiting separate operator authorization.
-    - Next Required Action: Operator Authorization for Worker v7 ACR Push & Deployment.
+    - Authorized Worker v7 Deployment (Executed & 100% Verified, 2026-10-24):
+      - Published worker v7 image `tendersaathiacr.azurecr.io/praroha-worker:v7` to Azure Container Registry (`tendersaathiacr`). Remote manifest digest matches local candidate: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`.
+      - Updated Azure Container Apps Job `praroha-render-job` (`env-praroha-render`, resource group `rg-tendersaathi`) to use worker v7. Deployment succeeded (`provisioningState: Succeeded`, `runningStatus: Ready`).
+      - All job parameters preserved: UAMI `uami-praroha-render` (`6ec7ec48-9deb-4518-b530-fbc483a9b0c7`), event-driven queue trigger, 300s timeout, 1.0 vCPU / 2.0 GiB RAM, zero ingress.
+      - Post-deployment read-only verification: 0 active executions (scale-to-zero active), queues clean (`cinematic-render-jobs: 0`, `cinematic-render-poison: 0`), completed canary job `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its MP4 asset (`124,558` bytes, HTTP 200) untouched.
+      - Feature flags remain strictly disabled: `CINEMATIC_PREVIEW_ENABLED=False`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`.
+      - Quality Gate QG-06 status: Explicitly unresolved / qualified (warm composition 2.46s passes $< 35$s target, cold-start wall time 64s exceeds target due to KEDA scheduling and container provisioning).
+      - Azure billing reconciliation: Status remains pending until usage charges populate in Azure Consumption API (`pretaxCost: None`).
+    - Next Required Action: Phase Gate F (Customer Feature Flag Enablement — Awaiting Operator Authorization).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:

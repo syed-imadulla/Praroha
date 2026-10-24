@@ -33,9 +33,10 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 - **Production `render_outbox`:** exists in Supabase (`public.render_outbox` with 11 columns, 5 constraints, 3 indexes; exactly 1 record present: Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`, status `published`, `published_at: 2026-10-24T15:23:31Z`).
 - **Both cinematic-preview feature flags:** disabled (backend `CINEMATIC_PREVIEW_ENABLED=False` unset/default false; frontend `VITE_ENABLE_CINEMATIC_PREVIEW` unset/falsy).
 - **Both queues:** empty (`cinematic-render-jobs`: 0 messages, drained by worker; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
-- **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v6`, zero ingress (`ingress: null`). Exactly 1 historical execution (`praroha-render-job-rsjqv`, status `Succeeded`, 55s duration), 0 active executions (scale-to-zero verified).
+- **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v7` (digest `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`, `ingress: null`, scale-to-zero active with 0 running executions).
 - **Canary:** **EXECUTED ONCE** (Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`). Playable 6.0-second H.264 MP4 stored in Supabase Storage (`124,558` bytes, 1280x720).
-- **FPS Acceptance Audit:** First canary output measured 25.0 FPS (150 frames / 6.0s) due to hardcoded FFmpeg filter graph constant in worker v6. Root cause resolved in candidate image `praroha-worker:v7` (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`, built locally, unpushed, undeployed).
+- **FPS Acceptance Audit:** First canary output measured 25.0 FPS (150 frames / 6.0s) due to hardcoded FFmpeg filter graph constant in worker v6. Root cause resolved in deployed image `praroha-worker:v7` (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`), verified in-container for 24 and 30 FPS.
+- **Canary Latency Reconciliation (QG-06):** **EXPLICITLY UNRESOLVED / PENDING WARM AUDIT**. Active FFmpeg rendering was 2.46s ($< 35$s), but total cold-start scale-from-zero wall time was 64.0s (9s queue wait + 55s container lifecycle).
 - **Azure Billing Reconciliation:** **Pending until actual cost data becomes available**. Consumption API reports `pretaxCost: None` for the current cycle.
 - **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
 - **Next required authorization:** Phase Gate F (Frontend / Backend Feature Flag Enablement — Awaiting Operator Authorization).
@@ -45,7 +46,7 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 | **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` present; 1 row (`published`). `generation_jobs` & `media_assets` canary rows marked `completed`. | **MIGRATED & AUDITED** (Phase Gate A Complete) |
 | **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`. Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **DEPLOYED & HEALTHY** (Phase Gate B & C Complete) |
 | **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
-| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`. Exactly 1 execution completed (`Succeeded`), currently 0 active executions. | Scale-to-zero active |
+| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Image: `tendersaathiacr.azurecr.io/praroha-worker:v7`. Digest: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`. Scale-to-zero active (0 active executions). | **DEPLOYED & VERIFIED** |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (drained by worker).<br>`cinematic-render-poison`: 0 messages. | Clean queue baseline verified |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
 | **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). | Verified disabled |
@@ -567,10 +568,10 @@ Isolated resilience testing was executed and verified 100% green against isolate
 
 - **Isolation Mechanisms Used**: Isolated SQLite databases (`test_seed_unfold.db` / temporary SQLite file fixtures via `sqlite+aiosqlite`), mocked queue clients (`MockQueueClient`). Zero production Azure queues accessed, zero cloud Container Apps touched.
 - **Regression Results**: 9/9 resilience tests passed (`backend/tests/test_cinematic_resilience_phase_gate_e.py`); 61/62 passed in related outbox/worker suite (1 skipped); 341 passed (2 skipped) in full backend suite (`pytest backend/tests/`).
-- **Worker Candidate Status**: `praroha-worker:v7` built locally (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`), not pushed to ACR, not deployed. Production job remains on `praroha-worker:v6`.
+- **Worker Deployment Status**: `tendersaathiacr.azurecr.io/praroha-worker:v7` (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`) published to ACR and deployed to `praroha-render-job`.
 - **FPS Acceptance Status**: FPS root cause fix verified dynamically for 24 and 30 FPS in worker codebase and inside candidate container image.
 - **Azure Billing Status**: Pending until actual billing data posts (`pretaxCost: None`); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
-- **Strict Stop Condition**: Phase Gate E complete. Production feature flags remain disabled. Awaiting separate operator authorization for Phase Gate F.
+- **Strict Stop Condition**: Phase Gate E complete. Worker v7 deployed. Production feature flags remain disabled. Awaiting separate operator authorization for Phase Gate F.
 
 ### 9.7 Canary Latency & End-to-End Timing Reconciliation (QG-06)
 Runbook Quality Gate **QG-06** specifies: *Full queue-to-MP4 playback completed in $< 35$ seconds.*
@@ -585,37 +586,34 @@ Telemetry reconciliation from the single authorized production canary (`0d9c2349
 - **Acceptance Gate Reconciliation**:
   - *Active Video Rendering*: **2.46 seconds** — **PASSES** the $< 35$s target by an order of magnitude.
   - *Cold-Start Scale-from-Zero Total Wall Time*: **64.0 seconds** — Exceeds the 35s target due to cold container provisioning in Azure Container Apps.
-  - *Formal Gate Decision*: QG-06 is accepted for warm composition performance, but cold-start latency must be explicitly noted. No false claim of sub-35s cold-start performance is made.
+  - *Formal Gate Decision*: **EXPLICITLY UNRESOLVED / QUALIFIED**. QG-06 is accepted for warm composition performance, but cold-start latency must be explicitly noted. No false claim of sub-35s cold-start performance is made.
 
-### 9.8 Release Plan for Worker v7 Deployment
-When explicitly authorized by the operator, the deployment of candidate worker `v7` will proceed under the following strict sequence:
+### 9.8 Executed Worker v7 Publication & Deployment (Completed & Verified 2026-10-24)
+Worker v7 was explicitly authorized by the operator, published to ACR, and deployed to Container Apps Job `praroha-render-job`:
 
-1. **Preflight Checks (Read-Only)**:
-   - Confirm Azure subscription `36794f11-1aa5-4a25-a4aa-3b973c335e2d`.
-   - Confirm ACR `tendersaathiacr` accessibility.
-   - Confirm `praroha-render-job` has 0 active executions (scale-to-zero verified).
-   - Confirm queues `cinematic-render-jobs` (0 msgs) and `cinematic-render-poison` (0 msgs) are empty.
-   - Confirm canary record `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its MP4 remain intact.
-   - Confirm both feature flags remain disabled.
-2. **Publish Image to ACR**:
-   ```bash
-   az acr login --name tendersaathiacr
-   docker push tendersaathiacr.azurecr.io/praroha-worker:v7
-   # Verify remote ACR digest matches local build
-   az acr repository show-manifests --name tendersaathiacr --repository praroha-worker --query "[?contains(tags, 'v7')]" -o json
-   ```
-3. **Deploy Candidate to Container Apps Job**:
-   ```bash
-   az containerapp job update \
-     --name praroha-render-job \
-     --resource-group rg-tendersaathi \
-     --image tendersaathiacr.azurecr.io/praroha-worker:v7
-   ```
+1. **Preflight Checks (Passed)**:
+   - Subscription `36794f11-1aa5-4a25-a4aa-3b973c335e2d` (`Azure for Students`) verified active.
+   - Tag `v7` confirmed not present in ACR before push.
+   - `praroha-render-job` verified at 0 active executions.
+   - Queues `cinematic-render-jobs` and `cinematic-render-poison` confirmed empty (0 messages).
+   - Canary record `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its MP4 verified intact (HTTP 200, 124,558 bytes).
+   - Both feature flags confirmed disabled in production.
+2. **ACR Publication**:
+   - Authenticated via `az acr login --name tendersaathiacr`.
+   - Pushed `tendersaathiacr.azurecr.io/praroha-worker:v7`.
+   - Remote manifest digest: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996` (exact match to local image ID).
+3. **Container Apps Job Deployment**:
+   - `az containerapp job update --name praroha-render-job --resource-group rg-tendersaathi --image tendersaathiacr.azurecr.io/praroha-worker:v7`
+   - Result: `provisioningState: Succeeded`, `runningStatus: Ready`.
 4. **Post-Deployment Read-Only Verification**:
-   - `az containerapp job show --name praroha-render-job --resource-group rg-tendersaathi --query "properties.template.containers[0].image"` reflects `...:v7`.
-   - Verify `ingress: null` (zero open ports).
-   - Verify 0 active executions.
-5. **Non-Destructive Rollback Step (if required)**:
+   - Image verified: `tendersaathiacr.azurecr.io/praroha-worker:v7`.
+   - Ingress verified: `null` (zero open ports).
+   - Managed identity: `uami-praroha-render` (`6ec7ec48-9deb-4518-b530-fbc483a9b0c7`) preserved.
+   - Scaling: `azure-queue` trigger, min 0, max 2 preserved.
+   - Active executions: 0 (scale-to-zero active).
+   - Queues: Empty (`cinematic-render-jobs: 0`, `cinematic-render-poison: 0`).
+   - Feature flags: Disabled.
+5. **Non-Destructive Rollback Procedure (Available if needed)**:
    ```bash
    az containerapp job update \
      --name praroha-render-job \
