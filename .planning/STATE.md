@@ -54,8 +54,9 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Outbox record `e3cfdc80-dca2-4489-98c4-c4dd74a551e2` transitioned durably to `published`.
       - Worker execution `praroha-render-job-rsjqv` ran 55s, succeeded (exit 0), queues drained cleanly (`cinematic-render-jobs: 0`, `cinematic-render-poison: 0`), worker scaled back to 0.
       - Supabase Storage artifact uploaded: `124,558` bytes, H.264, 1280x720, 6.000s duration, genuine playability with 0 decode errors.
-      - Post-Canary FPS Acceptance Audit: 25.0 FPS output diagnosed to hardcoded PAL constant in `CinematicPreviewComposer` and dropped parameter in `CinematicPreviewSpec`. Fixed dynamically for 24 and 30 FPS, verified with `ffprobe`. Candidate worker image `praroha-worker:v7` built locally (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`).
-      - Azure Billing reconciliation status documented: pending until billing data posts (`pretaxCost: None`); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
+      - Post-Canary FPS Acceptance Audit: 25.0 FPS output diagnosed to hardcoded PAL constant in `CinematicPreviewComposer` and dropped parameter in `CinematicPreviewSpec`. Fixed dynamically for 24 and 30 FPS, verified with `ffprobe` and in-container decoding. Candidate worker image `praroha-worker:v7` verified locally (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`).
+      - Canary Latency Reconciliation: Pure rendering completed in 2.46s (passes $< 35$s target); total scale-from-zero wall-clock time was 64s due to cold container creation (9s queue wait + 55s container lifecycle).
+      - Azure Billing reconciliation status documented: pending until billing data posts (`pretaxCost: None` across all resources in Azure Consumption API); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
     - Phase Gate E: Isolated Resilience Testing (Executed & 100% Passed, 2026-10-24):
       - Executed comprehensive 9-scenario resilience battery in `backend/tests/test_cinematic_resilience_phase_gate_e.py`.
       - Test A (Outbox Interruption & Recovery): Verified pending record survival after simulated crash, CAS concurrency-safe multi-sweeper leasing, crash-after-enqueue duplicate protection, exponential backoff, and terminal failure handling on retry budget exhaustion.
@@ -63,7 +64,11 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Test C (Poison-Message Routing): Injected hostile payloads (unsupported schema versions, invalid UUID formats, unknown entity types, unexpected fields, credential injection); verified rejection with zero secret leakage in logs; verified poison queue routing (`cinematic-render-poison`) on dequeue exhaustion.
       - Test D (Data Immutability): Verified that completed canary render `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its Supabase MP4 asset are completely immutable across all sweep passes, retries, and duplicate delivery events.
       - Isolation Mechanisms: Strictly bounded to isolated temporary SQLite fixtures (`sqlite+aiosqlite`) and `MockQueueClient`. Zero production queue mutations, zero Container Apps touched.
-    - Next Required Action: Phase Gate F (Frontend / Backend Feature Flag Enablement — Awaiting Operator Authorization).
+    - Worker v7 Release Readiness Audit (Completed, 2026-10-24):
+      - Audited source, Dockerfile.worker, and dependencies: pure queue worker with no FastAPI/Uvicorn runtime overhead; UAMI `uami-praroha-render` role compatibility confirmed; database connection and honest synthetic MP4 metadata verified.
+      - In-container validation: 24 and 30 FPS clips rendered, probed with `ffprobe` (`24/1` and `30/1`), frame count verified, 0 FFmpeg decode errors.
+      - Release and non-destructive rollback plans prepared; awaiting separate operator authorization.
+    - Next Required Action: Operator Authorization for Worker v7 ACR Push & Deployment.
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:

@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792762174.1769445,
-    "seen": 1792856781.3717365,
-    "ast_hash": "adcf8feb25397950be155aa25b8cf66b",
+    "mtime": 1792858038.48263,
+    "seen": 1792858065.787457,
+    "ast_hash": "84f66ab9c2ada74e14729b0adf573b64",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "backend/app/workers/cinematic_worker.py": {
-    "mtime": 1792856307.106239,
-    "seen": 1792856781.366475,
-    "ast_hash": "b09ffc3f15e7cc0a722ca848f4cc64db",
+    "mtime": 1792857751.0367544,
+    "seen": 1792858065.7837312,
+    "ast_hash": "09f11a50a2dc511cb6a66d38349974ee",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_worker.py": {
@@ -3318,9 +3318,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/ROLLOUT_TEST_AND_ROLLBACK_PLAN.md": {
-    "mtime": 1792856622.3451402,
-    "seen": 1792856781.3791788,
-    "ast_hash": "9fb26f2faeb04d124ce17633a930f43a",
+    "mtime": 1792858022.9109077,
+    "seen": 1792858065.7935138,
+    "ast_hash": "a1c8b5a8ceb08df978d8bbb4a42b4085",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json": {
@@ -3396,9 +3396,9 @@
     "semantic_hash": ""
   },
   "backend/app/services/cinematic_outbox_sweeper.py": {
-    "mtime": 1792748346.2100759,
-    "seen": 1792749138.7041492,
-    "ast_hash": "00bb57241883106a77f24de4c25e42ef",
+    "mtime": 1792857520.2653553,
+    "seen": 1792858065.7833657,
+    "ast_hash": "4d6634069f167c63a2f884fe5987babd",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_outbox_sweeper.py": {
@@ -3426,9 +3426,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md": {
-    "mtime": 1792856730.8317297,
-    "seen": 1792856781.3791516,
-    "ast_hash": "04508933fff55934d608bba6b50c5703",
+    "mtime": 1792858003.653251,
+    "seen": 1792858065.7934864,
+    "ast_hash": "6ccb06401fa3e095d69c35738e9ea70a",
     "semantic_hash": ""
   },
   "backend/tests/test_production_database_init.py": {
@@ -3453,6 +3453,18 @@
     "mtime": 1792854355.1016605,
     "seen": 1792856781.3666515,
     "ast_hash": "c9ca91b1c3426c660f77041c8e1dcceb",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_resilience_phase_gate_e.py": {
+    "mtime": 1792857771.2273946,
+    "seen": 1792858065.784042,
+    "ast_hash": "99111af100a38e6a5522a7de91fc770b",
+    "semantic_hash": ""
+  },
+  ".planning/phases/52-queue-based-cinematic-rendering/52-UAT.md": {
+    "mtime": 1792857162.4721048,
+    "seen": 1792858065.7933795,
+    "ast_hash": "ba70f5ffca23436f443d0c50cf77a224",
     "semantic_hash": ""
   }
 }

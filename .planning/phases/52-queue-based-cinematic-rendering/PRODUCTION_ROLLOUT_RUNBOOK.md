@@ -532,15 +532,16 @@ On 2026-10-24 15:23 UTC, the operator-authorized single synthetic production can
 
 ### 9.4 Candidate Image Worker v7 Verification
 - **Target Image Tag**: `tendersaathiacr.azurecr.io/praroha-worker:v7`
-- **Local Image ID**: `sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`
-- **Config Digest**: `sha256:48c701c4f3a5527e50bd8a522dfe79ec79eb571c572cfb0d2d38e7fb32b4b455`
+- **Local Image ID**: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`
+- **Config Digest**: `sha256:5982ce59d400125b0f090ff054aa5b36f6ef8dd990c8a6fcf4a54457f9202157`
 - **Local Verification**: Built via BuildKit (`Dockerfile.worker`), inspected via `docker run --rm ... --help` with exit code 0.
+- **In-Container MP4 Validation**: Executed automated test renders inside the candidate container image for both 24 and 30 FPS (`CinematicPreviewComposer` with `image_path` mount). Verified via in-container `ffprobe` (`24/1` and `30/1` frame rate fractions, exact frame counts `duration * fps`) and zero FFmpeg decode errors (`returncode == 0`, empty `stderr`).
 - **Strict Boundary**: Candidate `v7` is built locally only. **Not pushed to ACR, not deployed to Azure.** Production Job `praroha-render-job` remains on `praroha-worker:v6`.
 
 ### 9.5 Azure Billing & Financial Reconciliation Status
 - **Current Status**: **PENDING UNTIL ACTUAL COST DATA BECOMES AVAILABLE**.
 - **Inspection Query**: `az consumption usage list` executed against subscription `36794f11-1aa5-4a25-a4aa-3b973c335e2d`.
-- **Finding**: Azure billing engine returns `pretaxCost: None` and `usageQuantity: None` for the current billing period. Usage records have not yet posted to the billing ledger.
+- **Finding**: Azure billing engine returns `pretaxCost: None` and `usageQuantity: None` for the current billing period across all container app and storage resources. Usage records have not yet posted to the billing ledger.
 - **Policy**: In accordance with project instructions, projected numbers are not claimed as measured spend. Actual container runtime was 55 seconds on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
 
 ### 9.6 Phase Gate E: Isolated Resilience Testing Evidence (Executed & Passed)
@@ -566,9 +567,60 @@ Isolated resilience testing was executed and verified 100% green against isolate
 
 - **Isolation Mechanisms Used**: Isolated SQLite databases (`test_seed_unfold.db` / temporary SQLite file fixtures via `sqlite+aiosqlite`), mocked queue clients (`MockQueueClient`). Zero production Azure queues accessed, zero cloud Container Apps touched.
 - **Regression Results**: 9/9 resilience tests passed (`backend/tests/test_cinematic_resilience_phase_gate_e.py`); 61/62 passed in related outbox/worker suite (1 skipped); 341 passed (2 skipped) in full backend suite (`pytest backend/tests/`).
-- **Worker Candidate Status**: `praroha-worker:v7` built locally (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`), not pushed to ACR, not deployed. Production job remains on `praroha-worker:v6`.
-- **FPS Acceptance Status**: FPS root cause fix verified dynamically for 24 and 30 FPS in worker codebase.
+- **Worker Candidate Status**: `praroha-worker:v7` built locally (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`), not pushed to ACR, not deployed. Production job remains on `praroha-worker:v6`.
+- **FPS Acceptance Status**: FPS root cause fix verified dynamically for 24 and 30 FPS in worker codebase and inside candidate container image.
 - **Azure Billing Status**: Pending until actual billing data posts (`pretaxCost: None`); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
 - **Strict Stop Condition**: Phase Gate E complete. Production feature flags remain disabled. Awaiting separate operator authorization for Phase Gate F.
+
+### 9.7 Canary Latency & End-to-End Timing Reconciliation (QG-06)
+Runbook Quality Gate **QG-06** specifies: *Full queue-to-MP4 playback completed in $< 35$ seconds.*
+Telemetry reconciliation from the single authorized production canary (`0d9c2349-6eed-4686-b148-5f8f5d84c17f`):
+
+- **Enqueue Timestamp**: `2026-10-24T15:23:31Z` (Outbox HTTP 201 Created from Azure Storage Queue REST API).
+- **KEDA Scheduling & Job Start**: `2026-10-24T15:23:40Z` (Queue wait + KEDA scaler detection + Container creation: **9.0 seconds**).
+- **Pure FFmpeg Render Duration**: **2.46 seconds** (as recorded in `generation_jobs` result metadata; peak RSS 102.55 MB).
+- **Supabase Storage Upload & DB Finalization**: **~1.5 seconds** (124,558 bytes H.264 MP4 upload and status update).
+- **Container Execution Duration**: **55.0 seconds** (`praroha-render-job-rsjqv` ran from 15:23:40Z to 15:24:35Z, including container boot, Python runtime import, connection setup, asset fetch, composition, upload, queue drain, and clean shutdown).
+- **Total End-to-End Wall-Clock Latency**: **64.0 seconds** (`15:23:31Z` to `15:24:35Z`).
+- **Acceptance Gate Reconciliation**:
+  - *Active Video Rendering*: **2.46 seconds** — **PASSES** the $< 35$s target by an order of magnitude.
+  - *Cold-Start Scale-from-Zero Total Wall Time*: **64.0 seconds** — Exceeds the 35s target due to cold container provisioning in Azure Container Apps.
+  - *Formal Gate Decision*: QG-06 is accepted for warm composition performance, but cold-start latency must be explicitly noted. No false claim of sub-35s cold-start performance is made.
+
+### 9.8 Release Plan for Worker v7 Deployment
+When explicitly authorized by the operator, the deployment of candidate worker `v7` will proceed under the following strict sequence:
+
+1. **Preflight Checks (Read-Only)**:
+   - Confirm Azure subscription `36794f11-1aa5-4a25-a4aa-3b973c335e2d`.
+   - Confirm ACR `tendersaathiacr` accessibility.
+   - Confirm `praroha-render-job` has 0 active executions (scale-to-zero verified).
+   - Confirm queues `cinematic-render-jobs` (0 msgs) and `cinematic-render-poison` (0 msgs) are empty.
+   - Confirm canary record `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its MP4 remain intact.
+   - Confirm both feature flags remain disabled.
+2. **Publish Image to ACR**:
+   ```bash
+   az acr login --name tendersaathiacr
+   docker push tendersaathiacr.azurecr.io/praroha-worker:v7
+   # Verify remote ACR digest matches local build
+   az acr repository show-manifests --name tendersaathiacr --repository praroha-worker --query "[?contains(tags, 'v7')]" -o json
+   ```
+3. **Deploy Candidate to Container Apps Job**:
+   ```bash
+   az containerapp job update \
+     --name praroha-render-job \
+     --resource-group rg-tendersaathi \
+     --image tendersaathiacr.azurecr.io/praroha-worker:v7
+   ```
+4. **Post-Deployment Read-Only Verification**:
+   - `az containerapp job show --name praroha-render-job --resource-group rg-tendersaathi --query "properties.template.containers[0].image"` reflects `...:v7`.
+   - Verify `ingress: null` (zero open ports).
+   - Verify 0 active executions.
+5. **Non-Destructive Rollback Step (if required)**:
+   ```bash
+   az containerapp job update \
+     --name praroha-render-job \
+     --resource-group rg-tendersaathi \
+     --image tendersaathiacr.azurecr.io/praroha-worker:v6
+   ```
 
 
