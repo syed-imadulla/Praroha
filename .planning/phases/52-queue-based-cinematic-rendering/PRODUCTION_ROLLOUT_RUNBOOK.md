@@ -37,7 +37,8 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 - **Canary:** **EXECUTED ONCE** (Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`). Playable 6.0-second H.264 MP4 stored in Supabase Storage (`124,558` bytes, 1280x720).
 - **FPS Acceptance Audit:** First canary output measured 25.0 FPS (150 frames / 6.0s) due to hardcoded FFmpeg filter graph constant in worker v6. Root cause resolved in candidate image `praroha-worker:v7` (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`, built locally, unpushed, undeployed).
 - **Azure Billing Reconciliation:** **Pending until actual cost data becomes available**. Consumption API reports `pretaxCost: None` for the current cycle.
-- **Next required authorization:** Phase Gate E (Isolated Resilience Testing Plan — Awaiting Authorization).
+- **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
+- **Next required authorization:** Phase Gate F (Frontend / Backend Feature Flag Enablement — Awaiting Operator Authorization).
 
 | Component | Target Resource | Live Audited State | Status |
 | :--- | :--- | :--- | :--- |
@@ -48,7 +49,8 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (drained by worker).<br>`cinematic-render-poison`: 0 messages. | Clean queue baseline verified |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
 | **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). | Verified disabled |
-| **Test Battery & Build** | Local repo | 332 passed (2 skipped) in `pytest backend/tests/`. Frontend production build succeeds in 13.9s. | Verified 100% green |
+| **Resilience Battery** | Isolated SQLite / Mock Queues | 9/9 resilience scenarios verified across Scenarios A, B, C, and D. | **100% PASSED** (Phase Gate E Complete) |
+| **Test Battery & Build** | Local repo | 341 passed (2 skipped) in `pytest backend/tests/`. `git diff --check` clean. | Verified 100% green |
 
 ---
 
@@ -399,12 +401,16 @@ The single authorized synthetic canary render was executed on 2026-10-24 15:23 U
 - **Queue Drained**: `cinematic-render-jobs`: 0 messages, `cinematic-render-poison`: 0 messages.
 - **Current Status**: **CANARY EXECUTED & AUDITED (2026-10-24). Phase Gate D complete.**
 
-### 6.4 Next Required Production Approval: Isolated Resilience Testing Gate (Phase Gate E)
-The next operational gate before any customer feature enablement is:
+### 6.4 Phase Gate E: Isolated Resilience Testing (Executed & Passed)
+Phase Gate E has been executed and verified 100% green:
+- **Operation**: Executed isolated resilience scenarios (Scenarios A, B, C, D) covering outbox sweeper retry/recovery, worker visibility renewal and idempotent duplicate suppression, poison routing, and data immutability.
+- **Boundary**: Ran exclusively against isolated temporary SQLite databases and mocked Azure Storage Queue clients (`MockQueueClient`). Zero production queue mutations, zero cloud executions, zero database mutations.
+- **Status**: **EXECUTED & 100% PASSED** (9/9 tests passed in `backend/tests/test_cinematic_resilience_phase_gate_e.py`; 341 passed in full backend suite). Phase Gate E complete.
 
-- **Operation**: Run isolated fault injection and resilience tests covering outbox sweeper retry, worker duplicate delivery protection, and poison queue routing.
-- **Boundary**: Must run exclusively against isolated test/local resources. Zero production queue mutations or production render triggers authorized.
-- **Status**: **PLAN PREPARED / AWAITING SEPARATE OPERATOR AUTHORIZATION**. Strictly gated.
+### 6.5 Next Required Production Approval: Feature Flag Enablement Gate (Phase Gate F)
+The next operational gate is:
+- **Operation**: Enable `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` and `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
+- **Status**: **AWAITING SEPARATE OPERATOR AUTHORIZATION**. Strictly gated. Both feature flags remain disabled.
 
 ---
 
@@ -537,12 +543,32 @@ On 2026-10-24 15:23 UTC, the operator-authorized single synthetic production can
 - **Finding**: Azure billing engine returns `pretaxCost: None` and `usageQuantity: None` for the current billing period. Usage records have not yet posted to the billing ledger.
 - **Policy**: In accordance with project instructions, projected numbers are not claimed as measured spend. Actual container runtime was 55 seconds on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
 
-### 9.6 Phase Gate E: Isolated Resilience Testing Plan (Prepared — Awaiting Authorization)
-Before enabling the feature flag in frontend/backend, the following isolated resilience scenarios are planned:
-1. *Outbox Sweeper Interruption & Recovery*: Simulate crash between database outbox commit and queue enqueue; verify sweeper reclaims without duplicate render.
-2. *Worker Lease Renewal & Idempotency*: Verify 15-second heartbeat loop prevents visibility expiration during extended operations, and duplicate message deliveries fail closed.
-3. *Poison Queue Quarantine*: Verify malformed messages exhaust 3 retries and route cleanly to `cinematic-render-poison` with diagnostic logging and no orphaned database locks.
-4. *Data Immutability*: Verify completed renders (including canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f`) are never re-rendered or modified.
-*All resilience tests will be conducted using isolated SQLite/Postgres test fixtures and mock queue clients.*
+### 9.6 Phase Gate E: Isolated Resilience Testing Evidence (Executed & Passed)
+Isolated resilience testing was executed and verified 100% green against isolated test fixtures and mock queue clients:
+
+1. **Test A — Outbox Interruption & Recovery**:
+   - *Scenario A1 (Interruption & Sweeper Recovery)*: Simulated primary backend crash after outbox commit but before queue publication. Record survived in `pending` state; sweeper claimed after lease elapsed and published successfully.
+   - *Scenario A2 (CAS Concurrency Locking)*: Multiple concurrent sweepers competed for eligible records; atomic CAS leasing ensured exactly one sweeper claimed each record with zero duplicate dispatches.
+   - *Scenario A3 (Crash After Enqueue)*: Verified worker rejects duplicate deliveries if a crash occurs after enqueue, preventing duplicate renders.
+   - *Scenario A4 (Terminal Failure & Backoff)*: Verified exponential backoff and terminal `failed` status when Azure Queue outages exceed the retry budget (5 attempts), clearing `request_hash` safely.
+
+2. **Test B — Worker Lease Heartbeat & Idempotency**:
+   - *Scenario B1 (Heartbeat & Visibility Renewal)*: Verified worker `_heartbeat_loop` executes Azure Queue message visibility renewal (`update_message`, visibility 120s) and persists periodic database heartbeats to prevent API lease expiration.
+   - *Scenario B2 (Duplicate Delivery for In-Flight Job)*: Simulated duplicate delivery for a job currently in `processing` status. Worker detected atomic claim conflict, performed zero render work, and safely deleted duplicate from queue to prevent poison looping.
+   - *Scenario B3 (Duplicate Delivery for Completed Job)*: Simulated duplicate delivery for an already `completed` job. Worker recognized terminal completion, bypassed render, and acknowledged message.
+
+3. **Test C — Poison-Message Routing & Hostile Payloads**:
+   - *Scenario C1 (Hostile Payload Rejection)*: Injected malformed payloads (unsupported schema versions, invalid UUID formats, unknown entity types, unexpected fields, and credential injection attempts like `sig=secret`). Verified immediate rejection before queue dispatch or render processing, with zero secret leakage in logs.
+   - *Scenario C2 (Poison Queue Routing)*: Simulated poisoned message exceeding retry budget (`dequeue_count > 3`). Verified message was routed to `cinematic-render-poison`, terminal error status recorded, and processing lock released.
+
+4. **Test D — Data Immutability for Pre-Existing Completed Renders**:
+   - *Scenario D1 (Canary Immutability)*: Modeled against production canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f`. Verified that sweeps, duplicate worker deliveries, and poison routing never mutate, overwrite, or delete already-completed render records, media assets, or stored MP4 URLs.
+
+- **Isolation Mechanisms Used**: Isolated SQLite databases (`test_seed_unfold.db` / temporary SQLite file fixtures via `sqlite+aiosqlite`), mocked queue clients (`MockQueueClient`). Zero production Azure queues accessed, zero cloud Container Apps touched.
+- **Regression Results**: 9/9 resilience tests passed (`backend/tests/test_cinematic_resilience_phase_gate_e.py`); 61/62 passed in related outbox/worker suite (1 skipped); 341 passed (2 skipped) in full backend suite (`pytest backend/tests/`).
+- **Worker Candidate Status**: `praroha-worker:v7` built locally (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`), not pushed to ACR, not deployed. Production job remains on `praroha-worker:v6`.
+- **FPS Acceptance Status**: FPS root cause fix verified dynamically for 24 and 30 FPS in worker codebase.
+- **Azure Billing Status**: Pending until actual billing data posts (`pretaxCost: None`); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
+- **Strict Stop Condition**: Phase Gate E complete. Production feature flags remain disabled. Awaiting separate operator authorization for Phase Gate F.
 
 

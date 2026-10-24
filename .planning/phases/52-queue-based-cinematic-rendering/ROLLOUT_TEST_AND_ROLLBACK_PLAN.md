@@ -92,29 +92,28 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
   - Status: **Pending until actual cost data becomes available**. The Azure Consumption API currently returns `pretaxCost: None` and `usageQuantity: None` for the current billing cycle. No projected numbers are reported as measured spend.
 - **Status**: **CANARY EXECUTED & ACCEPTED WITH DOCUMENTED FPS RESOLUTION (Phase Gate D Complete)**.
 
-#### Stage 5: Isolated Fault Injection & Resilience Testing Plan (Prepared — Awaiting Authorization)
+#### Stage 5: Isolated Fault Injection & Resilience Testing (Executed & Passed — Phase Gate E)
 *Strict Safety Rule: Must use isolated mock/local test resources only. Never inject faults into production queues, containers, or secrets.*
-- **Scope & Scenarios**:
+- **Scope & Scenarios Executed**:
   1. **Outbox Interruption & Recovery**:
-     - Simulate primary backend failure immediately after database commit of `render_outbox (status='pending')` but before queue enqueue.
-     - Verify the background outbox sweeper (`CinematicOutboxSweeper`) claims stale pending entries with savepoint isolation and successfully enqueues to the queue without duplicating database jobs.
+     - Simulated primary backend failure immediately after database commit of `render_outbox (status='pending')` but before queue enqueue.
+     - Verified outbox sweeper (`CinematicOutboxSweeper`) claims stale pending entries with savepoint isolation and successfully enqueues without duplicating database jobs. Verified CAS concurrency leasing across multiple sweepers and exponential backoff retry budget exhaustion.
   2. **Worker Lease Renewal & Idempotent Claim**:
-     - Simulate extended composition exceeding initial queue visibility timeout (300s).
-     - Verify worker heartbeat loop extends lease via `update_message` visibility renewal and updates database heartbeat timestamps.
-     - Simulate duplicate delivery of already-claimed or already-completed message; verify worker detects atomic claim conflict or terminal state, discards duplicate, and ACKs queue message without duplicate render.
+     - Simulated extended composition exceeding visibility threshold. Verified worker heartbeat loop extends lease via `update_message` (visibility 120s) and updates database heartbeat timestamps.
+     - Simulated duplicate delivery of already-claimed (in-flight) and already-completed messages. Verified worker detects claim conflict or terminal state, discards duplicate, performs zero redundant work, and ACKs/deletes message from queue cleanly.
   3. **Poison Message Routing & Terminal Diagnostics**:
-     - Inject malformed/corrupted payloads (`schema_version != '1.0'`, invalid IDs, unexpected fields, credential injection attempts).
-     - Verify worker decrements retry budget, moves message to poison queue upon exhaustion, records terminal `failed` state with descriptive error code (`MALFORMED_PAYLOAD`, `INVALID_SCHEMA`), and preserves diagnostic logs.
-  4. **Preservation of Existing Completed Renders**:
-     - Ensure test runs verify that completed jobs (like canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f`) and outbox records are completely immutable and never modified or deleted by retry/recovery sweeps.
-- **Gate Check**: 100% green on isolated resilience test battery; zero mutations to production queues.
-- **Status**: **PLAN PREPARED / NOT EXECUTED (Phase Gate E)**. Awaiting separate operator authorization.
+     - Injected malformed/corrupted payloads (`schema_version != '1.0'`, invalid IDs, unexpected fields, credential injection attempts).
+     - Verified immediate validation rejection before queue enqueue, zero secret leakage in logs, poison routing when `dequeue_count > 3` to `cinematic-render-poison`, terminal error status recording, and release of locks.
+  4. **Preservation of Existing Completed Renders (Data Immutability)**:
+     - Modeled directly against production canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f`. Verified sweeper passes, duplicate deliveries, and poison handling never mutate or delete completed records or stored video asset URLs.
+- **Gate Check**: 100% green on isolated resilience test battery (`pytest backend/tests/test_cinematic_resilience_phase_gate_e.py` — 9 passed in 1.12s); zero mutations to production queues, containers, or secrets.
+- **Status**: **EXECUTED & 100% PASSED (Phase Gate E Complete)**.
 
-#### Stage 6: Frontend Feature Flag Enablement
+#### Stage 6: Frontend / Backend Feature Flag Enablement (Phase Gate F — Awaiting Operator Authorization)
 - **Actions**:
-  1. Toggle `VITE_ENABLE_CINEMATIC_PREVIEW=true` in Vercel environment variables for preview deployment.
+  1. Toggle `CINEMATIC_PREVIEW_ENABLED=true` on backend and `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
   2. Verify creator UI in browser: button transitions from disabled to interactive, displays honest tooltip, runs progress animation, and plays back video upon completion.
-- **Status**: Pending Stage 5 verification. Both backend and frontend flags currently remain **disabled**.
+- **Status**: **AWAITING SEPARATE OPERATOR AUTHORIZATION**. Both backend and frontend flags currently remain **disabled**. Zero customer traffic enabled.
 
 ---
 

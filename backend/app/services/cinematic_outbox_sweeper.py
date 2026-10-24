@@ -40,14 +40,19 @@ class CinematicOutboxSweeper:
         max_attempts: int = 5,
         base_backoff_seconds: int = 30,
         queue_client: Optional[Any] = None,
+        session_factory: Optional[Any] = None,
+        batch_size: int = 10,
+        max_retries: Optional[int] = None,
     ) -> None:
         raw_url = queue_publish_url if queue_publish_url is not None else getattr(settings, "QUEUE_PUBLISH_URL", None)
         self.queue_publish_url = (raw_url or "").strip()
         self.interval_seconds = interval_seconds
         self.lease_seconds = lease_seconds
-        self.max_attempts = max_attempts
+        self.max_attempts = max_retries if max_retries is not None else max_attempts
         self.base_backoff_seconds = base_backoff_seconds
         self._injected_queue_client = queue_client
+        self.session_factory = session_factory
+        self.batch_size = batch_size
         self._task: Optional[asyncio.Task] = None
         self._shutdown_event = asyncio.Event()
 
@@ -91,10 +96,12 @@ class CinematicOutboxSweeper:
             logger.debug("Cinematic outbox sweeper: QUEUE_PUBLISH_URL not configured. Skipping sweep.")
             return 0
 
-        async with async_session() as session:
+        session_maker = self.session_factory or async_session
+
+        async with session_maker() as session:
             repo = ProjectRepository(session)
             claimed = await repo.claim_eligible_outbox_records(
-                limit=10,
+                limit=self.batch_size,
                 lease_seconds=self.lease_seconds,
                 max_attempts=self.max_attempts,
                 base_backoff_seconds=self.base_backoff_seconds,
@@ -113,7 +120,7 @@ class CinematicOutboxSweeper:
 
             publish_ok, publish_err = await self._send_queue_message(payload)
 
-            async with async_session() as session:
+            async with session_maker() as session:
                 repo = ProjectRepository(session)
                 if publish_ok:
                     now = get_utc_now()

@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792738431.1562335,
-    "seen": 1792749138.7081048,
-    "ast_hash": "f1b4bf5fb679f2239e385917e3cb8f32",
+    "mtime": 1792762174.1769445,
+    "seen": 1792856781.3717365,
+    "ast_hash": "adcf8feb25397950be155aa25b8cf66b",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -3102,15 +3102,15 @@
     "semantic_hash": ""
   },
   "backend/app/services/cinematic_preview.py": {
-    "mtime": 1792674895.1758842,
-    "seen": 1792675648.9919817,
-    "ast_hash": "912c6fd0ea40841b89365c223f003c06",
+    "mtime": 1792856286.2265105,
+    "seen": 1792856781.3659496,
+    "ast_hash": "643f1c359aeb37d37174d4f8efaec5b1",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_preview.py": {
-    "mtime": 1792662841.8169498,
-    "seen": 1792663058.0789025,
-    "ast_hash": "f131477f84cc76b5f3612bc4b3387652",
+    "mtime": 1792856363.8685012,
+    "seen": 1792856781.3666866,
+    "ast_hash": "39b2af9233cd82484b08442e79a4ab1b",
     "semantic_hash": ""
   },
   "scripts/benchmark_cinematic_preview.py": {
@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "backend/app/workers/cinematic_worker.py": {
-    "mtime": 1792748320.2122679,
-    "seen": 1792749138.7044883,
-    "ast_hash": "ea317a5d4624e5b46b52e023bd5913c8",
+    "mtime": 1792856307.106239,
+    "seen": 1792856781.366475,
+    "ast_hash": "b09ffc3f15e7cc0a722ca848f4cc64db",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_worker.py": {
@@ -3276,9 +3276,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-01-PLAN.md": {
-    "mtime": 1792738417.1543572,
-    "seen": 1792749138.7137308,
-    "ast_hash": "dbcbbb26e209d47f18fdd94c2956f0c2",
+    "mtime": 1792853620.7317472,
+    "seen": 1792856781.3787842,
+    "ast_hash": "b2a0c16f23493c441e7f7e41c7579767",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-CONTEXT.md": {
@@ -3318,9 +3318,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/ROLLOUT_TEST_AND_ROLLBACK_PLAN.md": {
-    "mtime": 1792739101.8983104,
-    "seen": 1792749138.7140744,
-    "ast_hash": "5ca85095f46521d0af14f233c471da2e",
+    "mtime": 1792856622.3451402,
+    "seen": 1792856781.3791788,
+    "ast_hash": "9fb26f2faeb04d124ce17633a930f43a",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json": {
@@ -3330,9 +3330,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_queue_worker.py": {
-    "mtime": 1792696343.6949763,
-    "seen": 1792696936.823992,
-    "ast_hash": "94ba5a018a468169ffc653b10db29630",
+    "mtime": 1792856400.4270258,
+    "seen": 1792856781.3667557,
+    "ast_hash": "fd77509ed22a472af23624de54614f25",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-01-SUMMARY.md": {
@@ -3426,15 +3426,33 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md": {
-    "mtime": 1792753912.9842422,
-    "seen": 1792753936.2561367,
-    "ast_hash": "118999d2c9c713f6260f956d6728a681",
+    "mtime": 1792856730.8317297,
+    "seen": 1792856781.3791516,
+    "ast_hash": "04508933fff55934d608bba6b50c5703",
     "semantic_hash": ""
   },
   "backend/tests/test_production_database_init.py": {
     "mtime": 1792758995.685056,
     "seen": 1792759156.6563053,
     "ast_hash": "d806585baa83e2d3ffe60b213604bfb6",
+    "semantic_hash": ""
+  },
+  "backend/scripts/__init__.py": {
+    "mtime": 1792854058.4914665,
+    "seen": 1792856781.3664775,
+    "ast_hash": "9ef4c145653f4275abe80899feab21ce",
+    "semantic_hash": ""
+  },
+  "backend/scripts/run_canary_dispatch.py": {
+    "mtime": 1792855628.0496724,
+    "seen": 1792856781.3664804,
+    "ast_hash": "5a5e829fbf7dfda73dd1d1b726323461",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_canary_dispatch_cli.py": {
+    "mtime": 1792854355.1016605,
+    "seen": 1792856781.3666515,
+    "ast_hash": "c9ca91b1c3426c660f77041c8e1dcceb",
     "semantic_hash": ""
   }
 }

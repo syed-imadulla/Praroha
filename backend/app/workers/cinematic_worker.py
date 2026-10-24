@@ -517,11 +517,12 @@ async def _heartbeat_loop(
     message: Any,
     stop_event: asyncio.Event,
     heartbeat_interval: float = 15.0,
+    visibility_renew_threshold: float = 60.0,
 ):
     """
     Heartbeat and lease maintenance task:
     - Periodically updates updated_at in DB so API stale lease recovery recognizes active progress.
-    - Renews message visibility in queue if elapsed execution time exceeds 60s.
+    - Renews message visibility in queue if elapsed execution time exceeds visibility_renew_threshold.
     """
     start_time = time.monotonic()
     while not stop_event.is_set():
@@ -544,9 +545,9 @@ async def _heartbeat_loop(
         except Exception as exc:
             logger.warning("Heartbeat DB update failed for job %s: %s", job_id, exc)
 
-        # 2. Renew queue visibility if execution > 60s
+        # 2. Renew queue visibility if execution exceeds threshold
         elapsed = time.monotonic() - start_time
-        if elapsed > 60.0 and queue_client and hasattr(queue_client, "update_message"):
+        if elapsed >= visibility_renew_threshold and queue_client and hasattr(queue_client, "update_message"):
             try:
                 queue_client.update_message(message, visibility_timeout=120)
                 logger.debug("Renewed message visibility for job %s", job_id)

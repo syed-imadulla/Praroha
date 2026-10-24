@@ -56,13 +56,20 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Supabase Storage artifact uploaded: `124,558` bytes, H.264, 1280x720, 6.000s duration, genuine playability with 0 decode errors.
       - Post-Canary FPS Acceptance Audit: 25.0 FPS output diagnosed to hardcoded PAL constant in `CinematicPreviewComposer` and dropped parameter in `CinematicPreviewSpec`. Fixed dynamically for 24 and 30 FPS, verified with `ffprobe`. Candidate worker image `praroha-worker:v7` built locally (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`).
       - Azure Billing reconciliation status documented: pending until billing data posts (`pretaxCost: None`); actual compute time was 55s on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
-    - Next Required Action: Phase Gate E (Isolated Resilience Testing Plan — Awaiting Operator Authorization).
+    - Phase Gate E: Isolated Resilience Testing (Executed & 100% Passed, 2026-10-24):
+      - Executed comprehensive 9-scenario resilience battery in `backend/tests/test_cinematic_resilience_phase_gate_e.py`.
+      - Test A (Outbox Interruption & Recovery): Verified pending record survival after simulated crash, CAS concurrency-safe multi-sweeper leasing, crash-after-enqueue duplicate protection, exponential backoff, and terminal failure handling on retry budget exhaustion.
+      - Test B (Worker Lease Heartbeat & Idempotency): Verified queue message visibility renewal (120s timeout) and periodic database heartbeats during long renders; verified duplicate delivery suppression for in-flight and completed renders with zero redundant execution.
+      - Test C (Poison-Message Routing): Injected hostile payloads (unsupported schema versions, invalid UUID formats, unknown entity types, unexpected fields, credential injection); verified rejection with zero secret leakage in logs; verified poison queue routing (`cinematic-render-poison`) on dequeue exhaustion.
+      - Test D (Data Immutability): Verified that completed canary render `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its Supabase MP4 asset are completely immutable across all sweep passes, retries, and duplicate delivery events.
+      - Isolation Mechanisms: Strictly bounded to isolated temporary SQLite fixtures (`sqlite+aiosqlite`) and `MockQueueClient`. Zero production queue mutations, zero Container Apps touched.
+    - Next Required Action: Phase Gate F (Frontend / Backend Feature Flag Enablement — Awaiting Operator Authorization).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
   - Frontend: `https://praroha-ai.vercel.app` (Alias: `https://frontend-iota-green-73.vercel.app`)
   - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io`
-- **Backend Test Battery**: 332 passed, 2 skipped in 39.6s (`pytest backend/tests`). Includes 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification with `ffprobe` stream cadence auditing.
+- **Backend Test Battery**: 341 passed, 2 skipped in 43.8s (`pytest backend/tests`). Includes 9 dedicated Phase Gate E resilience tests, 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification.
 - **Frontend Production Bundle**: Compiled in 13.9s with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries.
 - **PWA Installation Audit**: 100% passed on live Vercel domain (`node frontend/e2e/test_phase37_pwa.mjs`). Verified manifest, icons (192px, 512px, maskable), active Service Worker, and offline transparency banner.
 - **Full User Journey E2E**: 100% passed on live cloud stack (`node frontend/e2e/test_phase31_10_journey.mjs`). Verified end-to-end flow with live Gemini AI extraction, divergent 3-world synthesis, EdgeTTS voice generation, concept art and narration, DAG rendering, portable project JSON export, and state reload.
