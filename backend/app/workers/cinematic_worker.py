@@ -369,6 +369,7 @@ async def run_worker(
             ambient_path=local_amb,
             duration_sec=target_spec.duration_sec,
             aspect_ratio=target_spec.aspect_ratio,
+            fps=getattr(target_spec, "fps", 24),
         )
 
         # 6. Execute Render
@@ -790,6 +791,7 @@ async def process_queue_message(
             ambient_path=local_amb,
             duration_sec=options["duration_seconds"],
             aspect_ratio=options["aspect_ratio"],
+            fps=options.get("fps", 24),
         )
 
         logger.info("Executing composition for job %s (duration=%ss)...", job_id, spec.duration_sec)

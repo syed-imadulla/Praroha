@@ -25,28 +25,30 @@ All operations in this runbook are strictly gated and categorized into three exp
 
 ## 2. Authoritative Current Production State
 
-As of the latest verified deployment (commit `3a27031`):
+As of the latest verified canary execution (2026-10-24 15:24 UTC):
 
 - **Production backend:** `v7.3` (`tendersaathiacr.azurecr.io/praroha-backend:v7.3`, digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`, revision `praroha-backend--latest`, status `Running`, `provisioningState: Succeeded`, healthy on `/api/health`).
 - **Queue-publisher environment binding:** **BOUND** (`QUEUE_PUBLISH_URL=secretref:queue-publish-url`).
 - **Database initialization:** Production schema validated via `validate_production_schema()` with **ZERO DDL**. PostgreSQL connection confirmed (`fallback_used: false`). No SQLite fallback, no crash loop, no import errors.
-- **Production `render_outbox`:** exists in Supabase (`public.render_outbox` created via `0001_create_render_outbox.sql` with 11 columns, 5 constraints, 3 indexes; currently 0 total rows, 0 pending rows).
+- **Production `render_outbox`:** exists in Supabase (`public.render_outbox` with 11 columns, 5 constraints, 3 indexes; exactly 1 record present: Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`, status `published`, `published_at: 2026-10-24T15:23:31Z`).
 - **Both cinematic-preview feature flags:** disabled (backend `CINEMATIC_PREVIEW_ENABLED=False` unset/default false; frontend `VITE_ENABLE_CINEMATIC_PREVIEW` unset/falsy).
-- **Both queues:** empty (`cinematic-render-jobs`: 0 messages; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
-- **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v6`, zero ingress (`ingress: null`), and 0 active/historical executions.
-- **Canary:** **not executed**.
-- **Next required authorization:** execute single synthetic canary render (Phase Gate D).
+- **Both queues:** empty (`cinematic-render-jobs`: 0 messages, drained by worker; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
+- **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v6`, zero ingress (`ingress: null`). Exactly 1 historical execution (`praroha-render-job-rsjqv`, status `Succeeded`, 55s duration), 0 active executions (scale-to-zero verified).
+- **Canary:** **EXECUTED ONCE** (Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`). Playable 6.0-second H.264 MP4 stored in Supabase Storage (`124,558` bytes, 1280x720).
+- **FPS Acceptance Audit:** First canary output measured 25.0 FPS (150 frames / 6.0s) due to hardcoded FFmpeg filter graph constant in worker v6. Root cause resolved in candidate image `praroha-worker:v7` (`sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`, built locally, unpushed, undeployed).
+- **Azure Billing Reconciliation:** **Pending until actual cost data becomes available**. Consumption API reports `pretaxCost: None` for the current cycle.
+- **Next required authorization:** Phase Gate E (Isolated Resilience Testing Plan — Awaiting Authorization).
 
 | Component | Target Resource | Live Audited State | Status |
 | :--- | :--- | :--- | :--- |
-| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` verified present (11 columns, 5 constraints, 3 indexes). HTTP 200 on REST API; 0 total rows, 0 pending rows. | **MIGRATED & VERIFIED** (Phase Gate A Complete) |
+| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` present; 1 row (`published`). `generation_jobs` & `media_assets` canary rows marked `completed`. | **MIGRATED & AUDITED** (Phase Gate A Complete) |
 | **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`. Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **DEPLOYED & HEALTHY** (Phase Gate B & C Complete) |
 | **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
-| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`, UAMI `uami-praroha-render`, zero ingress (`ingress: null`), and 0 active or historical executions. | Verified scale-to-zero active |
-| **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (`[]`).<br>`cinematic-render-poison`: 0 messages (`[]`). | Verified clean queue baseline |
+| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Provisioned with image `praroha-worker:v6`. Exactly 1 execution completed (`Succeeded`), currently 0 active executions. | Scale-to-zero active |
+| **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (drained by worker).<br>`cinematic-render-poison`: 0 messages. | Clean queue baseline verified |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
 | **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). | Verified disabled |
-| **Test Battery & Build** | Local repo | 318 passed (2 skipped) in `pytest backend/tests/`. Frontend production build succeeds in 13.9s. | Verified 100% green |
+| **Test Battery & Build** | Local repo | 332 passed (2 skipped) in `pytest backend/tests/`. Frontend production build succeeds in 13.9s. | Verified 100% green |
 
 ---
 
@@ -384,12 +386,25 @@ The candidate `v7.3` deployment was explicitly authorized and executed on 2026-1
   - Dependency boundary clean: pure `queue_contract.py` without `psutil` or FFmpeg worker dependencies.
 - **Current Status**: **DEPLOYED & HEALTHY (2026-10-23). Phase Gate B step B8 and Phase Gate C complete.**
 
-### 6.3 Next Required Production Approval: Synthetic Canary Render Gate (Phase Gate D)
-The **SINGLE** next required operational approval before any rendering execution is:
+### 6.3 Executed Production Approval: Single Synthetic Canary Render Gate (Phase Gate D — Completed)
+The single authorized synthetic canary render was executed on 2026-10-24 15:23 UTC via `backend/scripts/run_canary_dispatch.py`:
 
-- **Operation `[RENDER-TRIGGERING]`**: Execute exactly ONE synthetic canary render.
-- **Prerequisite**: Candidate `v7.3` deployed and verified healthy — **SATISFIED** (Phase Gate C complete).
-- **Status**: **NOT EXECUTED / PENDING EXPLICIT OPERATOR AUTHORIZATION**. Strictly gated until safe invocation tooling is verified and operator authorizes execution.
+- **Operation `[RENDER-TRIGGERING]`**: Exactly ONE synthetic canary render dispatched.
+- **Canary Job ID**: `0d9c2349-6eed-4686-b148-5f8f5d84c17f` (Project: `25e15040-73e6-47e5-b030-d95598e17292`, Entity: `99b0c570-2d22-402e-8a68-1392243f8d30`).
+- **Transactional Outbox Record**: ID `e3cfdc80-dca2-4489-98c4-c4dd74a551e2` transitioned durably to `status = 'published'` (`published_at: 2026-10-24T15:23:31Z`).
+- **Queue Enqueue**: HTTP 201 Created from Azure Storage Queue REST API (`x-ms-request-id: bb991d11-0003-0076-71cb-63699c000000`).
+- **Worker Execution**: `praroha-render-job-rsjqv` ran for 55 seconds (started 15:23:40Z, succeeded 15:24:35Z, exit 0). Returned to scale-to-zero (0 active executions).
+- **Database Records**: `generation_jobs` marked `completed` (100% progress, 2.46s render elapsed, peak RSS 102.55 MB). `media_assets` marked `completed` with honest badges (`is_synthetic: true`, `provider_label: "Cinematic Preview"`).
+- **Generated Media**: Uploaded to Supabase Storage `seed-unfold-assets`. 124,558 bytes, 1280x720, 6.000s duration, H.264 MP4, 0 decoding errors.
+- **Queue Drained**: `cinematic-render-jobs`: 0 messages, `cinematic-render-poison`: 0 messages.
+- **Current Status**: **CANARY EXECUTED & AUDITED (2026-10-24). Phase Gate D complete.**
+
+### 6.4 Next Required Production Approval: Isolated Resilience Testing Gate (Phase Gate E)
+The next operational gate before any customer feature enablement is:
+
+- **Operation**: Run isolated fault injection and resilience tests covering outbox sweeper retry, worker duplicate delivery protection, and poison queue routing.
+- **Boundary**: Must run exclusively against isolated test/local resources. Zero production queue mutations or production render triggers authorized.
+- **Status**: **PLAN PREPARED / AWAITING SEPARATE OPERATOR AUTHORIZATION**. Strictly gated.
 
 ---
 
@@ -457,5 +472,77 @@ The **SINGLE** next required operational approval before any rendering execution
   3. *Migrated DB*: Normal production container startup (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`) connected, validated schema with zero DDL, and `/api/health` returned `HTTP 200 OK`.
   4. *Fail-Closed*: Invalid PostgreSQL URL terminated immediately with code 3.
 - **Strict Boundary**: Candidate `v7.3` is pushed to ACR only. **Not deployed to production.** Production Container App remains on `v6`.
+
+---
+
+## 9. Post-Canary Acceptance Audit, FPS Root Cause & Candidate Worker v7 Verification
+
+### 9.1 Canary Execution Summary & Telemetry
+On 2026-10-24 15:23 UTC, the operator-authorized single synthetic production canary was dispatched via `backend.scripts.run_canary_dispatch`:
+
+- **Job ID**: `0d9c2349-6eed-4686-b148-5f8f5d84c17f`
+- **Project ID**: `25e15040-73e6-47e5-b030-d95598e17292` (*"The Sunken City: Bio-City"*)
+- **Entity ID**: `99b0c570-2d22-402e-8a68-1392243f8d30`
+- **Request Hash**: `4f8521d16e432af8ef023f8036e0b5525f78bc85991ef94002936ba2d4a64448`
+- **Outbox ID**: `e3cfdc80-dca2-4489-98c4-c4dd74a551e2` (status: `published`, `published_at: 2026-10-24T15:23:31Z`)
+- **Queue Enqueue**: HTTP 201 Created from Azure Storage Queue REST API (`x-ms-request-id: bb991d11-0003-0076-71cb-63699c000000`)
+- **Worker Execution**: `praroha-render-job-rsjqv` on `praroha-worker:v6` (1.0 vCPU, 2.0 GiB RAM):
+  - Start Time: `2026-10-24T15:23:40+00:00`
+  - End Time: `2026-10-24T15:24:35+00:00`
+  - Exit Status: `Succeeded` (Exit code 0, 55s wall-clock duration)
+- **DB Transitions**: `generation_jobs` & `media_assets` both marked `completed` (render elapsed: 2.46s, peak RSS: 102.55 MB).
+- **Storage Artifact**: Uploaded to `seed-unfold-assets`:
+  - URL: `https://stxnxkzaftmwcbtvgzbm.supabase.co/storage/v1/object/public/seed-unfold-assets/projects/25e15040-73e6-47e5-b030-d95598e17292/media/video/99b0c570-2d22-402e-8a68-1392243f8d30_1792855464.mp4`
+  - File Size: 124,558 bytes
+  - Codec: H.264, 1280x720, duration 6.000s, 0 decoding errors (`ffmpeg -v error -i ... -f null -`).
+- **Post-Canary Isolation**: `cinematic-render-jobs`: 0 messages, `cinematic-render-poison`: 0 messages, worker returned to scale-to-zero. Both feature flags remain disabled.
+
+### 9.2 24-versus-25 FPS Discrepancy & Root Cause Analysis
+- **Empirical Measurement**: Probing the generated MP4 via `ffprobe` revealed:
+  - `codec_name`: `h264`
+  - `r_frame_rate`: `25/1`
+  - `avg_frame_rate`: `25/1`
+  - `nb_read_frames`: 150 frames over 6.000 seconds (25.0 FPS)
+- **Expected Acceptance Standard**: The Phase 52 runbook and queue contract specify `fps = 24`.
+- **Root Cause Investigation**:
+  1. *Filter Graph Hardcoding*: In `backend/app/services/cinematic_preview.py:169`, `zoompan` was hardcoded to `fps=25` and `d={spec.duration_sec * 25}` (authored in Phase 46 using the European broadcast PAL default).
+  2. *Dropped Parameter*: In `backend/app/workers/cinematic_worker.py:791`, `CinematicPreviewSpec` was instantiated with `duration_sec` and `aspect_ratio`, but `CinematicPreviewSpec` did not declare an `fps` field. Thus, `options["fps"] = 24` was discarded upon receipt.
+  3. *Missing Output Flag*: Without `-r` specified in FFmpeg output arguments, FFmpeg defaulted to the filter stream's output cadence of 25.0 FPS.
+
+### 9.3 Code Remediation & Verification
+1. **Dynamic FPS in `CinematicPreviewSpec`** (`backend/app/services/cinematic_preview.py`):
+   - Added `fps: int = 24` with validation enforcing `fps in (24, 30)`.
+2. **Dynamic Zoompan & Output Cadence** (`backend/app/services/cinematic_preview.py`):
+   - Filter calculates `total_frames = spec.duration_sec * fps`.
+   - `zoompan` configured with `d={total_frames}:...:fps={fps}`.
+   - Added `-r {fps}` to output arguments to guarantee matching container/stream headers.
+3. **Queue Worker Forwarding** (`backend/app/workers/cinematic_worker.py`):
+   - Worker extracts `fps=options.get("fps", 24)` and passes it to `CinematicPreviewSpec`.
+4. **Local ffprobe Verification**:
+   - Added unit tests in `test_cinematic_preview.py` and `test_cinematic_queue_worker.py` rendering clips at 24 and 30 FPS.
+   - `ffprobe` measured exact `24/1` (72 frames / 3.0s) and `30/1` (90 frames / 3.0s).
+   - Zero FFmpeg decode errors verified via `ffmpeg -v error -i ... -f null -`.
+   - Full test battery: 332 passed in `pytest backend/tests/`.
+
+### 9.4 Candidate Image Worker v7 Verification
+- **Target Image Tag**: `tendersaathiacr.azurecr.io/praroha-worker:v7`
+- **Local Image ID**: `sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`
+- **Config Digest**: `sha256:48c701c4f3a5527e50bd8a522dfe79ec79eb571c572cfb0d2d38e7fb32b4b455`
+- **Local Verification**: Built via BuildKit (`Dockerfile.worker`), inspected via `docker run --rm ... --help` with exit code 0.
+- **Strict Boundary**: Candidate `v7` is built locally only. **Not pushed to ACR, not deployed to Azure.** Production Job `praroha-render-job` remains on `praroha-worker:v6`.
+
+### 9.5 Azure Billing & Financial Reconciliation Status
+- **Current Status**: **PENDING UNTIL ACTUAL COST DATA BECOMES AVAILABLE**.
+- **Inspection Query**: `az consumption usage list` executed against subscription `36794f11-1aa5-4a25-a4aa-3b973c335e2d`.
+- **Finding**: Azure billing engine returns `pretaxCost: None` and `usageQuantity: None` for the current billing period. Usage records have not yet posted to the billing ledger.
+- **Policy**: In accordance with project instructions, projected numbers are not claimed as measured spend. Actual container runtime was 55 seconds on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
+
+### 9.6 Phase Gate E: Isolated Resilience Testing Plan (Prepared — Awaiting Authorization)
+Before enabling the feature flag in frontend/backend, the following isolated resilience scenarios are planned:
+1. *Outbox Sweeper Interruption & Recovery*: Simulate crash between database outbox commit and queue enqueue; verify sweeper reclaims without duplicate render.
+2. *Worker Lease Renewal & Idempotency*: Verify 15-second heartbeat loop prevents visibility expiration during extended operations, and duplicate message deliveries fail closed.
+3. *Poison Queue Quarantine*: Verify malformed messages exhaust 3 retries and route cleanly to `cinematic-render-poison` with diagnostic logging and no orphaned database locks.
+4. *Data Immutability*: Verify completed renders (including canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f`) are never re-rendered or modified.
+*All resilience tests will be conducted using isolated SQLite/Postgres test fixtures and mock queue clients.*
 
 

@@ -71,20 +71,44 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
      - *Status*: **COMPLETED & VERIFIED (2026-10-23)**.
 - **Gate Check**: Verify backend tests pass. Live `/api/health` returns HTTP 200. *(VERIFIED: HTTP 200, status healthy).*
 
-#### Stage 4: Synthetic Canary Validation
+#### Stage 4: Synthetic Canary Validation & Acceptance Audit
 - **Actions**:
-  1. Execute synthetic end-to-end canary dispatch using canonical demo seed assets and canonical queue message schema.
-  2. Observe KEDA trigger execution in Azure Log Analytics.
-  3. Confirm rendered MP4 is uploaded to Supabase Storage bucket `seed-unfold-assets`.
-- **Gate Check**: Verify MP4 metadata: `duration == 6.0s`, `codec == h264`, `resolution == 1280x720`, `is_synthetic == true`, `provider_label == "Cinematic Preview"`.
-- **Status**: **NOT EXECUTED / PENDING EXPLICIT OPERATOR AUTHORIZATION (Phase Gate D)**. Prerequisite v7.3 deployment complete. Gated pending safe operator dispatch tooling and operator authorization.
+  1. Executed authorized one-shot synthetic canary render via `backend/scripts/run_canary_dispatch.py` on 2026-10-24 15:23 UTC.
+  2. Verified transactional outbox publication (`published_at: 2026-10-24T15:23:31Z`) and Azure Queue enqueue.
+  3. Verified ACA Job worker execution `praroha-render-job-rsjqv` (started: 15:23:40Z, succeeded: 15:24:35Z, duration: 55s wall-clock, render elapsed: 2.46s).
+  4. Verified Supabase database record transition to `status = 'completed'` with honest metadata (`is_synthetic: true`, `provider_label: "Cinematic Preview"`).
+  5. Verified Supabase Storage upload to `seed-unfold-assets`: `124,558` bytes, H.264, 1280x720, 6.000s duration, 0 decoding errors.
+  6. Verified queue baseline: `cinematic-render-jobs` drained to 0, `cinematic-render-poison` remained 0, worker scaled back to 0.
+- **FPS Discrepancy & Root Cause Audit**:
+  - *Measured Output*: ffprobe measured `r_frame_rate: 25/1`, `avg_frame_rate: 25/1`, and `nb_read_frames: 150` over 6.0s (25.0 FPS) instead of expected 24 FPS.
+  - *Root Cause*: `CinematicPreviewComposer` had a hardcoded `fps=25` constant and `d={duration * 25}` in its FFmpeg `zoompan` filter graph string, and `CinematicPreviewSpec` did not accept an `fps` parameter, dropping `options["fps"] = 24`.
+  - *Code Remediation*:
+    - Added `fps: int = 24` to `CinematicPreviewSpec` with validation against `{24, 30}`.
+    - Wired `fps` dynamically into `zoompan` duration (`d=duration * fps`) and framerate (`fps={fps}`), and added `-r {fps}` to output arguments.
+    - Updated `cinematic_worker.py` to forward `options["fps"]` into `CinematicPreviewSpec`.
+    - Added regression tests in `test_cinematic_preview.py` and `test_cinematic_queue_worker.py` validating 24 and 30 FPS outputs with `ffprobe` and error-free FFmpeg decoding. Full backend suite (332 passed).
+  - *Candidate Worker Image*: Built locally as `tendersaathiacr.azurecr.io/praroha-worker:v7` (ID `sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`). Unpushed, undeployed. Production remains on `v6`.
+- **Azure Billing Reconciliation**:
+  - Status: **Pending until actual cost data becomes available**. The Azure Consumption API currently returns `pretaxCost: None` and `usageQuantity: None` for the current billing cycle. No projected numbers are reported as measured spend.
+- **Status**: **CANARY EXECUTED & ACCEPTED WITH DOCUMENTED FPS RESOLUTION (Phase Gate D Complete)**.
 
-#### Stage 5: Fault Injection & Resilience Testing
-- **Actions**:
-  1. **Restart Simulation**: Enqueue a job and immediately restart the `praroha-backend` container. Confirm the outbox sweeper detects and recovers the job without duplicate execution.
-  2. **Poison Message Test**: Inject an intentionally malformed message (`{"schema_version": "0.1", "corrupt": true}`). Verify the message is dequeued, retried up to 3 times, moved to `cinematic-render-poison`, and the job marked `failed` with clear diagnostics.
-- **Gate Check**: Zero orphaned locks in `generation_jobs`; `cinematic-render-poison` contains exactly 1 entry.
-- **Status**: Pending Stage 4 verification.
+#### Stage 5: Isolated Fault Injection & Resilience Testing Plan (Prepared — Awaiting Authorization)
+*Strict Safety Rule: Must use isolated mock/local test resources only. Never inject faults into production queues, containers, or secrets.*
+- **Scope & Scenarios**:
+  1. **Outbox Interruption & Recovery**:
+     - Simulate primary backend failure immediately after database commit of `render_outbox (status='pending')` but before queue enqueue.
+     - Verify the background outbox sweeper (`CinematicOutboxSweeper`) claims stale pending entries with savepoint isolation and successfully enqueues to the queue without duplicating database jobs.
+  2. **Worker Lease Renewal & Idempotent Claim**:
+     - Simulate extended composition exceeding initial queue visibility timeout (300s).
+     - Verify worker heartbeat loop extends lease via `update_message` visibility renewal and updates database heartbeat timestamps.
+     - Simulate duplicate delivery of already-claimed or already-completed message; verify worker detects atomic claim conflict or terminal state, discards duplicate, and ACKs queue message without duplicate render.
+  3. **Poison Message Routing & Terminal Diagnostics**:
+     - Inject malformed/corrupted payloads (`schema_version != '1.0'`, invalid IDs, unexpected fields, credential injection attempts).
+     - Verify worker decrements retry budget, moves message to poison queue upon exhaustion, records terminal `failed` state with descriptive error code (`MALFORMED_PAYLOAD`, `INVALID_SCHEMA`), and preserves diagnostic logs.
+  4. **Preservation of Existing Completed Renders**:
+     - Ensure test runs verify that completed jobs (like canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f`) and outbox records are completely immutable and never modified or deleted by retry/recovery sweeps.
+- **Gate Check**: 100% green on isolated resilience test battery; zero mutations to production queues.
+- **Status**: **PLAN PREPARED / NOT EXECUTED (Phase Gate E)**. Awaiting separate operator authorization.
 
 #### Stage 6: Frontend Feature Flag Enablement
 - **Actions**:

@@ -44,6 +44,7 @@ class CinematicPreviewSpec:
     ambient_path: Optional[str] = None
     duration_sec: int = 12
     aspect_ratio: str = "16:9"
+    fps: int = 24
 
     def validate(self) -> List[str]:
         """Check specification validity; return list of missing or invalid fields."""
@@ -52,6 +53,8 @@ class CinematicPreviewSpec:
             issues.append("Missing title")
         if self.duration_sec < 3 or self.duration_sec > 60:
             issues.append(f"Duration {self.duration_sec}s outside allowed range (3-60s)")
+        if self.fps not in (24, 30):
+            issues.append(f"FPS {self.fps} outside allowed range (24, 30)")
         return issues
 
 
@@ -163,10 +166,13 @@ class CinematicPreviewComposer:
         has_voice = spec.voice_path and os.path.exists(spec.voice_path)
         has_ambient = spec.ambient_path and os.path.exists(spec.ambient_path)
 
+        fps = getattr(spec, "fps", 24) or 24
+        total_frames = spec.duration_sec * fps
+
         # Video filter: Ken Burns slow zoom + pan + text branding & title
         vf_parts = [
             "[0:v]scale=1920:1080",
-            f"zoompan=z='min(zoom+0.0012,1.15)':d={spec.duration_sec * 25}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1280x720:fps=25",
+            f"zoompan=z='min(zoom+0.0012,1.15)':d={total_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1280x720:fps={fps}",
             "drawtext=text='PRAROHA CINEMATIC PREVIEW':fontcolor=white@0.9:fontsize=20:x=40:y=40:box=1:boxcolor=black@0.5:boxborderw=6",
             f"drawtext=text='{safe_title}':fontcolor=white:fontsize=32:x=40:y=620:box=1:boxcolor=black@0.6:boxborderw=10",
         ]
@@ -217,6 +223,7 @@ class CinematicPreviewComposer:
             "-c:v", "libx264",
             "-preset", "veryfast",
             "-pix_fmt", "yuv420p",
+            "-r", str(fps),
             "-c:a", "aac",
             "-b:a", "192k",
             "-t", str(spec.duration_sec),
@@ -283,6 +290,7 @@ class CinematicPreviewComposer:
                     "duration_sec": spec.duration_sec,
                     "aspect_ratio": spec.aspect_ratio,
                     "resolution": "720p",
+                    "fps": fps,
                     "file_size_bytes": len(video_data),
                     "assets_used": used_modalities,
                     "render_engine": "ffmpeg-motion-composer",

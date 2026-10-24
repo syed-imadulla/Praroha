@@ -743,3 +743,119 @@ async def test_run_queue_cli_managed_identity_drain_exit():
         exit_code = await run_queue_cli(args)
         assert exit_code == 0
 
+
+@pytest.mark.asyncio
+async def test_queue_worker_end_to_end_ffprobe_fps_verification(isolated_db_session_factory):
+    """Guarantees queue options['fps']=24 produces genuine 24 FPS MP4 verified with ffprobe."""
+    import subprocess
+
+    session_factory, _ = isolated_db_session_factory
+    job_id = "job-fps-24-queue-test"
+    project_id = "proj-fps-e2e"
+    entity_id = "scene-fps-24"
+
+    image_fixture = "gallery/gallery_04_stage3_divergent_worlds.png"
+    if not os.path.exists(image_fixture):
+        pytest.skip("Test image fixture missing")
+
+    async with session_factory() as session:
+        job = GenerationJob(
+            id=job_id,
+            project_id=project_id,
+            job_type="media_video",
+            status="queued",
+        )
+        img_asset = MediaAssetRecord(
+            project_id=project_id,
+            entity_type="scene",
+            entity_id=entity_id,
+            media_type="image",
+            status="completed",
+            asset_url=image_fixture,
+        )
+        video_asset = MediaAssetRecord(
+            id=job_id,
+            project_id=project_id,
+            entity_type="scene",
+            entity_id=entity_id,
+            media_type="video",
+            status="queued",
+            request_hash="e" * 64,
+        )
+        session.add(job)
+        session.add(img_asset)
+        session.add(video_asset)
+        await session.commit()
+
+    duration = 3
+    msg_payload = {
+        "schema_version": "1.0",
+        "job_id": job_id,
+        "project_id": project_id,
+        "entity_type": "scene",
+        "entity_id": entity_id,
+        "request_hash": "e" * 64,
+        "options": {
+            "duration_seconds": duration,
+            "fps": 24,
+            "resolution": "1280x720",
+            "aspect_ratio": "16:9",
+            "motion_preset": "slow_pan",
+        },
+        "enqueued_at": get_utc_now_iso(),
+        "attempt": 1,
+    }
+    mock_msg = MockQueueMessage(content=json.dumps(msg_payload))
+    mock_queue = MockQueueClient([mock_msg])
+
+    with tempfile.TemporaryDirectory() as upload_dir:
+        storage = LocalStorageProvider(upload_dir=upload_dir)
+
+        handled = await process_queue_message(
+            message=mock_msg,
+            queue_client=mock_queue,
+            session_factory=session_factory,
+            storage_provider=storage,
+            timeout_sec=30.0,
+        )
+
+        assert handled is True
+        assert len(mock_queue.deleted_messages) == 1
+
+        async with session_factory() as session:
+            m = (await session.execute(select(MediaAssetRecord).where(MediaAssetRecord.id == job_id))).scalars().first()
+            assert m.status == "completed"
+            assert m.asset_url is not None
+            meta = json.loads(m.metadata_json)
+            assert meta["options"]["fps"] == 24
+
+            # Locate local rendered file from storage
+            key = meta.get("storage_key") or f"cinematic-previews/{project_id}/{job_id}.mp4"
+            rendered_file = os.path.join(upload_dir, key)
+            assert os.path.exists(rendered_file)
+
+            # Probe with ffprobe
+            probe_cmd = [
+                "ffprobe", "-v", "quiet",
+                "-print_format", "json",
+                "-show_streams", "-show_format", "-count_frames",
+                rendered_file,
+            ]
+            probe_proc = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
+            info = json.loads(probe_proc.stdout)
+            vstream = next(s for s in info["streams"] if s["codec_type"] == "video")
+
+            assert vstream["codec_name"] == "h264"
+            assert vstream["r_frame_rate"] == "24/1"
+            assert vstream["avg_frame_rate"] == "24/1"
+            assert int(vstream.get("nb_read_frames", 0)) == duration * 24
+
+            # Verify zero decoding errors
+            decode_proc = subprocess.run(
+                ["ffmpeg", "-v", "error", "-i", rendered_file, "-f", "null", "-"],
+                capture_output=True,
+                text=True,
+            )
+            assert decode_proc.returncode == 0
+            assert decode_proc.stderr == ""
+
