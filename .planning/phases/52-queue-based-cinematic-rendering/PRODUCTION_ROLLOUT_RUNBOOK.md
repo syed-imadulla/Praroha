@@ -183,19 +183,45 @@ As of the latest verified deployment (commit `3a27031`):
 *Prerequisite: Phase Gates A, B, and C verified. SEPARATE EXPLICIT OPERATOR APPROVAL REQUIRED.*
 
 - [ ] **Step D1 `[RENDER-TRIGGERING]`**: Dispatch exactly one synthetic render job:
-  - Trigger via authorized test script with canonical demo seed.
-  - Observe `render_outbox` row created with `status = 'pending'`.
-  - Observe immediate or sweeper dispatch transitions status to `status = 'published'`, and `published_at` is set.
+  - **Tooling**: Standalone operator CLI `backend/scripts/run_canary_dispatch.py` (commit `fbfe02b`).
+  - **Dry-Run Audit Command** (zero mutations, verifies all 8 preflights):
+    ```bash
+    python -m backend.scripts.run_canary_dispatch --fetch-azure-sas
+    ```
+  - **Authorized Canary Execution Command** (requires explicit confirmation flag):
+    ```bash
+    python -m backend.scripts.run_canary_dispatch --fetch-azure-sas --confirm-production-canary
+    ```
+  - **Expected Observations**:
+    1. Preflight audit reports all 8 checks passed (health, image v7.3, empty outbox, empty queues, 0 executions, disabled flags, verified demo seed, worker contract compatibility).
+    2. Selected project is `"The Sunken City: Bio-City"` with verified keyframe image.
+    3. Exactly 1 `MediaAssetRecord`, 1 `GenerationJob`, and 1 `RenderOutbox` created atomically in PostgreSQL.
+    4. Outbox payload published to Azure Storage Queue `cinematic-render-jobs` outside DB transaction.
+    5. `RenderOutbox` transitions to `status = 'published'` with `published_at` timestamp.
 - [ ] **Step D2 `[READ-ONLY]`**: Monitor event-driven worker execution:
-  - Observe `praroha-render-job` KEDA scaler triggers from 0 to 1 execution.
+  - Monitor with:
+    ```bash
+    az containerapp job execution list --name praroha-render-job --resource-group rg-tendersaathi -o table
+    ```
+  - Observe `praroha-render-job` KEDA scaler triggers from 0 to 1 execution (`Running`).
   - Worker claims job via atomic CAS (`UPDATE generation_jobs SET status = 'processing' WHERE id = :id AND status = 'queued'`).
   - Worker maintains 15s heartbeat visibility updates.
-  - Synthetic video renders cleanly and uploads MP4 to Supabase Storage `seed-unfold-assets`.
-  - Generation job finalizes to `completed`.
-  - Message is deleted from `cinematic-render-jobs`.
+  - Synthetic video renders cleanly (6.0s duration, 1280x720, 24fps, H.264).
+  - Worker uploads MP4 to Supabase Storage bucket `seed-unfold-assets`.
+  - Generation job finalizes to `status = 'completed'` with `progress = 100`.
+  - Media asset record finalizes to `status = 'completed'` with `is_synthetic: true` and `provider_label: "Cinematic Preview"`.
+  - Queue message is deleted from `cinematic-render-jobs` upon verified completion.
 - [ ] **Step D3 `[READ-ONLY]`**: Verify clean drain and poison queue:
-  - `cinematic-render-poison` message count remains 0.
-  - `praroha-render-job` execution exits code 0 and scales back to 0 active executions.
+  - Peek queues:
+    ```bash
+    ACCOUNT_KEY=$(az storage account keys list --account-name stpraroharender --resource-group rg-tendersaathi --query "[0].value" -o tsv)
+    az storage message peek --queue-name cinematic-render-jobs --account-name stpraroharender --account-key "$ACCOUNT_KEY" -o json
+    az storage message peek --queue-name cinematic-render-poison --account-name stpraroharender --account-key "$ACCOUNT_KEY" -o json
+    unset ACCOUNT_KEY
+    ```
+  - `cinematic-render-jobs` message count == 0.
+  - `cinematic-render-poison` message count == 0.
+  - `praroha-render-job` execution exits with code 0 (`Succeeded`) and scales back to 0 active executions.
   - MP4 asset playback verified in Supabase Storage.
 
 ---
