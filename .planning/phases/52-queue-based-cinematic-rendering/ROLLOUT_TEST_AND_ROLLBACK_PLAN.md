@@ -64,19 +64,20 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 - **Actions**:
   1. Add `render_outbox` table migration in Supabase PostgreSQL. *(Completed & Verified 2026-10-23: 11 columns, 5 constraints, 3 indexes, 0 rows).*
   2. Update `CinematicDispatcherService` in `backend/app/services/cinematic_dispatcher.py` to write to `render_outbox` and dispatch to `cinematic-render-jobs`. *(Completed & Verified).*
-  3. Deploy updated `praroha-backend` revision to ACA:
+   3. Deploy updated `praroha-backend` revision to ACA:
      - *Historical Note*: Initial deployments of v7 and v7.1 encountered startup exceptions (psutil worker import and boolean column migration fallback) and were safely rolled back to `v6` with `QUEUE_PUBLISH_URL` unbound. Telemetry confirmed 0 writes and zero data loss.
      - *Candidate Hardening*: Candidate `v7.3` (`sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`) separates runtime validation (zero DDL) from migrations and fails closed against PostgreSQL errors.
-     - *Status*: Staged in ACR. **Awaiting operator authorization to deploy candidate v7.3 and bind `QUEUE_PUBLISH_URL=secretref:queue-publish-url`**. Production currently runs `v6` (unbound).
-- **Gate Check**: Verify backend tests pass (318 passed, 2 skipped). Live `/api/health` returns HTTP 200.
+     - *Deployment Execution*: Deployed to production on 2026-10-23. `QUEUE_PUBLISH_URL=secretref:queue-publish-url` bound. Provisioning state `Succeeded`, status `Running`. Zero DDL executed on startup; `/api/health` returns HTTP 200 (`fallback_used: false`).
+     - *Status*: **COMPLETED & VERIFIED (2026-10-23)**.
+- **Gate Check**: Verify backend tests pass. Live `/api/health` returns HTTP 200. *(VERIFIED: HTTP 200, status healthy).*
 
 #### Stage 4: Synthetic Canary Validation
 - **Actions**:
-  1. Execute synthetic end-to-end test script `backend/tests/test_canary_queue_render.py` using canonical demo seed assets.
+  1. Execute synthetic end-to-end canary dispatch using canonical demo seed assets and canonical queue message schema.
   2. Observe KEDA trigger execution in Azure Log Analytics.
   3. Confirm rendered MP4 is uploaded to Supabase Storage bucket `seed-unfold-assets`.
 - **Gate Check**: Verify MP4 metadata: `duration == 6.0s`, `codec == h264`, `resolution == 1280x720`, `is_synthetic == true`, `provider_label == "Cinematic Preview"`.
-- **Status**: **NOT EXECUTED**. Strictly blocked awaiting deployment of Candidate `v7.3` and separate explicit canary authorization.
+- **Status**: **NOT EXECUTED / PENDING EXPLICIT OPERATOR AUTHORIZATION (Phase Gate D)**. Prerequisite v7.3 deployment complete. Gated pending safe operator dispatch tooling and operator authorization.
 
 #### Stage 5: Fault Injection & Resilience Testing
 - **Actions**:

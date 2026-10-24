@@ -35,7 +35,7 @@ As of the latest verified deployment (commit `3a27031`):
 - **Both queues:** empty (`cinematic-render-jobs`: 0 messages; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
 - **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v6`, zero ingress (`ingress: null`), and 0 active/historical executions.
 - **Canary:** **not executed**.
-- **Next required authorization:** deploy candidate `v7.3` and bind the existing queue-publisher secret reference (`QUEUE_PUBLISH_URL=secretref:queue-publish-url`).
+- **Next required authorization:** execute single synthetic canary render (Phase Gate D).
 
 | Component | Target Resource | Live Audited State | Status |
 | :--- | :--- | :--- | :--- |
@@ -344,31 +344,26 @@ All operations remain strictly gated. The reconciliation of historical and remai
    - *Action*: Deploy `praroha-backend:v7` / `v7.1` and bind `QUEUE_PUBLISH_URL`.
    - *Status*: **EXECUTED, INCIDENTS ENCOUNTERED, AND FULLY ROLLED BACK TO v6** (2026-10-23). `QUEUE_PUBLISH_URL` unbound. Telemetry verified 0 writes and zero data loss.
 
-### 6.2 Next Required Production Approval: Deploy Candidate v7.3 Gate
-The **SINGLE** next required operational approval before any further production modification is:
+### 6.2 Executed Production Approval: Deploy Candidate v7.3 Gate (Completed & Verified)
+The candidate `v7.3` deployment was explicitly authorized and executed on 2026-10-23:
 
 - **Operation `[PROD-CHANGING]`**: Deploy candidate `v7.3` image and bind existing secret reference `QUEUE_PUBLISH_URL=secretref:queue-publish-url`.
 - **Target Container App**: `praroha-backend` (Resource Group: `rg-tendersaathi`).
-- **Verified Candidate Image**: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`
-- **Expected & Verified Digest**: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`
-- **Exact Azure CLI Command**:
-  ```bash
-  az containerapp update \
-    --name praroha-backend \
-    --resource-group rg-tendersaathi \
-    --image tendersaathiacr.azurecr.io/praroha-backend:v7.3 \
-    --set-env-vars QUEUE_PUBLISH_URL=secretref:queue-publish-url
-  ```
-- **Safety Properties of v7.3**:
-  - Production runtime startup performs **ZERO DDL** schema changes (`validate_production_schema()`); automatic migrations disabled (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`).
-  - Fails closed immediately on connection or schema validation failure; silent SQLite fallback completely eliminated.
+- **Verified Image**: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`
+- **Verified Digest**: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f` (exact match).
+- **Execution Result**: Container App updated successfully (`provisioningState: Succeeded`, `runningStatus: Running`).
+- **Safety Properties Verified**:
+  - Production runtime startup performed **ZERO DDL** schema changes (`validate_production_schema()`); automatic migrations disabled (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`).
+  - Fail-closed initialization verified; silent SQLite fallback eliminated; `/api/health` returned HTTP 200 with `fallback_used: false`.
   - Dependency boundary clean: pure `queue_contract.py` without `psutil` or FFmpeg worker dependencies.
-- **Current Status**: **DEPLOYED & VERIFIED (2026-10-23). Phase Gate B step B8 and Phase Gate C complete.**
+- **Current Status**: **DEPLOYED & HEALTHY (2026-10-23). Phase Gate B step B8 and Phase Gate C complete.**
 
-### 6.3 Subsequent Deployment Gate: Synthetic Canary Render
+### 6.3 Next Required Production Approval: Synthetic Canary Render Gate (Phase Gate D)
+The **SINGLE** next required operational approval before any rendering execution is:
+
 - **Operation `[RENDER-TRIGGERING]`**: Execute exactly ONE synthetic canary render.
 - **Prerequisite**: Candidate `v7.3` deployed and verified healthy — **SATISFIED** (Phase Gate C complete).
-- **Status**: **NOT EXECUTED / PENDING SEPARATE OPERATOR AUTHORIZATION**.
+- **Status**: **NOT EXECUTED / PENDING EXPLICIT OPERATOR AUTHORIZATION**. Strictly gated until safe invocation tooling is verified and operator authorizes execution.
 
 ---
 
