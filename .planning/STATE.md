@@ -106,14 +106,22 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Structured secret-free telemetry logging (`event=request_accepted`, `event=request_rejected`, `event=job_enqueued`, `event=queue_publish_failed`).
       - Dedicated test suite `backend/tests/test_cinematic_quotas_and_safeguards.py` (8/8 passed). Full cinematic test battery passed (130/130 across 13 files).
       - Strict Production Boundary Maintained: `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false` and `VITE_ENABLE_CINEMATIC_PREVIEW` remain strictly disabled. Zero cloud deployments, zero production DB mutations, zero public access.
-    - Stage 2 Public Rollout Readiness: **SAFEGUARDS HARDENED & LOCALLY VERIFIED; AWAITING DEPLOYMENT AUTHORIZATION & PUBLIC SPENDING CEILING APPROVAL**.
+    - Stage 2 Safeguards Released & Budget Alert Configured (Executed & 100% Verified, 2026-10-25):
+      - Backend release candidate `praroha-backend:v7.5` pushed to ACR (`sha256:681713e79a44240f296c8c85dac00e96c1919079e75e5d642c02f1d8f2369a45`).
+      - Deployed to Azure Container App `praroha-backend` in `rg-tendersaathi` (`provisioningState: Succeeded`, `runningStatus: Running`).
+      - Azure monthly budget alert `praroha-pilot-budget` created at `rg-tendersaathi` scope: **₹200.00 INR / month** (triggers at 80% [₹160] and 100% [₹200] to `imadulla.s45@gmail.com`).
+      - Verified live `/api/health` HTTP 200, unauthenticated requests rejected with HTTP 401, non-operator requests rejected with HTTP 403, `/api/media/providers/health` healthy across all modalities.
+      - Worker remains `praroha-worker:v7` with scale-to-zero (0 executions, queues empty: `cinematic-render-jobs: 0`, `cinematic-render-poison: 0`).
+      - Rollback target `v7.4` verified in ACR.
+      - Public cinematic flags remain strictly disabled: `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`.
+    - Stage 2 Public Rollout Readiness: **BACKEND SAFEGUARDS v7.5 DEPLOYED & BUDGET ALERT ACTIVE; PUBLIC ACCESS REMAINS STRICTLY GATED AWAITING EXPLICIT PUBLIC ROLLOUT AUTHORIZATION**.
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
   - Frontend: `https://praroha-ai.vercel.app` (Bundle: `/assets/index-1DKbSIsW.js`, Target: `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb`)
-  - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io` (`praroha-backend:v7.4`, healthy)
-- **Backend Test Battery**: 362 passed, 2 skipped in 43.9s (`pytest backend/tests`). Includes 8 dedicated quota/safeguard tests, 13 internal security gate tests, 9 Phase Gate E resilience tests, 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification.
-- **Frontend Production Bundle & Rehearsal**: Compiled with zero errors (`npm run build --prefix frontend` in 12.4s). PWA v2.0.0 Workbox precaches 33 entries. Local browser rehearsal passed 9/9 scenarios (`node frontend/e2e/test_phase52_cinematic_rehearsal.mjs`).
+  - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io` (`praroha-backend:v7.5`, healthy)
+- **Backend Test Battery**: 362 passed, 2 skipped in 42.93s (`pytest backend/tests`). Includes 8 dedicated quota/safeguard tests, 13 internal security gate tests, 9 Phase Gate E resilience tests, 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification.
+- **Frontend Production Bundle & Rehearsal**: Compiled with zero errors (`npm run build --prefix frontend` in 12.16s). PWA v2.0.0 Workbox precaches 33 entries. Local browser rehearsal passed 9/9 scenarios (`node frontend/e2e/test_phase52_cinematic_rehearsal.mjs`).
 - **Production Post-Promotion Smoke Test**: 100% passed on live production domain (8/8 checks in `node frontend/e2e/test_production_post_promotion_smoke.mjs`). Verified AuthScreen landing, guest demo workspace hydration without 401 bounce, disabled cinematic control tooltip, route navigation, deep routing, session persistence, clean sign-out, and zero mutating backend requests.
 - **PWA Installation Audit**: 100% passed on live Vercel domain (`node frontend/e2e/test_phase37_pwa.mjs`). Verified manifest, icons (192px, 512px, maskable), active Service Worker, and offline transparency banner.
 - **Full User Journey E2E**: 100% passed on live cloud stack (`node frontend/e2e/test_phase31_10_journey.mjs`). Verified end-to-end flow with live Gemini AI extraction, divergent 3-world synthesis, EdgeTTS voice generation, concept art and narration, DAG rendering, portable project JSON export, and state reload.

@@ -1029,6 +1029,39 @@ Stage 2 public access is **STRICTLY GATED**. Before public access can be activat
   npx vercel redeploy
   ```
 
+### 13.4 Backend v7.5 Safeguards Deployment & Budget Alert Verification (Executed 2026-10-25)
+1. **Azure Container Registry Push**:
+   - Pushed `tendersaathiacr.azurecr.io/praroha-backend:v7.5` (ID: `681713e79a44`, Digest: `sha256:681713e79a44240f296c8c85dac00e96c1919079e75e5d642c02f1d8f2369a45`, Size: 436 MB).
+   - Confirmed remote ACR manifest digest matches candidate image digest byte-for-byte.
+2. **Azure Container App Update**:
+   - Deployed `v7.5` to `praroha-backend` in `rg-tendersaathi` (`provisioningState: Succeeded`, `runningStatus: Running`, revision `praroha-backend--latest`).
+   - Secret bindings (`database-url`, `supabase-key`, `gemini-key`, `queue-publish-url`, etc.) and networking preserved without modification.
+3. **Azure Budget Alert Configured**:
+   - Budget Name: `praroha-pilot-budget`
+   - Scope: Resource Group `rg-tendersaathi`
+   - Amount / Currency: **₹200.00 INR / month**
+   - Time Period: `2026-10-01` to `2027-10-01` (Monthly grain)
+   - Notifications:
+     - 80% (₹160.00 INR): `imadulla.s45@gmail.com`
+     - 100% (₹200.00 INR): `imadulla.s45@gmail.com`
+   - Confirmed: Budget alert serves as an asynchronous notification mechanism, NOT a real-time hard compute kill switch.
+4. **Post-Deployment Verification**:
+   - `/api/health`: HTTP 200 OK (`service: PRAROHA — Seed to Universe`, `ai_provider: gemini`, `storage_provider: supabase`).
+   - Unauthenticated rejection: `POST /api/projects/{id}/media/cinematic-preview/jobs` returns `HTTP 401 Unauthorized` (`Authentication required`).
+   - Security gate: Non-operator access returns `HTTP 403 Forbidden` (`Cinematic preview generation is restricted to authorized operators during internal verification`).
+   - Modality readiness: `/api/media/providers/health` returns HTTP 200 with all image, voice, video, and audio providers healthy.
+   - Worker status: `praroha-worker:v7` configured with scale-to-zero (`minExecutions: 0`), zero active executions.
+   - Queues: `cinematic-render-jobs` (0 messages) and `cinematic-render-poison` (0 messages).
+5. **Rollback Readiness**:
+   - Proven rollback target: `tendersaathiacr.azurecr.io/praroha-backend:v7.4` verified in ACR.
+   - Rollback command: `az containerapp update --name praroha-backend --resource-group rg-tendersaathi --image tendersaathiacr.azurecr.io/praroha-backend:v7.4`.
+6. **Strict Production Boundary Maintained**:
+   - `CINEMATIC_PREVIEW_ENABLED=true`
+   - `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false`
+   - `CINEMATIC_OPERATOR_EMAILS=imadulla.s45@gmail.com`
+   - `VITE_ENABLE_CINEMATIC_PREVIEW=false` (Vercel)
+   - Public rendering remains strictly disabled. Zero new renders enqueued.
+
 ### 12.3 Instant Rollback Protocol for Stage 2
 1. **Tier 1 (Instant Public Cut-off — Preserve Operator Access)**:
    ```bash
