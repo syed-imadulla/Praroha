@@ -42,6 +42,7 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
   - *Historical Result Preserved*: The original under-35-second end-to-end target was **not met** for scale-from-zero cold starts (64.0s vs 35s due to container provisioning). This historical result is preserved and not claimed as passed.
 - **Azure Billing Reconciliation (QG-07):** **PENDING (Reconciliation)**. Azure Consumption API reports `pretaxCost: None` for the current cycle due to billing ingestion delay. Estimated compute cost is ~₹0.14 INR (55s on 1.0 vCPU / 2.0 GiB RAM), strictly below the $< ₹50.00$ INR budget ceiling; estimates remain strictly distinguished from official billed charges.
 - **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
+- **Local Browser Rehearsal (Pre-Gate F):** **EXECUTED & 100% PASSED (Commit `1648e72`)**. Automated browser test suite (`frontend/e2e/test_phase52_cinematic_rehearsal.mjs`) verified 9/9 scenarios across Flag OFF and Flag ON on isolated local ports (5180 and 5181). Discovered and fixed a UI bug in `EntityMediaSection.tsx` where failed job cards unmounted due to missing `activeMediaJobs` in the container condition. Local fixture video was used for browser playback verification; zero cloud compute, zero queue messages, zero Supabase mutations, and zero production renders were invoked.
 - **Phase Gate F Status:** **PREPARED — NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION**. (Controlled internal enablement and rollback checklist fully prepared in Section 10; feature flags remain disabled in production).
 
 | Component | Target Resource | Live Audited State | Status |
@@ -52,9 +53,10 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 | **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Image: `tendersaathiacr.azurecr.io/praroha-worker:v7`. Digest: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`. Scale-to-zero active (0 active executions). | **DEPLOYED & VERIFIED** |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (drained by worker).<br>`cinematic-render-poison`: 0 messages. | Clean queue baseline verified |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
-| **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). | Verified disabled |
+| **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). Local rehearsal verified Flag OFF disabled state & Flag ON interactive behavior. | Verified disabled in production |
 | **Resilience Battery** | Isolated SQLite / Mock Queues | 9/9 resilience scenarios verified across Scenarios A, B, C, and D. | **100% PASSED** (Phase Gate E Complete) |
-| **Test Battery & Build** | Local repo | 341 passed (2 skipped) in `pytest backend/tests/`. `git diff --check` clean. | Verified 100% green |
+| **Local Browser Rehearsal** | Isolated Playwright / Ports 5180 & 5181 | 9/9 scenarios passed in `test_phase52_cinematic_rehearsal.mjs`. UI fix in `EntityMediaSection.tsx` verified. Zero cloud compute. | **100% PASSED** (Pre-Gate F Rehearsal) |
+| **Test Battery & Build** | Local repo | 341 passed in backend suite; 15/15 passed in cinematic worker regression suite; `npm run build --prefix frontend` clean (0 errors); `git diff --check` clean. | Verified 100% green |
 
 ---
 
@@ -778,4 +780,43 @@ az containerapp job update \
 ```
 - Halts all automated worker spin-ups (0 active executions, ₹0 compute cost). Preserves all database records and storage queues intact.
 
+---
 
+### 10.4 Pre-Release Local Browser Rehearsal & UI Fix Audit (Commit `1648e72`)
+
+Prior to requesting production authorization for Phase Gate F, a full local browser rehearsal was executed using Playwright (`frontend/e2e/test_phase52_cinematic_rehearsal.mjs`) to validate both feature-flag states in a real browser environment without impacting production.
+
+#### 1. Rehearsal Methodology & Cloud Isolation
+- **Dual Server Instances**:
+  - Flag OFF server spawned on `http://localhost:5180` (`VITE_ENABLE_CINEMATIC_PREVIEW=false`).
+  - Flag ON server spawned on `http://localhost:5181` (`VITE_ENABLE_CINEMATIC_PREVIEW=true`).
+- **Complete Cloud Decoupling**:
+  - All `**/*.supabase.co/**` requests intercepted and fulfilled locally (`{ data: [], error: null }`).
+  - All `/api/**` backend routes intercepted and deterministically mocked (canonical demo universe, instant scene loading, transactional job states, and health checks).
+  - Authentic video decoding validated by serving local MP4 test fixture (`scratch/worker_previews/preview_proj-fps-e2e_scene-fps-24_1792907026.mp4`) via route `**/local-fixture-video.mp4`.
+  - **Zero production mutations**: 0 Azure queue messages, 0 cloud dispatcher calls, 0 Supabase DB/storage writes, 0 cloud GPU/CPU compute consumed. This local playback test strictly does **not** constitute another production render.
+
+#### 2. Rehearsal Test Matrix & Verification Results
+| # | Scenario | Tested State | Verified Behavior | Actual Result |
+|---|---|---|---|---|
+| 1 | **Flag OFF Control Disabled** | Port 5180 | Badge `data-testid="generate-video-disabled-scene-sanctum-001"` renders `"Cinematic Preview (Disabled)"` with title `"Cinematic preview generation is currently disabled in production. Awaiting release approval."` | **PASS** |
+| 2 | **Flag OFF Dispatch Suppression** | Port 5180 | Clicking disabled control triggers zero network dispatches (`stateOff.dispatchCalls === 0`) | **PASS** |
+| 3 | **Flag ON Interactivity** | Port 5181 | Button `data-testid="generate-video-scene-sanctum-001"` renders `"Cinematic Preview"` with title `"Render 16:9 cinematic motion preview with Ken Burns easing and audio ducking"` | **PASS** |
+| 4 | **Single Click & Double-Click Guard** | Port 5181 | Rapid double-click immediately disables button with `"Rendering Preview..."` and `.animate-spin` icon; duplicate dispatch is suppressed (exactly 1 dispatch call recorded) | **PASS** |
+| 5 | **Queued & Synthesizing Progress States** | Port 5181 | Media card displays status pill `"Queued"` / `"Synthesizing"`, card message `"Creating your video..."`, and subtext `"Non-blocking background synthesis"` | **PASS** |
+| 6 | **Completed Video Playback & Controls** | Port 5181 | HTML5 `<video data-testid="media-video-player">` mounts with local MP4; play/pause, download, and lightbox buttons attached; badge displays `"Cinematic Preview • 16:9 • 3s"` with tooltip `"Programmatic cinematic preview composed from world assets."` | **PASS** |
+| 7 | **Sanitized Failure & Retry Flow** | Port 5181 | Tested on Scene 2 (`scene-abyssal-rift-002`); status pill shows `"Failed"`; displays sanitized error `"Worker capacity reached; safe backoff initiated."`; 0 internal tokens/connection strings leaked; `"Try Again"` retry button renders and is interactive | **PASS** |
+| 8 | **Keyboard Accessibility (A11y)** | Port 5181 | Retry button receives keyboard focus (`document.activeElement === retryBtn`) with visible focus ring | **PASS** |
+| 9 | **Responsive Layout & Console Hygiene** | Port 5181 | Clean single-column layout at 375x667 mobile viewport with zero horizontal overflow; zero unhandled exceptions or fatal errors across entire session | **PASS** |
+
+#### 3. Frontend Implementation Gap Discovered & Resolved
+- **Defect Discovered**: In `frontend/src/components/EntityMediaSection.tsx` (line 363), the Media Cards Grid wrapper evaluated:
+  ```tsx
+  {availableModalities.some((m) => assets.some((a) => a.media_type === m) || isGeneratingMedia[`${entityId}_${m}`]) && (
+  ```
+  When a job failed, `isGeneratingMedia` was cleared to `false` and no asset was saved to `assets`. Because `activeMediaJobs` was omitted from this outer check, the entire card container unmounted, hiding the failed card, error message, and retry button from the user.
+- **Remediation**: Added `Object.values(activeMediaJobs).some(j => j.entity_id === entityId && j.media_type === m)` to the container condition (committed in `1648e72`).
+- **Validation**: Post-fix re-execution verified that the failure card remains visible with the sanitized error and the `"Try Again"` retry button. Production build (`npm run build --prefix frontend`) passed cleanly with zero TypeScript errors.
+
+#### 4. Gate Confirmation
+Phase Gate F remains **`PREPARED — NOT EXECUTED`**. All production settings and feature flags remain strictly disabled.

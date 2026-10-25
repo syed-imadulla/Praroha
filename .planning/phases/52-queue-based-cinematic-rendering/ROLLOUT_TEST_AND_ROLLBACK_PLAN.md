@@ -110,16 +110,22 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 - **Status**: **EXECUTED & 100% PASSED (Phase Gate E Complete)**.
 
 #### Stage 6: Frontend / Backend Feature Flag Enablement (Phase Gate F — PREPARED, NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION)
+- **Local Browser Rehearsal & UI Fix (Executed & 100% Passed — Commit `1648e72`)**:
+  - *Automated Browser Test Suite*: Implemented and verified in `frontend/e2e/test_phase52_cinematic_rehearsal.mjs` using Playwright across two isolated local Vite instances:
+    - Port 5180 (`VITE_ENABLE_CINEMATIC_PREVIEW=false`): verified disabled badge `data-testid="generate-video-disabled-scene-sanctum-001"`, explanatory tooltip, and zero dispatch calls on click attempts.
+    - Port 5181 (`VITE_ENABLE_CINEMATIC_PREVIEW=true`): verified interactive button, immediate loading state (`"Rendering Preview..."`), single-click duplicate submission suppression, queued/synthesizing states (`"Creating your video..."` with `"Non-blocking background synthesis"`), HTML5 `<video>` playback with local MP4 fixture, custom controls (play/pause, download, lightbox), honest provider badge (`"Cinematic Preview • 16:9 • 3s"` with programmatic composition tooltip), failure state and sanitized retry CTA on Scene 2 (`scene-abyssal-rift-002`), keyboard accessibility focus, 375px mobile viewport responsiveness, and zero unhandled console exceptions.
+  - *UI Implementation Gap Resolved*: Diagnosed and resolved bug in `EntityMediaSection.tsx` where failed cards unmounted due to omitting `activeMediaJobs` from the outer grid display condition. With fix applied, failed cards remain durably mounted with the sanitized error and `"Try Again"` retry CTA.
+  - *Zero Cloud Compute*: All Supabase and backend routes were locally intercepted; local test fixture MP4 (`scratch/worker_previews/preview_proj-fps-e2e_scene-fps-24_1792907026.mp4`) provided in-browser video playback; zero cloud compute, zero queue messages, and zero production renders were invoked.
 - **Scope & Controlled Verification Checklist**:
   1. *Backend Activation*: Set `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` Container App via `az containerapp update`.
   2. *Frontend Activation*: Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
   3. *Browser Verification Walkthrough*:
      - Internal operator session on canonical project (`25e15040-73e6-47e5-b030-d95598e17292`).
-     - Button interactivity & honest tooltip (*"AI-generated synthetic 720p 24fps preview with motion and ambient soundscape"*).
+     - Button interactivity & honest tooltip (*"Render 16:9 cinematic motion preview with Ken Burns easing and audio ducking"*).
      - Single click dispatch with instant button disabling (double-dispatch prevention).
-     - Progress animation (*"Queued in render pipeline..."* -> *"Generating cinematic composition..."*).
+     - Progress animation (*"Queued"* -> *"Synthesizing"* with card message *"Creating your video..."*).
      - In-browser HTML5 `<video>` playback at 24 FPS with ambient soundscape.
-     - Persistent UI badge: *"AI Cinematic Preview (Synthetic)"*.
+     - Persistent UI badge: *"Cinematic Preview • 16:9 • 6s"* with amber synthetic indicator.
      - Failure resilience & retry button verification (`request_hash` released).
      - Scale-to-zero confirmation (0 active executions, queues drained).
   4. *Instant Rollback*:
