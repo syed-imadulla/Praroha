@@ -60,6 +60,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             f"Failed to start cinematic outbox sweeper: {exc}"
         )
 
+    # Start background cinematic retention sweeper
+    retention_sweeper = None
+    if getattr(settings, "CINEMATIC_RETENTION_ENABLED", False):
+        try:
+            from backend.app.services.cinematic_retention_sweeper import get_retention_sweeper
+            retention_sweeper = get_retention_sweeper()
+            interval = getattr(settings, "CINEMATIC_RETENTION_INTERVAL_SECONDS", 86400.0)
+            dry_run = getattr(settings, "CINEMATIC_RETENTION_DRY_RUN", True)
+            retention_sweeper.start(interval_seconds=interval, dry_run=dry_run)
+        except Exception as exc:
+            import logging
+            logging.getLogger("backend.app").warning(
+                f"Failed to start cinematic retention sweeper: {exc}"
+            )
+
     try:
         yield
     finally:
@@ -71,6 +86,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 import logging
                 logging.getLogger("backend.app").warning(
                     f"Error stopping cinematic outbox sweeper: {exc}"
+                )
+        # Graceful shutdown of background retention sweeper
+        if retention_sweeper is not None:
+            try:
+                await retention_sweeper.stop()
+            except Exception as exc:
+                import logging
+                logging.getLogger("backend.app").warning(
+                    f"Error stopping cinematic retention sweeper: {exc}"
                 )
 
 

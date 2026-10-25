@@ -118,6 +118,8 @@ class CinematicPreviewRetentionSweeper:
         self.batch_size = max(1, min(500, batch_size))
         self.session_factory = session_factory or async_session
         self._storage_provider = storage_provider
+        self._task: Optional[asyncio.Task] = None
+        self._shutdown_event = asyncio.Event()
 
     def _resolve_storage_provider(self) -> StorageProvider:
         if self._storage_provider:
@@ -295,6 +297,62 @@ class CinematicPreviewRetentionSweeper:
             report.storage_errors,
         )
         return report
+
+    async def _run_loop(self, interval_seconds: float, dry_run: bool) -> None:
+        """Background loop executing retention sweep on configured cadence until shutdown."""
+        logger.info(
+            "Cinematic retention sweeper started (interval=%.1fs, dry_run=%s, threshold_days=%d).",
+            interval_seconds,
+            dry_run,
+            self.retention_days,
+        )
+        while not self._shutdown_event.is_set():
+            try:
+                await self.evaluate_and_sweep(dry_run=dry_run)
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                logger.error("Unhandled error in cinematic retention sweeper: %s", exc, exc_info=True)
+
+            try:
+                await asyncio.wait_for(self._shutdown_event.wait(), timeout=interval_seconds)
+                break
+            except asyncio.TimeoutError:
+                pass
+            except asyncio.CancelledError:
+                break
+
+        logger.info("Cinematic retention sweeper stopped cleanly.")
+
+    def start(self, interval_seconds: float = 86400.0, dry_run: bool = True) -> asyncio.Task:
+        """Start the background retention sweeper task if not already running."""
+        if self._task is None or self._task.done():
+            self._shutdown_event.clear()
+            self._task = asyncio.create_task(self._run_loop(interval_seconds, dry_run))
+        return self._task
+
+    async def stop(self) -> None:
+        """Signal shutdown and wait cleanly for the background loop to finish."""
+        self._shutdown_event.set()
+        if self._task is not None and not self._task.done():
+            self._task.cancel()
+            try:
+                await self._task
+            except asyncio.CancelledError:
+                pass
+            self._task = None
+
+
+_retention_sweeper_singleton: Optional[CinematicPreviewRetentionSweeper] = None
+
+
+def get_retention_sweeper() -> CinematicPreviewRetentionSweeper:
+    global _retention_sweeper_singleton
+    if _retention_sweeper_singleton is None:
+        from backend.app.config import settings
+        days = getattr(settings, "CINEMATIC_RETENTION_DAYS", 60)
+        _retention_sweeper_singleton = CinematicPreviewRetentionSweeper(retention_days=days)
+    return _retention_sweeper_singleton
 
 
 async def _run_cli() -> None:

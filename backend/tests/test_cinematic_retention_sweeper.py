@@ -2,6 +2,7 @@
 Tests for PRAROHA Cinematic Preview Retention Sweeper (Phase 54 Task B).
 """
 
+import asyncio
 import json
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -346,3 +347,29 @@ async def test_ignores_non_cinematic_assets():
     async with async_session() as session:
         assert (await session.get(MediaAssetRecord, img_id)).status == "completed"
         assert (await session.get(MediaAssetRecord, aud_id)).status == "completed"
+
+
+@pytest.mark.asyncio
+async def test_retention_sweeper_start_stop_lifecycle():
+    from backend.app.services.cinematic_retention_sweeper import (
+        CinematicPreviewRetentionSweeper,
+        get_retention_sweeper,
+    )
+
+    sweeper = CinematicPreviewRetentionSweeper(retention_days=30)
+    task = sweeper.start(interval_seconds=0.1, dry_run=True)
+    assert task is not None
+    assert not task.done()
+
+    # Repeated start returns existing task
+    assert sweeper.start(interval_seconds=0.1, dry_run=True) is task
+
+    await asyncio.sleep(0.05)
+    await sweeper.stop()
+    assert task.done()
+    assert sweeper._task is None
+
+    # Verify singleton helper
+    singleton = get_retention_sweeper()
+    assert singleton is not None
+    assert isinstance(singleton, CinematicPreviewRetentionSweeper)

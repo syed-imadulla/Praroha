@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     CINEMATIC_MAX_USER_ACTIVE_RENDERS: int = 1  # Maximum active/concurrent renders per user
     CINEMATIC_MAX_GLOBAL_OUTSTANDING_RENDERS: int = 5  # Maximum outstanding (queued + processing) renders globally
     CINEMATIC_USER_DAILY_WINDOW_HOURS: int = 24  # Rolling window size in hours for daily render quota
+    CINEMATIC_RETENTION_ENABLED: bool = True  # Enable periodic retention sweeper
+    CINEMATIC_RETENTION_DRY_RUN: bool = True  # Safe default: evaluate candidates without destructive deletion
+    CINEMATIC_RETENTION_DAYS: int = 60  # Default asset retention window in days
+    CINEMATIC_RETENTION_INTERVAL_SECONDS: float = 86400.0  # Daily cadence (24 hours)
     AI_PROVIDER: str = "mock"  # options: mock, gemini
     STORAGE_PROVIDER: str = "local"  # options: local, supabase
     DATABASE_URL: str = "sqlite+aiosqlite:///./seed_unfold.db"
