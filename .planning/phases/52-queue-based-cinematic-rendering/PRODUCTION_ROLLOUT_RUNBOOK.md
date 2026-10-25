@@ -625,4 +625,96 @@ Worker v7 was explicitly authorized by the operator, published to ACR, and deplo
      --image tendersaathiacr.azurecr.io/praroha-worker:v6
    ```
 
+---
+
+## 10. Phase Gate F — Controlled Internal Feature Enablement & Verification Protocol
+
+> [!IMPORTANT]
+> **PREPARATION ONLY**: This protocol specifies the exact sequence, verification checks, and instant rollback procedures to be executed ONLY after explicit operator authorization. Do not execute any prod-changing commands in this section without approval.
+
+### 10.1 Required Preconditions
+1. **Operator Decisions Confirmed**:
+   - Explicit operator approval of Phase Gate F execution.
+   - Explicit operator decision on QG-06 (acceptance of two-tier SLA: warm render $< 10$s, cold-start $< 75$s, or instruction for cold-start optimizations).
+2. **Read-Only Preflight Baseline**:
+   - `praroha-backend` running `v7.3` (`provisioningState: Succeeded`, `Running`).
+   - `praroha-render-job` running `v7` with `ingress: null`, scale-to-zero active (0 active executions).
+   - Queues `cinematic-render-jobs` and `cinematic-render-poison` confirmed at 0 messages.
+   - Completed canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its MP4 artifact intact.
+
+### 10.2 Gated Activation Sequence (Post-Authorization)
+
+#### Step F1: Backend Feature Flag Enablement (Azure Container App)
+- **Command**:
+  ```bash
+  az containerapp update \
+    --name praroha-backend \
+    --resource-group rg-tendersaathi \
+    --set-env-vars CINEMATIC_PREVIEW_ENABLED=true
+  ```
+- **Verification**:
+  - `az containerapp show -n praroha-backend -g rg-tendersaathi --query "properties.template.containers[0].env[?name=='CINEMATIC_PREVIEW_ENABLED'].value" -o tsv` returns `true`.
+  - Live health probe: `curl -s https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io/api/health` returns `HTTP 200 OK`, `status: "healthy"`.
+
+#### Step F2: Frontend Feature Flag Enablement (Vercel)
+- **Action**:
+  - In Vercel Project Settings for `praroha-ai` (or via Vercel CLI), add environment variable:
+    `VITE_ENABLE_CINEMATIC_PREVIEW=true` (Production environment).
+  - Deploy the updated frontend build to production.
+- **Verification**:
+  - Inspect production bundle: `isCinematicPreviewEnabled` evaluates to `true`.
+
+#### Step F3: Controlled Browser Verification Walkthrough (Operator / Internal Session)
+- **Target URL**: `https://praroha-ai.vercel.app`
+- **Test Entity**: Canonical demo project (*"The Sunken City: Bio-City"*, ID `25e15040-73e6-47e5-b030-d95598e17292`), scene entity `99b0c570-2d22-402e-8a68-1392243f8d30`.
+- **Verification Checklist**:
+  1. *Interactive State*: "Generate Cinematic Preview" button is enabled, interactive, and styled with active theme colors.
+  2. *Honest Labeling Tooltip*: Hovering displays honest notice: *"AI-generated synthetic 720p 24fps preview with motion and ambient soundscape"*.
+  3. *Single Interactive Dispatch*: Click button once.
+     - Button immediately transitions to disabled/loading state to prevent double-dispatch.
+     - Progress UI displays: *"Queued in render pipeline..."* transitioning to *"Generating cinematic composition..."*.
+  4. *Pipeline Telemetry Verification*:
+     - Outbox record created in PostgreSQL (`render_outbox`, status `published`).
+     - Message enqueued in `cinematic-render-jobs`.
+     - KEDA scales `praroha-render-job` from 0 to 1 execution.
+     - Worker v7 picks up message, renews lease, executes FFmpeg composition at 24 FPS, uploads MP4 to Supabase Storage, and marks DB records `completed`.
+  5. *In-Browser Playback & Labeling*:
+     - Progress indicator resolves; HTML5 video player component renders.
+     - MP4 plays automatically with clear 24 FPS motion and synthesized soundscape.
+     - Persistent UI badge displays: *"AI Cinematic Preview (Synthetic)"*.
+  6. *Failure Handling Verification*:
+     - In the event of network disruption or worker error, UI gracefully displays error notification with clear retry button (`request_hash` released). Zero internal secrets or stack traces leaked to user.
+  7. *Scale-to-Zero Verification*:
+     - Queues drain back to 0 messages.
+     - Worker completes execution and returns to 0 active replicas.
+
+### 10.3 Instant Rollback Protocol for Phase Gate F
+
+If any unexpected UI behavior, double-dispatch, playback glitch, or scaling runaway occurs during Phase Gate F, execute the graduated rollback immediately:
+
+#### Level 1: Instant Client Isolation (< 1 Minute)
+Disable frontend button immediately so no user can trigger renders:
+- Set `VITE_ENABLE_CINEMATIC_PREVIEW=false` in Vercel and redeploy.
+- Creator UI instantly returns button to disabled/inactive state.
+
+#### Level 2: Backend Dispatch Decoupling (< 2 Minutes)
+Disable backend cinematic dispatch endpoint:
+```bash
+az containerapp update \
+  --name praroha-backend \
+  --resource-group rg-tendersaathi \
+  --set-env-vars CINEMATIC_PREVIEW_ENABLED=false
+```
+- Direct `/api/cinematic/generate` requests immediately return clean HTTP 503 `"Cinematic preview temporarily unavailable"`. Core worldbuilding, text, and audio APIs remain 100% operational.
+
+#### Level 3: Worker Scale Suspension (< 3 Minutes)
+If job scaling must be paused without losing messages:
+```bash
+az containerapp job update \
+  --name praroha-render-job \
+  --resource-group rg-tendersaathi \
+  --trigger-type Manual
+```
+- Halts all automated worker spin-ups (0 active executions, ₹0 compute cost). Preserves all database records and storage queues intact.
+
 

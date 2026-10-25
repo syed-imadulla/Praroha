@@ -110,10 +110,23 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 - **Status**: **EXECUTED & 100% PASSED (Phase Gate E Complete)**.
 
 #### Stage 6: Frontend / Backend Feature Flag Enablement (Phase Gate F — Awaiting Operator Authorization)
-- **Actions**:
-  1. Toggle `CINEMATIC_PREVIEW_ENABLED=true` on backend and `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
-  2. Verify creator UI in browser: button transitions from disabled to interactive, displays honest tooltip, runs progress animation, and plays back video upon completion.
-- **Status**: **AWAITING SEPARATE OPERATOR AUTHORIZATION**. Both backend and frontend flags currently remain **disabled**. Zero customer traffic enabled.
+- **Scope & Controlled Verification Checklist**:
+  1. *Backend Activation*: Set `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` Container App via `az containerapp update`.
+  2. *Frontend Activation*: Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
+  3. *Browser Verification Walkthrough*:
+     - Internal operator session on canonical project (`25e15040-73e6-47e5-b030-d95598e17292`).
+     - Button interactivity & honest tooltip (*"AI-generated synthetic 720p 24fps preview with motion and ambient soundscape"*).
+     - Single click dispatch with instant button disabling (double-dispatch prevention).
+     - Progress animation (*"Queued in render pipeline..."* -> *"Generating cinematic composition..."*).
+     - In-browser HTML5 `<video>` playback at 24 FPS with ambient soundscape.
+     - Persistent UI badge: *"AI Cinematic Preview (Synthetic)"*.
+     - Failure resilience & retry button verification (`request_hash` released).
+     - Scale-to-zero confirmation (0 active executions, queues drained).
+  4. *Instant Rollback*:
+     - Level 1: `VITE_ENABLE_CINEMATIC_PREVIEW=false` in Vercel (< 1 min).
+     - Level 2: `az containerapp update ... --set-env-vars CINEMATIC_PREVIEW_ENABLED=false` (< 2 mins).
+     - Level 3: `az containerapp job update ... --trigger-type Manual` (< 3 mins).
+- **Status**: **PREPARED — AWAITING SEPARATE OPERATOR AUTHORIZATION**. Both flags strictly remain **disabled**. Zero customer traffic enabled. For full step-by-step commands, see Section 10 of [PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md).
 
 ---
 
