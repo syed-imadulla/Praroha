@@ -958,10 +958,11 @@ npx vercel rollback --yes
      - Max 5 outstanding (queued + processing) cinematic jobs globally (`CINEMATIC_MAX_GLOBAL_OUTSTANDING_RENDERS=5`).
      - Uses atomic database transaction and PostgreSQL advisory transaction locks (`pg_advisory_xact_lock`) + in-process `_dispatch_concurrency_lock` to prevent race conditions under concurrent requests.
      - Returns HTTP 429 with `Retry-After: 60` when capacity is exhausted.
-3. **Spend & Billing Sign-Off [PENDING OPERATOR APPROVAL]**:
+3. **Spend & Billing Sign-Off [RESOLVED & CONFIGURED IN PRODUCTION]**:
    - Azure Cost Management audit confirmed dedicated rendering pilot spend is **₹17.79 INR**, well below the ₹50.00 ceiling.
-   - `az consumption budget list` returns `[]`; no automated Azure Cost Management budget alert is currently configured on this subscription.
-   - **Requirement**: Public-pilot spending ceiling (proposed: ₹100 or ₹200 INR) must be explicitly approved by operator and configured with an alert before public rollout. The verified ₹17.79 internal pilot spend remains strictly separated.
+   - Configured active Azure budget alert `praroha-pilot-budget` on resource group `rg-tendersaathi` with **₹200.00 INR / month** threshold.
+   - Notifications configured at **80% (₹160.00 INR)** and **100% (₹200.00 INR)** to `imadulla.s45@gmail.com`.
+   - Confirmed: Budget alerts serve as an asynchronous monitoring notification, while backend v7.5 quotas provide real-time runtime rate-limiting.
 
 ---
 
@@ -1001,17 +1002,19 @@ npx vercel rollback --yes
 - **Frontend Production Build**: `npm run build` compiled cleanly in 12.44s with Workbox PWA precaching.
 - **Git Tree Cleanliness**: `git diff --check` passed with 0 errors; zero secrets introduced.
 
-### 13.3 Exact Approvals Required Before Live Stage 2 Execution
-Stage 2 public access is **STRICTLY GATED**. Before public access can be activated, the following explicit approvals and actions are required:
+### 13.3 Approvals Status Before Live Public Rollout
+Stage 2 public access is **STRICTLY GATED**. Prior infrastructure approvals have succeeded, while feature activation remains blocked:
 1. **Approval 1 `[PROD-CHANGING]` (Deploy Backend v7.5)**:
-   - Build and deploy backend candidate containing the quota and workload protection code to Azure Container App `praroha-backend`.
+   - **STATUS: COMPLETED & VERIFIED (2026-10-25)**. Backend `tendersaathiacr.azurecr.io/praroha-backend:v7.5` deployed to `praroha-backend` in `rg-tendersaathi`. Health HTTP 200 OK.
 2. **Approval 2 `[PROD-CHANGING]` (Configure Azure Budget & Spending Ceiling)**:
-   - Configure Azure budget alert for public pilot (proposed: ₹100 or ₹200 INR).
+   - **STATUS: COMPLETED & VERIFIED (2026-10-25)**. Configured `praroha-pilot-budget` on `rg-tendersaathi` at ₹200.00 INR/month with 80% and 100% email notifications.
 3. **Approval 3 `[FLAG-ENABLING]` (Backend Public Flag Enablement)**:
-   - Set `CINEMATIC_PREVIEW_PUBLIC_ENABLED=true` on `praroha-backend` Container App.
+   - **STATUS: PENDING SEPARATE OPERATOR APPROVAL (UNEXECUTED)**.
+   - Target command: Set `CINEMATIC_PREVIEW_PUBLIC_ENABLED=true` on `praroha-backend` Container App.
 4. **Approval 4 `[FLAG-ENABLING]` (Frontend Public Flag Enablement)**:
-   - Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel production environment and redeploy frontend.
-5. **Stage 2 Verification**:
+   - **STATUS: PENDING SEPARATE OPERATOR APPROVAL (UNEXECUTED)**.
+   - Target command: Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel production environment and redeploy frontend.
+5. **Stage 2 Verification (When Authorized)**:
    - Run post-rollout smoke test with ordinary non-operator test account to verify public render capability, per-user quota enforcement (HTTP 429 on 3rd render), and frontend UI interactivity.
 
 ### 12.2 Required Configuration Changes (When Authorized)
