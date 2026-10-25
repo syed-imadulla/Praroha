@@ -21,11 +21,14 @@ from backend.app.repositories import project_repo
 def enable_cinematic_preview_for_tests():
     orig_flag = settings.CINEMATIC_PREVIEW_ENABLED
     orig_url = settings.QUEUE_PUBLISH_URL
+    orig_ops = settings.CINEMATIC_OPERATOR_EMAILS
     settings.CINEMATIC_PREVIEW_ENABLED = True
     settings.QUEUE_PUBLISH_URL = "https://stpraroharender.queue.core.windows.net/cinematic-render-jobs?mock-sas"
+    settings.CINEMATIC_OPERATOR_EMAILS = "test@praroha.local"
     yield
     settings.CINEMATIC_PREVIEW_ENABLED = orig_flag
     settings.QUEUE_PUBLISH_URL = orig_url
+    settings.CINEMATIC_OPERATOR_EMAILS = orig_ops
 
 
 @pytest.fixture(autouse=True)

@@ -151,3 +151,44 @@ async def require_admin_user(
             detail="Administrator access required.",
         )
     return current_user
+
+
+def verify_cinematic_preview_access(user: AuthenticatedUser) -> None:
+    """
+    Enforces server-side authorization for cinematic preview rendering.
+
+    Security Contract:
+    1. If CINEMATIC_PREVIEW_PUBLIC_ENABLED is True, any authenticated user can invoke.
+    2. If CINEMATIC_PREVIEW_PUBLIC_ENABLED is False (default / internal testing),
+       access is strictly restricted to operators listed in CINEMATIC_OPERATOR_EMAILS
+       or ADMIN_EMAILS.
+    3. Fails closed: if operator allowlist is empty or user email is missing/unmatched,
+       raises HTTP 403 Forbidden.
+    4. Client-supplied role claims (e.g. role='admin') are NEVER trusted to bypass this check.
+       Authorization strictly requires email verification against server-side configuration.
+    """
+    if getattr(settings, "CINEMATIC_PREVIEW_PUBLIC_ENABLED", False) is True:
+        return
+
+    user_email = (user.email or "").strip().lower()
+    if not user_email or "@" not in user_email:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cinematic preview generation is restricted to authorized operators during internal verification.",
+        )
+
+    allowed_emails = {
+        e.strip().lower()
+        for e in (getattr(settings, "CINEMATIC_OPERATOR_EMAILS", "") or "").split(",")
+        if e.strip() and "@" in e
+    } | {
+        e.strip().lower()
+        for e in (getattr(settings, "ADMIN_EMAILS", "") or "").split(",")
+        if e.strip() and "@" in e
+    }
+
+    if user_email not in allowed_emails:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cinematic preview generation is restricted to authorized operators during internal verification.",
+        )

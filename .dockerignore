@@ -21,3 +21,5 @@ backend/*.db*
 *.db-shm
 *.db-wal
 backend/tests
+.env*
+*.env

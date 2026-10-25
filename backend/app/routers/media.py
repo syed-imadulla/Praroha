@@ -7,7 +7,11 @@ from backend.app.config import settings
 import json
 from pydantic import BaseModel
 
-from backend.app.core.auth import AuthenticatedUser, get_current_user
+from backend.app.core.auth import (
+    AuthenticatedUser,
+    get_current_user,
+    verify_cinematic_preview_access,
+)
 from backend.app.core.response import APIResponse, api_success
 from backend.app.models.job import GenerationJob
 from backend.app.models.media import (
@@ -317,6 +321,7 @@ async def create_cinematic_preview_job(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Cinematic preview generation is currently disabled on this server.",
         )
+    verify_cinematic_preview_access(current_user)
     await verify_project_owner(project_id, current_user.id, dispatcher.repo)
     job = await dispatcher.dispatch_preview_job(project_id, payload)
     return api_success(job)
@@ -339,6 +344,7 @@ async def generate_cinematic_preview(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Cinematic preview generation is currently disabled on this server.",
         )
+    verify_cinematic_preview_access(current_user)
     await verify_project_owner(project_id, current_user.id, dispatcher.repo)
     job = await dispatcher.dispatch_preview_job(project_id, payload)
     return api_success(job)
