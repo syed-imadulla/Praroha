@@ -944,17 +944,75 @@ npx vercel rollback --yes
 > [!CAUTION]
 > **PREPARATION ONLY — DO NOT EXECUTE**: Public rollout (Stage 2) requires separate approval and resolution of server-side rate-limiting safeguards. The frontend feature flag must remain disabled.
 
-### 12.1 Prerequisites & Blockers to Public Rollout
-1. **Per-User Rate Limiting & Daily Quota [BLOCKER]**:
-   - Currently, deduplication is enforced via `request_hash`, which prevents duplicate identical renders.
-   - However, there is no per-user ceiling on generating *new/different* renders. A malicious or script-driven authenticated user could submit hundreds of distinct parameters, exhausting cloud rendering budget.
-   - *Requirement*: Implement a server-side per-user quota (e.g. max 2 cinematic preview renders per user per 24 hours, and max 1 active render per user concurrently) before setting `CINEMATIC_PREVIEW_PUBLIC_ENABLED=true`.
-2. **Global Concurrency & Worker Queue Limit**:
-   - Azure Container App Job `praroha-render-job` is capped at `maxExecutions: 2`.
-   - If public users enqueue dozens of jobs, queue lag will build up without a queue depth reject threshold.
-   - *Requirement*: Dispatcher should return `HTTP 429 Too Many Requests` or `HTTP 503` if queue depth exceeds a safe buffer (e.g. 5 jobs).
-3. **Spend & Billing Sign-Off**:
-   - Operator sign-off on public pilot ceiling (e.g. ₹100 or ₹200) with an automated spend-alert webhook.
+### 12.1 Prerequisites & Blockers to Public Rollout (Status Update)
+1. **Per-User Rate Limiting & Daily Quota [RESOLVED & TESTED LOCALLY]**:
+   - Implemented server-side atomic per-user quota in `backend/app/services/cinematic_dispatcher.py` and `backend/app/config.py`:
+     - Max 2 accepted cinematic renders per user per rolling 24-hour window (`CINEMATIC_MAX_USER_DAILY_RENDERS=2`).
+     - Max 1 active concurrent cinematic render per user (`CINEMATIC_MAX_USER_ACTIVE_RENDERS=1`).
+     - Returns HTTP 429 with computed `Retry-After` header when daily or active limits are reached.
+     - Preserves duplicate-request idempotency: identical parameters return existing active/completed jobs without quota consumption.
+     - Supersedes prior active renders on the same entity when `force_regenerate=True` is requested.
+     - Verified with 8 dedicated tests in `backend/tests/test_cinematic_quotas_and_safeguards.py`.
+2. **Global Concurrency & Workload Protection [RESOLVED & TESTED LOCALLY]**:
+   - Implemented system-wide capacity limit in `backend/app/services/cinematic_dispatcher.py`:
+     - Max 5 outstanding (queued + processing) cinematic jobs globally (`CINEMATIC_MAX_GLOBAL_OUTSTANDING_RENDERS=5`).
+     - Uses atomic database transaction and PostgreSQL advisory transaction locks (`pg_advisory_xact_lock`) + in-process `_dispatch_concurrency_lock` to prevent race conditions under concurrent requests.
+     - Returns HTTP 429 with `Retry-After: 60` when capacity is exhausted.
+3. **Spend & Billing Sign-Off [PENDING OPERATOR APPROVAL]**:
+   - Azure Cost Management audit confirmed dedicated rendering pilot spend is **₹17.79 INR**, well below the ₹50.00 ceiling.
+   - `az consumption budget list` returns `[]`; no automated Azure Cost Management budget alert is currently configured on this subscription.
+   - **Requirement**: Public-pilot spending ceiling (proposed: ₹100 or ₹200 INR) must be explicitly approved by operator and configured with an alert before public rollout. The verified ₹17.79 internal pilot spend remains strictly separated.
+
+---
+
+## 13. Stage 2 Public Rollout Safeguards Implementation & Local Verification
+
+### 13.1 Safeguards Architecture
+1. **Atomic Per-User Quotas (`backend/app/services/cinematic_dispatcher.py`)**:
+   - User identity resolved strictly from cryptographically validated token (`current_user.id`) via `backend/app/routers/media.py`.
+   - Projects owned by the user are queried atomically in PostgreSQL/SQLite.
+   - Active render limit (1 active): rejects distinct dispatches with `HTTP 429` and `Retry-After: 30`.
+   - Daily render quota (2 renders / 24h): rejects excessive dispatches with `HTTP 429` and calculated `Retry-After` (hours/minutes remaining until oldest accepted job expires).
+   - Duplicate suppression: duplicate identical requests return the existing job (`status in ('queued', 'processing', 'completed')`) with HTTP 202/200 without consuming quota.
+   - Force regeneration: supersedes prior active jobs on the same entity, freeing concurrency while consuming one daily render.
+2. **Global Workload Protection (`_enforce_global_workload_limit`)**:
+   - PostgreSQL-backed query counting outstanding cinematic jobs (`status in ('queued', 'processing')`).
+   - Saturated capacity (>= 5 jobs) triggers `HTTP 429` with `Retry-After: 60`.
+   - Serialization: dual-layer locking using in-process `asyncio.Lock` and PostgreSQL transaction advisory lock `pg_advisory_xact_lock`.
+3. **Structured Secret-Free Telemetry**:
+   - Standardized log events: `event=request_accepted`, `event=request_rejected`, `event=job_enqueued`, `event=queue_publish_failed`.
+   - Logs include `job_id`, `user_id`, `project_id`, `duration_sec`, `aspect_ratio`, `fps`, `resolution`.
+   - Zero secrets: all error messages, URLs, and payloads are stripped of credentials and SAS signatures.
+4. **FastAPI HTTP Header Preservation (`backend/app/main.py`)**:
+   - Updated `http_exception_handler` to forward `exc.headers` to `JSONResponse`, ensuring `Retry-After` headers reach clients.
+
+### 13.2 Local Test Evidence
+- **Dedicated Safeguards Suite**: `backend/tests/test_cinematic_quotas_and_safeguards.py` (8/8 passed in 1.16s).
+  - Proves ordinary owner rejection when public mode is false (403).
+  - Proves unauthenticated (401) and non-owner (404) rejection.
+  - Proves user concurrency limit enforcement (429).
+  - Proves rolling 24-hour quota enforcement with accurate `Retry-After` calculation.
+  - Proves global capacity limit enforcement (429).
+  - Proves duplicate-request idempotency without quota penalty.
+  - Proves race-safe atomic concurrency under `asyncio.gather` (1 succeeds, competitors receive 429).
+  - Proves normal non-cinematic features (soundscape library, composition) are completely unaffected.
+- **Cinematic Test Battery**: 130/130 passed across all 13 cinematic test files in 18.3s.
+- **Full Backend Suite**: 362 passed, 2 skipped, 0 failures in 43.9s (`pytest backend/tests/`).
+- **Frontend Production Build**: `npm run build` compiled cleanly in 12.44s with Workbox PWA precaching.
+- **Git Tree Cleanliness**: `git diff --check` passed with 0 errors; zero secrets introduced.
+
+### 13.3 Exact Approvals Required Before Live Stage 2 Execution
+Stage 2 public access is **STRICTLY GATED**. Before public access can be activated, the following explicit approvals and actions are required:
+1. **Approval 1 `[PROD-CHANGING]` (Deploy Backend v7.5)**:
+   - Build and deploy backend candidate containing the quota and workload protection code to Azure Container App `praroha-backend`.
+2. **Approval 2 `[PROD-CHANGING]` (Configure Azure Budget & Spending Ceiling)**:
+   - Configure Azure budget alert for public pilot (proposed: ₹100 or ₹200 INR).
+3. **Approval 3 `[FLAG-ENABLING]` (Backend Public Flag Enablement)**:
+   - Set `CINEMATIC_PREVIEW_PUBLIC_ENABLED=true` on `praroha-backend` Container App.
+4. **Approval 4 `[FLAG-ENABLING]` (Frontend Public Flag Enablement)**:
+   - Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel production environment and redeploy frontend.
+5. **Stage 2 Verification**:
+   - Run post-rollout smoke test with ordinary non-operator test account to verify public render capability, per-user quota enforcement (HTTP 429 on 3rd render), and frontend UI interactivity.
 
 ### 12.2 Required Configuration Changes (When Authorized)
 - **Backend**:

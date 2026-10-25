@@ -42,11 +42,20 @@ def event_loop():
 async def initialize_test_db():
     from backend.app.main import app
     from backend.app.core.auth import get_current_user, AuthenticatedUser
+    from sqlmodel import text
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         id="test-default-user",
         email="test@praroha.local",
     )
     await project_repo.init_db()
+    async with project_repo.async_session() as session:
+        try:
+            await session.execute(text("DELETE FROM render_outbox"))
+            await session.execute(text("DELETE FROM media_assets"))
+            await session.execute(text("DELETE FROM generation_jobs"))
+            await session.commit()
+        except Exception:
+            await session.rollback()
 
 
 @pytest_asyncio.fixture

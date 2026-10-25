@@ -24,23 +24,28 @@ import logging
 import os
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Tuple
 from urllib.parse import urlparse
 from pydantic import BaseModel, Field
 
 import httpx  # retained for backward compatibility with legacy test patches
 from fastapi import HTTPException
+from sqlalchemy import func, or_, select, text
 from sqlalchemy.exc import IntegrityError
 
 from backend.app.config import settings
 from backend.app.models.job import GenerationJob
 from backend.app.models.media import MediaAssetRecord, MediaJobResponse
 from backend.app.models.outbox import RenderOutbox, assert_no_secrets_in_payload
+from backend.app.models.project import Project
 from backend.app.repositories.project_repo import ProjectRepository, async_session
 from backend.app.services.queue_contract import validate_queue_message_dict
 
 logger = logging.getLogger("seed_unfold.cinematic_dispatcher")
+
+# In-process concurrency lock to serialize concurrent check-and-insert blocks
+_dispatch_concurrency_lock = asyncio.Lock()
 
 
 def get_utc_now() -> datetime:
@@ -175,10 +180,151 @@ class CinematicDispatcherService:
         except Exception as exc:
             return False, str(exc)
 
+    async def _enforce_global_workload_limit(self, project_id: str, user_id: str) -> None:
+        """
+        Enforce system-wide limit on concurrent/queued cinematic renders (default 5).
+        Prevents Azure Queue and Container App worker pool exhaustion.
+        """
+        max_global = getattr(settings, "CINEMATIC_MAX_GLOBAL_OUTSTANDING_RENDERS", 5)
+        now = get_utc_now()
+        stmt = (
+            select(func.count(MediaAssetRecord.id))
+            .where(
+                MediaAssetRecord.media_type == "video",
+                MediaAssetRecord.provider_name == "Cinematic Preview",
+                MediaAssetRecord.status.in_(["queued", "processing"]),
+                MediaAssetRecord.created_at >= now - timedelta(hours=2),
+            )
+        )
+        res = await self.repo.session.execute(stmt)
+        active_count = res.scalar() or 0
+
+        if active_count >= max_global:
+            logger.warning(
+                "cinematic_telemetry event=request_rejected reason=global_capacity_reached "
+                "user_id=%s project_id=%s active_jobs=%d max_allowed=%d",
+                user_id,
+                project_id,
+                active_count,
+                max_global,
+            )
+            raise HTTPException(
+                status_code=429,
+                detail=f"Global cinematic rendering capacity reached ({max_global} active jobs). Please try again shortly.",
+                headers={"Retry-After": "60"},
+            )
+
+    async def _enforce_user_quota_limits(self, project_id: str, user_id: str) -> None:
+        """
+        Enforce atomic per-user quotas:
+        1. Maximum 1 active render per user.
+        2. Maximum 2 accepted renders per user in rolling 24 hours.
+        """
+        max_active = getattr(settings, "CINEMATIC_MAX_USER_ACTIVE_RENDERS", 1)
+        max_daily = getattr(settings, "CINEMATIC_MAX_USER_DAILY_RENDERS", 2)
+        window_hours = getattr(settings, "CINEMATIC_USER_DAILY_WINDOW_HOURS", 24)
+        now = get_utc_now()
+
+        # Match projects owned by this user, or current project if owner_id is unassigned
+        if user_id:
+            user_filter = or_(Project.owner_id == user_id, (Project.owner_id.is_(None) & (Project.id == project_id)))
+        else:
+            user_filter = (Project.id == project_id)
+
+        # 1. Active renders check
+        active_stmt = (
+            select(func.count(MediaAssetRecord.id))
+            .join(Project, MediaAssetRecord.project_id == Project.id)
+            .where(
+                user_filter,
+                MediaAssetRecord.media_type == "video",
+                MediaAssetRecord.provider_name == "Cinematic Preview",
+                MediaAssetRecord.status.in_(["queued", "processing"]),
+                MediaAssetRecord.created_at >= now - timedelta(hours=2),
+            )
+        )
+        active_res = await self.repo.session.execute(active_stmt)
+        active_count = active_res.scalar() or 0
+
+        if active_count >= max_active:
+            logger.warning(
+                "cinematic_telemetry event=request_rejected reason=user_active_limit_exceeded "
+                "user_id=%s project_id=%s active_count=%d max_allowed=%d",
+                user_id,
+                project_id,
+                active_count,
+                max_active,
+            )
+            raise HTTPException(
+                status_code=429,
+                detail="User concurrency limit reached: you already have an active cinematic render job in progress. Please wait for it to complete.",
+                headers={"Retry-After": "30"},
+            )
+
+        # 2. Rolling 24-hour accepted renders check
+        window_start = now - timedelta(hours=window_hours)
+        daily_stmt = (
+            select(func.count(MediaAssetRecord.id))
+            .join(Project, MediaAssetRecord.project_id == Project.id)
+            .where(
+                user_filter,
+                MediaAssetRecord.media_type == "video",
+                MediaAssetRecord.provider_name == "Cinematic Preview",
+                MediaAssetRecord.status.in_(["queued", "processing", "completed"]),
+                MediaAssetRecord.created_at >= window_start,
+            )
+        )
+        daily_res = await self.repo.session.execute(daily_stmt)
+        daily_count = daily_res.scalar() or 0
+
+        if daily_count >= max_daily:
+            earliest_stmt = (
+                select(MediaAssetRecord.created_at)
+                .join(Project, MediaAssetRecord.project_id == Project.id)
+                .where(
+                    user_filter,
+                    MediaAssetRecord.media_type == "video",
+                    MediaAssetRecord.provider_name == "Cinematic Preview",
+                    MediaAssetRecord.status.in_(["queued", "processing", "completed"]),
+                    MediaAssetRecord.created_at >= window_start,
+                )
+                .order_by(MediaAssetRecord.created_at.asc())
+                .limit(1)
+            )
+            earliest_res = await self.repo.session.execute(earliest_stmt)
+            earliest_dt = earliest_res.scalars().first()
+            retry_sec = 3600 * window_hours
+            if earliest_dt:
+                if earliest_dt.tzinfo is None:
+                    earliest_dt = earliest_dt.replace(tzinfo=timezone.utc)
+                elapsed = (now - earliest_dt).total_seconds()
+                remaining = (window_hours * 3600) - elapsed
+                retry_sec = max(1, int(remaining))
+
+            hours = retry_sec // 3600
+            minutes = (retry_sec % 3600) // 60
+            time_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+
+            logger.warning(
+                "cinematic_telemetry event=request_rejected reason=user_daily_quota_exceeded "
+                "user_id=%s project_id=%s daily_count=%d max_allowed=%d retry_after_sec=%d",
+                user_id,
+                project_id,
+                daily_count,
+                max_daily,
+                retry_sec,
+            )
+            raise HTTPException(
+                status_code=429,
+                detail=f"Daily cinematic render quota exceeded: maximum {max_daily} renders per {window_hours}-hour window. Please try again in approximately {time_str}.",
+                headers={"Retry-After": str(retry_sec)},
+            )
+
     async def dispatch_preview_job(
         self,
         project_id: str,
         request: CinematicPreviewJobRequest,
+        user_id: Optional[str] = None,
     ) -> MediaJobResponse:
         """
         Validate request, commit GenerationJob and RenderOutbox atomically,
@@ -221,6 +367,18 @@ class CinematicDispatcherService:
         project = await self.repo.get_project(project_id)
         if not project:
             raise HTTPException(status_code=404, detail="Project not found.")
+
+        # 2.1 Resolve caller identity and enforce project ownership
+        effective_user_id = user_id or project.owner_id or "anonymous"
+        if user_id and project.owner_id and user_id != project.owner_id:
+            logger.warning(
+                "cinematic_telemetry event=request_rejected reason=project_ownership_mismatch "
+                "user_id=%s project_owner_id=%s project_id=%s",
+                user_id,
+                project.owner_id,
+                project_id,
+            )
+            raise HTTPException(status_code=403, detail="Not authorized to dispatch renders for this project.")
 
         # 3. Resolve and validate essential entity context
         resolved_title = request.title
@@ -299,7 +457,14 @@ class CinematicDispatcherService:
         )
 
         if request.force_regenerate:
-            from sqlalchemy import text
+            # Supersede prior active renders on the same entity to avoid orphaned work and allow clean regeneration
+            await self.repo.session.execute(
+                text(
+                    "UPDATE media_assets SET status = 'failed', error_message = 'Superseded by force regeneration', request_hash = NULL "
+                    "WHERE project_id = :project_id AND entity_id = :entity_id AND status IN ('queued', 'processing')"
+                ),
+                {"project_id": project_id, "entity_id": request.entity_id},
+            )
             await self.repo.session.execute(
                 text("UPDATE media_assets SET request_hash = NULL WHERE project_id = :project_id AND request_hash = :request_hash"),
                 {"project_id": project_id, "request_hash": req_hash},
@@ -371,7 +536,7 @@ class CinematicDispatcherService:
         # Validate strictly against canonical schema and worker validator
         validate_queue_message_dict(queue_payload)
 
-        # 7. Step A: Atomic Database Transaction
+        # 7. Step A: Atomic Quota & Capacity Verification + Database Transaction
         # Persist MediaAssetRecord, GenerationJob, and RenderOutbox together in one commit.
         asset_record = MediaAssetRecord(
             id=job_id,
@@ -406,28 +571,88 @@ class CinematicDispatcherService:
             attempt_count=0,
         )
 
-        try:
-            self.repo.session.add(asset_record)
-            self.repo.session.add(job_record)
-            self.repo.session.add(outbox_record)
-            await self.repo.session.commit()
-            await self.repo.session.refresh(asset_record)
-            await self.repo.session.refresh(job_record)
-            await self.repo.session.refresh(outbox_record)
-        except IntegrityError:
-            await self.repo.session.rollback()
-            existing = await self.repo.find_media_asset_by_hash(project_id, req_hash)
-            if existing:
-                return MediaJobResponse(
-                    job_id=existing.id,
-                    status=existing.status,
-                    media_type="video",
-                    entity_type=existing.entity_type,
-                    entity_id=existing.entity_id,
-                    asset_url=existing.asset_url,
-                    error_message=existing.error_message,
+        async with _dispatch_concurrency_lock:
+            # 7.1 Acquire PostgreSQL advisory transaction locks if running on PostgreSQL
+            is_postgres = False
+            try:
+                bind = self.repo.session.bind
+                if bind and bind.dialect.name == "postgresql":
+                    is_postgres = True
+            except Exception:
+                pass
+
+            if is_postgres:
+                await self.repo.session.execute(text("SELECT pg_advisory_xact_lock(hashtext('cinematic_global_workload_lock'))"))
+                await self.repo.session.execute(
+                    text("SELECT pg_advisory_xact_lock(hashtext(:user_lock_key))"),
+                    {"user_lock_key": f"cinematic_user_quota_lock:{effective_user_id}"},
                 )
-            raise
+
+            # 7.2 Re-check deduplication inside lock in case a concurrent request just committed
+            if not request.force_regenerate:
+                concurrent_existing = await self.repo.find_media_asset_by_hash(project_id, req_hash)
+                if concurrent_existing:
+                    if concurrent_existing.status in ("completed", "queued", "processing"):
+                        logger.info(
+                            "cinematic_telemetry event=deduplication_hit job_id=%s status=%s user_id=%s project_id=%s",
+                            concurrent_existing.id,
+                            concurrent_existing.status,
+                            effective_user_id,
+                            project_id,
+                        )
+                        return MediaJobResponse(
+                            job_id=concurrent_existing.id,
+                            status=concurrent_existing.status,
+                            media_type="video",
+                            entity_type=concurrent_existing.entity_type,
+                            entity_id=concurrent_existing.entity_id,
+                            asset_url=concurrent_existing.asset_url,
+                            error_message=concurrent_existing.error_message,
+                        )
+
+            # 7.3 Global capacity check (max 5 active/queued renders across system)
+            await self._enforce_global_workload_limit(project_id=project_id, user_id=effective_user_id)
+
+            # 7.4 Per-user concurrency (max 1 active) and rolling 24h daily quota (max 2 accepted)
+            await self._enforce_user_quota_limits(project_id=project_id, user_id=effective_user_id)
+
+            # 7.5 Persist records atomically in database
+            try:
+                self.repo.session.add(asset_record)
+                self.repo.session.add(job_record)
+                self.repo.session.add(outbox_record)
+                await self.repo.session.commit()
+                await self.repo.session.refresh(asset_record)
+                await self.repo.session.refresh(job_record)
+                await self.repo.session.refresh(outbox_record)
+            except IntegrityError:
+                await self.repo.session.rollback()
+                existing = await self.repo.find_media_asset_by_hash(project_id, req_hash)
+                if existing:
+                    return MediaJobResponse(
+                        job_id=existing.id,
+                        status=existing.status,
+                        media_type="video",
+                        entity_type=existing.entity_type,
+                        entity_id=existing.entity_id,
+                        asset_url=existing.asset_url,
+                        error_message=existing.error_message,
+                    )
+                raise
+
+        # Telemetry: Request Accepted
+        logger.info(
+            "cinematic_telemetry event=request_accepted job_id=%s user_id=%s project_id=%s "
+            "duration_sec=%d aspect_ratio=%s fps=%d resolution=%s motion_preset=%s",
+            job_id,
+            effective_user_id,
+            project_id,
+            dur,
+            ar,
+            fps_val,
+            res_val,
+            mp_val,
+        )
 
         # 8. Step B: Publish to Azure Storage Queue (Outside Database Transaction)
         safe_url = sanitize_queue_url(self.queue_publish_url)
@@ -443,7 +668,12 @@ class CinematicDispatcherService:
                 status="published",
                 published_at=published_at,
             )
-            logger.info("Successfully published job %s to queue. Outbox marked published.", job_id)
+            logger.info(
+                "cinematic_telemetry event=job_enqueued job_id=%s user_id=%s project_id=%s status=queued",
+                job_id,
+                effective_user_id,
+                project_id,
+            )
 
             return MediaJobResponse(
                 job_id=job_id,
@@ -457,8 +687,10 @@ class CinematicDispatcherService:
         else:
             sanitized_err = sanitize_error_message(publish_err)
             logger.error(
-                "Failed to enqueue job %s to Azure Queue: %s. Preserving outbox record in pending status.",
+                "cinematic_telemetry event=queue_publish_failed job_id=%s user_id=%s project_id=%s error=%s",
                 job_id,
+                effective_user_id,
+                project_id,
                 sanitized_err,
             )
             await self.repo.update_render_outbox_status(

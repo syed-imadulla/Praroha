@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     CINEMATIC_PREVIEW_ENABLED: bool = False  # Master server-side guard against cinematic preview generation
     CINEMATIC_PREVIEW_PUBLIC_ENABLED: bool = False  # Gate for public/general user access; when False, internal operator only
     CINEMATIC_OPERATOR_EMAILS: str = ""  # Comma-separated list of authorized operator emails for internal preview
+    CINEMATIC_MAX_USER_DAILY_RENDERS: int = 2  # Maximum accepted cinematic renders per user in rolling window
+    CINEMATIC_MAX_USER_ACTIVE_RENDERS: int = 1  # Maximum active/concurrent renders per user
+    CINEMATIC_MAX_GLOBAL_OUTSTANDING_RENDERS: int = 5  # Maximum outstanding (queued + processing) renders globally
+    CINEMATIC_USER_DAILY_WINDOW_HOURS: int = 24  # Rolling window size in hours for daily render quota
     AI_PROVIDER: str = "mock"  # options: mock, gemini
     STORAGE_PROVIDER: str = "local"  # options: local, supabase
     DATABASE_URL: str = "sqlite+aiosqlite:///./seed_unfold.db"

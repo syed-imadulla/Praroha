@@ -97,14 +97,23 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Outbox record `91a0ccfb-81ac-48a1-84df-74b9fee343dc` transitioned to `published`.
       - Worker execution `praroha-render-job-v4dk6` completed in 41.0s with status `Succeeded`. Queues drained cleanly (`cinematic-render-jobs: 0`, `cinematic-render-poison: 0`), and worker scaled to 0.
       - Output MP4 asset uploaded to Supabase storage (`112,893` bytes, H.264 1280x720 24fps + AAC, 5.000s duration, playable with honest synthetic labeling). Historical canary asset preserved intact.
-    - Stage 2 Public Rollout Status: **PREPARED — NOT EXECUTED; AWAITING RATE LIMIT IMPLEMENTATION & SEPARATE APPROVAL**. (Server-side per-user quotas and concurrency limits identified as prerequisites before public flag enablement).
+    - Stage 2 Public Rollout Safeguards Hardening (Implemented & Locally Verified 100% Green, 2026-10-25):
+      - Implemented atomic per-user quotas in `backend/app/services/cinematic_dispatcher.py` and `backend/app/config.py`: max 2 accepted renders in rolling 24h window (`CINEMATIC_MAX_USER_DAILY_RENDERS=2`), max 1 active concurrent render (`CINEMATIC_MAX_USER_ACTIVE_RENDERS=1`), with calculated `Retry-After` header.
+      - Implemented global workload protection: max 5 outstanding jobs system-wide (`CINEMATIC_MAX_GLOBAL_OUTSTANDING_RENDERS=5`) with `Retry-After: 60`.
+      - Concurrency atomicity: PostgreSQL transaction advisory lock (`pg_advisory_xact_lock`) + in-process `asyncio.Lock` serialization.
+      - Duplicate suppression & idempotency: duplicate clicks return existing active/completed jobs without quota exhaustion; force regeneration supersedes previous active jobs on the entity cleanly.
+      - FastAPI exception handling fix in `backend/app/main.py`: forwarded `exc.headers` to preserve `Retry-After` on HTTP 429.
+      - Structured secret-free telemetry logging (`event=request_accepted`, `event=request_rejected`, `event=job_enqueued`, `event=queue_publish_failed`).
+      - Dedicated test suite `backend/tests/test_cinematic_quotas_and_safeguards.py` (8/8 passed). Full cinematic test battery passed (130/130 across 13 files).
+      - Strict Production Boundary Maintained: `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false` and `VITE_ENABLE_CINEMATIC_PREVIEW` remain strictly disabled. Zero cloud deployments, zero production DB mutations, zero public access.
+    - Stage 2 Public Rollout Readiness: **SAFEGUARDS HARDENED & LOCALLY VERIFIED; AWAITING DEPLOYMENT AUTHORIZATION & PUBLIC SPENDING CEILING APPROVAL**.
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
   - Frontend: `https://praroha-ai.vercel.app` (Bundle: `/assets/index-1DKbSIsW.js`, Target: `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb`)
   - Backend: `https://praroha-backend.whiteground-dc69e38a.centralindia.azurecontainerapps.io` (`praroha-backend:v7.4`, healthy)
-- **Backend Test Battery**: 354 passed, 2 skipped in 43.2s (`pytest backend/tests`). Includes 13 dedicated internal security gate tests, 9 Phase Gate E resilience tests, 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification.
-- **Frontend Production Bundle & Rehearsal**: Compiled with zero errors (`npm run build --prefix frontend`). PWA v2.0.0 Workbox precaches 33 entries. Local browser rehearsal passed 9/9 scenarios (`node frontend/e2e/test_phase52_cinematic_rehearsal.mjs`).
+- **Backend Test Battery**: 362 passed, 2 skipped in 43.9s (`pytest backend/tests`). Includes 8 dedicated quota/safeguard tests, 13 internal security gate tests, 9 Phase Gate E resilience tests, 21 queue worker tests, 12 production dispatch tests, 9 outbox sweeper tests, 11 canary dispatch CLI tests, and full regression verification.
+- **Frontend Production Bundle & Rehearsal**: Compiled with zero errors (`npm run build --prefix frontend` in 12.4s). PWA v2.0.0 Workbox precaches 33 entries. Local browser rehearsal passed 9/9 scenarios (`node frontend/e2e/test_phase52_cinematic_rehearsal.mjs`).
 - **Production Post-Promotion Smoke Test**: 100% passed on live production domain (8/8 checks in `node frontend/e2e/test_production_post_promotion_smoke.mjs`). Verified AuthScreen landing, guest demo workspace hydration without 401 bounce, disabled cinematic control tooltip, route navigation, deep routing, session persistence, clean sign-out, and zero mutating backend requests.
 - **PWA Installation Audit**: 100% passed on live Vercel domain (`node frontend/e2e/test_phase37_pwa.mjs`). Verified manifest, icons (192px, 512px, maskable), active Service Worker, and offline transparency banner.
 - **Full User Journey E2E**: 100% passed on live cloud stack (`node frontend/e2e/test_phase31_10_journey.mjs`). Verified end-to-end flow with live Gemini AI extraction, divergent 3-world synthesis, EdgeTTS voice generation, concept art and narration, DAG rendering, portable project JSON export, and state reload.

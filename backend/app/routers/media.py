@@ -323,7 +323,7 @@ async def create_cinematic_preview_job(
         )
     verify_cinematic_preview_access(current_user)
     await verify_project_owner(project_id, current_user.id, dispatcher.repo)
-    job = await dispatcher.dispatch_preview_job(project_id, payload)
+    job = await dispatcher.dispatch_preview_job(project_id, payload, user_id=current_user.id)
     return api_success(job)
 
 
@@ -346,6 +346,6 @@ async def generate_cinematic_preview(
         )
     verify_cinematic_preview_access(current_user)
     await verify_project_owner(project_id, current_user.id, dispatcher.repo)
-    job = await dispatcher.dispatch_preview_job(project_id, payload)
+    job = await dispatcher.dispatch_preview_job(project_id, payload, user_id=current_user.id)
     return api_success(job)
 
