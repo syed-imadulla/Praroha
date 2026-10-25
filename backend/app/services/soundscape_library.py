@@ -3,7 +3,7 @@ import math
 import random
 import struct
 import wave
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from pydantic import BaseModel
 
 
