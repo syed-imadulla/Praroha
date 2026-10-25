@@ -114,7 +114,19 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - Worker remains `praroha-worker:v7` with scale-to-zero (0 executions, queues empty: `cinematic-render-jobs: 0`, `cinematic-render-poison: 0`).
       - Rollback target `v7.4` verified in ACR.
       - Public cinematic flags remain strictly disabled: `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`.
-    - Stage 2 Public Rollout Readiness: **BACKEND SAFEGUARDS v7.5 DEPLOYED & BUDGET ALERT ACTIVE; PUBLIC ACCESS REMAINS STRICTLY GATED AWAITING EXPLICIT PUBLIC ROLLOUT AUTHORIZATION**.
+    - Budget Alert Incident Review & Dual Monitoring Remediation (Executed & 100% Verified, 2026-10-25):
+      - Measured October MTD spend in `rg-tendersaathi`: ₹1,231.64 INR (`praroha-backend`: ₹824.66 INR [~₹74.65/day], `tendersaathiacr`: ₹389.14 INR [~₹15.99/day flat ACR Basic tier fee], `tender-saathi-backend`: ₹8.71 INR, `praroha-cinematic-worker`: ₹8.65 INR, `stpraroharender`: ₹0.48 INR). Dedicated rendering spend was only ₹17.84 INR (well within ₹50 pilot ceiling).
+      - Replaced misleading unfiltered ₹200 budget with supported dual-budget architecture:
+        1. `praroha-infrastructure-budget`: ₹3,000.00 INR / month for full `rg-tendersaathi` resource group (covers ~₹2,730 baseline hosting with headroom; alerts at 80% [₹2,400] and 100% [₹3,000] to `imadulla.s45@gmail.com`).
+        2. `praroha-rendering-pilot-budget`: ₹200.00 INR / month filtered strictly to rendering resources (`stpraroharender` storage and `praroha-render-job` compute via `Microsoft.Consumption/budgets` Dimension `ResourceId` filter; alerts at 80% [₹160] and 100% [₹200] to `imadulla.s45@gmail.com`).
+        3. Removed original `praroha-pilot-budget` after verifying both replacements are active.
+      - Safe Cost Review & Invariants:
+        - `tender-saathi-backend` confirmed at 0 active replicas (incurs ₹0.00 active compute burn).
+        - `praroha-cinematic-worker` confirmed at 0 active replicas, ingress `null`, superseded by `praroha-render-job`, kept untouched.
+        - ACR Basic registry and all images (`praroha-backend:v7.5`, `v7.4`, `praroha-worker:v7`) preserved for production and instant rollback.
+        - `praroha-backend` maintained at 0.5 vCPU / 1.0 GiB with `minReplicas: 1` to guarantee zero-cold-start production reliability.
+      - Production Boundaries Maintained: `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false` and `VITE_ENABLE_CINEMATIC_PREVIEW=false` strictly preserved. Zero renders dispatched, zero queue messages sent, zero DB mutations.
+    - Stage 2 Public Rollout Readiness: **BUDGET RECONCILED & INFRASTRUCTURE VERIFIED; PUBLIC ACCESS REMAINS STRICTLY GATED AWAITING EXPLICIT PUBLIC ROLLOUT AUTHORIZATION**.
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
