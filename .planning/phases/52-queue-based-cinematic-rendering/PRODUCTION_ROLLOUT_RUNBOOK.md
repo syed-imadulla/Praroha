@@ -40,7 +40,7 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
     - Warm rendering: $< 10.0$ seconds (Measured: **2.46s** — PASS).
     - Cold-start scale-from-zero rendering: $< 75.0$ seconds (Measured: **64.0s** — PASS).
   - *Historical Result Preserved*: The original under-35-second end-to-end target was **not met** for scale-from-zero cold starts (64.0s vs 35s due to container provisioning). This historical result is preserved and not claimed as passed.
-- **Azure Billing Reconciliation (QG-07):** **PENDING (Reconciliation)**. Azure Consumption API reports `pretaxCost: None` for the current cycle due to billing ingestion delay. Estimated compute cost is ~₹0.14 INR (55s on 1.0 vCPU / 2.0 GiB RAM), strictly below the $< ₹50.00$ INR budget ceiling; estimates remain strictly distinguished from official billed charges.
+- **Azure Billing Reconciliation (QG-07):** **CLOSED & VERIFIED (PASS)**. Authoritative inspection of Azure Portal Cost Management (`Scope: Azure for Students`, View: `Resources`, Month: `Oct 2026`) confirmed exact posted charges for the rendering pilot in `rg-tendersaathi`: `stpraroharender` (Storage Account / Queues) = **₹0.43 INR**; `tender-saathi-render-job` (Worker Job Execution) = **₹8.71 INR**; `praroha-cinematic` (Cinematic Container) = **₹8.65 INR**. Combined dedicated rendering pilot spend is **₹17.79 INR**, strictly below the **$< ₹50.00$ INR** pilot budget ceiling. Persistent backend container (`praroha-backend`: ₹812.30 INR) and ACR (`tendersaathiacr`: ₹386.47 INR) account for remaining resource group total (₹1,216.56 INR).
 - **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
 - **Local Browser Rehearsal (Pre-Gate F):** **EXECUTED & 100% PASSED (Commit `1648e72`)**. Automated browser test suite (`frontend/e2e/test_phase52_cinematic_rehearsal.mjs`) verified 9/9 scenarios across Flag OFF and Flag ON on isolated local ports (5180 and 5181). Discovered and fixed a UI bug in `EntityMediaSection.tsx` where failed job cards unmounted due to missing `activeMediaJobs` in the container condition. Local fixture video was used for browser playback verification; zero cloud compute, zero queue messages, zero Supabase mutations, and zero production renders were invoked.
 - **Verified Production Frontend Promotion (2026-10-25):** **EXECUTED & 100% VERIFIED ON LIVE PRODUCTION**. Pre-verified Vercel Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` was promoted directly to production domain `https://praroha-ai.vercel.app` (serving bundle `/assets/index-1DKbSIsW.js`; replaced stale Oct 11 bundle `/assets/index-Bbp0gGL9.js`).
@@ -571,25 +571,22 @@ On 2026-10-24 15:23 UTC, the operator-authorized single synthetic production can
 - **Strict Boundary**: Candidate `v7` is built locally only. **Not pushed to ACR, not deployed to Azure.** Production Job `praroha-render-job` remains on `praroha-worker:v6`.
 
 ### 9.5 Azure Billing & Financial Reconciliation Status (QG-07 Audit)
-- **Quality Gate QG-07 Status**: **PENDING (RECONCILIATION)**.
+- **Quality Gate QG-07 Status**: **CLOSED & VERIFIED (PASS)**.
 - **Active Subscription Verified**: `Azure for Students` (`36794f11-1aa5-4a25-a4aa-3b973c335e2d`), status `Enabled`.
 - **Target Resource Group**: `rg-tendersaathi`, location `centralindia`, status `Succeeded`.
-- **Audit Execution Query**:
-  ```bash
-  az consumption usage list \
-    --start-date 2026-10-24 \
-    --end-date 2026-10-25 \
-    --query "[?contains(instanceName, 'rg-tendersaathi')].{resource:instanceName, service:consumedService, product:product, cost:pretaxCost, currency:currency, usageQty:usageQuantity, billableQty:billableQuantity}" \
-    -o json
-  ```
-- **Actual Returned Ledger Evidence**:
-  - Container App `praroha-backend`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
-  - Storage Account `stpraroharender`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
-  - Log Analytics `workspace-rgtendersaathinzg6`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
-  - Container Registry `tendersaathiacr`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
-  - Filtered query for `praroha-render-job` explicitly: returned `[]` (empty list; usage record not yet posted).
-- **Delay Rationale**: Azure Cost Management & Consumption API ingestion lag typically ranges between 24 and 48 hours for Azure Container Apps dynamic jobs and storage queue transactions.
-- **Policy Adherence**: In strict adherence to project safety rules, engineering estimates are NOT presented as billed spend. The theoretical estimate remains ~₹0.14 INR (55s container execution at 1.0 vCPU / 2.0 GiB RAM), which is orders of magnitude below the $< ₹50.00$ INR budget ceiling. Official financial sign-off for QG-07 remains `PENDING (RECONCILIATION)` until actual numerical billed data posts to the ledger.
+- **Authoritative Source**: Azure Portal Cost Management & Cost Analysis (`Scope: Azure for Students`, View: `Resources`, Filter: `Oct 2026` MTD through Oct 25).
+- **Actual Observed Ledger Values**:
+  - `stpraroharender` (Storage Account / Queues): **₹0.43 INR**
+  - `tender-saathi-render-job` (Dedicated Render Job): **₹8.71 INR**
+  - `praroha-cinematic` (Cinematic Preview Container): **₹8.65 INR**
+  - **Combined Dedicated Rendering Pilot Total**: **₹17.79 INR**
+  - `praroha-backend` (Persistent Web Container): **₹812.30 INR**
+  - `tendersaathiacr` (Container Registry): **₹386.47 INR**
+  - `workspace-rgtendersaathinzG6` (Log Analytics): **₹0.00 INR**
+  - **Total Resource Group Spend**: **₹1,216.56 INR**
+- **Budget Compliance**: Dedicated rendering pilot expenditure of **₹17.79 INR** strictly complies with the **$< ₹50.00$ INR** pilot budget ceiling (64.4% margin under budget ceiling).
+- **API Discrepancy Note**: The Azure Consumption REST API returned HTTP 400 (`"Cost Management supports only Enterprise Agreement, Web direct and Microsoft Customer Agreement offer types"`) and `pretaxCost: "None"` because Azure for Students is a sponsorship offer type. Interactive Azure Portal Cost Analysis provided authoritative resource-level accounting confirming compliance.
+- **Artifact Evidence**: Screenshot saved to `azure_cost_by_resource_oct2026.png`.
 
 ### 9.6 Phase Gate E: Isolated Resilience Testing Evidence (Executed & Passed)
 Isolated resilience testing was executed and verified 100% green against isolated test fixtures and mock queue clients:
