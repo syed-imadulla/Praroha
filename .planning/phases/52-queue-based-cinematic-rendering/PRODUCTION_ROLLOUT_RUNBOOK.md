@@ -25,39 +25,40 @@ All operations in this runbook are strictly gated and categorized into three exp
 
 ## 2. Authoritative Current Production State
 
-As of the latest verified canary execution (2026-10-24 15:24 UTC):
+As of the verified Stage 1 internal operator canary execution (2026-10-25 18:26 IST / 12:56 UTC):
 
-- **Production backend:** `v7.3` (`tendersaathiacr.azurecr.io/praroha-backend:v7.3`, digest `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`, revision `praroha-backend--latest`, status `Running`, `provisioningState: Succeeded`, healthy on `/api/health`).
+- **Production backend:** `v7.4` (`tendersaathiacr.azurecr.io/praroha-backend:v7.4`, digest `sha256:7722da2f830abfd27c4540e0c10296685c4e2cf02609547087a5786d47f19ff3`, revision `praroha-backend--latest`, status `Running`, `provisioningState: Succeeded`, healthy on `/api/health`).
+- **Backend security configuration:** `CINEMATIC_PREVIEW_ENABLED=true`, `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false`, `CINEMATIC_OPERATOR_EMAILS=imadulla.s45@gmail.com`.
+- **Frontend feature flag:** `VITE_ENABLE_CINEMATIC_PREVIEW` unset/disabled in Vercel production environment.
 - **Queue-publisher environment binding:** **BOUND** (`QUEUE_PUBLISH_URL=secretref:queue-publish-url`).
 - **Database initialization:** Production schema validated via `validate_production_schema()` with **ZERO DDL**. PostgreSQL connection confirmed (`fallback_used: false`). No SQLite fallback, no crash loop, no import errors.
-- **Production `render_outbox`:** exists in Supabase (`public.render_outbox` with 11 columns, 5 constraints, 3 indexes; exactly 1 record present: Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`, status `published`, `published_at: 2026-10-24T15:23:31Z`).
-- **Both cinematic-preview feature flags:** disabled (backend `CINEMATIC_PREVIEW_ENABLED=False` unset/default false; frontend `VITE_ENABLE_CINEMATIC_PREVIEW` unset/falsy).
+- **Production `render_outbox`:** exists in Supabase (`public.render_outbox` with 11 columns, 5 constraints, 3 indexes; exactly 2 records present: Historical Oct 24 Canary `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and Stage 1 Canary `9268bc08-0f3e-44e7-8b28-9cc2b96d6ddc`, both `published`).
 - **Both queues:** empty (`cinematic-render-jobs`: 0 messages, drained by worker; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
 - **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v7` (digest `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`, `ingress: null`, scale-to-zero active with 0 running executions).
-- **Canary:** **EXECUTED ONCE** (Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`). Playable 6.0-second H.264 MP4 stored in Supabase Storage (`124,558` bytes, 1280x720).
-- **Canary Latency Reconciliation (QG-06):** **ACCEPTED BY OPERATOR (REVISED TWO-TIER SLA)**.
-  - *Governing Policy*: The operator has explicitly approved and accepted the revised two-tier latency standard:
-    - Warm rendering: $< 10.0$ seconds (Measured: **2.46s** — PASS).
-    - Cold-start scale-from-zero rendering: $< 75.0$ seconds (Measured: **64.0s** — PASS).
-  - *Historical Result Preserved*: The original under-35-second end-to-end target was **not met** for scale-from-zero cold starts (64.0s vs 35s due to container provisioning). This historical result is preserved and not claimed as passed.
-- **Azure Billing Reconciliation (QG-07):** **CLOSED & VERIFIED (PASS)**. Authoritative inspection of Azure Portal Cost Management (`Scope: Azure for Students`, View: `Resources`, Month: `Oct 2026`) confirmed exact posted charges for the rendering pilot in `rg-tendersaathi`: `stpraroharender` (Storage Account / Queues) = **₹0.43 INR**; `tender-saathi-render-job` (Worker Job Execution) = **₹8.71 INR**; `praroha-cinematic` (Cinematic Container) = **₹8.65 INR**. Combined dedicated rendering pilot spend is **₹17.79 INR**, strictly below the **$< ₹50.00$ INR** pilot budget ceiling. Persistent backend container (`praroha-backend`: ₹812.30 INR) and ACR (`tendersaathiacr`: ₹386.47 INR) account for remaining resource group total (₹1,216.56 INR).
+- **Stage 1 Internal Operator Canary:** **EXECUTED ONCE & 100% SUCCEEDED** (Job ID `9268bc08-0f3e-44e7-8b28-9cc2b96d6ddc`, execution `praroha-render-job-v4dk6`, duration 41s). Playable 5.0-second H.264 MP4 stored in Supabase Storage (`112,893` bytes, 1280x720, 24 fps).
+- **Historical Canary Preserved:** Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f` MP4 artifact (`124,558` bytes) verified 100% intact.
+- **Canary Latency Reconciliation (QG-06):** **ACCEPTED BY OPERATOR (REVISED TWO-TIER SLA)** (Warm render $< 10.0$s; Cold-start $< 75.0$s).
+- **Azure Billing Reconciliation (QG-07):** **CLOSED & VERIFIED (PASS)**. Authoritative inspection of Azure Portal Cost Management confirmed exact posted charges for the rendering pilot in `rg-tendersaathi`: `stpraroharender` = **₹0.43 INR**; `tender-saathi-render-job` = **₹8.71 INR**; `praroha-cinematic` = **₹8.65 INR**. Combined dedicated rendering pilot spend is **₹17.79 INR**, strictly below the **$< ₹50.00$ INR** pilot budget ceiling.
 - **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
-- **Local Browser Rehearsal (Pre-Gate F):** **EXECUTED & 100% PASSED (Commit `1648e72`)**. Automated browser test suite (`frontend/e2e/test_phase52_cinematic_rehearsal.mjs`) verified 9/9 scenarios across Flag OFF and Flag ON on isolated local ports (5180 and 5181). Discovered and fixed a UI bug in `EntityMediaSection.tsx` where failed job cards unmounted due to missing `activeMediaJobs` in the container condition. Local fixture video was used for browser playback verification; zero cloud compute, zero queue messages, zero Supabase mutations, and zero production renders were invoked.
-- **Verified Production Frontend Promotion (2026-10-25):** **EXECUTED & 100% VERIFIED ON LIVE PRODUCTION**. Pre-verified Vercel Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` was promoted directly to production domain `https://praroha-ai.vercel.app` (serving bundle `/assets/index-1DKbSIsW.js`; replaced stale Oct 11 bundle `/assets/index-Bbp0gGL9.js`).
-- **Live Guest/Demo Workspace Flow:** Verified on production without 401 bounce. The canonical universe (`The Sunken City: Bio-City`) hydrates cleanly, `sessionStorage.praroha_guest_session` persists across navigation and deep linking, and sign-out cleans up state.
+- **Local Browser Rehearsal (Pre-Gate F):** **EXECUTED & 100% PASSED (Commit `1648e72`)**. Automated browser test suite (`frontend/e2e/test_phase52_cinematic_rehearsal.mjs`) verified 9/9 scenarios across Flag OFF and Flag ON on isolated local ports (5180 and 5181). Discovered and fixed a UI bug in `EntityMediaSection.tsx`.
+- **Verified Production Frontend Promotion (2026-10-25):** **EXECUTED & 100% VERIFIED ON LIVE PRODUCTION**. Pre-verified Vercel Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` was promoted directly to production domain `https://praroha-ai.vercel.app` (serving bundle `/assets/index-1DKbSIsW.js`).
+- **Live Guest/Demo Workspace Flow:** Verified on production without 401 bounce.
 - **Disabled Cinematic Control on Production:** Verified in live browser. The control renders `Cinematic Preview (Disabled)` with tooltip *"Cinematic preview generation is currently disabled awaiting release approval."* Exactly 0 render dispatches are issued on click attempts.
-- **Production Smoke Test Suite:** Automated read-only Playwright audit (`frontend/e2e/test_production_post_promotion_smoke.mjs`) passed 8/8 checks with zero mutating backend requests (29 intercepted, 0 aborted mutations).
-- **Backend & Worker Invariants:** Azure Container App `praroha-backend` remains on `v7.3` (`/api/health` 200 OK), ACA Job `praroha-render-job` remains on `v7`, worker executions remain at 0 (scale-to-zero active), and storage queues `cinematic-render-jobs` and `cinematic-render-poison` both have 0 messages.
-- **Strict Separation of Concerns:** **Frontend Hotfix Deployment COMPLETED**; **Cinematic Feature Enablement (Phase Gate F) NOT AUTHORIZED**. Both feature flags (`CINEMATIC_PREVIEW_ENABLED=False`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`) remain strictly disabled. Phase Gate F remains `PREPARED — NOT EXECUTED`.
+- **Security & Authorization Gate:** Ordinary authenticated users receive `HTTP 403 Forbidden`; cross-project operator calls receive `HTTP 404 Not Found`; public access fails closed.
+- **Stage 2 Public Rollout Status:** **PREPARED — NOT EXECUTED; AWAITING RATE LIMIT IMPLEMENTATION & SEPARATE APPROVAL**.
 
 | Component | Target Resource | Live Audited State | Status |
 | :--- | :--- | :--- | :--- |
-| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` present; 1 row (`published`). `generation_jobs` & `media_assets` canary rows marked `completed`. | **MIGRATED & AUDITED** (Phase Gate A Complete) |
-| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.3`. Digest: `sha256:74c0f103d0894ac931675c99dafdb273414af0c04cd781ed8675ba2ac44b0e1f`. Revision: `praroha-backend--latest` (`Running`, `Healthy`). | **DEPLOYED & HEALTHY** (Phase Gate B & C Complete) |
-| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
-| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Image: `tendersaathiacr.azurecr.io/praroha-worker:v7`. Digest: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`. Scale-to-zero active (0 active executions). | **DEPLOYED & VERIFIED** |
+| **Supabase DB Schema** | `stxnxkzaftmwcbtvgzbm.supabase.co` | `public.render_outbox` present; 2 rows (`published`). Canary rows marked `completed`. | **MIGRATED & AUDITED** |
+| **Backend Container** | `praroha-backend` (in `env-tendersaathi`) | Image: `tendersaathiacr.azurecr.io/praroha-backend:v7.4`. Status: `Running`, `Healthy` (HTTP 200). | **DEPLOYED & HEALTHY** |
+| **Backend Security Gate**| `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=true`, `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false`, `CINEMATIC_OPERATOR_EMAILS=imadulla.s45@gmail.com`. | **VERIFIED & ENFORCED** |
+| **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** |
+| **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Image: `tendersaathiacr.azurecr.io/praroha-worker:v7`. Scale-to-zero active (0 active executions). | **DEPLOYED & VERIFIED** |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (drained by worker).<br>`cinematic-render-poison`: 0 messages. | Clean queue baseline verified |
-| **Frontend Production App**| `https://praroha-ai.vercel.app` | Deployment: `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb`. Bundle: `/assets/index-1DKbSIsW.js`. Guest demo workspace functional; 401 bounces eliminated. | **PROMOTED & VERIFIED** (Production Hotfix) |
+| **Frontend Production App**| `https://praroha-ai.vercel.app` | Deployment: `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb`. Bundle: `/assets/index-1DKbSIsW.js`. Guest demo workspace functional. | **PROMOTED & VERIFIED** |
+| **Frontend Feature Flag** | Production bundle & Vercel env | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). Render control renders `Cinematic Preview (Disabled)`. | Verified disabled in production |
+| **Stage 1 Verification** | Live stack & Operator Account | 403 rejection on ordinary user, 404 on non-owned project, 1 canary rendered and verified (113 KB MP4, 720p 24fps). | **100% PASSED** (Stage 1 Complete) |
+| **Stage 2 Rollout** | Public access | Requires per-user rate limit & quota; public flag remains false. | **PREPARED — NOT EXECUTED** |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
 | **Frontend Feature Flag** | Production bundle & Vercel env | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). Render control renders `Cinematic Preview (Disabled)` with 0 dispatches. | Verified disabled in production |
 | **Production Smoke Test** | `https://praroha-ai.vercel.app` | 8/8 passed in `test_production_post_promotion_smoke.mjs`. 0 mutating backend requests attempted. | **100% PASSED** (Post-Promotion Smoke) |
@@ -874,11 +875,11 @@ Following operator authorization, the pre-verified Vercel Preview deployment was
 | 8 | **Backend Mutation Isolation Audit** | 29 HTTP requests intercepted; exactly 0 mutating requests (POST/PUT/PATCH/DELETE) attempted or executed | **PASS** |
 
 #### 3. Cloud Backend Invariants Verified
-- **Backend Container**: `praroha-backend` running image `tendersaathiacr.azurecr.io/praroha-backend:v7.3`; `/api/health` returns HTTP 200 (`status: "healthy"`).
+- **Backend Container**: `praroha-backend` running image `tendersaathiacr.azurecr.io/praroha-backend:v7.4`; `/api/health` returns HTTP 200 (`status: "healthy"`).
 - **Worker Job**: `praroha-render-job` running image `tendersaathiacr.azurecr.io/praroha-worker:v7`; scale-to-zero active with **0 running executions**.
 - **Storage Queues**: `cinematic-render-jobs` has **0 messages** (`[]`); `cinematic-render-poison` has **0 messages** (`[]`).
-- **Feature Flags**: Both flags remain strictly disabled: `CINEMATIC_PREVIEW_ENABLED=False`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`.
-- **Quality Gate QG-07**: Status remains strictly `PENDING (RECONCILIATION)` awaiting official billed charges from Azure Consumption API.
+- **Feature Flags**: `CINEMATIC_PREVIEW_ENABLED=true` (operator mode), `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false` (public access disabled), `VITE_ENABLE_CINEMATIC_PREVIEW=false` (frontend disabled).
+- **Quality Gate QG-07**: Status is **CLOSED & VERIFIED (PASS)** against official Azure Cost Management resource records (₹17.79 total pilot spend < ₹50.00 ceiling).
 
 #### 4. Documented Rollback Command
 If immediate rollback is required, re-alias the previous deployment (`0216121`):
@@ -891,3 +892,104 @@ npx vercel rollback --yes
 #### 5. Authoritative Boundary Statement
 **Frontend hotfix deployment is COMPLETED and VERIFIED.**
 **Phase Gate F (Cinematic Feature Enablement) is NOT AUTHORIZED and remains PREPARED — NOT EXECUTED.**
+
+---
+
+## 11. Backend v7.4 Security Release & Stage 1 Internal Operator Verification (2026-10-25)
+
+### 11.1 Security Implementation Details (v7.4)
+- **Problem Solved**: Enabling `CINEMATIC_PREVIEW_ENABLED=true` on the backend without public frontend release exposed an authorization gap where arbitrary authenticated users could invoke `POST /api/projects/{project_id}/media/cinematic-preview/jobs` directly.
+- **Remediation**: Implemented `verify_cinematic_preview_access(current_user)` in `backend/app/core/auth.py` and applied across all dispatch routes and aliases in `backend/app/routers/media.py`.
+- **Fail-Closed Operator Allowlist**: Requires `current_user.email` to match server-configured `CINEMATIC_OPERATOR_EMAILS` or `ADMIN_EMAILS` when `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false`. Client-supplied role claims (e.g. `role='admin'`) are strictly untrusted.
+- **Candidate Image**: `tendersaathiacr.azurecr.io/praroha-backend:v7.4` (digest `sha256:7722da2f830abfd27c4540e0c10296685c4e2cf02609547087a5786d47f19ff3`).
+
+### 11.2 Negative Security Audit & Ordinary User 403 Rejection
+- **Caller**: Authenticated non-operator user (`test@example.com` via verified Supabase JWT).
+- **Target**: `POST /api/projects/25e15040-73e6-47e5-b030-d95598e17292/media/cinematic-preview/jobs`.
+- **Live HTTP Response**: `HTTP 403 Forbidden`.
+- **Error Body**: `{"code": "HTTP_403", "message": "Cinematic preview generation is restricted to authorized operators during internal verification."}`.
+- **Side Effects**: Exactly 0 outbox rows created, 0 queue messages published.
+
+### 11.3 Operator Project Ownership Isolation (404 Rejection)
+- **Caller**: Authorized operator (`imadulla.s45@gmail.com`).
+- **Target**: `POST /api/projects/25e15040-73e6-47e5-b030-d95598e17292/media/cinematic-preview/jobs` (canonical project not owned by operator).
+- **Live HTTP Response**: `HTTP 404 Not Found` (`Project with ID '25e15040-73e6-47e5-b030-d95598e17292' not found.`).
+- **Side Effects**: Exactly 0 outbox rows created, 0 queue messages published.
+
+### 11.4 Authorized Stage 1 Canary Execution & Telemetry
+- **Authorization**: User explicitly authorized Stage 1 execution in operator-only mode with operator email `imadulla.s45@gmail.com`.
+- **Operator Project**: `c49858cd-8304-44de-8804-45f8b85790b9` ("Internal Operator Canary World", owned by operator UUID `918f7eed-9ecf-4676-9e98-0fb181420965`).
+- **Dispatched Job ID**: `9268bc08-0f3e-44e7-8b28-9cc2b96d6ddc`.
+- **Dispatch API Response**: `HTTP 202 Accepted` in 6.67s.
+- **Transactional Outbox Record**: `91a0ccfb-81ac-48a1-84df-74b9fee343dc` (created `12:55:25 UTC`, published `12:55:28 UTC`).
+- **Worker Execution**: `praroha-render-job-v4dk6` (Image: `praroha-worker:v7`).
+  - Started: `2026-10-25T12:55:35Z`
+  - Ended: `2026-10-25T12:56:16Z`
+  - Duration: **41.0 seconds**
+  - Exit Status: **`Succeeded`**
+- **Queue Draining**: `cinematic-render-jobs` drained to 0 messages; `cinematic-render-poison` remained at 0 messages.
+- **Worker Scale-to-Zero**: Worker job terminated execution pod and scaled to 0 active instances.
+
+### 11.5 Output Asset Integrity & Preservation
+- **Rendered Output URL**: `https://stxnxkzaftmwcbtvgzbm.supabase.co/storage/v1/object/public/seed-unfold-assets/projects/c49858cd-8304-44de-8804-45f8b85790b9/media/video/world-canary-01_1792932965.mp4`
+- **Asset Size & Type**: 112,893 bytes, `video/mp4`, HTTP 200 OK.
+- **ffprobe Verification**: H.264 video (1280x720, 24 fps) + AAC audio, duration exactly 5.000s.
+- **Synthetic Metadata**: `metadata_json` contains `is_synthetic: true`, `provider_label: "Cinematic Preview"`, `render_engine: "native-ffmpeg-worker"`.
+- **Historical Asset Preservation**: October 24 Canary (`0d9c2349-6eed-4686-b148-5f8f5d84c17f`, 124,558 bytes) verified 100% intact.
+
+---
+
+## 12. Stage 2 Public Rollout Readiness & Pre-Execution Specification (Unexecuted)
+
+> [!CAUTION]
+> **PREPARATION ONLY — DO NOT EXECUTE**: Public rollout (Stage 2) requires separate approval and resolution of server-side rate-limiting safeguards. The frontend feature flag must remain disabled.
+
+### 12.1 Prerequisites & Blockers to Public Rollout
+1. **Per-User Rate Limiting & Daily Quota [BLOCKER]**:
+   - Currently, deduplication is enforced via `request_hash`, which prevents duplicate identical renders.
+   - However, there is no per-user ceiling on generating *new/different* renders. A malicious or script-driven authenticated user could submit hundreds of distinct parameters, exhausting cloud rendering budget.
+   - *Requirement*: Implement a server-side per-user quota (e.g. max 2 cinematic preview renders per user per 24 hours, and max 1 active render per user concurrently) before setting `CINEMATIC_PREVIEW_PUBLIC_ENABLED=true`.
+2. **Global Concurrency & Worker Queue Limit**:
+   - Azure Container App Job `praroha-render-job` is capped at `maxExecutions: 2`.
+   - If public users enqueue dozens of jobs, queue lag will build up without a queue depth reject threshold.
+   - *Requirement*: Dispatcher should return `HTTP 429 Too Many Requests` or `HTTP 503` if queue depth exceeds a safe buffer (e.g. 5 jobs).
+3. **Spend & Billing Sign-Off**:
+   - Operator sign-off on public pilot ceiling (e.g. ₹100 or ₹200) with an automated spend-alert webhook.
+
+### 12.2 Required Configuration Changes (When Authorized)
+- **Backend**:
+  ```bash
+  az containerapp update \
+    --name praroha-backend \
+    --resource-group rg-tendersaathi \
+    --set-env-vars CINEMATIC_PREVIEW_PUBLIC_ENABLED=true
+  ```
+- **Frontend (Vercel)**:
+  ```bash
+  npx vercel env add VITE_ENABLE_CINEMATIC_PREVIEW production
+  # Value: true
+  npx vercel redeploy
+  ```
+
+### 12.3 Instant Rollback Protocol for Stage 2
+1. **Tier 1 (Instant Public Cut-off — Preserve Operator Access)**:
+   ```bash
+   az containerapp update \
+     --name praroha-backend \
+     --resource-group rg-tendersaathi \
+     --set-env-vars CINEMATIC_PREVIEW_PUBLIC_ENABLED=false
+   ```
+   *Effect*: Public requests instantly receive `HTTP 403 Forbidden`; authorized operator remains capable of diagnosing and verifying.
+2. **Tier 2 (Full Emergency Kill-Switch)**:
+   ```bash
+   az containerapp update \
+     --name praroha-backend \
+     --resource-group rg-tendersaathi \
+     --set-env-vars CINEMATIC_PREVIEW_ENABLED=false CINEMATIC_PREVIEW_PUBLIC_ENABLED=false
+   ```
+   *Effect*: All cinematic dispatch routes immediately return `HTTP 503 Service Unavailable`.
+3. **Tier 3 (Frontend Rollback)**:
+   ```bash
+   npx vercel rollback --yes
+   ```
+   *Effect*: Frontend returns to disabled button state with tooltip.
