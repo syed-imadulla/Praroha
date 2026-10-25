@@ -205,6 +205,7 @@
   "339": "Seed Unfold — Project Rules",
   "340": "Critical Findings Summary",
   "341": "test_storage_factory_supabase_resolution",
+  "342": "test_no_ffmpeg_execution_inside_primary_api",
   "345": "test_phase16_video_generation.cjs",
   "346": "test_phase6_traceability.cjs",
   "347": "Part 16 — Dual Seed Live Execution Trace",

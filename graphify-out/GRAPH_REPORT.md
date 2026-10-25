@@ -1,17 +1,17 @@
-# Graph Report - Praroha  (2026-10-24)
+# Graph Report - Praroha  (2026-10-25)
 
 ## Corpus Check
-- 498 files · ~838,939 words
+- 498 files · ~839,035 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 14 file(s) not represented in the graph (top: (none) 4, .example 2, .zip 2)
 
 ## Summary
-- 5278 nodes · 12133 edges · 349 communities (318 shown, 31 thin omitted)
-- Extraction: 77% EXTRACTED · 23% INFERRED · 0% AMBIGUOUS · INFERRED: 2744 edges (avg confidence: 0.94)
+- 5278 nodes · 12132 edges · 350 communities (319 shown, 31 thin omitted)
+- Extraction: 77% EXTRACTED · 23% INFERRED · 0% AMBIGUOUS · INFERRED: 2743 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8021d7c6`
+- Built from commit: `1e02b825`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -347,6 +347,7 @@
 - Seed Unfold — Project Rules
 - Critical Findings Summary
 - test_storage_factory_supabase_resolution
+- test_no_ffmpeg_execution_inside_primary_api
 - test_phase16_video_generation.cjs
 - test_phase6_traceability.cjs
 - Part 16 — Dual Seed Live Execution Trace
@@ -382,7 +383,7 @@
 ## Import Cycles
 - 3-file cycle: `frontend/src/api/client.ts -> frontend/src/store/authStore.ts -> frontend/src/store/workspaceStore.ts -> frontend/src/api/client.ts`
 
-## Communities (349 total, 31 thin omitted)
+## Communities (350 total, 31 thin omitted)
 
 ### Community 0 - "os"
 Cohesion: 0.04
@@ -1205,8 +1206,8 @@ Cohesion: 0.25
 Nodes (7): 1. Executive Summary, 2.2 Frontend Build & TypeScript Validation, 2.3 End-to-End Browser Automation (Playwright), 2. Test Execution Results, 3. Requirements Traceability Matrix, 4. Next Phase, Phase 10: Divergent Worlds Engine — User Acceptance Testing (UAT) Report
 
 ### Community 215 - "Detailed Stage Gates"
-Cohesion: 0.09
-Nodes (19): test_no_ffmpeg_execution_inside_primary_api(), Acceptance Status, Phase 52: Queue-Based Cinematic Rendering Architecture — UAT & Verification Summary, Phase Goal, User Acceptance Testing (UAT) Verification Ledger, 1. Staged Rollout Sequence, 2. Acceptance & Quality Gates Matrix, 3. Rollback Procedures (+11 more)
+Cohesion: 0.13
+Nodes (14): 1. Staged Rollout Sequence, 2. Acceptance & Quality Gates Matrix, 3. Rollback Procedures, 4. Authoritative Production Runbook, Detailed Stage Gates, Level 1: Instant Client Isolation (T + 1 minute), Level 2: Backend Dispatch Decoupling (T + 5 minutes), Level 3: Azure Worker Scale Suspension & Graceful Drain (T + 10 minutes) (+6 more)
 
 ### Community 216 - "PRAROHA — Project Overview"
 Cohesion: 0.13
@@ -1636,6 +1637,10 @@ Nodes (4): 1. Product Rules, 2. UX Rules, 3. Architecture Rules, Seed Unfold —
 Cohesion: 0.40
 Nodes (4): Critical Findings Summary, Deliverables Generated, Phase 41: Product Alignment & Technical Audit — Summary, Readiness for Milestone 6
 
+### Community 342 - "test_no_ffmpeg_execution_inside_primary_api"
+Cohesion: 0.29
+Nodes (5): test_no_ffmpeg_execution_inside_primary_api(), Acceptance Status, Phase 52: Queue-Based Cinematic Rendering Architecture — UAT & Verification Summary, Phase Goal, User Acceptance Testing (UAT) Verification Ledger
+
 ### Community 345 - "test_phase16_video_generation.cjs"
 Cohesion: 0.67
 Nodes (3): assert, { chromium }, runPhase16E2E()
@@ -1658,7 +1663,7 @@ Nodes (3): Part 5 — AI Provider & Generation Audit, The Critical Model Configu
 
 ## Knowledge Gaps
 - **10 isolated node(s):** `clsx`, `tailwind-merge`, `@types/node`, `@types/react`, `@types/react-dom` (+5 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2506 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2507 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
