@@ -50,7 +50,7 @@ function formatAuthError(errMessage: string): string {
   return errMessage || 'Something went wrong. Please try again.';
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   authStatus: 'AUTH_LOADING',
   user: null,
   session: null,
@@ -59,9 +59,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   isPasswordRecovery: false,
 
   initAuth: async () => {
+    const isGuestRequested =
+      typeof window !== 'undefined' &&
+      (sessionStorage.getItem('praroha_guest_session') === 'true' ||
+        window.location.pathname.startsWith('/projects/demo-canonical-bio-city'));
+
     if (!supabase) {
       console.warn('[Auth] Supabase client not configured.');
-      set({ authStatus: 'UNAUTHENTICATED' });
+      if (isGuestRequested) {
+        get().continueAsGuest();
+      } else {
+        set({ authStatus: 'UNAUTHENTICATED' });
+      }
       return;
     }
 
@@ -78,7 +87,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error('[Auth] Error getting initial session:', error);
-        set({ authStatus: 'UNAUTHENTICATED', user: null, session: null });
+        if (isGuestRequested) {
+          get().continueAsGuest();
+        } else {
+          set({ authStatus: 'UNAUTHENTICATED', user: null, session: null });
+        }
       } else if (session?.user) {
         // Enforce email verification check: if user has unconfirmed email, treat as unauthenticated
         const isEmailConfirmed = Boolean(
@@ -101,7 +114,11 @@ export const useAuthStore = create<AuthState>((set) => ({
           });
         }
       } else {
-        set({ authStatus: 'UNAUTHENTICATED', user: null, session: null });
+        if (isGuestRequested) {
+          get().continueAsGuest();
+        } else {
+          set({ authStatus: 'UNAUTHENTICATED', user: null, session: null });
+        }
       }
 
       // Listen for all auth state changes
@@ -300,6 +317,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (err) {
       console.warn('[Auth] Error during Supabase signOut:', err);
     } finally {
+      if (typeof window !== 'undefined') {
+        try {
+          sessionStorage.removeItem('praroha_guest_session');
+        } catch (e) {
+          // ignore
+        }
+      }
       projectSubscription.disconnectAll();
       useWorkspaceStore.getState().resetWorkspace();
       if (typeof window !== 'undefined' && window.location.pathname !== '/') {
@@ -316,6 +340,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   handleSessionExpired: () => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem('praroha_guest_session');
+      } catch (e) {
+        // ignore
+      }
+    }
     projectSubscription.disconnectAll();
     useWorkspaceStore.getState().resetWorkspace();
     if (typeof window !== 'undefined' && window.location.pathname !== '/') {
@@ -332,6 +363,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   continueAsGuest: () => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('praroha_guest_session', 'true');
+      } catch (e) {
+        // ignore
+      }
+    }
     set({
       authStatus: 'AUTHENTICATED',
       user: {
@@ -346,6 +384,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       sessionExpiredMessage: null,
       isPasswordRecovery: false,
     });
+    // Immediately load the read-only canonical demo universe into the workspace
+    useWorkspaceStore.getState().loadCanonicalDemoUniverse();
   },
 
   clearError: () => set({ error: null }),

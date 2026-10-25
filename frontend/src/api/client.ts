@@ -78,8 +78,10 @@ class ApiClient {
 
       if (!response.ok) {
         if (response.status === 401) {
-          if (useAuthStore.getState().authStatus === 'AUTHENTICATED') {
-            useAuthStore.getState().handleSessionExpired();
+          const authState = useAuthStore.getState();
+          const isGuest = !!authState.user?.user_metadata?.is_guest;
+          if (authState.authStatus === 'AUTHENTICATED' && !isGuest) {
+            authState.handleSessionExpired();
           }
         }
         return {
