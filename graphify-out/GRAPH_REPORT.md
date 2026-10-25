@@ -1,7 +1,7 @@
 # Graph Report - Praroha  (2026-10-25)
 
 ## Corpus Check
-- 498 files · ~839,035 words
+- 498 files · ~839,239 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 14 file(s) not represented in the graph (top: (none) 4, .example 2, .zip 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1e02b825`
+- Built from commit: `6b613996`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
