@@ -87,10 +87,10 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
     - Wired `fps` dynamically into `zoompan` duration (`d=duration * fps`) and framerate (`fps={fps}`), and added `-r {fps}` to output arguments.
     - Updated `cinematic_worker.py` to forward `options["fps"]` into `CinematicPreviewSpec`.
     - Added regression tests in `test_cinematic_preview.py` and `test_cinematic_queue_worker.py` validating 24 and 30 FPS outputs with `ffprobe` and error-free FFmpeg decoding. Full backend suite (332 passed).
-  - *Candidate Worker Image*: Built locally as `tendersaathiacr.azurecr.io/praroha-worker:v7` (ID `sha256:1df95b35a48cda4d77debb607ea0ff8a43ccf51244f9a44a0aa0ad3a11243b06`). Unpushed, undeployed. Production remains on `v6`.
+  - *Candidate Worker Image & Production Deployment*: Worker `v7` with the dynamic 24/30 FPS fix was built (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`), published to ACR (`tendersaathiacr.azurecr.io/praroha-worker:v7`), and deployed to ACA Job `praroha-render-job` on 2026-10-24 following operator authorization. Verified in production with 0 active executions (scale-to-zero active).
 - **Azure Billing Reconciliation**:
-  - Status: **Pending until actual cost data becomes available**. The Azure Consumption API currently returns `pretaxCost: None` and `usageQuantity: None` for the current billing cycle. No projected numbers are reported as measured spend.
-- **Status**: **CANARY EXECUTED & ACCEPTED WITH DOCUMENTED FPS RESOLUTION (Phase Gate D Complete)**.
+  - Status: **Pending until actual cost data becomes available**. The Azure Consumption API currently reports `pretaxCost: None` and `usageQuantity: None` across resources in `rg-tendersaathi`. No projected numbers are reported as measured spend.
+- **Status**: **CANARY EXECUTED & ACCEPTED WITH DOCUMENTED FPS RESOLUTION; WORKER V7 DEPLOYED & VERIFIED**.
 
 #### Stage 5: Isolated Fault Injection & Resilience Testing (Executed & Passed — Phase Gate E)
 *Strict Safety Rule: Must use isolated mock/local test resources only. Never inject faults into production queues, containers, or secrets.*
@@ -119,15 +119,15 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 
 ## 2. Acceptance & Quality Gates Matrix
 
-| Gate ID | Verification Item | Target Standard | Tool / Method |
-| :--- | :--- | :--- | :--- |
-| **QG-01** | **Worker Ingress Audit** | Exactly 0 open network ports; no HTTP ingress listener. | `az containerapp job show` |
-| **QG-02** | **Scale-to-Zero Verification** | 0 active executions when queue is empty; ₹0 idle compute. | Azure Portal / CLI query |
-| **QG-03** | **No FFmpeg in Web API** | Zero video composition code or subprocesses in FastAPI container. | `test_no_ffmpeg_execution_inside_primary_api` |
-| **QG-04** | **Zero Secrets in Payloads** | Messages contain only entity IDs and hashes. | Inspect queue message JSON |
-| **QG-05** | **Honest Labeling Compliance** | Video asset metadata retains `is_synthetic: true` and `provider_label: "Cinematic Preview"`. | Inspect DB `media_assets` |
-| **QG-06** | **End-to-End Latency** | Full queue-to-MP4 playback completed in $< 35$ seconds. | Synthetic canary run timer |
-| **QG-07** | **Budget Verification** | Total pilot expenditure remains strictly $< ₹50.00$ INR. | Azure Cost Management query |
+| Gate ID | Verification Item | Target Standard | Measured Production Value | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **QG-01** | **Worker Ingress Audit** | Exactly 0 open network ports; no HTTP ingress listener. | `properties.configuration.ingress == null` | **PASS** |
+| **QG-02** | **Scale-to-Zero Verification** | 0 active executions when queue is empty; ₹0 idle compute. | Exactly 0 active executions (`az containerapp job execution list`) | **PASS** |
+| **QG-03** | **No FFmpeg in Web API** | Zero video composition code or subprocesses in FastAPI container. | Web API purely dispatches to `render_outbox`; zero FFmpeg invocations | **PASS** |
+| **QG-04** | **Zero Secrets in Payloads** | Messages contain only entity IDs, hashes, and schema metadata. | Canonical queue schema 1.0; credentials strictly isolated | **PASS** |
+| **QG-05** | **Honest Labeling Compliance** | Video asset metadata retains `is_synthetic: true` and `provider_label: "Cinematic Preview"`. | Verified in DB `media_assets` and `generation_jobs` result JSON | **PASS** |
+| **QG-06** | **End-to-End Latency** | Full queue-to-MP4 playback completed in $< 35$ seconds. | Warm render: **2.46s** (PASS); Cold-start from zero: **64.0s** (EXCEEDS target) | **UNRESOLVED / QUALIFIED** |
+| **QG-07** | **Budget Verification** | Total pilot expenditure remains strictly $< ₹50.00$ INR. | Compute estimated at ~₹0.14 INR; Azure Consumption API reports `pretaxCost: None` | **PENDING (Reconciliation)** |
 
 ---
 

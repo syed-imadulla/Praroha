@@ -478,7 +478,7 @@ The next operational gate is:
   2. *Explicit Migration*: Executed via `run_migrations()` with `ALLOW_PRODUCTION_DB_MIGRATIONS=True`. Completed cleanly.
   3. *Migrated DB*: Normal production container startup (`ALLOW_PRODUCTION_DB_MIGRATIONS=False`) connected, validated schema with zero DDL, and `/api/health` returned `HTTP 200 OK`.
   4. *Fail-Closed*: Invalid PostgreSQL URL terminated immediately with code 3.
-- **Strict Boundary**: Candidate `v7.3` is pushed to ACR only. **Not deployed to production.** Production Container App remains on `v6`.
+- **Historical Boundary at Build Time**: At candidate audit time, `v7.3` was pushed to ACR only. (Subsequently authorized, deployed, and verified in Phase Gate B on 2026-10-23; live backend Container App is currently running `v7.3`).
 
 ---
 
