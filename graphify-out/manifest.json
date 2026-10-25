@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "backend/app/config.py": {
-    "mtime": 1792758908.2048705,
-    "seen": 1792759156.6535757,
-    "ast_hash": "beff971af161642321e6a5fe43e3af6c",
+    "mtime": 1792948110.960379,
+    "seen": 1792952036.7604983,
+    "ast_hash": "bc247547f68bc3895debeb254c481755",
     "semantic_hash": ""
   },
   "backend/app/core/response.py": {
@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1792736649.3250575,
-    "seen": 1792737378.2213929,
-    "ast_hash": "ca07732caaa989de10c5144a266e8ca2",
+    "mtime": 1792948195.7776778,
+    "seen": 1792952036.760556,
+    "ast_hash": "683a716219afbe73e44ddbe9879d0e85",
     "semantic_hash": ""
   },
   "backend/app/models/project.py": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/project_repo.py": {
-    "mtime": 1792758932.6076434,
-    "seen": 1792759156.6546197,
-    "ast_hash": "e67d5436141d719c8cebe621894cb410",
+    "mtime": 1792949672.2904377,
+    "seen": 1792952036.7614667,
+    "ast_hash": "b1c6163a3f23f02091d59868e3528b60",
     "semantic_hash": ""
   },
   "backend/app/routers/health.py": {
@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "backend/tests/conftest.py": {
-    "mtime": 1792650867.6445882,
-    "seen": 1792651000.0559747,
-    "ast_hash": "e2b0e27996d6117b5c88f0fda4024758",
+    "mtime": 1792935298.4355037,
+    "seen": 1792952036.7622244,
+    "ast_hash": "abe952eb76ba784512c7e5b9ea07725f",
     "semantic_hash": ""
   },
   "backend/tests/test_health.py": {
@@ -114,14 +114,14 @@
     "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
-    "mtime": 1792915037.468311,
-    "seen": 1792915104.0974948,
+    "mtime": 1792916663.5259843,
+    "seen": 1792952036.7641833,
     "ast_hash": "7bc44e66365c7e2b9721f3ac380cbf07",
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1792913852.528758,
-    "seen": 1792915104.0974965,
+    "mtime": 1792916663.5263987,
+    "seen": 1792952036.7641857,
     "ast_hash": "4707a181e6d8c97c9a3873c20bb992c7",
     "semantic_hash": ""
   },
@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1792913959.7552652,
-    "seen": 1792915104.0987406,
-    "ast_hash": "ee7e5dc6e6cc4e951ff2bfd7f5fc0987",
+    "mtime": 1792951835.6425588,
+    "seen": 1792952036.7656026,
+    "ast_hash": "7c0addf2040d7425db8fdc8cd29fe44f",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   ".planning/STATE.md": {
-    "mtime": 1792910622.0111413,
-    "seen": 1792910665.7371235,
-    "ast_hash": "069f6548b0a9c74184a1d6f718042bc6",
+    "mtime": 1792948653.1418974,
+    "seen": 1792952036.7659438,
+    "ast_hash": "d1aedb23fd2988e83c005854b87768a5",
     "semantic_hash": ""
   },
   ".planning/phases/01-foundation-project-shell/01-01-PLAN.md": {
@@ -1242,9 +1242,9 @@
     "semantic_hash": ""
   },
   "backend/app/providers/media/factory.py": {
-    "mtime": 1792660524.2734292,
-    "seen": 1792661480.1002986,
-    "ast_hash": "379bd91bc1925cb55f34088ddc44d735",
+    "mtime": 1792950144.982498,
+    "seen": 1792952036.7612417,
+    "ast_hash": "e327e5cd5adf7aedf1fea7b74ce1e1bc",
     "semantic_hash": ""
   },
   "backend/app/providers/media/mock.py": {
@@ -1254,15 +1254,15 @@
     "semantic_hash": ""
   },
   "backend/app/routers/media.py": {
-    "mtime": 1792683353.6888738,
-    "seen": 1792687829.493075,
-    "ast_hash": "074ddc554d61bd2fbbe93cbff874401b",
+    "mtime": 1792934900.480608,
+    "seen": 1792952036.7616215,
+    "ast_hash": "f3700457f5cbefef94fa205095fbe2b8",
     "semantic_hash": ""
   },
   "backend/app/services/media_service.py": {
-    "mtime": 1792662211.7915955,
-    "seen": 1792663058.078885,
-    "ast_hash": "507f6724cceaf19b581ace19a3c7e96d",
+    "mtime": 1792949697.5782268,
+    "seen": 1792952036.7620242,
+    "ast_hash": "06ab2b2664a259c3c8c49715a5d7cae2",
     "semantic_hash": ""
   },
   "backend/tests/test_media_provider.py": {
@@ -1278,15 +1278,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/EntityMediaSection.tsx": {
-    "mtime": 1792909689.7608075,
-    "seen": 1792910665.7356212,
-    "ast_hash": "510312f31d0dd00892e00c67e8e418b9",
+    "mtime": 1792951352.4865415,
+    "seen": 1792952036.7642927,
+    "ast_hash": "81577ae016f9e009000868d89f77ac57",
     "semantic_hash": ""
   },
   "frontend/src/components/MediaPreviewCard.tsx": {
-    "mtime": 1792662629.7328503,
-    "seen": 1792663058.0790317,
-    "ast_hash": "8b0888e14c8b21e4fb72b5fedaa43ac2",
+    "mtime": 1792951819.2566938,
+    "seen": 1792952036.764441,
+    "ast_hash": "ed4273def010e7ce0da3c6a727cf85f7",
     "semantic_hash": ""
   },
   "backend/app/providers/media/composite.py": {
@@ -1482,15 +1482,15 @@
     "semantic_hash": ""
   },
   "backend/app/providers/media/composite_audio.py": {
-    "mtime": 1792660984.3306923,
-    "seen": 1792661480.1002903,
-    "ast_hash": "7e1c7f63e55d910153c5c4d84f6c1048",
+    "mtime": 1792950051.1202803,
+    "seen": 1792952036.7611568,
+    "ast_hash": "b23c169290a1972caf0dd65afe1681c3",
     "semantic_hash": ""
   },
   "backend/tests/test_audio_generation.py": {
-    "mtime": 1792660847.0408075,
-    "seen": 1792661480.100372,
-    "ast_hash": "a56b5a2f4ca46c6436b9576af45d96b0",
+    "mtime": 1792950092.9599316,
+    "seen": 1792952036.7622492,
+    "ast_hash": "ec498f5b0cc5b5cee69ae9ef66ed7abc",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase17_audio_atmosphere.cjs": {
@@ -2430,9 +2430,9 @@
     "semantic_hash": ""
   },
   "backend/app/core/auth.py": {
-    "mtime": 1792682352.0395749,
-    "seen": 1792687829.4930027,
-    "ast_hash": "620f874f4c2fed4b1804f6e56ec05d7d",
+    "mtime": 1792927841.1068785,
+    "seen": 1792952036.7605004,
+    "ast_hash": "e58e7d9044d1e3e3f1cdae0643ab5ec2",
     "semantic_hash": ""
   },
   "backend/tests/test_auth_ownership.py": {
@@ -2448,8 +2448,8 @@
     "semantic_hash": ""
   },
   "frontend/src/store/authStore.ts": {
-    "mtime": 1792914651.762658,
-    "seen": 1792915104.0987391,
+    "mtime": 1792916663.5263987,
+    "seen": 1792952036.7656007,
     "ast_hash": "f93b13693f108b873308480e32b8341d",
     "semantic_hash": ""
   },
@@ -2844,9 +2844,9 @@
     "semantic_hash": ""
   },
   "backend/app/services/soundscape_library.py": {
-    "mtime": 1791712019.4314723,
-    "seen": 1791713593.1261573,
-    "ast_hash": "fdb3ab40313a7ae2570bfebc3d8934a1",
+    "mtime": 1792950619.0475874,
+    "seen": 1792952036.7621264,
+    "ast_hash": "12a9d8b284b7d48223148bd45ada13c3",
     "semantic_hash": ""
   },
   "backend/tests/test_soundscape_library.py": {
@@ -3090,9 +3090,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_removed_providers.py": {
-    "mtime": 1792661007.2555063,
-    "seen": 1792661480.1004279,
-    "ast_hash": "379ab3ea836428570e53d03fabb33435",
+    "mtime": 1792950191.5101116,
+    "seen": 1792952036.763024,
+    "ast_hash": "20cfcb4cf0e4e8684a3e57902b2cb820",
     "semantic_hash": ""
   },
   ".planning/phases/45-origin-trail-controlled-regeneration/45-01-SUMMARY.md": {
@@ -3252,15 +3252,15 @@
     "semantic_hash": ""
   },
   "backend/app/services/cinematic_dispatcher.py": {
-    "mtime": 1792748232.8889124,
-    "seen": 1792749138.7041466,
-    "ast_hash": "d4393b7b886e84d4a43792f49fc53d2c",
+    "mtime": 1792935328.891113,
+    "seen": 1792952036.7618196,
+    "ast_hash": "4c93520b5ad0ae0f5e2718624ed4e6ba",
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_production_dispatch.py": {
-    "mtime": 1792733611.4815493,
-    "seen": 1792733931.6627164,
-    "ast_hash": "7350d643787df991f5db2718f6d8ff23",
+    "mtime": 1792927011.8970864,
+    "seen": 1792952036.76237,
+    "ast_hash": "6b6052e8a10b49775e6c114287e73c66",
     "semantic_hash": ""
   },
   ".planning/phases/51-production-dispatch-release-gate/51-01-SUMMARY.md": {
@@ -3318,9 +3318,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/ROLLOUT_TEST_AND_ROLLBACK_PLAN.md": {
-    "mtime": 1792910599.876446,
-    "seen": 1792910665.7430854,
-    "ast_hash": "6f198e0f3f852518ab42fb1da8256521",
+    "mtime": 1792924799.4756413,
+    "seen": 1792952036.772029,
+    "ast_hash": "6605ee06eeaa4621b5a00324ba40ef88",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/queue_message_schema.json": {
@@ -3384,9 +3384,9 @@
     "semantic_hash": ""
   },
   "backend/tests/test_cinematic_queue_dispatch.py": {
-    "mtime": 1792748838.9427495,
-    "seen": 1792749138.7047124,
-    "ast_hash": "f59af149756f66c98f51299da8f4a3e2",
+    "mtime": 1792926990.8333457,
+    "seen": 1792952036.7623715,
+    "ast_hash": "95c4053252f6c033f2b8a74be54b33fa",
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/52-10-SUMMARY.md": {
@@ -3426,9 +3426,9 @@
     "semantic_hash": ""
   },
   ".planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md": {
-    "mtime": 1792910640.0208936,
-    "seen": 1792910665.7430522,
-    "ast_hash": "59a6b179c6f07b491f6c7eb72d7e3302",
+    "mtime": 1792942605.9024339,
+    "seen": 1792952036.7720006,
+    "ast_hash": "f658feca8ecce21d78b19a766b5ee2a5",
     "semantic_hash": ""
   },
   "backend/tests/test_production_database_init.py": {
@@ -3468,27 +3468,87 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase52_cinematic_rehearsal.mjs": {
-    "mtime": 1792914745.7277153,
-    "seen": 1792915104.097241,
+    "mtime": 1792916663.5259843,
+    "seen": 1792952036.7638874,
     "ast_hash": "63d85ff4e1ae87807f7d0f828de87113",
     "semantic_hash": ""
   },
   "frontend/e2e/test_guest_demo_flow.mjs": {
-    "mtime": 1792914985.59803,
-    "seen": 1792915104.0966938,
+    "mtime": 1792916663.5247872,
+    "seen": 1792952036.763332,
     "ast_hash": "a163efbc3f3d93224f51917a9a3458ba",
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase52_live_smoke.mjs": {
-    "mtime": 1792912619.7191408,
-    "seen": 1792915104.0972424,
+    "mtime": 1792916663.5259843,
+    "seen": 1792952036.7638888,
     "ast_hash": "58ea56ad9c97a0cbeb728f0f18f4e6f4",
     "semantic_hash": ""
   },
   "frontend/src/data/canonicalDemoFixture.ts": {
-    "mtime": 1792914836.3020997,
-    "seen": 1792915104.0986116,
+    "mtime": 1792916663.5263987,
+    "seen": 1792952036.765469,
     "ast_hash": "c1217b04c9668ee36be9cac22c5963c3",
+    "semantic_hash": ""
+  },
+  "backend/app/services/cinematic_retention_sweeper.py": {
+    "mtime": 1792948178.1968231,
+    "seen": 1792952036.7618725,
+    "ast_hash": "2c9840939bf295648a436ca93ceea092",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_internal_security_gate.py": {
+    "mtime": 1792927903.5981092,
+    "seen": 1792952036.7623193,
+    "ast_hash": "80d1318a40924b1f3347db12d078132f",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_quotas_and_safeguards.py": {
+    "mtime": 1792935593.2487226,
+    "seen": 1792952036.7623987,
+    "ast_hash": "8f55eb7212e2cae8ba4e1887cb4d5024",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_cinematic_retention_sweeper.py": {
+    "mtime": 1792948252.0342128,
+    "seen": 1792952036.7624328,
+    "ast_hash": "0b52bb0d42b1bbd4ed1a0be881aec7de",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_production_post_promotion_smoke.mjs": {
+    "mtime": 1792918415.6444993,
+    "seen": 1792952036.764034,
+    "ast_hash": "d51acab763e31d175501b729cde974b0",
+    "semantic_hash": ""
+  },
+  ".planning/phases/55-complete-production-readiness-controlled-stage-2-launch/55-AUDIT-FIX.md": {
+    "mtime": 1792948640.1130052,
+    "seen": 1792952036.7720304,
+    "ast_hash": "5e87d655cb75bd99f7aa923624bd2d18",
+    "semantic_hash": ""
+  },
+  ".planning/phases/55-complete-production-readiness-controlled-stage-2-launch/55-CONTEXT.md": {
+    "mtime": 1792948010.090166,
+    "seen": 1792952036.772032,
+    "ast_hash": "04e3c4d3228bcb3a377777cad2baa115",
+    "semantic_hash": ""
+  },
+  ".planning/phases/55-complete-production-readiness-controlled-stage-2-launch/55-PLAN.md": {
+    "mtime": 1792948044.1669004,
+    "seen": 1792952036.772033,
+    "ast_hash": "8a32ff9313428650525c5dfcffc99d91",
+    "semantic_hash": ""
+  },
+  ".planning/phases/55-complete-production-readiness-controlled-stage-2-launch/55-UAT.md": {
+    "mtime": 1792948627.2511115,
+    "seen": 1792952036.7720344,
+    "ast_hash": "4ec6bd01d4896b2f76ae0fba054e92b9",
+    "semantic_hash": ""
+  },
+  "docs/PHASE54_STAGE2_CONTROLLED_RELEASE_RUNBOOK.md": {
+    "mtime": 1792946974.2001865,
+    "seen": 1792952036.7722793,
+    "ast_hash": "27b4466ffc98bee6d39396e5c1f7daa6",
     "semantic_hash": ""
   }
 }
