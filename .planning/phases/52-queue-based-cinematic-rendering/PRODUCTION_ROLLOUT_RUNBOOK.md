@@ -35,9 +35,8 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 - **Both queues:** empty (`cinematic-render-jobs`: 0 messages, drained by worker; `cinematic-render-poison`: 0 messages; confirmed via fresh read-only peek).
 - **Worker compute:** `praroha-render-job` provisioned in `env-praroha-render` with `praroha-worker:v7` (digest `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`, `ingress: null`, scale-to-zero active with 0 running executions).
 - **Canary:** **EXECUTED ONCE** (Job ID `0d9c2349-6eed-4686-b148-5f8f5d84c17f`). Playable 6.0-second H.264 MP4 stored in Supabase Storage (`124,558` bytes, 1280x720).
-- **FPS Acceptance Audit:** First canary output measured 25.0 FPS (150 frames / 6.0s) due to hardcoded FFmpeg filter graph constant in worker v6. Root cause resolved in deployed image `praroha-worker:v7` (`sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`), verified in-container for 24 and 30 FPS.
-- **Canary Latency Reconciliation (QG-06):** **EXPLICITLY UNRESOLVED / PENDING WARM AUDIT**. Active FFmpeg rendering was 2.46s ($< 35$s), but total cold-start scale-from-zero wall time was 64.0s (9s queue wait + 55s container lifecycle).
-- **Azure Billing Reconciliation:** **Pending until actual cost data becomes available**. Consumption API reports `pretaxCost: None` for the current cycle.
+- **Canary Latency Reconciliation (QG-06):** **EXPLICITLY UNRESOLVED / AWAITING OPERATOR SLA ACCEPTANCE**. Original governing criterion: full queue-to-MP4 playback in $< 35$s. Measured cold start: **64.0s** (exceeds 35s target due to cloud container provisioning). Measured warm FFmpeg composition: **2.46s** (passes). Proposed revised two-tier standard: warm render $< 10$s, cold-start $< 75$s. **Policy Status**: Recommendation awaiting explicit operator decision; the original 35s standard is not silently redefined and remains formally unmet for scale-from-zero until authorized.
+- **Azure Billing Reconciliation (QG-07):** **PENDING (Reconciliation)**. Azure Consumption API reports `pretaxCost: None` for the current cycle due to billing ingestion delay. Estimated compute cost is ~₹0.14 INR (55s on 1.0 vCPU / 2.0 GiB RAM), strictly below the $< ₹50.00$ INR budget ceiling; estimates remain strictly distinguished from official billed charges.
 - **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
 - **Next required authorization:** Phase Gate F (Frontend / Backend Feature Flag Enablement — Awaiting Operator Authorization).
 
@@ -583,10 +582,15 @@ Telemetry reconciliation from the single authorized production canary (`0d9c2349
 - **Supabase Storage Upload & DB Finalization**: **~1.5 seconds** (124,558 bytes H.264 MP4 upload and status update).
 - **Container Execution Duration**: **55.0 seconds** (`praroha-render-job-rsjqv` ran from 15:23:40Z to 15:24:35Z, including container boot, Python runtime import, connection setup, asset fetch, composition, upload, queue drain, and clean shutdown).
 - **Total End-to-End Wall-Clock Latency**: **64.0 seconds** (`15:23:31Z` to `15:24:35Z`).
-- **Acceptance Gate Reconciliation**:
-  - *Active Video Rendering*: **2.46 seconds** — **PASSES** the $< 35$s target by an order of magnitude.
-  - *Cold-Start Scale-from-Zero Total Wall Time*: **64.0 seconds** — Exceeds the 35s target due to cold container provisioning in Azure Container Apps.
-  - *Formal Gate Decision*: **EXPLICITLY UNRESOLVED / QUALIFIED**. QG-06 is accepted for warm composition performance, but cold-start latency must be explicitly noted. No false claim of sub-35s cold-start performance is made.
+- **Acceptance Gate Reconciliation & Policy Decision**:
+  - *Original Acceptance Standard*: Full queue-to-MP4 playback completed in $< 35$ seconds.
+  - *Measured Performance*:
+    - Active Video Rendering: **2.46 seconds** (Passes $< 35$s).
+    - Cold-Start Total Wall Time: **64.0 seconds** (Exceeds 35s by 29s due to KEDA scheduling and cold container creation in Azure Container Apps).
+  - *Proposed Revised Two-Tier SLA (Technical Recommendation)*:
+    - Tier 1 (Warm Rendering): $< 10.0$ seconds (Measured: 2.46s — PASS).
+    - Tier 2 (Cold-Start Scale-from-Zero): $< 75.0$ seconds (Measured: 64.0s — PASS).
+  - *Governing Policy Status*: **RECOMMENDATION AWAITING OPERATOR ACCEPTANCE**. The original 35-second criterion is not silently redefined and remains formally **UNMET** for scale-from-zero executions. The proposed 75-second revised SLA is an engineering recommendation that requires explicit operator policy approval prior to Phase Gate F.
 
 ### 9.8 Executed Worker v7 Publication & Deployment (Completed & Verified 2026-10-24)
 Worker v7 was explicitly authorized by the operator, published to ACR, and deployed to Container Apps Job `praroha-render-job`:

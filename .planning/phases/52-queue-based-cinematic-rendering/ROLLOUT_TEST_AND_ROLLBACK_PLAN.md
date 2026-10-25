@@ -126,8 +126,8 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 | **QG-03** | **No FFmpeg in Web API** | Zero video composition code or subprocesses in FastAPI container. | Web API purely dispatches to `render_outbox`; zero FFmpeg invocations | **PASS** |
 | **QG-04** | **Zero Secrets in Payloads** | Messages contain only entity IDs, hashes, and schema metadata. | Canonical queue schema 1.0; credentials strictly isolated | **PASS** |
 | **QG-05** | **Honest Labeling Compliance** | Video asset metadata retains `is_synthetic: true` and `provider_label: "Cinematic Preview"`. | Verified in DB `media_assets` and `generation_jobs` result JSON | **PASS** |
-| **QG-06** | **End-to-End Latency** | Full queue-to-MP4 playback completed in $< 35$ seconds. | Warm render: **2.46s** (PASS); Cold-start from zero: **64.0s** (EXCEEDS target) | **UNRESOLVED / QUALIFIED** |
-| **QG-07** | **Budget Verification** | Total pilot expenditure remains strictly $< ₹50.00$ INR. | Compute estimated at ~₹0.14 INR; Azure Consumption API reports `pretaxCost: None` | **PENDING (Reconciliation)** |
+| **QG-06** | **End-to-End Latency** | **Original Standard**: Full queue-to-MP4 playback completed in $< 35$ seconds.<br>**Proposed Revised SLA**: Two-tier standard (Warm render $< 10$s; Cold-start $< 75$s). | Warm render: **2.46s** (Passes $< 10$s and $< 35$s).<br>Cold start from zero: **64.0s** (Exceeds original 35s standard; meets proposed 75s threshold). | **UNRESOLVED / QUALIFIED**<br>*(Original 35s standard unmet for cold start. Revised 75s SLA is a technical recommendation awaiting explicit operator policy acceptance; not formally approved).* |
+| **QG-07** | **Budget Verification** | Total pilot expenditure remains strictly $< ₹50.00$ INR. | Measured billed charges: `pretaxCost: None` (Azure Consumption API ingestion delay).<br>Engineering compute estimate: ~₹0.14 INR (55s runtime on 1.0 vCPU / 2.0 GiB RAM). | **PENDING (Reconciliation)**<br>*(Estimates kept strictly separate from measured charges; pending invoice posting).* |
 
 ---
 
