@@ -11,6 +11,7 @@ import { useAuthStore } from './store/authStore';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { ProfileSettingsView } from './components/profile/ProfileSettingsView';
 import { OfflineBanner } from './components/OfflineBanner';
+import { CANONICAL_DEMO_PROJECT_ID } from './data/canonicalDemoFixture';
 
 export const App: React.FC = () => {
   const [selectedCreationToast, setSelectedCreationToast] = useState<string | null>(null);
@@ -27,6 +28,7 @@ export const App: React.FC = () => {
     setActiveNav,
     hydrateProject,
     resetWorkspace,
+    loadCanonicalDemoUniverse,
     creations,
     isLoadingCreations,
     creationsError,
@@ -70,10 +72,17 @@ export const App: React.FC = () => {
     const handleRoute = async () => {
       const match = window.location.pathname.match(/^\/projects\/([a-zA-Z0-9-]+)$/);
       if (match) {
+        setActiveNav('home');
         const projectId = match[1];
         if (activeProject?.id !== projectId) {
           setIsHydrating(true);
           try {
+            if (projectId === CANONICAL_DEMO_PROJECT_ID) {
+              await loadCanonicalDemoUniverse();
+              setHydrationError(null);
+              setIsHydrating(false);
+              return;
+            }
             const res = await apiClient.getProjectBundle(projectId);
             if (res.success && res.data) {
               hydrateProject(res.data);
@@ -89,7 +98,10 @@ export const App: React.FC = () => {
           return;
         }
       } else if (window.location.pathname === '/' && activeProject) {
-        resetWorkspace();
+        const isGuest = !!useAuthStore.getState().user?.user_metadata?.is_guest;
+        if (!isGuest || activeProject.id !== CANONICAL_DEMO_PROJECT_ID) {
+          resetWorkspace();
+        }
       }
       setIsHydrating(false);
     };

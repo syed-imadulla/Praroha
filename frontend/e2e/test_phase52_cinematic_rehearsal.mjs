@@ -607,11 +607,14 @@ async function runRehearsal() {
       await pageOff.waitForTimeout(500);
     }
 
-    // Load canonical universe
-    console.log('  Triggering Instant Full Universe demo loader...');
+    // Load canonical universe if not already loaded by guest entry
     const demoBtnOff = pageOff.locator('button:has-text("Instant Full Universe")').first();
-    await demoBtnOff.waitFor({ timeout: 10000 });
-    await demoBtnOff.click();
+    if (await demoBtnOff.isVisible({ timeout: 2000 }).catch(() => false)) {
+      console.log('  Triggering Instant Full Universe demo loader...');
+      await demoBtnOff.click();
+    } else {
+      console.log('  Canonical universe already mounted by guest mode.');
+    }
 
     // Switch to Scenes tab in Universe Codex
     const scenesTabOff = pageOff.locator('#codex-tab-scenes');
@@ -706,11 +709,14 @@ async function runRehearsal() {
       await pageOn.waitForTimeout(500);
     }
 
-    // Load canonical universe
-    console.log('  Triggering Instant Full Universe demo loader...');
+    // Load canonical universe if not already loaded by guest entry
     const demoBtnOn = pageOn.locator('button:has-text("Instant Full Universe")').first();
-    await demoBtnOn.waitFor({ timeout: 10000 });
-    await demoBtnOn.click();
+    if (await demoBtnOn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      console.log('  Triggering Instant Full Universe demo loader...');
+      await demoBtnOn.click();
+    } else {
+      console.log('  Canonical universe already mounted by guest mode.');
+    }
 
     // Switch to Scenes tab in Universe Codex
     const scenesTabOn = pageOn.locator('#codex-tab-scenes');

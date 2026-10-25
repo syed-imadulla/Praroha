@@ -37,6 +37,8 @@ import {
   HumanOnlyZones,
   ProjectBundle,
 } from '../types';
+import { useAuthStore } from './authStore';
+import { CANONICAL_DEMO_BUNDLE } from '../data/canonicalDemoFixture';
 
 export function deriveProjectTitle(seedText: string): string {
   const cleaned = (seedText || '').trim();
@@ -1327,6 +1329,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       loadCanonicalDemoUniverse: async () => {
         try {
           set({ isSyncing: true });
+          const isGuest = !!useAuthStore.getState().user?.user_metadata?.is_guest;
+          if (isGuest) {
+            get().hydrateProject(CANONICAL_DEMO_BUNDLE);
+            set({
+              activeStage: 'unfold',
+              activeCodexTab: 'scenes',
+              seedText: CANONICAL_DEMO_BUNDLE.project.seed_text || 'A child discovers a forgotten city beneath the ocean.',
+              unlockedStages: ['seed', 'understand', 'worlds', 'choose', 'unfold', 'trace', 'refine'],
+              isSyncing: false,
+            });
+            return true;
+          }
+
           const res = await apiClient.createCanonicalDemoProject();
           if (res.success && res.data) {
             const success = await get().switchBranch(res.data.id);
@@ -1340,12 +1355,26 @@ export const useWorkspaceStore = create<WorkspaceState>()(
               return true;
             }
           }
-          set({ isSyncing: false });
-          return false;
+
+          console.warn('[Demo] Remote canonical creation failed; falling back to local demo fixture.');
+          get().hydrateProject(CANONICAL_DEMO_BUNDLE);
+          set({
+            activeStage: 'unfold',
+            activeCodexTab: 'scenes',
+            seedText: CANONICAL_DEMO_BUNDLE.project.seed_text || 'A child discovers a forgotten city beneath the ocean.',
+            unlockedStages: ['seed', 'understand', 'worlds', 'choose', 'unfold', 'trace', 'refine'],
+            isSyncing: false,
+          });
+          return true;
         } catch (err) {
-          console.error('Failed to load canonical demo universe:', err);
-          set({ isSyncing: false });
-          return false;
+          console.error('Failed to load canonical demo universe, falling back to local fixture:', err);
+          get().hydrateProject(CANONICAL_DEMO_BUNDLE);
+          set({
+            activeStage: 'unfold',
+            activeCodexTab: 'scenes',
+            isSyncing: false,
+          });
+          return true;
         }
       },
 
@@ -1555,6 +1584,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       },
 
       fetchCreations: async () => {
+        const isGuest = !!useAuthStore.getState().user?.user_metadata?.is_guest;
+        if (isGuest) {
+          set({
+            creations: [CANONICAL_DEMO_BUNDLE.project],
+            isLoadingCreations: false,
+            creationsError: null,
+          });
+          return;
+        }
         set({ isLoadingCreations: true, creationsError: null });
         try {
           const res = await apiClient.listProjects(false, false);
@@ -1573,6 +1611,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       },
 
       fetchGraveyard: async () => {
+        const isGuest = !!useAuthStore.getState().user?.user_metadata?.is_guest;
+        if (isGuest) {
+          set({
+            graveyard: [],
+            isLoadingGraveyard: false,
+            graveyardError: null,
+          });
+          return;
+        }
         set({ isLoadingGraveyard: true, graveyardError: null });
         try {
           const res = await apiClient.listGraveyardProjects();
