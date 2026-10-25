@@ -89,12 +89,12 @@ class MediaProviderFactory:
 
     @classmethod
     def get_audio_provider(cls) -> AudioProvider:
-        provider_name = os.getenv("AUDIO_PROVIDER", "composite").lower()
+        provider_name = os.getenv("AUDIO_PROVIDER", "procedural").lower()
         if provider_name == "mock":
             return MockAudioProvider()
-        if provider_name in ("rewind", "rewind_music", "pixazo", "pixazo_tracks", "stable_audio", "ace_step"):
+        if provider_name in ("stable_audio", "pixazo", "pixazo_tracks", "rewind", "rewind_music", "ace_step"):
             raise ProviderUnavailableError(
-                f"Audio provider '{provider_name}' has been retired due to unreliability. Use the built-in Procedural Soundscape Composer."
+                f"Audio provider '{provider_name}' has been retired. Please use the built-in Procedural Soundscape Composer."
             )
         return CompositeAudioProvider()
 

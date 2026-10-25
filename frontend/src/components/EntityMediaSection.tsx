@@ -114,7 +114,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
     return found || null;
   }, [assets, activeMediaJobs]);
 
-  const handleGenerate = async (mediaType: MediaType) => {
+  const handleGenerate = async (mediaType: MediaType, forceRegenerate: boolean = false) => {
     await generateMediaAction({
       entity_type: entityType,
       entity_id: entityId,
@@ -125,6 +125,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
       duration_sec: mediaType === 'video' ? 5 : (mediaType === 'audio' ? 15 : undefined),
       mood: mediaType === 'audio' ? selectedAudioMood : undefined,
       context: undefined,
+      force_regenerate: forceRegenerate,
     });
   };
 
@@ -394,7 +395,7 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
                 asset={asset}
                 job={activeJob}
                 isGenerating={isGenerating}
-                onRetry={() => handleGenerate(modality)}
+                onRetry={() => handleGenerate(modality, true)}
                 entityType={entityType}
                 entityTitle={entityTitle}
               />

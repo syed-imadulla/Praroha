@@ -47,19 +47,70 @@ async def test_mock_wav_audio_container_structure():
 
 
 @pytest.mark.asyncio
-async def test_composite_audio_fallback_to_mock():
-    """Verifies CompositeAudioProvider delivers deterministic WAV soundscape in demo/test mode."""
+async def test_composite_audio_procedural_generation():
+    """Verifies CompositeAudioProvider delivers authentic procedural WAV soundscape."""
     composite = CompositeAudioProvider()
     payload = await composite.generate_audio(
         prompt="Ominous sub-bass drone",
         mood="ominous-drone",
         duration_sec=15,
     )
-    assert payload.metadata["resolved_provider"] == "mock"
+    assert payload.metadata["resolved_provider"] == "procedural-soundscape"
     assert payload.metadata["mood"] == "ominous-drone"
     assert payload.mime_type == "audio/wav"
     assert payload.data[:4] == b"RIFF"
     assert payload.data[8:12] == b"WAVE"
+
+
+@pytest.mark.asyncio
+async def test_procedural_soundscape_scene1_the_forbidden_docking():
+    """Validates end-to-end procedural soundscape generation for 'Scene 1: The Forbidden Docking'.
+
+    Verifies:
+    - Built-in composer selects correct atmospheric layers based on scene mood & environment.
+    - WAV container has valid RIFF/WAVE header and 16-bit PCM payload.
+    - Output is playable ambient audio matching requested duration.
+    - Metadata accurately reports resolved_provider and layer synthesis breakdown.
+    """
+    composite = CompositeAudioProvider()
+    payload = await composite.generate_audio(
+        prompt="Scene atmosphere: Scene 1: The Forbidden Docking in Submerged Deep-Water Sub-Bay. Tone: tense-dramatic.",
+        mood="tense-dramatic",
+        duration_sec=15,
+        context={
+            "scene_title": "Scene 1: The Forbidden Docking",
+            "location_setting": "Submerged Deep-Water Sub-Bay",
+            "conflict_narrative": "Unauthorized docking in high-security submersible bay under sensor lockdown",
+        },
+    )
+    assert payload.mime_type == "audio/wav"
+    assert payload.metadata["resolved_provider"] == "procedural-soundscape"
+    assert payload.metadata["provider_label"] == "Procedural Soundscape Composer"
+    assert payload.metadata["mood"] == "tense-dramatic"
+    assert payload.metadata["duration_sec"] == 15.0
+    layer_ids = [l["id"] for l in payload.metadata.get("layers", [])]
+    assert "submerged_dock" in layer_ids
+    assert "tense_pulse" in layer_ids
+
+    data = payload.data
+    assert len(data) > 600_000  # 15s * 22050 samples/sec * 2 bytes/sample + 44 header ~= 661,544 bytes
+    assert data[:4] == b"RIFF"
+    assert data[8:12] == b"WAVE"
+    assert data[12:16] == b"fmt "
+    assert b"data" in data
+
+
+@pytest.mark.asyncio
+async def test_composite_audio_synthesis_failure_handling():
+    """Validates that procedural synthesis errors are wrapped in AudioSynthesisError with clear diagnostics."""
+    from backend.app.providers.media.composite_audio import AudioSynthesisError
+    from backend.app.services.soundscape_library import SoundscapeComposer
+
+    composite = CompositeAudioProvider(mock=None)
+    with patch.object(SoundscapeComposer, "compose_procedural_soundscape", side_effect=RuntimeError("WAV synthesis buffer overflow")):
+        with pytest.raises(AudioSynthesisError) as exc_info:
+            await composite.generate_audio("Corrupted scene", mood="tense-dramatic")
+        assert "Atmospheric soundscape synthesis failed" in str(exc_info.value)
 
 
 @pytest.mark.asyncio
@@ -254,3 +305,51 @@ async def test_audio_api_endpoints():
         assets = entity_res.json()["data"]
         assert len(assets) >= 1
         assert assets[0]["media_type"] == "audio"
+
+
+@pytest.mark.asyncio
+async def test_audio_retry_clears_failed_hash_and_regenerates():
+    """Validates retry semantics: failed jobs have their hash cleared and regenerate cleanly without duplicates."""
+    async with async_session() as session:
+        repo = ProjectRepository(session)
+        service = MediaService(repo)
+
+        proj = await repo.create_project(ProjectCreate(title="Retry Test Universe"))
+        req = MediaGenerationRequest(
+            entity_type="scene",
+            entity_id="scene-docking-retry-1",
+            media_type="audio",
+            prompt="Scene 1: The Forbidden Docking",
+            mood="tense-dramatic",
+            duration_sec=15,
+        )
+
+        # 1. Dispatch initial job and allow background pipeline to complete
+        job1 = await service.dispatch_job(proj.id, req)
+        await asyncio.sleep(0.3)
+
+        # 2. Simulate failure
+        await repo.update_media_asset(job1.job_id, {"status": "failed", "error_message": "Synthesis timeout"})
+        failed_asset = await repo.get_media_asset(job1.job_id)
+        assert failed_asset.status == "failed"
+
+        # 3. Retry with force_regenerate=True
+        retry_req = MediaGenerationRequest(
+            entity_type="scene",
+            entity_id="scene-docking-retry-1",
+            media_type="audio",
+            prompt="Scene 1: The Forbidden Docking",
+            mood="tense-dramatic",
+            duration_sec=15,
+            force_regenerate=True,
+        )
+        retry_job = await service.dispatch_job(proj.id, retry_req)
+        # Old failed job's hash should have been cleared, so new job ID is created
+        assert retry_job.job_id != job1.job_id
+        assert retry_job.status in ("queued", "processing")
+
+        # Process and verify completion
+        completed = await service.process_job_now(retry_job.job_id, retry_req)
+        assert completed.status == "completed"
+        assert completed.asset_url is not None
+

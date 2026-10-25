@@ -141,8 +141,16 @@ class MediaService:
                         asset_url=existing_asset.asset_url,
                         error_message=None,
                     )
+                elif existing_asset.status == "failed":
+                    # Clear request_hash on existing failed asset to allow clean retry
+                    await self.repo.clear_active_media_request_hash(project_id, req_hash)
 
         # 2. Create new MediaAssetRecord with request_hash
+        initial_provider_name = (
+            "procedural-soundscape"
+            if request.media_type == "audio"
+            else self.media_provider.name
+        )
         asset_record = MediaAssetRecord(
             project_id=project_id,
             entity_type=request.entity_type,
@@ -151,7 +159,7 @@ class MediaService:
             status="queued",
             prompt=request.prompt,
             aspect_ratio=request.aspect_ratio or "1:1",
-            provider_name=self.media_provider.name,
+            provider_name=initial_provider_name,
             request_hash=req_hash,
         )
 
@@ -475,7 +483,9 @@ class MediaService:
                 mime_type=payload.mime_type,
             )
 
-            resolved_provider = payload.metadata.get("resolved_provider") or self.media_provider.name
+            resolved_provider = payload.metadata.get("resolved_provider") or (
+                "procedural-soundscape" if request.media_type == "audio" else self.media_provider.name
+            )
             width = payload.metadata.get("width")
             height = payload.metadata.get("height")
             aspect_ratio = payload.metadata.get("aspect_ratio") or effective_aspect_ratio

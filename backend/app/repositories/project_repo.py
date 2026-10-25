@@ -2125,11 +2125,11 @@ class ProjectRepository:
     async def clear_active_media_request_hash(
         self, project_id: str, request_hash: str
     ) -> None:
-        """Clear request_hash on existing active (queued/processing) assets to allow clean force regeneration."""
+        """Clear request_hash on existing active or failed assets to allow clean force regeneration and retries."""
         stmt = text(
             "UPDATE media_assets SET request_hash = NULL "
             "WHERE project_id = :project_id AND request_hash = :request_hash "
-            "AND status IN ('queued', 'processing')"
+            "AND status IN ('queued', 'processing', 'failed')"
         )
         await self.session.execute(stmt, {"project_id": project_id, "request_hash": request_hash})
         await self.session.commit()

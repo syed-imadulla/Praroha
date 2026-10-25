@@ -94,10 +94,13 @@ async def test_video_actions_fail_honestly_in_production():
 
 
 @pytest.mark.asyncio
-async def test_audio_actions_fail_honestly_in_production():
-    """Proves audio generative AI music raises ProviderUnavailableError directing to SoundscapeComposer in production."""
+async def test_audio_actions_succeed_with_procedural_soundscape_in_production():
+    """Proves audio generation in production successfully synthesizes valid WAV using procedural composer."""
     with patch.dict(os.environ, {"ENVIRONMENT": "production"}):
         composite = CompositeAudioProvider()
-        with pytest.raises(ProviderUnavailableError) as exc_info:
-            await composite.generate_audio("ambient drone")
-        assert "Procedural Soundscape Composer" in str(exc_info.value)
+        payload = await composite.generate_audio("ambient drone", mood="serene-ambient", duration_sec=10)
+        assert payload.mime_type == "audio/wav"
+        assert payload.metadata["resolved_provider"] == "procedural-soundscape"
+        assert payload.metadata["provider_label"] == "Procedural Soundscape Composer"
+        assert len(payload.data) > 44
+

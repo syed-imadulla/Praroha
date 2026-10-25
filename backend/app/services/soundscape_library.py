@@ -54,6 +54,34 @@ CURATED_SOUNDSCAPE_LAYERS: List[SoundscapeLayerDef] = [
         description="Deep meditative drone chord with subtle acoustic beating and warm sub-bass.",
         tags=["drone", "ambient", "meditation", "drone"],
     ),
+    SoundscapeLayerDef(
+        id="submerged_dock",
+        name="Submerged Docking Bay",
+        category="water",
+        description="Sub-aquatic low-frequency swell, distant resonant hull creaks, and oceanic pressure textures.",
+        tags=["dock", "docking", "submerged", "underwater", "water", "ocean", "harbor", "port", "bay"],
+    ),
+    SoundscapeLayerDef(
+        id="tense_pulse",
+        name="Suspense Heartbeat & Tension Pulse",
+        category="suspense",
+        description="Subtle rhythmic sub-bass pulse with dark cinematic tension and brooding low tones.",
+        tags=["tense", "dramatic", "suspense", "heartbeat", "pulse", "conflict", "danger", "dark", "forbidden"],
+    ),
+    SoundscapeLayerDef(
+        id="cavern_ambience",
+        name="Subterranean Cavern & Echoes",
+        category="ambience",
+        description="Distant subterranean acoustic echoes, stone resonance, and cavernous air currents.",
+        tags=["cavern", "cave", "subterranean", "underground", "stone", "ruin", "forge"],
+    ),
+    SoundscapeLayerDef(
+        id="cosmic_shimmer",
+        name="Celestial Shimmer & Ethereal Resonance",
+        category="ethereal",
+        description="Airy high-register crystalline pads and ethereal harmonics.",
+        tags=["mystic", "ethereal", "celestial", "shimmer", "stars", "cosmic", "astral", "crystal"],
+    ),
 ]
 
 
@@ -146,6 +174,74 @@ class SoundscapeComposer:
                 samples[i] = v * 0.7
                 lfo += lfo_inc
 
+        elif layer_id == "submerged_dock":
+            # Deep aquatic low-frequency surge with slow tidal LFO (0.07 Hz) and distant resonant creaks
+            state = 0.0
+            lfo_phase = 0.0
+            lfo_inc = 2.0 * math.pi * 0.07 / cls.SAMPLE_RATE
+            for i in range(num_samples):
+                white = random.uniform(-1.0, 1.0)
+                state = 0.96 * state + 0.04 * white  # deep low-pass brown-like noise
+                surge = 0.5 + 0.5 * math.sin(lfo_phase)
+                samples[i] = state * surge * 2.2
+                lfo_phase += lfo_inc
+            # Distant resonant hull creaks every 4.0s
+            creak_interval = int(4.0 * cls.SAMPLE_RATE)
+            for strike in range(0, num_samples, creak_interval):
+                decay_len = min(int(1.8 * cls.SAMPLE_RATE), num_samples - strike)
+                for j in range(decay_len):
+                    t = j / cls.SAMPLE_RATE
+                    decay = math.exp(-2.2 * t)
+                    samples[strike + j] += 0.25 * decay * math.sin(2.0 * math.pi * 174.0 * t)
+
+        elif layer_id == "tense_pulse":
+            # 48 BPM suspense heartbeat pulse (interval = 1.25s) with 65 Hz sub-bass decay over 55 Hz brooding drone
+            pulse_interval = int(1.25 * cls.SAMPLE_RATE)
+            drone_lfo = 0.0
+            drone_lfo_inc = 2.0 * math.pi * 0.15 / cls.SAMPLE_RATE
+            for i in range(num_samples):
+                t = i / cls.SAMPLE_RATE
+                detune = 1.0 + 0.003 * math.sin(drone_lfo)
+                drone = 0.35 * math.sin(2.0 * math.pi * (55.0 * detune) * t)
+                drone += 0.15 * math.sin(2.0 * math.pi * (82.5 * detune) * t)
+                samples[i] = drone
+                drone_lfo += drone_lfo_inc
+            for strike in range(0, num_samples, pulse_interval):
+                pulse_len = min(int(0.6 * cls.SAMPLE_RATE), num_samples - strike)
+                for j in range(pulse_len):
+                    t = j / cls.SAMPLE_RATE
+                    env = math.exp(-7.0 * t)
+                    samples[strike + j] += 0.5 * env * math.sin(2.0 * math.pi * 65.0 * t)
+
+        elif layer_id == "cavern_ambience":
+            # Low cavernous air current with sparse crystalline water drips
+            state = 0.0
+            for i in range(num_samples):
+                white = random.uniform(-1.0, 1.0)
+                state = 0.93 * state + 0.07 * white
+                samples[i] = state * 0.45
+            # Sparse drips every ~2.5s
+            drip_interval = int(2.5 * cls.SAMPLE_RATE)
+            for strike in range(int(0.8 * cls.SAMPLE_RATE), num_samples, drip_interval):
+                drip_len = min(int(0.4 * cls.SAMPLE_RATE), num_samples - strike)
+                for j in range(drip_len):
+                    t = j / cls.SAMPLE_RATE
+                    env = math.exp(-12.0 * t)
+                    samples[strike + j] += 0.2 * env * math.sin(2.0 * math.pi * 1200.0 * t)
+
+        elif layer_id == "cosmic_shimmer":
+            # Ethereal high celestial triad (528 Hz, 660 Hz, 792 Hz) with gentle tremolo
+            lfo = 0.0
+            lfo_inc = 2.0 * math.pi * 0.3 / cls.SAMPLE_RATE
+            for i in range(num_samples):
+                t = i / cls.SAMPLE_RATE
+                tremolo = 0.7 + 0.3 * math.sin(lfo)
+                v = 0.15 * math.sin(2.0 * math.pi * 528.0 * t)
+                v += 0.12 * math.sin(2.0 * math.pi * 660.0 * t)
+                v += 0.08 * math.sin(2.0 * math.pi * 792.0 * t)
+                samples[i] = v * tremolo
+                lfo += lfo_inc
+
         # Fade in/out edges to prevent clicking
         fade_len = int(0.1 * cls.SAMPLE_RATE)
         for i in range(min(fade_len, num_samples)):
@@ -192,3 +288,89 @@ class SoundscapeComposer:
             wf.writeframes(bytes(int_samples))
 
         return wav_buffer.getvalue()
+
+    @classmethod
+    def select_layers_for_scene(
+        cls,
+        mood: str = "ambient",
+        prompt: str = "",
+        context: Optional[Dict[str, Any]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Select matching acoustic layers based on mood, scene description, and environment."""
+        text = f"{mood} {prompt}".lower()
+        if context:
+            ctx_text = f"{context.get('entity_type', '')} {context.get('entity_id', '')} {context.get('location_setting', '')} {context.get('title', '')}".lower()
+            text = f"{text} {ctx_text}"
+
+        scores: Dict[str, float] = {}
+
+        # Thematic keyword mapping
+        if any(w in text for w in ("dock", "docking", "submerged", "underwater", "ocean", "harbor", "port", "bay", "water", "sea")):
+            scores["submerged_dock"] = 0.85
+        if any(w in text for w in ("tense", "dramatic", "suspense", "danger", "conflict", "forbidden", "dark", "heartbeat", "pulse")):
+            scores["tense_pulse"] = 0.80
+        if any(w in text for w in ("rain", "monsoon", "storm", "wet", "downpour")):
+            scores["rain_monsoon"] = 0.75
+        if any(w in text for w in ("wind", "mountain", "alpine", "cliff", "gust", "breeze", "blizzard", "height")):
+            scores["wind_mountain"] = 0.75
+        if any(w in text for w in ("forest", "canopy", "woodland", "trees", "nature", "leaf", "leaves", "jungle")):
+            scores["forest_dawn"] = 0.70
+        if any(w in text for w in ("temple", "bells", "sacred", "bowl", "singing", "spiritual", "shrine", "ritual")):
+            scores["temple_bells"] = 0.70
+        if any(w in text for w in ("cavern", "cave", "subterranean", "underground", "basalt", "grotto", "forge")):
+            scores["cavern_ambience"] = 0.75
+        if any(w in text for w in ("mystic", "ethereal", "celestial", "shimmer", "stars", "cosmic", "astral", "crystal")):
+            scores["cosmic_shimmer"] = 0.70
+        if any(w in text for w in ("drone", "deep", "space", "resonance", "meditation", "ambient")):
+            scores["astral_drone"] = 0.65
+
+        # Mood-based defaults if few keywords matched
+        clean_mood = mood.lower().strip()
+        if clean_mood in ("tense-dramatic", "tense", "dramatic"):
+            scores.setdefault("tense_pulse", 0.80)
+            scores.setdefault("astral_drone", 0.40)
+        elif clean_mood in ("serene-ambient", "serene", "ambient"):
+            scores.setdefault("astral_drone", 0.65)
+            scores.setdefault("forest_dawn", 0.45)
+        elif clean_mood in ("mystic-ethereal", "mystic", "ethereal"):
+            scores.setdefault("cosmic_shimmer", 0.65)
+            scores.setdefault("temple_bells", 0.50)
+        elif clean_mood in ("ominous-drone", "ominous"):
+            scores.setdefault("astral_drone", 0.70)
+            scores.setdefault("cavern_ambience", 0.55)
+        elif clean_mood in ("epic-orchestral", "epic"):
+            scores.setdefault("astral_drone", 0.70)
+            scores.setdefault("tense_pulse", 0.60)
+        else:
+            scores.setdefault("astral_drone", 0.70)
+            scores.setdefault("wind_mountain", 0.40)
+
+        # Sort layers by score descending, take top 2 or 3
+        sorted_layers = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:3]
+        return [{"id": layer_id, "volume": round(weight, 2)} for layer_id, weight in sorted_layers]
+
+    @classmethod
+    def compose_procedural_soundscape(
+        cls,
+        mood: str = "ambient",
+        prompt: str = "",
+        duration_sec: float = 15.0,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[bytes, Dict[str, Any]]:
+        """Procedurally synthesize ambient WAV audio tailored to mood, scene, and duration."""
+        layers = cls.select_layers_for_scene(mood=mood, prompt=prompt, context=context)
+        duration_clamped = max(3.0, min(float(duration_sec), 60.0))
+        wav_bytes = cls.compose_soundscape(layers=layers, duration_sec=duration_clamped)
+
+        metadata = {
+            "resolved_provider": "procedural-soundscape",
+            "provider_label": "Procedural Soundscape Composer",
+            "is_synthetic": True,
+            "is_procedural": True,
+            "mood": mood,
+            "duration_sec": int(duration_clamped),
+            "layers": layers,
+            "license": "CC0 1.0 Universal (Public Domain)",
+            "generator": "PRAROHA Procedural Soundscape Composer",
+        }
+        return wav_bytes, metadata
