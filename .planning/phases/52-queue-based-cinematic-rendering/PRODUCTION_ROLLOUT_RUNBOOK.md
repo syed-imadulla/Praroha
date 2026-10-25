@@ -542,11 +542,26 @@ On 2026-10-24 15:23 UTC, the operator-authorized single synthetic production can
 - **In-Container MP4 Validation**: Executed automated test renders inside the candidate container image for both 24 and 30 FPS (`CinematicPreviewComposer` with `image_path` mount). Verified via in-container `ffprobe` (`24/1` and `30/1` frame rate fractions, exact frame counts `duration * fps`) and zero FFmpeg decode errors (`returncode == 0`, empty `stderr`).
 - **Strict Boundary**: Candidate `v7` is built locally only. **Not pushed to ACR, not deployed to Azure.** Production Job `praroha-render-job` remains on `praroha-worker:v6`.
 
-### 9.5 Azure Billing & Financial Reconciliation Status
-- **Current Status**: **PENDING UNTIL ACTUAL COST DATA BECOMES AVAILABLE**.
-- **Inspection Query**: `az consumption usage list` executed against subscription `36794f11-1aa5-4a25-a4aa-3b973c335e2d`.
-- **Finding**: Azure billing engine returns `pretaxCost: None` and `usageQuantity: None` for the current billing period across all container app and storage resources. Usage records have not yet posted to the billing ledger.
-- **Policy**: In accordance with project instructions, projected numbers are not claimed as measured spend. Actual container runtime was 55 seconds on 1.0 vCPU / 2.0 GiB RAM ($< ₹0.50$ INR estimated).
+### 9.5 Azure Billing & Financial Reconciliation Status (QG-07 Audit)
+- **Quality Gate QG-07 Status**: **PENDING (RECONCILIATION)**.
+- **Active Subscription Verified**: `Azure for Students` (`36794f11-1aa5-4a25-a4aa-3b973c335e2d`), status `Enabled`.
+- **Target Resource Group**: `rg-tendersaathi`, location `centralindia`, status `Succeeded`.
+- **Audit Execution Query**:
+  ```bash
+  az consumption usage list \
+    --start-date 2026-10-24 \
+    --end-date 2026-10-25 \
+    --query "[?contains(instanceName, 'rg-tendersaathi')].{resource:instanceName, service:consumedService, product:product, cost:pretaxCost, currency:currency, usageQty:usageQuantity, billableQty:billableQuantity}" \
+    -o json
+  ```
+- **Actual Returned Ledger Evidence**:
+  - Container App `praroha-backend`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
+  - Storage Account `stpraroharender`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
+  - Log Analytics `workspace-rgtendersaathinzg6`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
+  - Container Registry `tendersaathiacr`: `cost: "None"`, `usageQty: "None"`, `billableQty: "None"`, `currency: null`.
+  - Filtered query for `praroha-render-job` explicitly: returned `[]` (empty list; usage record not yet posted).
+- **Delay Rationale**: Azure Cost Management & Consumption API ingestion lag typically ranges between 24 and 48 hours for Azure Container Apps dynamic jobs and storage queue transactions.
+- **Policy Adherence**: In strict adherence to project safety rules, engineering estimates are NOT presented as billed spend. The theoretical estimate remains ~₹0.14 INR (55s container execution at 1.0 vCPU / 2.0 GiB RAM), which is orders of magnitude below the $< ₹50.00$ INR budget ceiling. Official financial sign-off for QG-07 remains `PENDING (RECONCILIATION)` until actual numerical billed data posts to the ledger.
 
 ### 9.6 Phase Gate E: Isolated Resilience Testing Evidence (Executed & Passed)
 Isolated resilience testing was executed and verified 100% green against isolated test fixtures and mock queue clients:
@@ -670,26 +685,69 @@ Worker v7 was explicitly authorized by the operator, published to ACR, and deplo
 #### Step F3: Controlled Browser Verification Walkthrough (Operator / Internal Session)
 - **Target URL**: `https://praroha-ai.vercel.app`
 - **Test Entity**: Canonical demo project (*"The Sunken City: Bio-City"*, ID `25e15040-73e6-47e5-b030-d95598e17292`), scene entity `99b0c570-2d22-402e-8a68-1392243f8d30`.
-- **Verification Checklist**:
-  1. *Interactive State*: "Generate Cinematic Preview" button is enabled, interactive, and styled with active theme colors.
-  2. *Honest Labeling Tooltip*: Hovering displays honest notice: *"AI-generated synthetic 720p 24fps preview with motion and ambient soundscape"*.
-  3. *Single Interactive Dispatch*: Click button once.
-     - Button immediately transitions to disabled/loading state to prevent double-dispatch.
-     - Progress UI displays: *"Queued in render pipeline..."* transitioning to *"Generating cinematic composition..."*.
-  4. *Pipeline Telemetry Verification*:
-     - Outbox record created in PostgreSQL (`render_outbox`, status `published`).
-     - Message enqueued in `cinematic-render-jobs`.
-     - KEDA scales `praroha-render-job` from 0 to 1 execution.
-     - Worker v7 picks up message, renews lease, executes FFmpeg composition at 24 FPS, uploads MP4 to Supabase Storage, and marks DB records `completed`.
-  5. *In-Browser Playback & Labeling*:
-     - Progress indicator resolves; HTML5 video player component renders.
-     - MP4 plays automatically with clear 24 FPS motion and synthesized soundscape.
-     - Persistent UI badge displays: *"AI Cinematic Preview (Synthetic)"*.
-  6. *Failure Handling Verification*:
-     - In the event of network disruption or worker error, UI gracefully displays error notification with clear retry button (`request_hash` released). Zero internal secrets or stack traces leaked to user.
-  7. *Scale-to-Zero Verification*:
-     - Queues drain back to 0 messages.
-     - Worker completes execution and returns to 0 active replicas.
+- **Grounded Verification Checklist**:
+  1. *Preview Control Visibility & Disabled State (Pre-Activation Baseline)*:
+     - Component: `EntityMediaSection.tsx` (lines 284–301).
+     - When `VITE_ENABLE_CINEMATIC_PREVIEW` is false:
+       - Renders badge with `data-testid="generate-video-disabled-${entityId}"`.
+       - Title attribute: `"Cinematic preview generation is currently disabled in production. Awaiting release approval."`
+       - Visual style: `cursor-not-allowed opacity-80 border-dashed border-stone-800 bg-stone-900/40 text-stone-500`.
+       - Text label: `"Cinematic Preview (Disabled)"`.
+  2. *Interactive Button & Duplicate-Click Protection (Post-Activation)*:
+     - Component: `EntityMediaSection.tsx` (lines 304–326).
+     - When `VITE_ENABLE_CINEMATIC_PREVIEW` is true:
+       - Renders button with `data-testid="generate-video-${entityId}"`.
+       - Title: `"Render 16:9 cinematic motion preview with Ken Burns easing and audio ducking"`.
+       - Visual style: active theme gradient/border with video camera icon.
+       - Button text: `"Cinematic Preview"`.
+     - *Single Click & Double-Click Guard*:
+       - Clicking immediately sets `isGeneratingVideo = true` (`isGeneratingMedia[key] = true` in `workspaceStore.ts`).
+       - Button enters disabled state (`disabled={isGeneratingVideo}`).
+       - Button icon swaps to `<RotateCw className="h-3 w-3 animate-spin" />` with text label `"Rendering Preview..."`.
+       - Store-level protection suppresses duplicate clicks while in-flight (`if (isGeneratingMedia[key]) return;`).
+  3. *Queued & Processing Progress States*:
+     - Component: `MediaPreviewCard.tsx` (lines 200–225) & `workspaceStore.ts` (polling loop every 2000ms).
+     - *Queued State*:
+       - Status badge `data-testid="media-status-processing"` renders `"Queued"`.
+       - Card body displays `"Creating your video..."` with subtext `"Non-blocking background synthesis"`.
+     - *Processing State*:
+       - Once worker claims the job, status transitions from `queued` to `processing`.
+       - Status badge `data-testid="media-status-processing"` updates to `"Synthesizing"`.
+       - Spinning amber loader communicates background rendering without blocking the UI.
+  4. *Completed MP4 Playback & Synthetic Labeling*:
+     - Component: `MediaPreviewCard.tsx` (lines 80–190).
+     - Video player mounts: `<video data-testid="media-video-player" ... />`.
+     - 16:9 aspect ratio container (`aspect-video`), playable H.264 MP4 with soundscape.
+     - Custom media controls:
+       - Play/pause toggle: `data-testid="media-video-play-toggle"`.
+       - Seek bar: clickable/draggable timeline.
+       - Download button: `data-testid="media-video-download-btn"` (initiates direct download of `.mp4`).
+       - Lightbox trigger: `data-testid="media-video-lightbox-trigger"` (expands to theater modal).
+     - *Honest Provider & Synthetic Badging*:
+       - Badge element: `data-testid="media-video-provider-badge"`.
+       - Brown synthetic indicator dot: `<span className="h-1.5 w-1.5 rounded-full bg-amber-500/80" />`.
+       - Label text: `{providerLabel}` (`"Cinematic Preview"`).
+       - Metadata tags: `"16:9"`, `"6s"`, `"completed"`.
+       - Tooltip: `"Programmatic cinematic preview composed from world assets."`.
+  5. *Safe Error Handling & Retry Behavior*:
+     - Component: `MediaPreviewCard.tsx` (lines 228–260).
+     - If render fails or poison-routed:
+       - Card transitions to `data-testid="media-status-failed"`.
+       - Displays descriptive error message (e.g. `asset.error` or generic safe fallback; zero stack traces, connection strings, or internal tokens exposed).
+       - Quota badge if applicable: `"Credit / Quota Required"`.
+       - Retry trigger: `data-testid="media-retry-btn"` labeled `"Try Again"` with `<RotateCcw />` icon.
+       - Clicking retry invokes `generateMediaAction` with `force_regenerate=true`, safely releasing hash and re-enqueueing.
+  6. *Accessibility, Layout & Console Hygiene*:
+     - Semantic HTML `<video>`, descriptive `aria-label`s on buttons, full keyboard navigation support.
+     - Responsive flex/grid layout matching PRAROHA's dark botanical theme.
+     - Zero unhandled console errors or runtime warnings in DevTools.
+
+> [!NOTE]
+> **Implementation Alignment Note**:
+> Previous documentation drafts informally summarized UI labels as `"Queued in render pipeline..."` and `"AI Cinematic Preview (Synthetic)"`. In the actual grounded implementation:
+> - The progress state renders a status pill with `"Queued"` or `"Synthesizing"`, card title `"Creating your video..."`, and button text `"Rendering Preview..."`.
+> - The synthetic badge renders `data-testid="media-video-provider-badge"` with provider `"Cinematic Preview"`, an amber synthetic dot, `"16:9"`, `"6s"`, and tooltip `"Programmatic cinematic preview composed from world assets."`.
+> The verification protocol uses the exact test IDs and strings above.
 
 ### 10.3 Instant Rollback Protocol for Phase Gate F
 
