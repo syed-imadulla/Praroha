@@ -127,6 +127,13 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
         - `praroha-backend` maintained at 0.5 vCPU / 1.0 GiB with `minReplicas: 1` to guarantee zero-cold-start production reliability.
       - Production Boundaries Maintained: `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false` and `VITE_ENABLE_CINEMATIC_PREVIEW=false` strictly preserved. Zero renders dispatched, zero queue messages sent, zero DB mutations.
     - Stage 2 Public Rollout Readiness: **BUDGET RECONCILED & INFRASTRUCTURE VERIFIED; PUBLIC ACCESS REMAINS STRICTLY GATED AWAITING EXPLICIT PUBLIC ROLLOUT AUTHORIZATION**.
+    - Phase 54 Production Hardening, Cost Verification & Controlled Release Preparation (Executed & 100% Verified, 2026-10-25):
+      - Azure Rendering Budget Filter Expansion: Added `/subscriptions/36794f11-1aa5-4a25-a4aa-3b973c335e2d/resourceGroups/rg-tendersaathi/providers/Microsoft.App/managedEnvironments/env-praroha-render` to `praroha-rendering-pilot-budget` alongside `stpraroharender` and `praroha-render-job` (verified via live ARM GET; ₹200.00/mo amount and 80%/100% alerts preserved).
+      - Safe Preview Asset Retention Sweeper: Implemented `CinematicPreviewRetentionSweeper` in `backend/app/services/cinematic_retention_sweeper.py` with 60-day threshold, dry-run by default, active asset preservation (never purges primary preview of non-deleted project), and structured non-sensitive audit logs. Unit tests passed 6/6 in `backend/tests/test_cinematic_retention_sweeper.py`. Live DB dry-run verified preservation of historical canary asset `0d9c2349-6eed-4686-b148-5f8f5d84c17f`.
+      - Public Asset Security Review: Verified project-ownership access checks on dispatch and status polling; documented public Supabase CDN asset delivery model and user transparency notice.
+      - Rendering Reliability & Safeguards: Dedicated cinematic test battery passed (121/121 passed in 16.91s across 12 test suites). Frontend production bundle compiled cleanly (`tsc && vite build` in 12.83s, 33 precache entries).
+      - Controlled Release Runbook: Authored `docs/PHASE54_STAGE2_CONTROLLED_RELEASE_RUNBOOK.md` detailing 6-phase staged rollout and multi-tier rollback procedures.
+      - Public Gate Status: Both `CINEMATIC_PREVIEW_PUBLIC_ENABLED=false` and `VITE_ENABLE_CINEMATIC_PREVIEW=false` strictly preserved. Zero paid production renders dispatched. Zero unpushed commits. Ready for controlled launch authorization.
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
