@@ -109,14 +109,31 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 - **Gate Check**: 100% green on isolated resilience test battery (`pytest backend/tests/test_cinematic_resilience_phase_gate_e.py` — 9 passed in 1.12s); zero mutations to production queues, containers, or secrets.
 - **Status**: **EXECUTED & 100% PASSED (Phase Gate E Complete)**.
 
-#### Stage 6: Frontend / Backend Feature Flag Enablement (Phase Gate F — PREPARED, NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION)
+#### Stage 6: Frontend Release & Feature Gate Management
+
+##### Stage 6A: Production Frontend Hotfix Promotion & Live Smoke Audit (EXECUTED & 100% PASSED — 2026-10-25)
+- **Actions Executed**:
+  1. Promoted pre-verified Vercel Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` directly to production domain alias `https://praroha-ai.vercel.app` via `npx vercel alias set`.
+  2. Verified live production bundle `/assets/index-1DKbSIsW.js` (replaced stale Oct 11 bundle `/assets/index-Bbp0gGL9.js`).
+  3. Ran automated read-only Playwright smoke test battery (`frontend/e2e/test_production_post_promotion_smoke.mjs`) on `https://praroha-ai.vercel.app`.
+- **Verification Results**:
+  - **8/8 checks PASSED** (0 failures).
+  - Guest/demo entry: `The Sunken City: Bio-City` loads cleanly with zero 401 bounces (`sessionStorage.praroha_guest_session` persisted; direct deep routing and clean sign-out verified).
+  - Cinematic control safeguard: renders `Cinematic Preview (Disabled)` with tooltip *"Cinematic preview generation is currently disabled awaiting release approval."*; triggers 0 dispatches.
+  - Zero mutating requests: 29 HTTP requests intercepted, exactly 0 mutating requests (POST/PUT/PATCH/DELETE) attempted or executed.
+- **Backend & Worker Invariants**:
+  - Azure Container App `praroha-backend`: `v7.3` (healthy on `/api/health`).
+  - Azure Container Apps Job `praroha-render-job`: `v7` with 0 active executions (scale-to-zero active).
+  - Storage Queues: `cinematic-render-jobs` (0 messages) and `cinematic-render-poison` (0 messages).
+
+##### Stage 6B: Feature Flag Enablement Gate (Phase Gate F — PREPARED, NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION)
 - **Local Browser Rehearsal & UI Fix (Executed & 100% Passed — Commit `1648e72`)**:
   - *Automated Browser Test Suite*: Implemented and verified in `frontend/e2e/test_phase52_cinematic_rehearsal.mjs` using Playwright across two isolated local Vite instances:
     - Port 5180 (`VITE_ENABLE_CINEMATIC_PREVIEW=false`): verified disabled badge `data-testid="generate-video-disabled-scene-sanctum-001"`, explanatory tooltip, and zero dispatch calls on click attempts.
     - Port 5181 (`VITE_ENABLE_CINEMATIC_PREVIEW=true`): verified interactive button, immediate loading state (`"Rendering Preview..."`), single-click duplicate submission suppression, queued/synthesizing states (`"Creating your video..."` with `"Non-blocking background synthesis"`), HTML5 `<video>` playback with local MP4 fixture, custom controls (play/pause, download, lightbox), honest provider badge (`"Cinematic Preview • 16:9 • 3s"` with programmatic composition tooltip), failure state and sanitized retry CTA on Scene 2 (`scene-abyssal-rift-002`), keyboard accessibility focus, 375px mobile viewport responsiveness, and zero unhandled console exceptions.
   - *UI Implementation Gap Resolved*: Diagnosed and resolved bug in `EntityMediaSection.tsx` where failed cards unmounted due to omitting `activeMediaJobs` from the outer grid display condition. With fix applied, failed cards remain durably mounted with the sanitized error and `"Try Again"` retry CTA.
   - *Zero Cloud Compute*: All Supabase and backend routes were locally intercepted; local test fixture MP4 (`scratch/worker_previews/preview_proj-fps-e2e_scene-fps-24_1792907026.mp4`) provided in-browser video playback; zero cloud compute, zero queue messages, and zero production renders were invoked.
-- **Scope & Controlled Verification Checklist**:
+- **Scope & Controlled Verification Checklist (Upon Separate Authorization)**:
   1. *Backend Activation*: Set `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` Container App via `az containerapp update`.
   2. *Frontend Activation*: Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
   3. *Browser Verification Walkthrough*:
@@ -147,6 +164,7 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 | **QG-05** | **Honest Labeling Compliance** | Video asset metadata retains `is_synthetic: true` and `provider_label: "Cinematic Preview"`. | Verified in DB `media_assets` and `generation_jobs` result JSON | **PASS** |
 | **QG-06** | **End-to-End Latency** | **Original Standard**: Full queue-to-MP4 playback completed in $< 35$ seconds (historical baseline).<br>**Approved Revised SLA**: Two-tier standard (Warm render $< 10$s; Cold-start $< 75$s; accepted by operator). | Warm render: **2.46s** (Passes $< 10$s and $< 35$s).<br>Cold start from zero: **64.0s** (Exceeded original 35s standard; meets approved 75s threshold). | **ACCEPTED BY OPERATOR**<br>*(Revised two-tier SLA approved and met. Historical 35s cold-start target was unmet and remains preserved).* |
 | **QG-07** | **Budget Verification** | Total pilot expenditure remains strictly $< ₹50.00$ INR. | Measured billed charges: `pretaxCost: None` (Azure Consumption API ingestion delay).<br>Engineering compute estimate: ~₹0.14 INR (55s runtime on 1.0 vCPU / 2.0 GiB RAM). | **PENDING (Reconciliation)**<br>*(Estimates kept strictly separate from measured charges; pending invoice posting).* |
+| **QG-FE** | **Frontend Production Promotion** | Live bundle serves guest/demo fix; disabled cinematic control renders; zero mutating requests. | Live bundle `/assets/index-1DKbSIsW.js`; 8/8 smoke checks passed on `https://praroha-ai.vercel.app` (zero 401s; 0 dispatches). | **PASS** |
 
 ---
 
@@ -154,8 +172,18 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 
 If any gate fails or unexpected behavior is detected during rollout, execute the graduated rollback plan:
 
+### Level 0: Frontend Hotfix Rollback (< 1 minute)
+- **Trigger**: Any unexpected regression on the live production frontend domain (`https://praroha-ai.vercel.app`).
+- **Action**: Re-alias the previous deployment (`0216121`):
+  ```bash
+  npx vercel alias set praroha-9u0f7819h-imadullas45-4746s-projects.vercel.app praroha-ai.vercel.app
+  # Alternatively:
+  npx vercel rollback --yes
+  ```
+- **Result**: Production traffic instantly redirects to the prior deployment without rebuilding.
+
 ### Level 1: Instant Client Isolation (T + 1 minute)
-- **Trigger**: Any frontend display bug, unexpected error state, or confusing user feedback.
+- **Trigger**: Any frontend display bug, unexpected error state, or confusing user feedback after feature flag enablement.
 - **Action**: In Vercel Project Settings, set `VITE_ENABLE_CINEMATIC_PREVIEW=false` and trigger instant redeploy.
 - **Result**: The "Cinematic Preview" button immediately returns to its disabled state. No user can trigger new renders.
 

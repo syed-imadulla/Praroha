@@ -43,7 +43,12 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 - **Azure Billing Reconciliation (QG-07):** **PENDING (Reconciliation)**. Azure Consumption API reports `pretaxCost: None` for the current cycle due to billing ingestion delay. Estimated compute cost is ~₹0.14 INR (55s on 1.0 vCPU / 2.0 GiB RAM), strictly below the $< ₹50.00$ INR budget ceiling; estimates remain strictly distinguished from official billed charges.
 - **Phase Gate E (Isolated Resilience Testing):** **EXECUTED & 100% PASSED** (9/9 resilience scenarios passed; 341 passed in full backend suite; zero production mutations).
 - **Local Browser Rehearsal (Pre-Gate F):** **EXECUTED & 100% PASSED (Commit `1648e72`)**. Automated browser test suite (`frontend/e2e/test_phase52_cinematic_rehearsal.mjs`) verified 9/9 scenarios across Flag OFF and Flag ON on isolated local ports (5180 and 5181). Discovered and fixed a UI bug in `EntityMediaSection.tsx` where failed job cards unmounted due to missing `activeMediaJobs` in the container condition. Local fixture video was used for browser playback verification; zero cloud compute, zero queue messages, zero Supabase mutations, and zero production renders were invoked.
-- **Phase Gate F Status:** **PREPARED — NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION**. (Controlled internal enablement and rollback checklist fully prepared in Section 10; feature flags remain disabled in production).
+- **Verified Production Frontend Promotion (2026-10-25):** **EXECUTED & 100% VERIFIED ON LIVE PRODUCTION**. Pre-verified Vercel Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` was promoted directly to production domain `https://praroha-ai.vercel.app` (serving bundle `/assets/index-1DKbSIsW.js`; replaced stale Oct 11 bundle `/assets/index-Bbp0gGL9.js`).
+- **Live Guest/Demo Workspace Flow:** Verified on production without 401 bounce. The canonical universe (`The Sunken City: Bio-City`) hydrates cleanly, `sessionStorage.praroha_guest_session` persists across navigation and deep linking, and sign-out cleans up state.
+- **Disabled Cinematic Control on Production:** Verified in live browser. The control renders `Cinematic Preview (Disabled)` with tooltip *"Cinematic preview generation is currently disabled awaiting release approval."* Exactly 0 render dispatches are issued on click attempts.
+- **Production Smoke Test Suite:** Automated read-only Playwright audit (`frontend/e2e/test_production_post_promotion_smoke.mjs`) passed 8/8 checks with zero mutating backend requests (29 intercepted, 0 aborted mutations).
+- **Backend & Worker Invariants:** Azure Container App `praroha-backend` remains on `v7.3` (`/api/health` 200 OK), ACA Job `praroha-render-job` remains on `v7`, worker executions remain at 0 (scale-to-zero active), and storage queues `cinematic-render-jobs` and `cinematic-render-poison` both have 0 messages.
+- **Strict Separation of Concerns:** **Frontend Hotfix Deployment COMPLETED**; **Cinematic Feature Enablement (Phase Gate F) NOT AUTHORIZED**. Both feature flags (`CINEMATIC_PREVIEW_ENABLED=False`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`) remain strictly disabled. Phase Gate F remains `PREPARED — NOT EXECUTED`.
 
 | Component | Target Resource | Live Audited State | Status |
 | :--- | :--- | :--- | :--- |
@@ -52,8 +57,10 @@ As of the latest verified canary execution (2026-10-24 15:24 UTC):
 | **Queue Secret Binding** | `praroha-backend` secrets store | `QUEUE_PUBLISH_URL` bound securely to `secretref:queue-publish-url`. | **BOUND & VERIFIED** (Phase Gate B Complete) |
 | **ACA Job Provisioning** | `praroha-render-job` (in `env-praroha-render`) | Image: `tendersaathiacr.azurecr.io/praroha-worker:v7`. Digest: `sha256:dac0a52998652cd586551af81747170b7f092ba67404d3eeb80563ac99199996`. Scale-to-zero active (0 active executions). | **DEPLOYED & VERIFIED** |
 | **Azure Queue Depths** | `stpraroharender` | `cinematic-render-jobs`: 0 messages (drained by worker).<br>`cinematic-render-poison`: 0 messages. | Clean queue baseline verified |
+| **Frontend Production App**| `https://praroha-ai.vercel.app` | Deployment: `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb`. Bundle: `/assets/index-1DKbSIsW.js`. Guest demo workspace functional; 401 bounces eliminated. | **PROMOTED & VERIFIED** (Production Hotfix) |
 | **Backend Feature Flag** | `praroha-backend` runtime | `CINEMATIC_PREVIEW_ENABLED=False` (default code setting, unset in env). | Verified disabled |
-| **Frontend Feature Flag** | Production bundle (`dist/`) | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). Local rehearsal verified Flag OFF disabled state & Flag ON interactive behavior. | Verified disabled in production |
+| **Frontend Feature Flag** | Production bundle & Vercel env | `VITE_ENABLE_CINEMATIC_PREVIEW` unset (evaluates to falsy in UI). Render control renders `Cinematic Preview (Disabled)` with 0 dispatches. | Verified disabled in production |
+| **Production Smoke Test** | `https://praroha-ai.vercel.app` | 8/8 passed in `test_production_post_promotion_smoke.mjs`. 0 mutating backend requests attempted. | **100% PASSED** (Post-Promotion Smoke) |
 | **Resilience Battery** | Isolated SQLite / Mock Queues | 9/9 resilience scenarios verified across Scenarios A, B, C, and D. | **100% PASSED** (Phase Gate E Complete) |
 | **Local Browser Rehearsal** | Isolated Playwright / Ports 5180 & 5181 | 9/9 scenarios passed in `test_phase52_cinematic_rehearsal.mjs`. UI fix in `EntityMediaSection.tsx` verified. Zero cloud compute. | **100% PASSED** (Pre-Gate F Rehearsal) |
 | **Test Battery & Build** | Local repo | 341 passed in backend suite; 15/15 passed in cinematic worker regression suite; `npm run build --prefix frontend` clean (0 errors); `git diff --check` clean. | Verified 100% green |
@@ -413,9 +420,28 @@ Phase Gate E has been executed and verified 100% green:
 - **Boundary**: Ran exclusively against isolated temporary SQLite databases and mocked Azure Storage Queue clients (`MockQueueClient`). Zero production queue mutations, zero cloud executions, zero database mutations.
 - **Status**: **EXECUTED & 100% PASSED** (9/9 tests passed in `backend/tests/test_cinematic_resilience_phase_gate_e.py`; 341 passed in full backend suite). Phase Gate E complete.
 
-### 6.5 Next Required Production Approval: Feature Flag Enablement Gate (Phase Gate F)
+### 6.5 Executed Production Approval: Frontend Release Promotion & Verification (Completed & Verified 2026-10-25)
+The promotion of the verified Vercel Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` was explicitly authorized and executed on 2026-10-25:
+
+- **Operation `[PROD-CHANGING]`**: Promote existing Preview deployment `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb` directly to production alias `https://praroha-ai.vercel.app` via `npx vercel alias set`. Zero rebuild, zero code modification.
+- **Target URL**: `https://praroha-ai.vercel.app`
+- **Verified Bundle**: `/assets/index-1DKbSIsW.js` (HTTP 200 OK; replaces stale Oct 11 bundle `/assets/index-Bbp0gGL9.js`).
+- **Live Verification**: Automated read-only Playwright smoke test (`frontend/e2e/test_production_post_promotion_smoke.mjs`) passed 8/8 checks:
+  1. AuthScreen landing: clean render.
+  2. Guest/demo workspace entry: `The Sunken City: Bio-City` loaded with zero 401 bounces.
+  3. Cinematic control safeguard: renders `Cinematic Preview (Disabled)` with tooltip *"Cinematic preview generation is currently disabled awaiting release approval."* Zero dispatches sent.
+  4. Creations & Graveyard views: clean navigation without session loss.
+  5. Deep route entry: `/projects/demo-canonical-bio-city` persists guest state.
+  6. Session storage: `sessionStorage.praroha_guest_session: "true"` verified.
+  7. Sign-out: cleanly clears guest state and routes to login.
+  8. Mutation isolation: 29 requests intercepted, **zero mutating requests attempted or executed**.
+- **Backend & Worker Invariants**: Azure Container App `praroha-backend` remains on `v7.3`, worker job `praroha-render-job` remains on `v7`, worker executions remain at 0, and queues `cinematic-render-jobs` and `cinematic-render-poison` both have 0 messages.
+- **Rollback Option Documented**: `npx vercel alias set praroha-9u0f7819h-imadullas45-4746s-projects.vercel.app praroha-ai.vercel.app` or `npx vercel rollback --yes`.
+- **Current Status**: **FRONTEND PROMOTED & VERIFIED (2026-10-25)**.
+
+### 6.6 Next Required Production Approval: Feature Flag Enablement Gate (Phase Gate F — Strictly Unexecuted)
 The next operational gate is:
-- **Operation**: Enable `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` and `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
+- **Operation**: Enable `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` Container App and `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
 - **Status**: **AWAITING SEPARATE OPERATOR AUTHORIZATION**. Strictly gated. Both feature flags remain disabled.
 
 ---
@@ -820,3 +846,51 @@ Prior to requesting production authorization for Phase Gate F, a full local brow
 
 #### 4. Gate Confirmation
 Phase Gate F remains **`PREPARED — NOT EXECUTED`**. All production settings and feature flags remain strictly disabled.
+
+---
+
+### 10.5 Verified Production Frontend Promotion & Read-Only Smoke Audit (2026-10-25)
+
+Following operator authorization, the pre-verified Vercel Preview deployment was promoted directly to production to remediate the stale frontend bundle and broken guest/demo workspace flow while maintaining strict Phase Gate F feature flag isolation.
+
+#### 1. Promotion Execution
+- **Deployment Promoted**: `dpl_71P97LPcH4Mvksw4mBbZpjj6qmdb`
+- **Preview Source URL**: `https://praroha-15cmnschd-imadullas45-4746s-projects.vercel.app`
+- **Production Alias**: `https://praroha-ai.vercel.app`
+- **Promotion Command**:
+  ```bash
+  npx vercel alias set praroha-15cmnschd-imadullas45-4746s-projects.vercel.app praroha-ai.vercel.app
+  ```
+- **Live Deployed Bundle**: `/assets/index-1DKbSIsW.js` (verified via curl; replaces stale Oct 11 bundle `/assets/index-Bbp0gGL9.js`).
+- **Feature Flag Configuration**: `VITE_ENABLE_CINEMATIC_PREVIEW` unset in Vercel production environment (evaluates to `false`).
+
+#### 2. Live Production Smoke-Test Matrix (`frontend/e2e/test_production_post_promotion_smoke.mjs`)
+| # | Test Scenario | Production Verification | Result |
+|---|---|---|---|
+| 1 | **Initial Auth Landing** | Clean load of `https://praroha-ai.vercel.app` with zero fatal JS errors | **PASS** |
+| 2 | **Guest Demo Workspace Hydration** | Click `"Explore as Guest"`; `The Sunken City: Bio-City` loads; zero 401 bounces | **PASS** |
+| 3 | **Cinematic Control Disabled Safeguard** | Renders `Cinematic Preview (Disabled)` with tooltip *"Cinematic preview generation is currently disabled awaiting release approval."*; 0 dispatches | **PASS** |
+| 4 | **Creations & Graveyard Navigation** | Clean tab navigation without dropping guest session | **PASS** |
+| 5 | **Deep Route Direct Navigation** | Direct load of `/projects/demo-canonical-bio-city` preserves guest state | **PASS** |
+| 6 | **Session Storage Persistence** | `sessionStorage.getItem('praroha_guest_session') === 'true'` verified | **PASS** |
+| 7 | **Clean Sign-Out Flow** | Sign out cleanly flushes `praroha_guest_session` and navigates to AuthScreen | **PASS** |
+| 8 | **Backend Mutation Isolation Audit** | 29 HTTP requests intercepted; exactly 0 mutating requests (POST/PUT/PATCH/DELETE) attempted or executed | **PASS** |
+
+#### 3. Cloud Backend Invariants Verified
+- **Backend Container**: `praroha-backend` running image `tendersaathiacr.azurecr.io/praroha-backend:v7.3`; `/api/health` returns HTTP 200 (`status: "healthy"`).
+- **Worker Job**: `praroha-render-job` running image `tendersaathiacr.azurecr.io/praroha-worker:v7`; scale-to-zero active with **0 running executions**.
+- **Storage Queues**: `cinematic-render-jobs` has **0 messages** (`[]`); `cinematic-render-poison` has **0 messages** (`[]`).
+- **Feature Flags**: Both flags remain strictly disabled: `CINEMATIC_PREVIEW_ENABLED=False`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`.
+- **Quality Gate QG-07**: Status remains strictly `PENDING (RECONCILIATION)` awaiting official billed charges from Azure Consumption API.
+
+#### 4. Documented Rollback Command
+If immediate rollback is required, re-alias the previous deployment (`0216121`):
+```bash
+npx vercel alias set praroha-9u0f7819h-imadullas45-4746s-projects.vercel.app praroha-ai.vercel.app
+# Alternatively:
+npx vercel rollback --yes
+```
+
+#### 5. Authoritative Boundary Statement
+**Frontend hotfix deployment is COMPLETED and VERIFIED.**
+**Phase Gate F (Cinematic Feature Enablement) is NOT AUTHORIZED and remains PREPARED — NOT EXECUTED.**
