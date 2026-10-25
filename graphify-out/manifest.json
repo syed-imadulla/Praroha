@@ -114,15 +114,15 @@
     "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
-    "mtime": 1791651089.6689062,
-    "seen": 1791651967.585651,
-    "ast_hash": "b616e8418242491699a0738dd083ccfc",
+    "mtime": 1792915037.468311,
+    "seen": 1792915104.0974948,
+    "ast_hash": "7bc44e66365c7e2b9721f3ac380cbf07",
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
-    "mtime": 1792677867.9615352,
-    "seen": 1792678669.26796,
-    "ast_hash": "458f20e91de6daa6ef2560b6a97c27b5",
+    "mtime": 1792913852.528758,
+    "seen": 1792915104.0974965,
+    "ast_hash": "4707a181e6d8c97c9a3873c20bb992c7",
     "semantic_hash": ""
   },
   "frontend/src/components/InspectorDrawer.tsx": {
@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/workspaceStore.ts": {
-    "mtime": 1792677895.025319,
-    "seen": 1792678669.268101,
-    "ast_hash": "341ca15afd4484ed63ca5bc27e657381",
+    "mtime": 1792913959.7552652,
+    "seen": 1792915104.0987406,
+    "ast_hash": "ee7e5dc6e6cc4e951ff2bfd7f5fc0987",
     "semantic_hash": ""
   },
   "frontend/src/types/index.ts": {
@@ -2448,9 +2448,9 @@
     "semantic_hash": ""
   },
   "frontend/src/store/authStore.ts": {
-    "mtime": 1791650022.438913,
-    "seen": 1791651967.5857008,
-    "ast_hash": "4884094cb355d667066928df7fc00b7a",
+    "mtime": 1792914651.762658,
+    "seen": 1792915104.0987391,
+    "ast_hash": "f93b13693f108b873308480e32b8341d",
     "semantic_hash": ""
   },
   "frontend/test_phase_31_7_e2e.mjs": {
@@ -3468,9 +3468,27 @@
     "semantic_hash": ""
   },
   "frontend/e2e/test_phase52_cinematic_rehearsal.mjs": {
-    "mtime": 1792909813.4828308,
-    "seen": 1792910665.7352471,
-    "ast_hash": "036ae527b81b9c05a09254290352ad39",
+    "mtime": 1792914745.7277153,
+    "seen": 1792915104.097241,
+    "ast_hash": "63d85ff4e1ae87807f7d0f828de87113",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_guest_demo_flow.mjs": {
+    "mtime": 1792914985.59803,
+    "seen": 1792915104.0966938,
+    "ast_hash": "a163efbc3f3d93224f51917a9a3458ba",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/test_phase52_live_smoke.mjs": {
+    "mtime": 1792912619.7191408,
+    "seen": 1792915104.0972424,
+    "ast_hash": "58ea56ad9c97a0cbeb728f0f18f4e6f4",
+    "semantic_hash": ""
+  },
+  "frontend/src/data/canonicalDemoFixture.ts": {
+    "mtime": 1792914836.3020997,
+    "seen": 1792915104.0986116,
+    "ast_hash": "c1217b04c9668ee36be9cac22c5963c3",
     "semantic_hash": ""
   }
 }
