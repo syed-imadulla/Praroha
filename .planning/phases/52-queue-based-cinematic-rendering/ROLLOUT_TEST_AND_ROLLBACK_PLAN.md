@@ -109,7 +109,7 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 - **Gate Check**: 100% green on isolated resilience test battery (`pytest backend/tests/test_cinematic_resilience_phase_gate_e.py` — 9 passed in 1.12s); zero mutations to production queues, containers, or secrets.
 - **Status**: **EXECUTED & 100% PASSED (Phase Gate E Complete)**.
 
-#### Stage 6: Frontend / Backend Feature Flag Enablement (Phase Gate F — Awaiting Operator Authorization)
+#### Stage 6: Frontend / Backend Feature Flag Enablement (Phase Gate F — PREPARED, NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION)
 - **Scope & Controlled Verification Checklist**:
   1. *Backend Activation*: Set `CINEMATIC_PREVIEW_ENABLED=true` on `praroha-backend` Container App via `az containerapp update`.
   2. *Frontend Activation*: Set `VITE_ENABLE_CINEMATIC_PREVIEW=true` on Vercel frontend.
@@ -126,7 +126,7 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
      - Level 1: `VITE_ENABLE_CINEMATIC_PREVIEW=false` in Vercel (< 1 min).
      - Level 2: `az containerapp update ... --set-env-vars CINEMATIC_PREVIEW_ENABLED=false` (< 2 mins).
      - Level 3: `az containerapp job update ... --trigger-type Manual` (< 3 mins).
-- **Status**: **PREPARED — AWAITING SEPARATE OPERATOR AUTHORIZATION**. Both flags strictly remain **disabled**. Zero customer traffic enabled. For full step-by-step commands, see Section 10 of [PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md).
+- **Status**: **PREPARED — NOT EXECUTED; AWAITING SEPARATE OPERATOR AUTHORIZATION**. Both flags strictly remain **disabled**. Zero customer traffic enabled. For full step-by-step commands, see Section 10 of [PRODUCTION_ROLLOUT_RUNBOOK.md](file:///home/syed-imadulla/Desktop/Praroha/.planning/phases/52-queue-based-cinematic-rendering/PRODUCTION_ROLLOUT_RUNBOOK.md).
 
 ---
 
@@ -139,7 +139,7 @@ To ensure zero downtime, strict security compliance, and budget safety, the queu
 | **QG-03** | **No FFmpeg in Web API** | Zero video composition code or subprocesses in FastAPI container. | Web API purely dispatches to `render_outbox`; zero FFmpeg invocations | **PASS** |
 | **QG-04** | **Zero Secrets in Payloads** | Messages contain only entity IDs, hashes, and schema metadata. | Canonical queue schema 1.0; credentials strictly isolated | **PASS** |
 | **QG-05** | **Honest Labeling Compliance** | Video asset metadata retains `is_synthetic: true` and `provider_label: "Cinematic Preview"`. | Verified in DB `media_assets` and `generation_jobs` result JSON | **PASS** |
-| **QG-06** | **End-to-End Latency** | **Original Standard**: Full queue-to-MP4 playback completed in $< 35$ seconds.<br>**Proposed Revised SLA**: Two-tier standard (Warm render $< 10$s; Cold-start $< 75$s). | Warm render: **2.46s** (Passes $< 10$s and $< 35$s).<br>Cold start from zero: **64.0s** (Exceeds original 35s standard; meets proposed 75s threshold). | **UNRESOLVED / QUALIFIED**<br>*(Original 35s standard unmet for cold start. Revised 75s SLA is a technical recommendation awaiting explicit operator policy acceptance; not formally approved).* |
+| **QG-06** | **End-to-End Latency** | **Original Standard**: Full queue-to-MP4 playback completed in $< 35$ seconds (historical baseline).<br>**Approved Revised SLA**: Two-tier standard (Warm render $< 10$s; Cold-start $< 75$s; accepted by operator). | Warm render: **2.46s** (Passes $< 10$s and $< 35$s).<br>Cold start from zero: **64.0s** (Exceeded original 35s standard; meets approved 75s threshold). | **ACCEPTED BY OPERATOR**<br>*(Revised two-tier SLA approved and met. Historical 35s cold-start target was unmet and remains preserved).* |
 | **QG-07** | **Budget Verification** | Total pilot expenditure remains strictly $< ₹50.00$ INR. | Measured billed charges: `pretaxCost: None` (Azure Consumption API ingestion delay).<br>Engineering compute estimate: ~₹0.14 INR (55s runtime on 1.0 vCPU / 2.0 GiB RAM). | **PENDING (Reconciliation)**<br>*(Estimates kept strictly separate from measured charges; pending invoice posting).* |
 
 ---

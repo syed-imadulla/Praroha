@@ -74,9 +74,9 @@ See: [.planning/PROJECT.md](file:///home/syed-imadulla/Desktop/Praroha/.planning
       - All job parameters preserved: UAMI `uami-praroha-render` (`6ec7ec48-9deb-4518-b530-fbc483a9b0c7`), event-driven queue trigger, 300s timeout, 1.0 vCPU / 2.0 GiB RAM, zero ingress.
       - Post-deployment read-only verification: 0 active executions (scale-to-zero active), queues clean (`cinematic-render-jobs: 0`, `cinematic-render-poison: 0`), completed canary job `0d9c2349-6eed-4686-b148-5f8f5d84c17f` and its MP4 asset (`124,558` bytes, HTTP 200) untouched.
       - Feature flags remain strictly disabled: `CINEMATIC_PREVIEW_ENABLED=False`, `VITE_ENABLE_CINEMATIC_PREVIEW=false`.
-      - Quality Gate QG-06 status: Explicitly unresolved / qualified. Original governing standard: $< 35$s end-to-end; measured cold-start wall time: 64.0s (unmet due to KEDA polling and container initialization); measured warm FFmpeg composition: 2.46s (passes). Proposed revised two-tier SLA: warm render $< 10$s, cold-start $< 75$s (Technical recommendation awaiting operator policy acceptance; original 35s baseline remains in effect until approved).
-      - Azure billing reconciliation: Status remains PENDING until usage charges populate in Azure Consumption API (`pretaxCost: None`). Estimated compute cost is ~₹0.14 INR (55s on 1 vCPU / 2 GiB RAM), kept strictly separate from measured billed charges.
-    - Next Required Action: Phase Gate F (Customer Feature Flag Enablement — Awaiting Operator Authorization).
+      - Quality Gate QG-06 status: **ACCEPTED BY OPERATOR (REVISED TWO-TIER SLA)**. The operator has formally approved and accepted the revised two-tier latency SLA: Warm render $< 10.0$s (measured: **2.46s** — PASS); Cold-start scale-from-zero $< 75.0$s (measured: **64.0s** — PASS). The original under-35-second end-to-end target was not met for cold starts (64.0s vs 35s); this historical result is strictly preserved and not claimed as passed.
+      - Azure billing reconciliation (QG-07): Status remains PENDING until usage charges populate in Azure Consumption API (`pretaxCost: None`). Estimated compute cost is ~₹0.14 INR (55s on 1 vCPU / 2 GiB RAM), kept strictly separate from measured billed charges.
+    - Phase Gate F Status: **PREPARED — NOT EXECUTED; AWAITING SEPARATE AUTHORIZATION**. (Controlled internal rollout and rollback checklist prepared in Section 10 of runbook; production configuration and feature flags remain strictly untouched).
 
 ## Verification Evidence & Quality Gates
 - **Live Cloud Production URLs**:
