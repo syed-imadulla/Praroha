@@ -363,7 +363,10 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
       {availableModalities.some(
         (m) =>
           assets.some((a) => a.media_type === m) ||
-          isGeneratingMedia[`${entityId}_${m}`]
+          isGeneratingMedia[`${entityId}_${m}`] ||
+          Object.values(activeMediaJobs).some(
+            (j) => j.entity_id === entityId && j.media_type === m
+          )
       ) && (
         <div
           className={`grid gap-3 min-w-0 ${
