@@ -326,13 +326,14 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
             }
 
             const isGenerating = !!isGeneratingMedia[`${entityId}_${modality}`];
-            const existingAsset = assets.find((a) => a.media_type === modality);
+            const matchingExisting = assets.filter((a) => a.media_type === modality);
+            const existingAsset = matchingExisting.find((a) => a.status === 'completed') || matchingExisting[0];
 
             return (
               <button
                 key={modality}
                 type="button"
-                onClick={() => handleGenerate(modality)}
+                onClick={() => handleGenerate(modality, Boolean(existingAsset && existingAsset.status === 'failed'))}
                 disabled={isGenerating}
                 data-testid={`generate-${modality}-${entityId}`}
                 className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all min-h-[32px] focus:outline-none focus:ring-1 focus:ring-[#294B3A] ${
@@ -377,7 +378,8 @@ export const EntityMediaSection: React.FC<EntityMediaSectionProps> = ({
           }`}
         >
           {availableModalities.map((modality) => {
-            const asset = assets.find((a) => a.media_type === modality);
+            const matchingAssets = assets.filter((a) => a.media_type === modality);
+            const asset = matchingAssets.find((a) => a.status === 'completed') || matchingAssets[0];
             const isGenerating = !!isGeneratingMedia[`${entityId}_${modality}`];
             // Find active job if any
             const activeJob = Object.values(activeMediaJobs).find(

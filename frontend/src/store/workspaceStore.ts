@@ -1228,24 +1228,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           const res = await apiClient.getMediaAssets(activeProject.id, entityId, mediaType);
           if (res.success && res.data) {
-            set((state) => {
-              const currentList = state.mediaAssets[entityId] || [];
-              const merged = [...currentList];
-              for (const asset of res.data!) {
-                const idx = merged.findIndex(a => a.id === asset.id);
-                if (idx >= 0) {
-                  merged[idx] = asset;
-                } else {
-                  merged.push(asset);
-                }
-              }
-              return {
-                mediaAssets: {
-                  ...state.mediaAssets,
-                  [entityId]: merged,
-                },
-              };
-            });
+            set((state) => ({
+              mediaAssets: {
+                ...state.mediaAssets,
+                [entityId]: res.data || [],
+              },
+            }));
           }
         } catch (err) {
           console.error('Failed to fetch entity media:', err);
