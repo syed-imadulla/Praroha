@@ -1244,9 +1244,18 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         const { activeProject } = get();
         if (!activeProject) return null;
         const key = `${req.entity_id}_${req.media_type}`;
-        set((state) => ({
-          isGeneratingMedia: { ...state.isGeneratingMedia, [key]: true },
-        }));
+        set((state) => {
+          const nextJobs = { ...state.activeMediaJobs };
+          for (const [id, j] of Object.entries(nextJobs)) {
+            if (j.entity_id === req.entity_id && j.media_type === req.media_type && j.status === 'failed') {
+              delete nextJobs[id];
+            }
+          }
+          return {
+            activeMediaJobs: nextJobs,
+            isGeneratingMedia: { ...state.isGeneratingMedia, [key]: true },
+          };
+        });
 
         try {
           const res = req.media_type === 'video'

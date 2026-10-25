@@ -745,15 +745,22 @@ export const MediaPreviewCard: React.FC<MediaPreviewCardProps> = ({
   const [isVideoLightboxOpen, setIsVideoLightboxOpen] = useState(false);
   const assetUrl = job?.asset_url || asset?.asset_url;
   
-  const isCurrentlyFailed = job?.status === 'failed' || asset?.status === 'failed';
-  const hasRealAsset = Boolean(!isCurrentlyFailed && assetUrl && (asset?.status === 'completed' || job?.status === 'completed'));
-  
-  const status = isCurrentlyFailed
-    ? 'failed'
+  const isGeneratingOrProcessing = Boolean(
+    isGenerating || job?.status === 'processing' || job?.status === 'queued'
+  );
+  const hasRealAsset = Boolean(
+    !isGeneratingOrProcessing && assetUrl && (asset?.status === 'completed' || job?.status === 'completed')
+  );
+  const isCurrentlyFailed = Boolean(
+    !hasRealAsset && !isGeneratingOrProcessing && (job?.status === 'failed' || asset?.status === 'failed')
+  );
+
+  const status = isGeneratingOrProcessing
+    ? (job?.status || 'processing')
     : hasRealAsset
     ? 'completed'
-    : (isGenerating || job?.status === 'processing' || job?.status === 'queued')
-    ? (job?.status || 'processing')
+    : isCurrentlyFailed
+    ? 'failed'
     : 'idle';
 
   const activeAsset: MediaAsset | undefined =
